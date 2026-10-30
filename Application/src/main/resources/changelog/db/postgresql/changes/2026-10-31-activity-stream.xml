@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-31-postgresql-table-activity-stream-entry" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="activity_stream_entry"/>
+            </not>
+        </preConditions>
+        <createTable tableName="activity_stream_entry">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="resource_type" type="VARCHAR(40)">
+                <constraints nullable="false" />
+            </column>
+            <column name="resource_id" type="VARCHAR(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="action" type="VARCHAR(80)">
+                <constraints nullable="false" />
+            </column>
+            <column name="reason" type="VARCHAR(500)" />
+            <column name="department_id" type="BIGINT" />
+            <column name="user_id" type="BIGINT" />
+            <column name="username" type="VARCHAR(255)" />
+            <column name="channel" type="VARCHAR(20)">
+                <constraints nullable="false" />
+            </column>
+            <column name="request_method" type="VARCHAR(10)" />
+            <column name="request_path" type="VARCHAR(500)" />
+            <column name="occurred_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <createIndex tableName="activity_stream_entry" indexName="idx_activity_stream_entry_resource">
+            <column name="operator_id"/>
+            <column name="resource_type"/>
+            <column name="resource_id"/>
+            <column name="occurred_at"/>
+        </createIndex>
+        <createIndex tableName="activity_stream_entry" indexName="idx_activity_stream_entry_operator_occurred_at">
+            <column name="operator_id"/>
+            <column name="occurred_at"/>
+        </createIndex>
+        <createIndex tableName="activity_stream_entry" indexName="idx_activity_stream_entry_user">
+            <column name="operator_id"/>
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2026-10-31-postgresql-table-activity-stream-change" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="activity_stream_change"/>
+            </not>
+        </preConditions>
+        <createTable tableName="activity_stream_change">
+            <column name="activity_stream_entry_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_activity_stream_change_entry"
+                             references="activity_stream_entry(id)" deleteCascade="true" />
+            </column>
+            <column name="position" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="field" type="VARCHAR(120)">
+                <constraints nullable="false" />
+            </column>
+            <column name="previous_value" type="VARCHAR(1000)" />
+            <column name="current_value" type="VARCHAR(1000)" />
+        </createTable>
+        <addPrimaryKey tableName="activity_stream_change" columnNames="activity_stream_entry_id, position"
+                       constraintName="pk_activity_stream_change" />
+    </changeSet>
+</databaseChangeLog>
