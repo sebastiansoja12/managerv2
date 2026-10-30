@@ -577,7 +577,8 @@ public class Shipment {
 
     public void notifyShipmentAccepted() {
         ensureCanBeModified();
-        if (!ShipmentStatus.SENT.equals(this.shipmentStatus)) {
+        if (!ShipmentStatus.SENT.equals(this.shipmentStatus)
+                && !ShipmentStatus.COLLECTED.equals(this.shipmentStatus)) {
             throw new ShipmentModificationException("Shipment cannot be accepted from status " + shipmentStatus);
         }
         this.shipmentStatus = ShipmentStatus.ACCEPTED;
@@ -606,6 +607,7 @@ public class Shipment {
         ensureShipmentIsNotDelivered();
         if (!ShipmentStatus.CREATED.equals(this.shipmentStatus)
                 && !ShipmentStatus.PREPARED.equals(this.shipmentStatus)
+                && !ShipmentStatus.COLLECTED.equals(this.shipmentStatus)
                 && !ShipmentStatus.ACCEPTED.equals(this.shipmentStatus)) {
             throw new ShipmentModificationException("Shipment cannot be loaded on pallet from status " + shipmentStatus);
         }
@@ -623,8 +625,21 @@ public class Shipment {
         return true;
     }
 
+    public void unloadFromPallet() {
+        if (ShipmentStatus.ACCEPTED.equals(this.shipmentStatus)) {
+            return;
+        }
+        if (!ShipmentStatus.SENT.equals(this.shipmentStatus)) {
+            throw new ShipmentModificationException("Shipment cannot be unloaded from pallet in status "
+                    + shipmentStatus);
+        }
+        this.shipmentStatus = ShipmentStatus.ACCEPTED;
+        markAsModified();
+    }
+
     public void ensureCanBeHandedOver() {
         if (!ShipmentStatus.SENT.equals(this.shipmentStatus)
+                && !ShipmentStatus.COLLECTED.equals(this.shipmentStatus)
                 && !ShipmentStatus.ACCEPTED.equals(this.shipmentStatus)
                 && !ShipmentStatus.REROUTE.equals(this.shipmentStatus)
                 && !ShipmentStatus.REDIRECT.equals(this.shipmentStatus)) {
@@ -633,10 +648,10 @@ public class Shipment {
     }
 
     public void notifyShipmentCollected() {
-        if (!ShipmentStatus.CREATED.equals(this.shipmentStatus) && !ShipmentStatus.PREPARED.equals(this.shipmentStatus)) {
+        if (ShipmentStatus.DELIVERY.equals(this.shipmentStatus) || ShipmentStatus.RETURN.equals(this.shipmentStatus)) {
             throw new ShipmentModificationException("Shipment cannot be collected from status " + shipmentStatus);
         }
-        this.shipmentStatus = ShipmentStatus.SENT;
+        this.shipmentStatus = ShipmentStatus.COLLECTED;
         markAsModified();
     }
 

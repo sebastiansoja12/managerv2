@@ -253,6 +253,24 @@ class ShipmentTest {
     }
 
     @Test
+    void shouldMarkSentShipmentAsAcceptedWhenUnloadedFromPallet() {
+        final Shipment shipment = shipment(null);
+        shipment.notifyShipmentLoadedOnPallet();
+
+        shipment.unloadFromPallet();
+        shipment.unloadFromPallet();
+
+        assertEquals(ShipmentStatus.ACCEPTED, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldRejectUnloadingFromPalletOfShipmentThatIsNotSent() {
+        final Shipment shipment = shipment(null);
+
+        assertThrows(ShipmentModificationException.class, shipment::unloadFromPallet);
+    }
+
+    @Test
     void shouldRevertPalletLoadingToConfiguredDefaultStatus() {
         final Shipment shipment = shipment(null);
         shipment.notifyShipmentLoadedOnPallet();
@@ -297,22 +315,54 @@ class ShipmentTest {
     }
 
     @Test
-    void shouldMarkCreatedShipmentAsSentWhenCollectedFromClient() {
+    void shouldMarkCreatedShipmentAsCollectedWhenCollectedFromClient() {
         final Shipment shipment = shipment(null);
 
         shipment.notifyShipmentCollected();
 
-        assertEquals(ShipmentStatus.SENT, shipment.getShipmentStatus());
+        assertEquals(ShipmentStatus.COLLECTED, shipment.getShipmentStatus());
     }
 
     @Test
-    void shouldMarkPreparedShipmentAsSentWhenCollectedFromClient() {
+    void shouldMarkPreparedShipmentAsCollectedWhenCollectedFromClient() {
         final Shipment shipment = shipment(null);
         shipment.changeShipmentStatus(ShipmentStatus.PREPARED);
 
         shipment.notifyShipmentCollected();
 
+        assertEquals(ShipmentStatus.COLLECTED, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldAcceptCollectedShipmentInDepartment() {
+        final Shipment shipment = shipment(null);
+        shipment.notifyShipmentCollected();
+
+        shipment.notifyShipmentAccepted();
+
+        assertEquals(ShipmentStatus.ACCEPTED, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldLoadCollectedShipmentOnPallet() {
+        final Shipment shipment = shipment(null);
+        shipment.notifyShipmentCollected();
+
+        assertTrue(shipment.notifyShipmentLoadedOnPallet());
         assertEquals(ShipmentStatus.SENT, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldRejectCollectingShipmentTwice() {
+        final Shipment shipment = shipment(null);
+        shipment.notifyShipmentCollected();
+
+        final ShipmentModificationException exception = assertThrows(
+                ShipmentModificationException.class,
+                shipment::notifyShipmentCollected
+        );
+
+        assertEquals("Shipment cannot be collected from status COLLECTED", exception.getMessage());
     }
 
     @Test
