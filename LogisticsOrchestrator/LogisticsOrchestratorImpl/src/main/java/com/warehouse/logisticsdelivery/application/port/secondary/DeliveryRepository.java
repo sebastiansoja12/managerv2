@@ -32,5 +32,13 @@ public interface DeliveryRepository {
 
     List<Delivery> findReplacedBy(final DeliveryId replacingDeliveryId);
 
+    long countCreatedForDestinationBetween(final DepartmentId departmentId,
+                                           final LocalDateTime createdFromInclusive,
+                                           final LocalDateTime createdToExclusive);
+
+    long countActiveByDepartment(final DepartmentId departmentId);
+
+    List<Delivery> findActiveByDepartment(final DepartmentId departmentId);
+
     void createOrUpdate(final Delivery delivery);
 }
