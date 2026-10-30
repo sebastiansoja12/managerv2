@@ -52,6 +52,7 @@
         <module>PalletManagement</module>
         <module>DepartmentMap</module>
         <module>McpServer</module>
+        <module>AuditLog</module>
     </modules>
 
 	<properties>
