@@ -11,12 +11,14 @@ public record ShipmentDetailsDto(ShipmentId shipmentId,
                                  BigDecimal weightInKilograms,
                                  String trackingNumber,
                                  String recipientCity,
-                                 String recipientPostalCode) {
+                                 String recipientPostalCode,
+                                 String recipientStreet,
+                                 String recipientCountryCode) {
 
     public ShipmentDetailsDto(final ShipmentId shipmentId,
                               final ShipmentStatus status,
                               final ShipmentId relatedShipmentId,
                               final BigDecimal weightInKilograms) {
-        this(shipmentId, status, relatedShipmentId, weightInKilograms, null, null, null);
+        this(shipmentId, status, relatedShipmentId, weightInKilograms, null, null, null, null, null);
     }
 }
