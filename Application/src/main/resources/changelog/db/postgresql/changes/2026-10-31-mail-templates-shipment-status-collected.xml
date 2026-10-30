@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-31-mail-templates-shipment-status-collected-sender" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM mail_templates WHERE template_key = 'shipment.status.collected.sender'</sqlCheck>
+        </preConditions>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="b3c2e215-75b1-48d7-a413-5817e5580c59"/>
+            <column name="template_key" value="shipment.status.collected.sender"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Kurier odebrał przesyłkę {{trackingNumber}}"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+Kurier odebrał od Ciebie przesyłkę. Wkrótce trafi do oddziału nadawczego.
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="af124fde-ea66-4606-9b78-1d571bbd7789"/>
+            <column name="template_key" value="shipment.status.collected.sender"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="The courier has collected shipment {{trackingNumber}}"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+The courier has collected your shipment. It will soon reach the dispatch branch.
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="aacb1101-fe1d-46d9-b3e6-f702bfa715a0"/>
+            <column name="template_key" value="shipment.status.collected.sender"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Der Kurier hat die Sendung {{trackingNumber}} abgeholt"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+Der Kurier hat Ihre Sendung abgeholt. Sie wird in Kürze die Versandfiliale erreichen.
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+    <changeSet id="2026-10-31-mail-templates-shipment-status-collected-recipient" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM mail_templates WHERE template_key = 'shipment.status.collected.recipient'</sqlCheck>
+        </preConditions>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="79c62938-6a4b-44d4-9435-a2fe15af936d"/>
+            <column name="template_key" value="shipment.status.collected.recipient"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Przesyłka {{trackingNumber}} została odebrana od nadawcy"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+Kurier odebrał przesyłkę od nadawcy{{#senderFirstName}} ({{senderFirstName}} {{senderLastName}}){{/senderFirstName}}. Poinformujemy Cię o kolejnych etapach doręczenia.
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="0b3a9cab-16cf-442c-9529-1f8bd18cb4af"/>
+            <column name="template_key" value="shipment.status.collected.recipient"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Shipment {{trackingNumber}} has been collected from the sender"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+The courier has collected the shipment from the sender{{#senderFirstName}} ({{senderFirstName}} {{senderLastName}}){{/senderFirstName}}. We will keep you informed about the next delivery steps.
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="4ac74f48-94ef-42ee-aae5-4970f07e0fa9"/>
+            <column name="template_key" value="shipment.status.collected.recipient"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Die Sendung {{trackingNumber}} wurde beim Absender abgeholt"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+Der Kurier hat die Sendung beim Absender abgeholt{{#senderFirstName}} ({{senderFirstName}} {{senderLastName}}){{/senderFirstName}}. Wir informieren Sie über die nächsten Zustellschritte.
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
