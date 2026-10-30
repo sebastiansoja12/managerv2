@@ -8,4 +8,10 @@ public class ShipmentRecipientChanged extends ShipmentChanged implements Shipmen
     public ShipmentRecipientChanged(final ShipmentSnapshot snapshot, final Instant timestamp) {
         super(snapshot, timestamp);
     }
+
+    public ShipmentRecipientChanged(final ShipmentSnapshot previousSnapshot,
+                                    final ShipmentSnapshot snapshot,
+                                    final Instant timestamp) {
+        super(previousSnapshot, snapshot, timestamp);
+    }
 }
