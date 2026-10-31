@@ -1,7 +1,9 @@
 package com.warehouse.logistics.application.port.primary;
 
 import com.warehouse.logistics.application.port.primary.command.PalletScanCommand;
+import com.warehouse.logistics.application.port.primary.command.PalletUnloadCommand;
 import com.warehouse.logistics.application.port.primary.result.PalletScanOutcome;
+import com.warehouse.logistics.application.port.primary.result.PalletUnloadOutcome;
 import com.warehouse.logistics.application.port.secondary.PalletScanServicePort;
 
 
@@ -16,5 +18,10 @@ public class PalletScanPortImpl implements PalletScanPort {
     @Override
     public PalletScanOutcome scan(final PalletScanCommand command) {
         return this.palletScanServicePort.scan(command);
+    }
+
+    @Override
+    public PalletUnloadOutcome unload(final PalletUnloadCommand command) {
+        return this.palletScanServicePort.unload(command);
     }
 }
