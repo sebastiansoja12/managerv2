@@ -46,6 +46,18 @@ public class ShipmentServiceAdapter implements ShipmentServicePort {
     }
 
     @Override
+    public ShipmentLoadResult unloadFromPallet(final ShipmentId shipmentId) {
+        try {
+            final ShipmentDetailsDto shipment = this.shipmentApiService.unloadShipmentFromPallet(shipmentId);
+            return ShipmentLoadResult.loaded(shipmentId, shipment.status().name());
+        } catch (final RuntimeException exception) {
+            log.warn("Shipment {} could not be unloaded from pallet: {}", shipmentId.getValue(),
+                    exception.getMessage());
+            return ShipmentLoadResult.failed(shipmentId, exception.getMessage());
+        }
+    }
+
+    @Override
     public Optional<PalletDocumentShipment> describeShipment(final ShipmentId shipmentId) {
         try {
             return Optional.ofNullable(this.shipmentApiService.getShipment(shipmentId))

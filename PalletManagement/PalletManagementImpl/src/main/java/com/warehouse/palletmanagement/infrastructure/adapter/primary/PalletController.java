@@ -27,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.palletmanagement.infrastructure.adapter.primary.dto.PalletDepartmentsRequestApi;
 import com.warehouse.palletmanagement.infrastructure.adapter.primary.dto.PalletShipmentsRequestApi;
+import com.warehouse.palletmanagement.infrastructure.adapter.primary.dto.PalletUnloadRequestApi;
 import com.warehouse.palletmanagement.infrastructure.adapter.primary.dto.PalletHistoryEntryResponseApi;
 import com.warehouse.palletmanagement.infrastructure.adapter.primary.dto.PalletMaxWeightRequestApi;
 import java.util.List;
@@ -102,6 +103,14 @@ public class PalletController {
     @PutMapping("/{palletId}/revert-loading")
     public ResponseEntity<PalletResponseApi> revertLoading(@PathVariable final String palletId) {
         final PalletDetails pallet = this.palletScanPort.revertLoading(new PalletId(palletId));
+        return ResponseEntity.ok(this.palletResponseMapper.map(pallet));
+    }
+
+    @PutMapping("/{palletId}/unload")
+    public ResponseEntity<PalletResponseApi> unload(@PathVariable final String palletId,
+                                                    @RequestBody(required = false) final PalletUnloadRequestApi request) {
+        final PalletDetails pallet = this.palletScanPort.unload(
+                this.palletRequestMapper.map(new PalletId(palletId), request));
         return ResponseEntity.ok(this.palletResponseMapper.map(pallet));
     }
 

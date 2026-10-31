@@ -3,6 +3,8 @@ package com.warehouse.palletmanagement.infrastructure.adapter.primary;
 import com.warehouse.palletmanagement.api.PalletApiService;
 import com.warehouse.palletmanagement.api.dto.PalletScanRequestDto;
 import com.warehouse.palletmanagement.api.dto.PalletScanResponseDto;
+import com.warehouse.palletmanagement.api.dto.PalletUnloadRequestDto;
+import com.warehouse.palletmanagement.api.dto.PalletUnloadResponseDto;
 import com.warehouse.palletmanagement.application.port.primary.PalletScanPort;
 import com.warehouse.palletmanagement.domain.exception.PalletRequestRejectedException;
 import com.warehouse.palletmanagement.domain.exception.PalletServiceUnavailableException;
@@ -38,6 +40,23 @@ public class PalletApiServiceAdapter implements PalletApiService {
                     exception.getMessage());
         } catch (final IllegalArgumentException exception) {
             return this.palletResponseMapper.failure(palletScanRequest.trackingNumber(), INVALID_REQUEST,
+                    exception.getMessage());
+        }
+    }
+
+    @Override
+    public PalletUnloadResponseDto unload(final PalletUnloadRequestDto palletUnloadRequest) {
+        try {
+            return this.palletResponseMapper.map(
+                    this.palletScanPort.unloadScanned(this.palletRequestMapper.map(palletUnloadRequest)));
+        } catch (final PalletRequestRejectedException exception) {
+            return this.palletResponseMapper.unloadFailure(palletUnloadRequest.trackingNumber(), exception.getCode(),
+                    exception.getMessage());
+        } catch (final PalletServiceUnavailableException exception) {
+            return this.palletResponseMapper.unloadFailure(palletUnloadRequest.trackingNumber(), exception.getCode(),
+                    exception.getMessage());
+        } catch (final IllegalArgumentException exception) {
+            return this.palletResponseMapper.unloadFailure(palletUnloadRequest.trackingNumber(), INVALID_REQUEST,
                     exception.getMessage());
         }
     }

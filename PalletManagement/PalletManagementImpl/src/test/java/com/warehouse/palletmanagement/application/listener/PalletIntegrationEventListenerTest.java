@@ -5,11 +5,14 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.palletmanagement.PalletFixture;
 import com.warehouse.palletmanagement.api.event.PalletLoadedIntegrationEvent;
 import com.warehouse.palletmanagement.api.event.PalletLoadingRevertedIntegrationEvent;
+import com.warehouse.palletmanagement.api.event.PalletUnloadedIntegrationEvent;
 import com.warehouse.palletmanagement.application.port.secondary.PalletIntegrationEventServicePort;
 import com.warehouse.palletmanagement.domain.event.PalletLoaded;
 import com.warehouse.palletmanagement.domain.event.PalletLoadingReverted;
+import com.warehouse.palletmanagement.domain.event.PalletUnloaded;
 import com.warehouse.palletmanagement.domain.vo.PalletLoadedSnapshot;
 import com.warehouse.palletmanagement.domain.vo.PalletLoadingRevertedSnapshot;
+import com.warehouse.palletmanagement.domain.vo.PalletUnloadedSnapshot;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -55,6 +58,24 @@ class PalletIntegrationEventListenerTest {
         verify(servicePort).publishEvent(event.capture());
         assertThat(event.getValue().payload().palletId()).isEqualTo("pallet-1");
         assertThat(event.getValue().payload().shipmentIds()).containsExactly(1L);
+        assertThat(event.getValue().eventKey()).isEqualTo("pallet-1");
+    }
+
+    @Test
+    void shouldPublishPalletUnloadedIntegrationEvent() {
+        final PalletIntegrationEventServicePort servicePort = mock(PalletIntegrationEventServicePort.class);
+        final PalletIntegrationEventListener listener = new PalletIntegrationEventListener(servicePort);
+
+        listener.handle(new PalletUnloaded(new PalletUnloadedSnapshot(PalletFixture.PALLET_ID,
+                PalletFixture.TRACKING_NUMBER, List.of(new ShipmentId(1L)), List.of(new ShipmentId(2L)),
+                new DepartmentId(6L)), Instant.now()));
+
+        final ArgumentCaptor<PalletUnloadedIntegrationEvent> event =
+                ArgumentCaptor.forClass(PalletUnloadedIntegrationEvent.class);
+        verify(servicePort).publishEvent(event.capture());
+        assertThat(event.getValue().payload().unloadedShipmentIds()).containsExactly(new ShipmentId(1L));
+        assertThat(event.getValue().payload().missingShipmentIds()).containsExactly(new ShipmentId(2L));
+        assertThat(event.getValue().payload().unloadDepartmentId()).isEqualTo(new DepartmentId(6L));
         assertThat(event.getValue().eventKey()).isEqualTo("pallet-1");
     }
 }

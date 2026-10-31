@@ -4,7 +4,11 @@ import com.warehouse.palletmanagement.infrastructure.adapter.primary.dto.PalletD
 import com.warehouse.palletmanagement.domain.vo.PalletCarrier;
 import com.warehouse.palletmanagement.infrastructure.adapter.primary.dto.PalletCarrierResponseApi;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.PalletTrackingNumber;
 import com.warehouse.palletmanagement.api.dto.PalletScanResponseDto;
+import com.warehouse.palletmanagement.domain.enumeration.PalletScanErrorCode;
+import com.warehouse.palletmanagement.application.port.primary.result.PalletUnloadResult;
+import com.warehouse.palletmanagement.api.dto.PalletUnloadResponseDto;
 import com.warehouse.palletmanagement.api.dto.PalletScanShipmentResultDto;
 import com.warehouse.palletmanagement.application.port.primary.result.PalletScanResult;
 import com.warehouse.palletmanagement.domain.vo.PalletDetails;
@@ -95,6 +99,25 @@ public class PalletResponseMapper {
 
     public PalletScanResponseDto failure(final String trackingNumber, final String errorCode, final String errorMessage) {
         return new PalletScanResponseDto(null, trackingNumber, null, false, false, errorCode, errorMessage, List.of());
+    }
+
+    public PalletUnloadResponseDto map(final PalletUnloadResult result) {
+        final PalletDetails pallet = result.pallet();
+        return new PalletUnloadResponseDto(
+                pallet.palletId(),
+                pallet.trackingNumber(),
+                pallet.palletStatus().name(),
+                result.success(),
+                result.alreadyUnloaded(),
+                result.success() ? null : PalletScanErrorCode.SHIPMENT_STATUS_UPDATE_FAILED.name(),
+                result.success() ? null : "Some shipments could not be updated",
+                result.shipments().stream().map(this::map).toList());
+    }
+
+    public PalletUnloadResponseDto unloadFailure(final PalletTrackingNumber trackingNumber, final String errorCode,
+                                                 final String errorMessage) {
+        return new PalletUnloadResponseDto(null, trackingNumber, null, false, false, errorCode, errorMessage,
+                List.of());
     }
 
     private PalletScanShipmentResultDto map(final ShipmentLoadResult result) {
