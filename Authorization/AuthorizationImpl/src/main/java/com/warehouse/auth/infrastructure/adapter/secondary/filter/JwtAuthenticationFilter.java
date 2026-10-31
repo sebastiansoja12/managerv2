@@ -31,6 +31,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     public static final String IMPERSONATION_ATTRIBUTE = JwtAuthenticationFilter.class.getName() + ".impersonation";
 
+    public static final String USERNAME_ATTRIBUTE = JwtAuthenticationFilter.class.getName() + ".username";
+
     private static final List<String> DEVICE_ENDPOINTS = List.of(
             "/v1/api/ws"
     );
@@ -72,6 +74,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         && operatorAccessPolicy.allowsAccess(user.operatorId(),
                         jwtService.extractIssuedAt(jwt).orElse(null), impersonation.isPresent())) {
                     impersonation.ifPresent(value -> request.setAttribute(IMPERSONATION_ATTRIBUTE, value));
+                    request.setAttribute(USERNAME_ATTRIBUTE, username);
                     final SecurityContext context = SecurityContextHolder.createEmptyContext();
                     final UsernameTenantPasswordAuthenticationToken authToken = new UsernameTenantPasswordAuthenticationToken(
                             user.getUserId(), user.operatorId(), this.jwtService.extractDepartmentId(jwt).orElse(null),
