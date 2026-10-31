@@ -52,6 +52,7 @@ public class DeliveryQueryController {
                                              @RequestParam(required = false) final String targetType,
                                              @RequestParam(required = false) final String method,
                                              @RequestParam(required = false) final Long departmentId,
+                                             @RequestParam(defaultValue = "false") final boolean missingDestination,
                                              @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                                              final LocalDate createdFrom,
                                              @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -76,6 +77,7 @@ public class DeliveryQueryController {
                     targetType == null ? null : DeliveryTargetType.valueOf(targetType),
                     method == null ? null : DeliveryMethod.valueOf(method),
                     departmentId == null ? null : new DepartmentId(departmentId),
+                    missingDestination,
                     createdFrom,
                     createdTo);
             final DeliveryReadSort readSort = new DeliveryReadSort(DeliveryReadSortField.valueOf(sort),

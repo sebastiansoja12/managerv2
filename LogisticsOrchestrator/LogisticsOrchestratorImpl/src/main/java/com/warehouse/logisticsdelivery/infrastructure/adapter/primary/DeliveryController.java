@@ -7,6 +7,7 @@ import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryHistoryPort;
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryPort;
 import com.warehouse.logisticsdelivery.domain.exception.DeliveryModificationException;
+import com.warehouse.logisticsdelivery.domain.exception.DestinationDepartmentNotResolvedException;
 import com.warehouse.logisticsdelivery.domain.exception.DeliveryNotFoundException;
 import com.warehouse.logisticsdelivery.domain.exception.DeliveryStepNotFoundException;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.api.DeliveryAttemptRegisterRequestDto;
@@ -115,6 +116,11 @@ public class DeliveryController {
         return responseMapper.map(deliveryPort.changeRoute(requestMapper.map(new DeliveryId(deliveryId), request)));
     }
 
+    @PostMapping("/{deliveryId}/destination/resolve")
+    public DeliveryResponseDto resolveDestinationDepartment(@PathVariable final String deliveryId) {
+        return responseMapper.map(deliveryPort.resolveDestinationDepartment(new DeliveryId(deliveryId)));
+    }
+
     @PutMapping("/{deliveryId}/conditions")
     public DeliveryResponseDto changeConditions(@PathVariable final String deliveryId,
                                                 @RequestBody final DeliveryConditionsRequestDto request) {
@@ -202,5 +208,10 @@ public class DeliveryController {
     @ExceptionHandler(DeliveryModificationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public void conflict() {
+    }
+
+    @ExceptionHandler(DestinationDepartmentNotResolvedException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public void destinationNotResolved() {
     }
 }
