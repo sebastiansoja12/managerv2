@@ -5,9 +5,16 @@ import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.DepartmentConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.OperatorConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentValidationConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentLabelConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentLimits;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentWorkflowConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.TrackingNumberRule;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentNotificationConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.service.OperatorConfigurationService;
 
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 public class OperatorConfigurationPortImpl implements OperatorConfigurationPort {
 
@@ -28,15 +35,49 @@ public class OperatorConfigurationPortImpl implements OperatorConfigurationPort 
 
     @Override
     public OperatorConfiguration updateCurrentShipmentConfiguration(final ShipmentConfiguration shipmentConfiguration) {
-        final OperatorId operatorId = currentOperatorService.getCurrentOperatorId();
-        final OperatorConfiguration currentConfiguration = operatorConfigurationService.getByOperatorId(operatorId)
-                .orElseGet(() -> OperatorConfiguration.defaultFor(false, false, false));
-        return operatorConfigurationService.create(operatorId, new OperatorConfiguration(
-                currentConfiguration.getShippingCapabilities(),
-                shipmentConfiguration,
-                currentConfiguration.getDeliveryTimeConfiguration(),
-                currentConfiguration.getDepartmentConfiguration()
-        ));
+        return updateCurrentShipmentConfiguration(currentShipmentConfiguration -> shipmentConfiguration);
+    }
+
+    @Override
+    public ShipmentConfiguration updateCurrentShipmentValidationConfiguration(final ShipmentValidationConfiguration validationConfiguration) {
+        return updateCurrentShipmentConfiguration(
+                shipmentConfiguration -> shipmentConfiguration.withValidationConfiguration(validationConfiguration))
+                .getShipmentConfiguration();
+    }
+
+    @Override
+    public ShipmentConfiguration updateCurrentShipmentLabelConfiguration(final ShipmentLabelConfiguration labelConfiguration) {
+        return updateCurrentShipmentConfiguration(
+                shipmentConfiguration -> shipmentConfiguration.withLabelConfiguration(labelConfiguration))
+                .getShipmentConfiguration();
+    }
+
+    @Override
+    public ShipmentConfiguration updateCurrentShipmentLimits(final ShipmentLimits shipmentLimits) {
+        return updateCurrentShipmentConfiguration(
+                shipmentConfiguration -> shipmentConfiguration.withShipmentLimits(shipmentLimits))
+                .getShipmentConfiguration();
+    }
+
+    @Override
+    public ShipmentConfiguration updateCurrentShipmentWorkflowConfiguration(final ShipmentWorkflowConfiguration workflowConfiguration) {
+        return updateCurrentShipmentConfiguration(
+                shipmentConfiguration -> shipmentConfiguration.withWorkflowConfiguration(workflowConfiguration))
+                .getShipmentConfiguration();
+    }
+
+    @Override
+    public ShipmentConfiguration updateCurrentTrackingNumberRule(final TrackingNumberRule trackingNumberRule) {
+        return updateCurrentShipmentConfiguration(
+                shipmentConfiguration -> shipmentConfiguration.withTrackingNumberRule(trackingNumberRule))
+                .getShipmentConfiguration();
+    }
+
+    @Override
+    public ShipmentConfiguration updateCurrentShipmentNotificationConfiguration(final ShipmentNotificationConfiguration notificationConfiguration) {
+        return updateCurrentShipmentConfiguration(
+                shipmentConfiguration -> shipmentConfiguration.withNotificationConfiguration(notificationConfiguration))
+                .getShipmentConfiguration();
     }
 
     @Override
@@ -60,5 +101,25 @@ public class OperatorConfigurationPortImpl implements OperatorConfigurationPort 
     @Override
     public void create(final OperatorId operatorId, final OperatorConfiguration configuration) {
         operatorConfigurationService.create(operatorId, configuration);
+    }
+
+    @Override
+    public ShipmentNotificationConfiguration getShipmentNotificationConfiguration(final OperatorId operatorId) {
+        return operatorConfigurationService.getByOperatorId(operatorId)
+                .map(OperatorConfiguration::getShipmentConfiguration)
+                .map(ShipmentConfiguration::getNotificationConfiguration)
+                .orElseGet(ShipmentNotificationConfiguration::defaultConfiguration);
+    }
+
+    private OperatorConfiguration updateCurrentShipmentConfiguration(
+            final UnaryOperator<ShipmentConfiguration> shipmentConfigurationChange) {
+        final OperatorId operatorId = currentOperatorService.getCurrentOperatorId();
+        final OperatorConfiguration currentConfiguration = operatorConfigurationService.getByOperatorId(operatorId)
+                .orElseGet(() -> OperatorConfiguration.defaultFor(false, false, false));
+        final ShipmentConfiguration currentShipmentConfiguration = Optional
+                .ofNullable(currentConfiguration.getShipmentConfiguration())
+                .orElseGet(ShipmentConfiguration::defaultConfiguration);
+        return operatorConfigurationService.create(operatorId, currentConfiguration.withShipmentConfiguration(
+                shipmentConfigurationChange.apply(currentShipmentConfiguration)));
     }
 }

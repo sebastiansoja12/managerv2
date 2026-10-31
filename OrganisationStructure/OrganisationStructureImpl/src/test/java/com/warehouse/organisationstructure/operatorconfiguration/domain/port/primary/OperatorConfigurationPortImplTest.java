@@ -3,6 +3,10 @@ package com.warehouse.organisationstructure.operatorconfiguration.domain.port.pr
 import com.warehouse.auth.CurrentOperatorService;
 import com.warehouse.organisationstructure.OperatorTestFixtures;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.OperatorConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentLimits;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.NotificationChannel;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentNotificationConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.service.OperatorConfigurationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,9 +17,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,6 +71,60 @@ class OperatorConfigurationPortImplTest {
         final Optional<OperatorConfiguration> configuration = operatorConfigurationPort.getCurrent();
 
         assertTrue(configuration.isEmpty());
+    }
+
+    @Test
+    void shouldGetNotificationConfigurationForGivenOperatorWithoutSecurityContext() {
+        final OperatorConfiguration configuration = OperatorTestFixtures.configuration();
+        when(operatorConfigurationService.getByOperatorId(OperatorTestFixtures.OPERATOR_ID))
+                .thenReturn(Optional.of(configuration));
+        final OperatorConfigurationPort operatorConfigurationPort =
+                new OperatorConfigurationPortImpl(operatorConfigurationService, currentOperatorService);
+
+        final ShipmentNotificationConfiguration notificationConfiguration =
+                operatorConfigurationPort.getShipmentNotificationConfiguration(OperatorTestFixtures.OPERATOR_ID);
+
+        assertEquals(configuration.getShipmentConfiguration().getNotificationConfiguration(), notificationConfiguration);
+        verifyNoInteractions(currentOperatorService);
+    }
+
+    @Test
+    void shouldFallBackToDefaultNotificationConfigurationWhenOperatorHasNoConfiguration() {
+        when(operatorConfigurationService.getByOperatorId(OperatorTestFixtures.OPERATOR_ID))
+                .thenReturn(Optional.empty());
+        final OperatorConfigurationPort operatorConfigurationPort =
+                new OperatorConfigurationPortImpl(operatorConfigurationService, currentOperatorService);
+
+        final ShipmentNotificationConfiguration notificationConfiguration =
+                operatorConfigurationPort.getShipmentNotificationConfiguration(OperatorTestFixtures.OPERATOR_ID);
+
+        assertEquals(NotificationChannel.SMS, notificationConfiguration.getNotificationChannel());
+        assertTrue(notificationConfiguration.isNotifyRecipientOnCreated());
+    }
+
+    @Test
+    void shouldUpdateOnlyShipmentLimitsOfCurrentOperator() {
+        final OperatorConfiguration configuration = OperatorTestFixtures.configuration();
+        final ShipmentConfiguration currentShipmentConfiguration = configuration.getShipmentConfiguration();
+        final ShipmentLimits shipmentLimits = new ShipmentLimits(10.0, 0.0, 50.0, 40.0, 30.0, 0.0, true);
+        when(currentOperatorService.getCurrentOperatorId()).thenReturn(OperatorTestFixtures.OPERATOR_ID);
+        when(operatorConfigurationService.getByOperatorId(OperatorTestFixtures.OPERATOR_ID))
+                .thenReturn(Optional.of(configuration));
+        when(operatorConfigurationService.create(any(), any()))
+                .thenAnswer(invocation -> invocation.getArgument(1));
+        final OperatorConfigurationPort operatorConfigurationPort =
+                new OperatorConfigurationPortImpl(operatorConfigurationService, currentOperatorService);
+
+        final ShipmentConfiguration shipmentConfiguration =
+                operatorConfigurationPort.updateCurrentShipmentLimits(shipmentLimits);
+
+        assertSame(shipmentLimits, shipmentConfiguration.getShipmentLimits());
+        assertSame(currentShipmentConfiguration.getValidationConfiguration(),
+                shipmentConfiguration.getValidationConfiguration());
+        assertSame(currentShipmentConfiguration.getLabelConfiguration(), shipmentConfiguration.getLabelConfiguration());
+        assertSame(currentShipmentConfiguration.getTrackingNumberRule(), shipmentConfiguration.getTrackingNumberRule());
+        assertSame(currentShipmentConfiguration.getNotificationConfiguration(),
+                shipmentConfiguration.getNotificationConfiguration());
     }
 
     @Test
