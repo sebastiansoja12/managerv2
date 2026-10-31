@@ -44,6 +44,8 @@ public interface ShipmentPort {
 
     ShipmentResult revertShipmentLoadingFromPallet(final ShipmentId shipmentId);
 
+    ShipmentResult unloadShipmentFromPallet(final ShipmentId shipmentId);
+
     Optional<OperatorId> findOperator(final TrackingNumber trackingNumber);
 
     Optional<ShipmentResult> findSourceShipment(final ShipmentId shipmentId);
@@ -65,8 +67,6 @@ public interface ShipmentPort {
     void lockShipment(final ShipmentId shipmentId);
 
     void redirectShipmentToSender(final ShipmentId shipmentId);
-
-    void changeDestination(final ShipmentId shipmentId, final DepartmentCode destination);
 
     void markReturned(final ShipmentId shipmentId);
 

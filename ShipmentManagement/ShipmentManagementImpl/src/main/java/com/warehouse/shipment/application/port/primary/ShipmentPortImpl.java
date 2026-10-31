@@ -32,6 +32,7 @@ import com.warehouse.shipment.domain.vo.Address;
 import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.vo.ShipmentDeliveryPlan;
 import com.warehouse.shipment.domain.vo.ShipmentOwnerContext;
+import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 import com.warehouse.shipment.domain.vo.conf.OperatorShipmentConfiguration;
 import com.warehouse.shipment.domain.vo.conf.ShipmentMetrics;
 import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
@@ -49,7 +50,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final Logger logger;
 
-
     private final DepartmentCountryAvailabilityService departmentCountryAvailabilityService;
 
     private final ShipmentResultFactory shipmentResultFactory;
@@ -65,8 +65,6 @@ public class ShipmentPortImpl implements ShipmentPort {
     private final ShipmentStatusChangeStrategyResolver shipmentStatusChangeStrategyResolver;
 
     private final DomainEventPublisher domainEventPublisher;
-
-    private final DepartmentServicePort departmentServicePort;
 
     private final ShipmentDepartmentResolutionService shipmentDepartmentResolutionService;
 
@@ -86,7 +84,6 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final ShipmentDeliveryStrategyResolver shipmentDeliveryStrategyResolver,
                             final ShipmentStatusChangeStrategyResolver shipmentStatusChangeStrategyResolver,
                             final DomainEventPublisher domainEventPublisher,
-                            final DepartmentServicePort departmentServicePort,
                             final ShipmentDepartmentResolutionService shipmentDepartmentResolutionService,
                             final AddressValidationService addressValidationService,
                             final PostalCodeServicePort postalCodeServicePort,
@@ -101,7 +98,6 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.shipmentDeliveryStrategyResolver = shipmentDeliveryStrategyResolver;
         this.shipmentStatusChangeStrategyResolver = shipmentStatusChangeStrategyResolver;
         this.domainEventPublisher = domainEventPublisher;
-        this.departmentServicePort = departmentServicePort;
         this.shipmentDepartmentResolutionService = shipmentDepartmentResolutionService;
         this.addressValidationService = addressValidationService;
         this.postalCodeServicePort = postalCodeServicePort;
@@ -160,7 +156,7 @@ public class ShipmentPortImpl implements ShipmentPort {
                 : workflowSettings.defaultStatus();
 
         final Result<DepartmentId, ErrorCode> targetDepartment =
-                shipmentDepartmentResolutionService.resolveTargetDepartmentId(command, recipient);
+                shipmentDepartmentResolutionService.resolveTargetDepartmentId(command);
         if (targetDepartment.isFailure()) {
             return Result.failure(targetDepartment.getFailure());
         }
@@ -270,33 +266,32 @@ public class ShipmentPortImpl implements ShipmentPort {
         final ShipmentWorkflowSettings settings = this.shipmentConfigurationServicePort
                 .getCurrentOperatorShipmentConfiguration().workflowSettings();
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        final ShipmentSnapshot previousSnapshot = shipment.snapshot();
         shipment.cancel(settings, LocalDateTime.now());
         this.shipmentRepository.createOrUpdate(shipment);
-        this.domainEventPublisher.publish(new ShipmentCanceled(shipment.snapshot(), Instant.now()));
+        this.domainEventPublisher.publish(new ShipmentCanceled(previousSnapshot, shipment.snapshot(), Instant.now()));
     }
 
     public void changeSenderTo(final ShipmentId shipmentId, final Party sender) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        final ShipmentSnapshot previousSnapshot = shipment.snapshot();
         shipment.changeSender(sender);
         this.shipmentRepository.createOrUpdate(shipment);
-        this.domainEventPublisher.publish(new ShipmentSenderChanged(shipment.snapshot(), Instant.now()));
+        this.domainEventPublisher.publish(new ShipmentSenderChanged(previousSnapshot, shipment.snapshot(),
+                Instant.now()));
     }
 
     public void changeRecipientTo(final ShipmentId shipmentId, final Party recipient) {
         final Shipment shipment = this.find(shipmentId);
-        if (!shipment.recipientAddressMatches(recipient)) {
-            final Result<DepartmentId, ErrorCode> deliveryDepartment =
-                    this.shipmentDepartmentResolutionService.resolveDeliveryDepartmentId(recipient);
-            if (deliveryDepartment.isFailure()) {
-                logger.warn("Cannot determine delivery department for recipient {}, skipping...", recipient);
-            } else {
-                this.domainEventPublisher.publish(new ShipmentDestinationChanged(shipment.snapshot(),
-                        deliveryDepartment.getSuccess(), Instant.now()));
-            }
-        }
+        final boolean destinationChanged = !shipment.recipientAddressMatches(recipient);
+        final ShipmentSnapshot previousSnapshot = shipment.snapshot();
         shipment.changeRecipient(recipient);
         this.shipmentRepository.createOrUpdate(shipment);
-        this.domainEventPublisher.publish(new ShipmentRecipientChanged(shipment.snapshot(), Instant.now()));
+        this.domainEventPublisher.publish(new ShipmentRecipientChanged(previousSnapshot, shipment.snapshot(),
+                Instant.now()));
+        if (destinationChanged) {
+            this.domainEventPublisher.publish(new ShipmentDestinationChanged(shipment.snapshot(), Instant.now()));
+        }
     }
 
     @Override
@@ -420,28 +415,16 @@ public class ShipmentPortImpl implements ShipmentPort {
         }
 
         final Shipment shipment = this.find(command.trackingNumber());
-        final Optional<DepartmentId> destinationDepartmentId = resolveDestinationForRecipient(shipment, recipient);
+        final boolean destinationChanged = !shipment.recipientAddressMatches(recipient);
+        final ShipmentSnapshot previousSnapshot = shipment.snapshot();
         shipment.reroute(sender, recipient);
         this.shipmentRepository.createOrUpdate(shipment);
 
-        destinationDepartmentId.ifPresent(departmentId -> this.domainEventPublisher.publish(
-                new ShipmentDestinationChanged(shipment.snapshot(), departmentId, Instant.now())));
-        this.domainEventPublisher.publish(new ShipmentRerouted(shipment.snapshot(), Instant.now()));
+        if (destinationChanged) {
+            this.domainEventPublisher.publish(new ShipmentDestinationChanged(shipment.snapshot(), Instant.now()));
+        }
+        this.domainEventPublisher.publish(new ShipmentRerouted(previousSnapshot, shipment.snapshot(), Instant.now()));
         return new ShipmentRerouteResult(shipment.snapshot(), shipment.canBeRerouted());
-    }
-
-    private Optional<DepartmentId> resolveDestinationForRecipient(final Shipment shipment, final Party recipient) {
-        if (shipment.recipientAddressMatches(recipient)) {
-            return Optional.empty();
-        }
-        final Result<DepartmentId, ErrorCode> deliveryDepartment =
-                this.shipmentDepartmentResolutionService.resolveDeliveryDepartmentId(recipient);
-        if (deliveryDepartment.isFailure()) {
-            logger.warn("Cannot determine delivery department for rerouted shipment {}, keeping current destination",
-                    shipment.getShipmentId().getValue());
-            return Optional.empty();
-        }
-        return Optional.of(deliveryDepartment.getSuccess());
     }
 
     @Override
@@ -450,7 +433,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         final Shipment shipment = this.find(trackingNumber);
         shipment.notifyShipmentCollected();
         this.shipmentRepository.createOrUpdate(shipment);
-        this.domainEventPublisher.publish(new ShipmentSent(shipment.snapshot(), Instant.now()));
+        this.domainEventPublisher.publish(new ShipmentCollected(shipment.snapshot(), Instant.now()));
         return this.shipmentResultFactory.create(shipment);
     }
 
@@ -479,10 +462,24 @@ public class ShipmentPortImpl implements ShipmentPort {
         final Shipment shipment = this.find(shipmentId);
         final ShipmentWorkflowSettings workflowSettings = this.shipmentConfigurationServicePort
                 .getCurrentOperatorShipmentConfiguration().workflowSettings();
+        final ShipmentSnapshot previousSnapshot = shipment.snapshot();
         if (shipment.revertLoadingFromPallet(workflowSettings)) {
             this.shipmentRepository.createOrUpdate(shipment);
-            this.domainEventPublisher.publish(new ShipmentStatusChanged(shipment.snapshot(), Instant.now()));
+            this.domainEventPublisher.publish(new ShipmentStatusChanged(previousSnapshot, shipment.snapshot(),
+                    Instant.now()));
         }
+        return this.shipmentResultFactory.create(shipment);
+    }
+
+    @Override
+    @Transactional
+    public ShipmentResult unloadShipmentFromPallet(final ShipmentId shipmentId) {
+        final Shipment shipment = this.find(shipmentId);
+        final ShipmentSnapshot previousSnapshot = shipment.snapshot();
+        shipment.unloadFromPallet();
+        this.shipmentRepository.createOrUpdate(shipment);
+        this.domainEventPublisher.publish(new ShipmentStatusChanged(previousSnapshot, shipment.snapshot(),
+                Instant.now()));
         return this.shipmentResultFactory.create(shipment);
     }
 
@@ -509,13 +506,14 @@ public class ShipmentPortImpl implements ShipmentPort {
                                      final ShipmentType shipmentType,
                                      final ShipmentId relatedShipmentId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        final ShipmentSnapshot previousSnapshot = shipment.snapshot();
         if (relatedShipmentId == null) {
             shipment.changeShipmentType(shipmentType);
         } else {
             shipment.changeShipmentTypeWithRelatedId(shipmentType, relatedShipmentId);
         }
         this.shipmentRepository.createOrUpdate(shipment);
-        this.domainEventPublisher.publish(new ShipmentTypeChanged(shipment.snapshot(), Instant.now()));
+        this.domainEventPublisher.publish(new ShipmentTypeChanged(previousSnapshot, shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -542,15 +540,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     @Transactional
-    public void changeDestination(final ShipmentId shipmentId, final DepartmentCode destination) {
-        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        final DepartmentId targetDepartmentId = departmentServicePort.getDepartmentId(destination);
-        this.domainEventPublisher.publish(new ShipmentDestinationChanged(shipment.snapshot(), targetDepartmentId,
-                Instant.now()));
-    }
-
-    @Override
-    @Transactional
     public void markReturned(final ShipmentId shipmentId) {
         final Shipment shipment = shipmentRepository.findById(shipmentId);
         shipment.notifyShipmentReturned(ShipmentId.nextId());
@@ -562,9 +551,11 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Transactional
     public void restoreAfterReturnCancellation(final ShipmentId shipmentId) {
         final Shipment shipment = shipmentRepository.findById(shipmentId);
+        final ShipmentSnapshot previousSnapshot = shipment.snapshot();
         shipment.notifyShipmentReturnCanceled();
         this.shipmentRepository.createOrUpdate(shipment);
-        this.domainEventPublisher.publish(new ShipmentStatusChanged(shipment.snapshot(), Instant.now()));
+        this.domainEventPublisher.publish(new ShipmentStatusChanged(previousSnapshot, shipment.snapshot(),
+                Instant.now()));
     }
 
     @Override
@@ -580,9 +571,10 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Transactional
     public void notifyShipmentReturnCanceled(final ShipmentId shipmentId) {
         final Shipment shipment = shipmentRepository.findById(shipmentId);
+        final ShipmentSnapshot previousSnapshot = shipment.snapshot();
         shipment.markAsCanceledWithoutPolicy();
         this.shipmentRepository.createOrUpdate(shipment);
-        this.domainEventPublisher.publish(new ShipmentCanceled(shipment.snapshot(), Instant.now()));
+        this.domainEventPublisher.publish(new ShipmentCanceled(previousSnapshot, shipment.snapshot(), Instant.now()));
     }
 
     @Override

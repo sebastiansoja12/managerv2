@@ -1,5 +1,6 @@
 package com.warehouse.shipment.application.service;
 
+import com.warehouse.shipment.domain.vo.ShipmentListEntry;
 import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.application.port.secondary.DepartmentServicePort;
@@ -25,6 +26,10 @@ public class ShipmentResultFactory {
 
     public ShipmentResult create(final Shipment shipment) {
         return new ShipmentResult(shipment.snapshot());
+    }
+
+    public ShipmentResult create(final ShipmentListEntry entry) {
+        return new ShipmentResult(entry.shipment().snapshot(), entry.deliveryDetails());
     }
 
     public ShipmentRouteLog createControlCenter(final Shipment shipment) {
