@@ -1,5 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
+import com.warehouse.shipment.domain.vo.ShipmentDeliveryDetails;
 import java.util.Optional;
 
 import com.warehouse.commonassets.identificator.ExternalId;
@@ -25,10 +26,29 @@ public class ShipmentReadModelRepositoryImpl implements ShipmentReadModelReposit
 
     @Override
     public void sync(final ShipmentSnapshot snapshot) {
-        final Optional<ShipmentReadEntity> currentEntity = this.repository.createCriteria(ShipmentReadEntity.class)
+        final Optional<ShipmentReadEntity> currentEntity = currentEntity(snapshot);
+        save(snapshot, currentEntity, currentEntity.map(this.persistenceMapper::deliveryDetails)
+                .orElse(ShipmentDeliveryDetails.NONE));
+    }
+
+    @Override
+    public void sync(final ShipmentSnapshot snapshot, final ShipmentDeliveryDetails deliveryDetails) {
+        final Optional<ShipmentReadEntity> currentEntity = currentEntity(snapshot);
+        save(snapshot, currentEntity, deliveryDetails.keepingOriginOf(currentEntity
+                .map(this.persistenceMapper::deliveryDetails)
+                .orElse(ShipmentDeliveryDetails.NONE)));
+    }
+
+    private Optional<ShipmentReadEntity> currentEntity(final ShipmentSnapshot snapshot) {
+        return this.repository.createCriteria(ShipmentReadEntity.class)
                 .eq("shipmentId.value", snapshot.shipmentId().getValue())
                 .one();
-        final ShipmentReadEntity entity = this.persistenceMapper.toReadEntity(snapshot);
+    }
+
+    private void save(final ShipmentSnapshot snapshot, final Optional<ShipmentReadEntity> currentEntity,
+                      final ShipmentDeliveryDetails deliveryDetails) {
+        final ShipmentReadEntity entity = this.persistenceMapper.withDeliveryDetails(
+                this.persistenceMapper.toReadEntity(snapshot), deliveryDetails);
         if (currentEntity.isPresent()) {
             this.repository.update(entity);
         } else {
