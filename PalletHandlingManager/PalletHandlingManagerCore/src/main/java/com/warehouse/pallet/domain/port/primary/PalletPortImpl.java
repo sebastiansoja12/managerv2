@@ -125,6 +125,14 @@ public class PalletPortImpl implements PalletPort {
     }
 
     @Override
+    public Pallet unload(final PalletId palletId, final OperatorId operatorId) {
+        final boolean alreadyUnloaded = getPallet(palletId, operatorId).isUnloaded();
+        final Pallet pallet = this.palletStorageService.unload(palletId);
+        return alreadyUnloaded ? pallet : record(pallet, PalletHistoryEventType.UNLOADED,
+                departmentDetails(pallet.getDestinationDepartmentId()));
+    }
+
+    @Override
     public List<PalletHistoryEntry> getHistory(final PalletId palletId, final OperatorId operatorId) {
         getPallet(palletId, operatorId);
         return this.palletHistoryRepository.findByPalletId(palletId);

@@ -50,6 +50,8 @@ public interface PalletStorageService {
     Pallet cancel(final PalletId palletId);
 
     Pallet revertLoading(final PalletId palletId);
+
+    Pallet unload(final PalletId palletId);
     boolean markLoaded(final PalletId palletId);
     Pallet changeGrossWeight(final PalletId palletId, final Weight grossWeight);
     Pallet defineMaxGrossWeight(final PalletId palletId, final BigDecimal maxGrossWeight);
