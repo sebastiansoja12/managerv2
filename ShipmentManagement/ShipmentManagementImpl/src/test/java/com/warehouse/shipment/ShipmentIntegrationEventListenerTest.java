@@ -82,11 +82,9 @@ class ShipmentIntegrationEventListenerTest {
     void shouldPublishDestinationChangedIntegrationEvent() {
         final Shipment shipment = DataTestCreator.shipment();
 
-        this.listener.handle(new ShipmentDestinationChanged(shipment.snapshot(), new DepartmentId(11L), Instant.now()));
+        this.listener.handle(new ShipmentDestinationChanged(shipment.snapshot(), Instant.now()));
 
-        final ShipmentDestinationChangedIntegrationEvent event = (ShipmentDestinationChangedIntegrationEvent)
-                assertPublishedEvent(ShipmentDestinationChangedIntegrationEvent.class, shipment);
-        assertEquals(new DepartmentId(11L), event.destinationDepartmentId());
+        assertPublishedEvent(ShipmentDestinationChangedIntegrationEvent.class, shipment);
     }
 
     @Test
