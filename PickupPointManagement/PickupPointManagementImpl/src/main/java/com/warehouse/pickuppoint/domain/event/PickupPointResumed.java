@@ -9,4 +9,10 @@ public final class PickupPointResumed extends PickupPointChanged {
     public PickupPointResumed(final PickupPointSnapshot snapshot, final Instant timestamp) {
         super(snapshot, timestamp);
     }
+
+    public PickupPointResumed(final PickupPointSnapshot previousSnapshot,
+                              final PickupPointSnapshot snapshot,
+                              final Instant timestamp) {
+        super(previousSnapshot, snapshot, timestamp);
+    }
 }
