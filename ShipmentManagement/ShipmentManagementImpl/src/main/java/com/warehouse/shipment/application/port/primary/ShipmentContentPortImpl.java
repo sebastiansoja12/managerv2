@@ -1,5 +1,6 @@
 package com.warehouse.shipment.application.port.primary;
 
+import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.application.port.secondary.ShipmentActorServicePort;
 import com.warehouse.shipment.application.port.secondary.ShipmentContentRepository;
@@ -8,6 +9,8 @@ import com.warehouse.shipment.domain.exception.ShipmentNotFoundException;
 import com.warehouse.shipment.domain.model.ShipmentDocument;
 import com.warehouse.shipment.domain.model.ShipmentDocumentFile;
 import com.warehouse.shipment.domain.model.ShipmentNote;
+import com.warehouse.shipment.domain.event.ShipmentDocumentAdded;
+import com.warehouse.shipment.domain.event.ShipmentNoteAdded;
 import com.warehouse.exceptionhandler.exception.RestException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,13 +30,16 @@ public class ShipmentContentPortImpl implements ShipmentContentPort {
     private final ShipmentRepository shipmentRepository;
     private final ShipmentContentRepository contentRepository;
     private final ShipmentActorServicePort actorServicePort;
+    private final DomainEventPublisher domainEventPublisher;
 
     public ShipmentContentPortImpl(final ShipmentRepository shipmentRepository,
                                    final ShipmentContentRepository contentRepository,
-                                   final ShipmentActorServicePort actorServicePort) {
+                                   final ShipmentActorServicePort actorServicePort,
+                                   final DomainEventPublisher domainEventPublisher) {
         this.shipmentRepository = shipmentRepository;
         this.contentRepository = contentRepository;
         this.actorServicePort = actorServicePort;
+        this.domainEventPublisher = domainEventPublisher;
     }
 
     @Override
@@ -43,6 +49,7 @@ public class ShipmentContentPortImpl implements ShipmentContentPort {
         final ShipmentNote note = new ShipmentNote(UUID.randomUUID(), shipmentId, body == null ? null : body.trim(), internal,
                 actorServicePort.currentUserId(), Instant.now());
         contentRepository.saveNote(note);
+        domainEventPublisher.publish(new ShipmentNoteAdded(shipmentId, internal, note.createdAt()));
         return note;
     }
 
@@ -68,6 +75,7 @@ public class ShipmentContentPortImpl implements ShipmentContentPort {
         final ShipmentDocument document = new ShipmentDocument(UUID.randomUUID(), shipmentId, safeFilename,
                 contentType, content.length, actorServicePort.currentUserId(), Instant.now());
         contentRepository.saveDocument(new ShipmentDocumentFile(document, content));
+        domainEventPublisher.publish(new ShipmentDocumentAdded(shipmentId, safeFilename, document.createdAt()));
         return document;
     }
 

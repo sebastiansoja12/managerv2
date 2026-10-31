@@ -30,6 +30,7 @@ import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.shipment.application.port.primary.ShipmentQueryPort;
 import com.warehouse.shipment.application.port.primary.ShipmentQueryPortImpl;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.vo.ShipmentListEntry;
 import com.warehouse.shipment.domain.vo.ShipmentSearchCriteria;
 import com.warehouse.shipment.application.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.application.port.primary.ShipmentReadModelSyncPort;
@@ -51,9 +52,6 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentRe
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.OperatorShipmentConfigurationMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentPersistenceMapper;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
-import com.warehouse.voronoi.VoronoiService;
-import com.warehouse.geocoding.api.GeocodingCoordinatesService;
-import com.warehouse.organisationstructure.deliveryarea.api.DeliveryAreaApiService;
 import com.warehouse.geocoding.api.PostalCodeService;
 
 import java.util.List;
@@ -115,7 +113,6 @@ public class ShipmentConfiguration {
                                      final ShipmentDeliveryStrategyResolver shipmentDeliveryStrategyResolver,
                                      final ShipmentStatusChangeStrategyResolver shipmentStatusChangeStrategyResolver,
                                      final DomainEventPublisher domainEventPublisher,
-                                     final DepartmentServicePort departmentServicePort,
                                      final ShipmentDepartmentResolutionService shipmentDepartmentResolutionService,
                                      final PostalCodeServicePort postalCodeServicePort,
                                      final OperatorServicePort shipmentOperatorServicePort) {
@@ -126,7 +123,7 @@ public class ShipmentConfiguration {
 				mailNotificationServicePort, trackingNumberGenerationService,
 				shipmentConfigurationServicePort,
                 shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
-                domainEventPublisher, departmentServicePort, shipmentDepartmentResolutionService, addressValidationService,
+                domainEventPublisher, shipmentDepartmentResolutionService, addressValidationService,
                 postalCodeServicePort, shipmentOperatorServicePort);
 	}
 
@@ -138,18 +135,8 @@ public class ShipmentConfiguration {
     @Bean
     public ShipmentDepartmentResolutionService shipmentDepartmentResolutionService(
             final PickupPointServicePort pickupPointServicePort,
-            final DepartmentServicePort departmentServicePort,
-            final PathFinderServicePort pathFinderServicePort,
-            final DeliveryAreaServicePort deliveryAreaServicePort,
             final OperatorContextProvider operatorContextProvider) {
-        return new ShipmentDepartmentResolutionService(pickupPointServicePort, departmentServicePort,
-                pathFinderServicePort, deliveryAreaServicePort, operatorContextProvider);
-    }
-
-    @Bean
-    public DeliveryAreaServicePort deliveryAreaServicePort(final GeocodingCoordinatesService geocodingCoordinatesService,
-                                                           final DeliveryAreaApiService deliveryAreaApiService) {
-        return new DeliveryAreaServiceAdapter(geocodingCoordinatesService, deliveryAreaApiService);
+        return new ShipmentDepartmentResolutionService(pickupPointServicePort, operatorContextProvider);
     }
 
     @Bean
@@ -196,6 +183,11 @@ public class ShipmentConfiguration {
     @Bean
     public ShipmentStatusChangeStrategy shipmentPlannedStatusChangeStrategy() {
         return new ShipmentPlannedStatusChangeStrategy();
+    }
+
+    @Bean
+    public ShipmentStatusChangeStrategy shipmentCollectedStatusChangeStrategy() {
+        return new ShipmentCollectedStatusChangeStrategy();
     }
 
     @Bean
@@ -415,7 +407,7 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public SpecificationRepository<ShipmentSearchCriteria, Shipment> specificationShipmentRepository(
+	public SpecificationRepository<ShipmentSearchCriteria, ShipmentListEntry> specificationShipmentRepository(
 			final OperatorFilteredRepository<ShipmentReadEntity> repository,
             final ShipmentPersistenceMapper persistenceMapper) {
 		return new SpecificationShipmentRepositoryImpl(repository, persistenceMapper);
@@ -431,25 +423,9 @@ public class ShipmentConfiguration {
 		return new RouteTrackerLogProperties();
 	}
 
-	@Bean
-	@ConditionalOnProperty(name="services.mock", havingValue="false")
-	public PathFinderServicePort pathFinderServicePort(final VoronoiService voronoiService,
-												   final DepartmentApiService departmentApiService,
-												   final GeocodingCoordinatesService geocodingCoordinatesService) {
-		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using path finder service");
-		return new PathFinderAdapter(voronoiService, departmentApiService, geocodingCoordinatesService);
-	}
-
-	//MOCK
-	@Bean
-	@ConditionalOnProperty(name = "services.mock", havingValue = "true", matchIfMissing = true)
-	public PathFinderServicePort pathFinderMockServicePort(final PathFinderMockService pathFinderMockService) {
-		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using mock path finder service");
-		return new PathFinderMockAdapter(pathFinderMockService);
-	}
     @Bean
     public ShipmentQueryPort shipmentQueryPort(
-            final SpecificationRepository<ShipmentSearchCriteria, Shipment> specificationShipmentRepository,
+            final SpecificationRepository<ShipmentSearchCriteria, ShipmentListEntry> specificationShipmentRepository,
             final ShipmentResultFactory shipmentResultFactory) {
         return new ShipmentQueryPortImpl(specificationShipmentRepository, shipmentResultFactory);
     }

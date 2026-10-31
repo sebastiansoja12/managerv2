@@ -1,5 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.mapper;
 
+import com.warehouse.shipment.domain.vo.ShipmentDeliveryDetails;
 import java.util.UUID;
 
 import com.warehouse.commonassets.identificator.ExternalId;
@@ -134,6 +135,21 @@ public class ShipmentPersistenceMapper {
                 .signatureRequired(snapshot.signatureRequired())
                 .externalId(new ExternalId<>(snapshot.externalShipmentId().value().toString()))
                 .trackingNumber(snapshot.trackingNumber())
+                .build();
+    }
+
+    public ShipmentDeliveryDetails deliveryDetails(final ShipmentReadEntity entity) {
+        return new ShipmentDeliveryDetails(entity.getOriginDepartmentId(), entity.getDestinationDepartmentId(),
+                entity.getPlannedDeliveryAt(), entity.getDeliveredAt());
+    }
+
+    public ShipmentReadEntity withDeliveryDetails(final ShipmentReadEntity entity,
+                                                  final ShipmentDeliveryDetails deliveryDetails) {
+        return entity.toBuilder()
+                .originDepartmentId(deliveryDetails.originDepartmentId())
+                .destinationDepartmentId(deliveryDetails.destinationDepartmentId())
+                .plannedDeliveryAt(deliveryDetails.plannedDeliveryAt())
+                .deliveredAt(deliveryDetails.deliveredAt())
                 .build();
     }
 
