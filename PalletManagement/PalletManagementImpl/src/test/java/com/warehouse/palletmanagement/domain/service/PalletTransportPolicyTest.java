@@ -1,7 +1,9 @@
 package com.warehouse.palletmanagement.domain.service;
 
 import com.warehouse.commonassets.identificator.CarrierId;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.DriverId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.VehicleId;
 import com.warehouse.palletmanagement.PalletFixture;
 import com.warehouse.palletmanagement.domain.enumeration.PalletStatus;
@@ -51,8 +53,33 @@ class PalletTransportPolicyTest {
                 .isInstanceOf(PalletRequestRejectedException.class);
         assertThatThrownBy(() -> PalletTransportPolicy.ensureManualStatusChange(PalletStatus.IN_TRANSIT, false))
                 .isInstanceOf(PalletRequestRejectedException.class);
-        assertThatCode(() -> PalletTransportPolicy.ensureManualStatusChange(PalletStatus.DELIVERED, false))
+        assertThatThrownBy(() -> PalletTransportPolicy.ensureManualStatusChange(PalletStatus.DELIVERED, true))
+                .isInstanceOf(PalletRequestRejectedException.class);
+        assertThatCode(() -> PalletTransportPolicy.ensureManualStatusChange(PalletStatus.IN_TRANSIT, true))
                 .doesNotThrowAnyException();
+    }
+
+    @Test
+    void shouldAllowUnloadingPalletInTransitInDestinationDepartment() {
+        assertThatCode(() -> PalletTransportPolicy.ensureUnloadable(
+                PalletFixture.inTransitPallet(new DepartmentId(5L), 1L, 2L), new DepartmentId(5L),
+                List.of(new ShipmentId(2L))))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void shouldRejectUnloadingPalletNotInTransit() {
+        assertThatThrownBy(() -> PalletTransportPolicy.ensureUnloadable(PalletFixture.loadedPallet(1L),
+                new DepartmentId(5L), List.of()))
+                .isInstanceOf(PalletRequestRejectedException.class);
+    }
+
+    @Test
+    void shouldRejectMissingShipmentOutsidePallet() {
+        assertThatThrownBy(() -> PalletTransportPolicy.ensureUnloadable(
+                PalletFixture.inTransitPallet(new DepartmentId(5L), 1L), new DepartmentId(5L),
+                List.of(new ShipmentId(3L))))
+                .isInstanceOf(PalletRequestRejectedException.class);
     }
 
     @Test
