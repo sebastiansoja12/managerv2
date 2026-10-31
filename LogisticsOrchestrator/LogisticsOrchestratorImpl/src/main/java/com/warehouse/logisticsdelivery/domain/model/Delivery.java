@@ -13,11 +13,14 @@ import com.warehouse.logisticsdelivery.domain.exception.DeliveryModificationExce
 import com.warehouse.logisticsdelivery.domain.exception.DeliveryStepNotFoundException;
 import com.warehouse.logisticsdelivery.domain.vo.DeliverySnapshot;
 import com.warehouse.logisticsdelivery.domain.vo.DeliveryTarget;
+import com.warehouse.logisticsdelivery.domain.vo.RecipientAddress;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class Delivery {
     private final DeliveryId deliveryId;
@@ -180,9 +183,31 @@ public class Delivery {
         return true;
     }
 
-    public boolean changeDestinationDepartment(final DepartmentId destinationDepartmentId) {
-        return changeRoute(originDepartmentId, destinationDepartmentId, pickupMethod, pickupPointId,
-                deliveryPickupPointId);
+    public void changeRecipientAddress(final RecipientAddress recipientAddress,
+                                       final Function<RecipientAddress, Optional<DepartmentId>> destinationResolver) {
+        if (this.target.type() != DeliveryTargetType.SHIPMENT || this.method != DeliveryMethod.COURIER) {
+            return;
+        }
+        ensureCanBeModified();
+        destinationResolver.apply(recipientAddress)
+                .filter(departmentId -> !departmentId.equals(this.destinationDepartmentId))
+                .ifPresent(departmentId -> {
+                    this.destinationDepartmentId = departmentId;
+                    markAsModified();
+                });
+    }
+
+    public void assignDestinationDepartment(final DepartmentId destinationDepartmentId) {
+        if (this.target.type() != DeliveryTargetType.SHIPMENT || this.method != DeliveryMethod.COURIER) {
+            throw new DeliveryModificationException(
+                    "Destination department can be resolved only for courier shipment deliveries");
+        }
+        if (Objects.equals(this.destinationDepartmentId, destinationDepartmentId)) {
+            return;
+        }
+        ensureCanBeModified();
+        this.destinationDepartmentId = destinationDepartmentId;
+        markAsModified();
     }
 
     public boolean changeConditions(final DeliveryMethod method,
@@ -269,15 +294,29 @@ public class Delivery {
         return true;
     }
 
-    public boolean restoreReplacedByPalletDelivery(final DeliveryId palletDeliveryId, final UserId userId) {
-        if (status != DeliveryLifecycleStatus.CANCELED || !Objects.equals(replacedByDeliveryId, palletDeliveryId)) {
-            return false;
+    public static Delivery continuedAfterPalletUnloading(final Delivery replaced, final DepartmentId unloadDepartmentId,
+                                                         final UserId userId) {
+        return continuedAfterPallet(replaced, unloadDepartmentId, DeliveryCommentCode.UNLOADED_FROM_PALLET, userId);
+    }
+
+    public static Delivery continuedAfterPalletLoadingReverted(final Delivery replaced, final UserId userId) {
+        return continuedAfterPallet(replaced, replaced.originDepartmentId, DeliveryCommentCode.PALLET_LOADING_REVERTED,
+                userId);
+    }
+
+    private static Delivery continuedAfterPallet(final Delivery replaced, final DepartmentId originDepartmentId,
+                                                 final DeliveryCommentCode commentCode, final UserId userId) {
+        if (replaced.status != DeliveryLifecycleStatus.CANCELED || replaced.replacedByDeliveryId == null) {
+            throw new DeliveryModificationException("Only delivery replaced by pallet delivery can be continued");
         }
-        markAsModified();
-        this.replacedByDeliveryId = null;
-        addStep(DeliveryStep.attempt(deliveryId, deliveryStatus, userId, supplierId, null, vehicleId,
-                DeliveryCommentCode.PALLET_LOADING_REVERTED, deliverySteps.size()));
-        return true;
+        final Delivery delivery = new Delivery(replaced.target, replaced.shipmentId, replaced.type, originDepartmentId,
+                replaced.destinationDepartmentId, replaced.pickupMethod, replaced.method, replaced.pickupPointId,
+                replaced.deliveryPickupPointId, null, replaced.signatureRequired, userId);
+        delivery.instructions = replaced.instructions;
+        delivery.plannedAt = replaced.plannedAt;
+        delivery.addStep(DeliveryStep.attempt(delivery.deliveryId, delivery.deliveryStatus, userId, null,
+                originDepartmentId, null, commentCode, delivery.deliverySteps.size()));
+        return delivery;
     }
 
     public void markAsCanceled() {

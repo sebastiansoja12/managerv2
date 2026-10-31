@@ -9,6 +9,7 @@ import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.identificator.VehicleId;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryLifecycleStatus;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryMethod;
+import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryTargetType;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryType;
 import com.warehouse.logisticsdelivery.domain.enumeration.PickupMethod;
 
@@ -39,5 +40,10 @@ public record DeliverySnapshot(DeliveryId deliveryId,
 
     public DeliverySnapshot {
         deliverySteps = List.copyOf(deliverySteps);
+    }
+
+    public boolean describesCurrentShipmentDelivery() {
+        return target.type() == DeliveryTargetType.SHIPMENT && type == DeliveryType.OUTBOUND
+                && status != DeliveryLifecycleStatus.CANCELED;
     }
 }
