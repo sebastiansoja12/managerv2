@@ -54,6 +54,6 @@ class SpecificationShipmentRepositoryImplTest {
 
     private ShipmentSearchCriteria searchCriteria(final Integer page, final Integer size) {
         return new ShipmentSearchCriteria(null, null, List.of(ShipmentStatus.CREATED), List.of(), null, null,
-                null, null, null, null, null, null, page, size);
+                null, null, null, null, null, null, null, page, size);
     }
 }
