@@ -13,6 +13,7 @@ import com.warehouse.process.infrastructure.event.ProcessFinishEvent;
 import com.warehouse.terminal.jaxb.HandoverResponse;
 import com.warehouse.terminal.jaxb.HandoverResponseDetailType;
 import com.warehouse.terminal.jaxb.HandoverResponseDetailsType;
+import com.warehouse.terminal.jaxb.PalletUnloadResponse;
 
 class LogisticsProcessFinishAspectTest {
 
@@ -38,6 +39,20 @@ class LogisticsProcessFinishAspectTest {
         final ProcessFinishEvent event = publishedEvent();
         assertThat(event.getProcessStatus()).isEqualTo(ProcessStatusDto.FAILURE);
         assertThat(event.getFaultDescription()).isEqualTo("Recipient signature is required for this delivery");
+    }
+
+    @Test
+    void shouldFinishFailedPalletUnloadProcessWithErrorMessage() {
+        final PalletUnloadResponse response = new PalletUnloadResponse();
+        response.setProcessId(PROCESS_ID);
+        response.setSuccess(false);
+        response.setErrorMessage("Pallet must be unloaded in its destination department");
+
+        aspect.publishProcessFinishEvent(response);
+
+        final ProcessFinishEvent event = publishedEvent();
+        assertThat(event.getProcessStatus()).isEqualTo(ProcessStatusDto.FAILURE);
+        assertThat(event.getFaultDescription()).isEqualTo("Pallet must be unloaded in its destination department");
     }
 
     private ProcessFinishEvent publishedEvent() {
