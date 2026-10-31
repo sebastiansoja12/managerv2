@@ -39,7 +39,7 @@ class MailTemplateSeedTest {
         templates.forEach(template -> localesByKey.computeIfAbsent(template.key(), key -> new HashSet<>())
                 .add(template.locale().toLanguageTag()));
         final MailRequest variablesSource = shipmentMailRequestMapper().mapCreated(shipment(ShipmentStatus.CREATED,
-                party("Jan", "jan@example.com", "PL"), party("Anna", "anna@example.com", "PL"))).get(0);
+                party("Jan", "jan@example.com", "PL"), party("Anna", "anna@example.com", "PL")), true).get(0);
         final MailTemplateRenderer renderer = new MailTemplateRenderer();
         final Map<String, String> variables = new HashMap<>(variablesSource.variables());
         variables.put("fromName", "Manager");

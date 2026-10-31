@@ -33,45 +33,48 @@ public class ShipmentMailRequestMapper {
         this.shipmentEditUrl = shipmentEditUrl;
     }
 
-    public List<MailRequest> mapCreated(final ShipmentEventData shipment) {
+    public List<MailRequest> mapCreated(final ShipmentEventData shipment, final boolean notifyRecipient) {
         if (shipment.shipmentRelatedId() != null) {
             return List.of();
         }
         return EXTERNAL_SOURCE.equals(shipment.source())
-                ? map("shipment.created.external", shipment)
-                : map("shipment.created", shipment);
+                ? map("shipment.created.external", shipment, notifyRecipient)
+                : map("shipment.created", shipment, notifyRecipient);
     }
 
     public List<MailRequest> mapStatusChanged(final ShipmentEventData shipment) {
         return shipment.shipmentStatus() == null ? List.of()
-                : map("shipment.status." + shipment.shipmentStatus().name().toLowerCase(Locale.ROOT), shipment);
+                : map("shipment.status." + shipment.shipmentStatus().name().toLowerCase(Locale.ROOT), shipment, true);
     }
 
-    public List<MailRequest> mapOutForDelivery(final ShipmentEventData shipment) {
-        return map("shipment.out-for-delivery", shipment);
+    public List<MailRequest> mapOutForDelivery(final ShipmentEventData shipment, final boolean notifyRecipient) {
+        return map("shipment.out-for-delivery", shipment, notifyRecipient);
     }
 
-    public List<MailRequest> mapDelivered(final ShipmentEventData shipment) {
-        return map("shipment.delivered", shipment);
+    public List<MailRequest> mapDelivered(final ShipmentEventData shipment, final boolean notifyRecipient) {
+        return map("shipment.delivered", shipment, notifyRecipient);
     }
 
     public List<MailRequest> mapRerouteRequested(final ShipmentRerouteRequestedIntegrationEvent event) {
         return forSenderAndRecipient("shipment.reroute.requested", event.trackingNumber(), "",
-                party(event.sender()), party(event.recipient()));
+                party(event.sender()), party(event.recipient()), true);
     }
 
-    private List<MailRequest> map(final String templateKeyPrefix, final ShipmentEventData shipment) {
+    private List<MailRequest> map(final String templateKeyPrefix,
+                                  final ShipmentEventData shipment,
+                                  final boolean notifyRecipient) {
         return forSenderAndRecipient(templateKeyPrefix,
                 shipment.trackingNumber() == null ? null : shipment.trackingNumber().value(),
                 shipment.shipmentStatus() == null ? "" : shipment.shipmentStatus().name(),
-                party(shipment.sender()), party(shipment.recipient()));
+                party(shipment.sender()), party(shipment.recipient()), notifyRecipient);
     }
 
     private List<MailRequest> forSenderAndRecipient(final String templateKeyPrefix,
                                                     final String trackingNumber,
                                                     final String status,
                                                     final MailParty sender,
-                                                    final MailParty recipient) {
+                                                    final MailParty recipient,
+                                                    final boolean notifyRecipient) {
         final Map<String, String> variables = new HashMap<>();
         final String normalizedTrackingNumber = text(trackingNumber);
         variables.put("trackingNumber", normalizedTrackingNumber);
@@ -81,7 +84,8 @@ public class ShipmentMailRequestMapper {
         putParty(variables, "sender", sender);
         putParty(variables, "recipient", recipient);
         return Stream.of(request(templateKeyPrefix + ".sender", sender, variables),
-                        request(templateKeyPrefix + ".recipient", recipient, variables))
+                        notifyRecipient ? request(templateKeyPrefix + ".recipient", recipient, variables)
+                                : Optional.<MailRequest>empty())
                 .flatMap(Optional::stream)
                 .toList();
     }
