@@ -38,5 +38,10 @@
             <artifactId>LogisticsOrchestratorApi</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>AuditLogApi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>

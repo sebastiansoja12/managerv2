@@ -7,6 +7,7 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
+import com.warehouse.deliverynetwork.application.exception.ShipmentDestinationDepartmentNotAssignedException;
 import com.warehouse.deliverynetwork.application.exception.ShipmentOriginDepartmentNotAssignedException;
 import com.warehouse.deliverynetwork.application.port.primary.command.DepartmentConnectionCommand;
 import com.warehouse.deliverynetwork.application.port.primary.command.DepartmentConnectionCodeCommand;
@@ -24,6 +25,7 @@ import com.warehouse.deliverynetwork.domain.enumeration.DepartmentStatus;
 import com.warehouse.deliverynetwork.domain.enumeration.DepartmentType;
 import com.warehouse.deliverynetwork.domain.model.DeliveryNetwork;
 import com.warehouse.deliverynetwork.domain.event.DeliveryNetworkChanged;
+import com.warehouse.deliverynetwork.application.service.ShipmentDeliveryRouteFactory;
 import com.warehouse.deliverynetwork.domain.service.DeliveryPathFinder;
 import com.warehouse.deliverynetwork.domain.vo.DeliveryPath;
 import com.warehouse.deliverynetwork.domain.vo.DepartmentConnection;
@@ -79,7 +81,8 @@ class DeliveryNetworkPortImplTest {
                 new DeliveryPathFinder(),
                 this.domainEventPublisher,
                 this.shipmentDeliveryServicePort,
-                this.shipmentRouteDocumentService);
+                this.shipmentRouteDocumentService,
+                new ShipmentDeliveryRouteFactory(new DeliveryPathFinder()));
     }
 
     @Test
@@ -211,6 +214,16 @@ class DeliveryNetworkPortImplTest {
                 new ShipmentDepartments(new ShipmentId(100L), trackingNumber, null, departmentId(3L)));
 
         assertThrows(ShipmentOriginDepartmentNotAssignedException.class,
+                () -> this.deliveryNetworkPort.findShipmentDeliveryRoute(trackingNumber));
+    }
+
+    @Test
+    void shouldRejectShipmentDeliveryRouteWithoutDestinationDepartment() {
+        final TrackingNumber trackingNumber = new TrackingNumber("TN-1");
+        when(this.shipmentDeliveryServicePort.getShipmentDepartments(trackingNumber)).thenReturn(
+                new ShipmentDepartments(new ShipmentId(100L), trackingNumber, departmentId(1L), null));
+
+        assertThrows(ShipmentDestinationDepartmentNotAssignedException.class,
                 () -> this.deliveryNetworkPort.findShipmentDeliveryRoute(trackingNumber));
     }
 
