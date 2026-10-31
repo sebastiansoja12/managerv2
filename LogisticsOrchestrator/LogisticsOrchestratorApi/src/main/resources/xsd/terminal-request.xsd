@@ -136,6 +136,31 @@
         </xs:complexType>
     </xs:element>
 
+    <xs:element name="PalletUnloadRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="DeviceInformation" type="DeviceType"/>
+                <xs:element name="PalletTrackingNumber" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="PalletUnloadResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="ProcessId" type="xs:string"/>
+                <xs:element name="Success" type="xs:boolean"/>
+                <xs:element name="PalletTrackingNumber" type="xs:string"/>
+                <xs:element name="PalletID" type="xs:string" minOccurs="0"/>
+                <xs:element name="PalletStatus" type="xs:string" minOccurs="0"/>
+                <xs:element name="AlreadyUnloaded" type="xs:boolean"/>
+                <xs:element name="ErrorCode" type="xs:string" minOccurs="0"/>
+                <xs:element name="ErrorMessage" type="xs:string" minOccurs="0"/>
+                <xs:element name="PalletScanResponseDetails" type="PalletScanResponseDetailsType" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
     <xs:complexType name="PalletScanResponseDetailsType">
         <xs:sequence>
             <xs:element name="PalletScanResponseDetail" type="PalletScanResponseDetailType" minOccurs="0" maxOccurs="unbounded"/>

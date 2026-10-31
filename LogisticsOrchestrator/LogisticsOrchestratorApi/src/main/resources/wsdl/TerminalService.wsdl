@@ -98,6 +98,31 @@
                 </xs:complexType>
             </xs:element>
 
+            <xs:element name="PalletUnloadRequest">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="DeviceInformation" type="DeviceType"/>
+                        <xs:element name="PalletTrackingNumber" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="PalletUnloadResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="ProcessId" type="xs:string"/>
+                        <xs:element name="Success" type="xs:boolean"/>
+                        <xs:element name="PalletTrackingNumber" type="xs:string"/>
+                        <xs:element name="PalletID" type="xs:string" minOccurs="0"/>
+                        <xs:element name="PalletStatus" type="xs:string" minOccurs="0"/>
+                        <xs:element name="AlreadyUnloaded" type="xs:boolean"/>
+                        <xs:element name="ErrorCode" type="xs:string" minOccurs="0"/>
+                        <xs:element name="ErrorMessage" type="xs:string" minOccurs="0"/>
+                        <xs:element name="PalletScanResponseDetails" type="PalletScanResponseDetailsType" minOccurs="0"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
             <xs:complexType name="PalletScanResponseDetailsType">
                 <xs:sequence>
                     <xs:element name="PalletScanResponseDetail" type="PalletScanResponseDetailType" minOccurs="0" maxOccurs="unbounded"/>
@@ -315,6 +340,14 @@
         <wsdl:part name="parameters" element="tns:PalletScanResponse"/>
     </wsdl:message>
 
+    <wsdl:message name="PalletUnloadRequestMessage">
+        <wsdl:part name="parameters" element="tns:PalletUnloadRequest"/>
+    </wsdl:message>
+
+    <wsdl:message name="PalletUnloadResponseMessage">
+        <wsdl:part name="parameters" element="tns:PalletUnloadResponse"/>
+    </wsdl:message>
+
     <wsdl:portType name="TerminalPortType">
         <wsdl:operation name="processTerminal">
             <wsdl:input message="tns:TerminalRequestMessage"/>
@@ -329,6 +362,11 @@
         <wsdl:operation name="processPalletScan">
             <wsdl:input message="tns:PalletScanRequestMessage"/>
             <wsdl:output message="tns:PalletScanResponseMessage"/>
+        </wsdl:operation>
+
+        <wsdl:operation name="processPalletUnload">
+            <wsdl:input message="tns:PalletUnloadRequestMessage"/>
+            <wsdl:output message="tns:PalletUnloadResponseMessage"/>
         </wsdl:operation>
     </wsdl:portType>
 
@@ -361,6 +399,18 @@
 
         <wsdl:operation name="processPalletScan">
             <soap:operation soapAction="http://warehouse.com/logistics/terminal/processPalletScan"/>
+
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="processPalletUnload">
+            <soap:operation soapAction="http://warehouse.com/logistics/terminal/processPalletUnload"/>
 
             <wsdl:input>
                 <soap:body use="literal"/>
