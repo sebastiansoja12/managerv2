@@ -6,10 +6,13 @@ import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaEven
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryPort;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreatePalletDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.RevertPalletDeliveryCommand;
+import com.warehouse.logisticsdelivery.application.port.primary.command.UnloadPalletDeliveryCommand;
 import com.warehouse.palletmanagement.api.event.PalletLoadedIntegrationEvent;
 import com.warehouse.palletmanagement.api.event.PalletLoadingRevertedIntegrationEvent;
+import com.warehouse.palletmanagement.api.event.PalletUnloadedIntegrationEvent;
 import com.warehouse.palletmanagement.api.event.snapshot.PalletLoadedEventData;
 import com.warehouse.palletmanagement.api.event.snapshot.PalletLoadingRevertedEventData;
+import com.warehouse.palletmanagement.api.event.snapshot.PalletUnloadedEventData;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -45,6 +48,19 @@ public class PalletDeliveryEventListener {
         deliveryPort.revertPalletDelivery(new RevertPalletDeliveryCommand(
                 payload.palletId(),
                 payload.shipmentIds().stream().map(ShipmentId::new).toList(),
+                event.userId()));
+    }
+
+    @KafkaEventListener(
+            topics = "${manager.kafka.topics.pallet-unloaded:pallet.unloaded}",
+            groupId = "${manager.kafka.consumer-groups.pallet-unloaded-delivery:logistics-orchestrator-pallet-unloaded}"
+    )
+    public void handle(final PalletUnloadedIntegrationEvent event) {
+        final PalletUnloadedEventData payload = event.payload();
+        deliveryPort.unloadPalletDelivery(new UnloadPalletDeliveryCommand(
+                payload.palletId(),
+                payload.unloadedShipmentIds(),
+                payload.unloadDepartmentId(),
                 event.userId()));
     }
 

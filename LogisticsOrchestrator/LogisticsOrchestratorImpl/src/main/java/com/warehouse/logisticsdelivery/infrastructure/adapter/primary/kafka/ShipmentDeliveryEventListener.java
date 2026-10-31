@@ -8,12 +8,14 @@ import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDe
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDerivedDeliveryCommand;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryMethod;
 import com.warehouse.logisticsdelivery.domain.enumeration.PickupMethod;
+import com.warehouse.logisticsdelivery.domain.vo.RecipientAddress;
 import com.warehouse.shipment.api.event.ShipmentCanceledIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentDestinationChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentStatusChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.snapshot.ShipmentDeliveryData;
+import com.warehouse.shipment.api.event.snapshot.PartySnapshot;
 import com.warehouse.shipment.api.event.snapshot.ShipmentEventData;
 import org.springframework.stereotype.Component;
 
@@ -66,9 +68,12 @@ public class ShipmentDeliveryEventListener {
             groupId = "logistics-orchestrator"
     )
     public void handle(final ShipmentChangedIntegrationEvent event) {
-        if (event instanceof ShipmentDestinationChangedIntegrationEvent destinationChangedEvent) {
-            deliveryPort.changeDestinationDepartment(event.payload().shipmentId(),
-                    destinationChangedEvent.destinationDepartmentId());
+        if (event instanceof ShipmentDestinationChangedIntegrationEvent) {
+            final PartySnapshot recipient = event.payload().recipient();
+            if (recipient != null) {
+                deliveryPort.changeRecipientAddress(event.payload().shipmentId(), new RecipientAddress(
+                        recipient.city(), recipient.street(), recipient.postalCode(), recipient.countryCode()));
+            }
             return;
         }
         final ShipmentEventData payload = event.payload();
