@@ -23,11 +23,14 @@ import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDe
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreatePalletDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.RecordDeliveryAttemptCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.RevertPalletDeliveryCommand;
+import com.warehouse.logisticsdelivery.application.port.primary.command.UnloadPalletDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryRepository;
+import com.warehouse.logisticsdelivery.application.port.secondary.DestinationDepartmentResolverPort;
 import com.warehouse.logisticsdelivery.application.port.secondary.ShipmentServicePort;
 import com.warehouse.logisticsdelivery.application.port.secondary.SignatureRepository;
 import com.warehouse.logisticsdelivery.application.port.secondary.SourceShipment;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryLifecycleStatus;
+import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryMethod;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryRelationType;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryTargetType;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryType;
@@ -41,12 +44,14 @@ import com.warehouse.logisticsdelivery.domain.event.DeliveryModified;
 import com.warehouse.logisticsdelivery.domain.exception.DeliveryAlreadyExistsException;
 import com.warehouse.logisticsdelivery.domain.exception.DeliveryModificationException;
 import com.warehouse.logisticsdelivery.domain.exception.DeliveryNotFoundException;
+import com.warehouse.logisticsdelivery.domain.exception.DestinationDepartmentNotResolvedException;
 import com.warehouse.logisticsdelivery.domain.exception.SourceShipmentNotFoundException;
 import com.warehouse.logisticsdelivery.domain.model.Delivery;
 import com.warehouse.logisticsdelivery.domain.model.Signature;
 import com.warehouse.logisticsdelivery.domain.vo.DeliverySnapshot;
 import com.warehouse.logisticsdelivery.domain.vo.DeliveryStepSnapshot;
 import com.warehouse.logisticsdelivery.domain.vo.DeliveryTarget;
+import com.warehouse.logisticsdelivery.domain.vo.RecipientAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,10 +59,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class DeliveryPortImpl implements DeliveryPort {
 
@@ -73,16 +81,20 @@ public class DeliveryPortImpl implements DeliveryPort {
 
     private final SignatureRepository signatureRepository;
 
+    private final DestinationDepartmentResolverPort destinationDepartmentResolverPort;
+
     public DeliveryPortImpl(final DeliveryRepository deliveryRepository,
                             final ShipmentServicePort shipmentServicePort,
                             final DomainEventPublisher domainEventPublisher,
                             final OperatorContextProvider operatorContextProvider,
-                            final SignatureRepository signatureRepository) {
+                            final SignatureRepository signatureRepository,
+                            final DestinationDepartmentResolverPort destinationDepartmentResolverPort) {
         this.deliveryRepository = deliveryRepository;
         this.shipmentServicePort = shipmentServicePort;
         this.domainEventPublisher = domainEventPublisher;
         this.operatorContextProvider = operatorContextProvider;
         this.signatureRepository = signatureRepository;
+        this.destinationDepartmentResolverPort = destinationDepartmentResolverPort;
     }
 
     @Override
@@ -90,8 +102,12 @@ public class DeliveryPortImpl implements DeliveryPort {
     public void createDelivery(final CreateDeliveryCommand command) {
         final DeliveryTarget target = DeliveryTarget.shipment(command.shipmentId());
         ensureDeliveryDoesNotExist(target);
+        final DepartmentId destinationDepartmentId = command.destinationDepartmentId() == null
+                && command.method() == DeliveryMethod.COURIER
+                ? resolveDestinationDepartment(command.shipmentId()).orElse(null)
+                : command.destinationDepartmentId();
         save(new Delivery(target, command.shipmentId(), DeliveryType.OUTBOUND, command.originDepartmentId(),
-                command.destinationDepartmentId(), command.pickupMethod(), command.method(), command.pickupPointId(),
+                destinationDepartmentId, command.pickupMethod(), command.method(), command.pickupPointId(),
                 command.deliveryPickupPointId(), command.signatureId(), command.signatureRequired(),
                 command.userId()), DeliveryCreated::new);
     }
@@ -134,13 +150,41 @@ public class DeliveryPortImpl implements DeliveryPort {
                 .filter(Delivery::isActive)
                 .ifPresent(palletDelivery -> {
                     cancel(palletDelivery);
-                    command.shipmentIds().forEach(shipmentId -> findOutbound(DeliveryTarget.shipment(shipmentId))
-                            .filter(delivery -> delivery.restoreReplacedByPalletDelivery(
-                                    palletDelivery.getDeliveryId(), command.userId()))
-                            .ifPresent(delivery -> save(delivery, DeliveryModified::new)));
+                    continueReplacedDeliveries(palletDelivery, command.shipmentIds(), replaced ->
+                            Delivery.continuedAfterPalletLoadingReverted(replaced, command.userId()));
                     log.info("Pallet delivery {} reverted for pallet {}", palletDelivery.getDeliveryId().getId(),
                             command.palletId());
                 });
+    }
+
+    @Override
+    @Transactional
+    public void unloadPalletDelivery(final UnloadPalletDeliveryCommand command) {
+        findOutbound(DeliveryTarget.pallet(command.palletId().value()))
+                .filter(Delivery::isActive)
+                .ifPresent(palletDelivery -> {
+                    palletDelivery.complete(palletDelivery.getSupplierId(), command.userId(),
+                            command.unloadDepartmentId());
+                    save(palletDelivery, DeliveryCompleted::new);
+                    continueReplacedDeliveries(palletDelivery, command.shipmentIds(), replaced ->
+                            Delivery.continuedAfterPalletUnloading(replaced, command.unloadDepartmentId(),
+                                    command.userId()));
+                    log.info("Pallet delivery {} completed after unloading pallet {}",
+                            palletDelivery.getDeliveryId().getId(), command.palletId().value());
+                });
+    }
+
+    private void continueReplacedDeliveries(final Delivery palletDelivery, final List<ShipmentId> shipmentIds,
+                                            final Function<Delivery, Delivery> continuation) {
+        final Map<ShipmentId, Delivery> replacedDeliveries = new LinkedHashMap<>();
+        this.deliveryRepository.findReplacedBy(palletDelivery.getDeliveryId())
+                .forEach(replaced -> replacedDeliveries.putIfAbsent(replaced.getShipmentId(), replaced));
+        shipmentIds.stream()
+                .filter(replacedDeliveries::containsKey)
+                .filter(shipmentId -> !hasCurrentDelivery(DeliveryTarget.shipment(shipmentId)))
+                .filter(shipmentId -> !this.shipmentServicePort.isCanceled(shipmentId))
+                .map(shipmentId -> continuation.apply(replacedDeliveries.get(shipmentId)))
+                .forEach(delivery -> save(delivery, DeliveryCreated::new));
     }
 
     private Delivery reopen(final Delivery delivery, final CreatePalletDeliveryCommand command) {
@@ -163,7 +207,7 @@ public class DeliveryPortImpl implements DeliveryPort {
     @Override
     @Transactional
     public DeliverySnapshot recordAttempt(final RecordDeliveryAttemptCommand command) {
-        final Delivery delivery = this.deliveryRepository.findByTargetAndType(command.target(), command.type())
+        final Delivery delivery = this.deliveryRepository.findCurrentByTargetAndType(command.target(), command.type())
                 .orElseThrow(() -> new DeliveryNotFoundException("Delivery for target " + command.target().id()
                         + " was not found"));
         delivery.recordAttempt(command.deliveryStatus(), command.userId(), command.supplierId(),
@@ -173,10 +217,12 @@ public class DeliveryPortImpl implements DeliveryPort {
 
     @Override
     @Transactional
-    public void changeDestinationDepartment(final ShipmentId shipmentId, final DepartmentId destinationDepartmentId) {
-        findActiveShipmentDelivery(shipmentId)
-                .filter(delivery -> delivery.changeDestinationDepartment(destinationDepartmentId))
-                .ifPresent(delivery -> save(delivery, DeliveryModified::new));
+    public void changeRecipientAddress(final ShipmentId shipmentId, final RecipientAddress recipientAddress) {
+        findActiveShipmentDelivery(shipmentId).ifPresent(delivery -> {
+            final DeliverySnapshot before = delivery.snapshot();
+            delivery.changeRecipientAddress(recipientAddress, this.destinationDepartmentResolverPort::resolve);
+            saveModifiedWhen(delivery, !delivery.snapshot().equals(before));
+        });
     }
 
     @Override
@@ -192,6 +238,7 @@ public class DeliveryPortImpl implements DeliveryPort {
             this.shipmentServicePort.findDerivedShipment(shipmentId)
                     .filter(id -> !id.equals(shipmentId) && !sourceShipmentId.map(id::equals).orElse(false))
                     .ifPresent(id -> addShipmentRelations(relations, DeliveryRelationType.DERIVED, id));
+            addContinuationRelations(relations, delivery);
         }
         Optional.ofNullable(delivery.getReplacedByDeliveryId())
                 .flatMap(this.deliveryRepository::findById)
@@ -232,6 +279,17 @@ public class DeliveryPortImpl implements DeliveryPort {
         return saveModifiedWhen(delivery, delivery.changeRoute(command.originDepartmentId(),
                 command.destinationDepartmentId(), command.pickupMethod(), command.pickupPointId(),
                 command.deliveryPickupPointId()));
+    }
+
+    @Override
+    @Transactional
+    public DeliverySnapshot resolveDestinationDepartment(final DeliveryId deliveryId) {
+        final Delivery delivery = find(deliveryId);
+        final DepartmentId destinationDepartmentId = resolveDestinationDepartment(delivery.getShipmentId())
+                .orElseThrow(() -> new DestinationDepartmentNotResolvedException(
+                        "Destination department of delivery " + deliveryId.getId() + " could not be resolved"));
+        delivery.assignDestinationDepartment(destinationDepartmentId);
+        return save(delivery, DeliveryModified::new);
     }
 
     @Override
@@ -385,10 +443,37 @@ public class DeliveryPortImpl implements DeliveryPort {
         save(delivery, DeliveryCanceled::new);
     }
 
+    private void addContinuationRelations(final List<DeliveryRelation> relations, final Delivery delivery) {
+        final List<Delivery> newestFirst = this.deliveryRepository.findByTarget(delivery.getTarget()).stream()
+                .filter(other -> other.getType() == delivery.getType())
+                .toList();
+        final List<DeliveryId> newestFirstIds = newestFirst.stream().map(Delivery::getDeliveryId).toList();
+        final int position = newestFirstIds.indexOf(delivery.getDeliveryId());
+        for (int index = 0; index < newestFirst.size(); index++) {
+            if (index != position) {
+                relations.add(new DeliveryRelation(index > position
+                        ? DeliveryRelationType.CONTINUES
+                        : DeliveryRelationType.CONTINUED_BY, newestFirst.get(index).snapshot()));
+            }
+        }
+    }
+
     private void addShipmentRelations(final List<DeliveryRelation> relations, final DeliveryRelationType relation,
                                       final ShipmentId shipmentId) {
         this.deliveryRepository.findByTarget(DeliveryTarget.shipment(shipmentId))
                 .forEach(related -> relations.add(new DeliveryRelation(relation, related.snapshot())));
+    }
+
+    private Optional<DepartmentId> resolveDestinationDepartment(final ShipmentId shipmentId) {
+        if (shipmentId == null) {
+            return Optional.empty();
+        }
+        final Optional<DepartmentId> destinationDepartmentId = this.shipmentServicePort.findRecipientAddress(shipmentId)
+                .flatMap(this.destinationDepartmentResolverPort::resolve);
+        if (destinationDepartmentId.isEmpty()) {
+            log.warn("Destination department of shipment {} could not be resolved", shipmentId.getValue());
+        }
+        return destinationDepartmentId;
     }
 
     private Delivery find(final DeliveryId deliveryId) {
@@ -397,7 +482,7 @@ public class DeliveryPortImpl implements DeliveryPort {
     }
 
     private Optional<Delivery> findOutbound(final DeliveryTarget target) {
-        return this.deliveryRepository.findByTargetAndType(target, DeliveryType.OUTBOUND);
+        return this.deliveryRepository.findCurrentByTargetAndType(target, DeliveryType.OUTBOUND);
     }
 
     private Optional<Delivery> findActiveShipmentDelivery(final ShipmentId shipmentId) {
@@ -428,8 +513,14 @@ public class DeliveryPortImpl implements DeliveryPort {
     }
 
     private void ensureDeliveryDoesNotExist(final DeliveryTarget target) {
-        if (findOutbound(target).isPresent()) {
+        if (hasCurrentDelivery(target)) {
             throw new DeliveryAlreadyExistsException("Delivery for shipment " + target.id() + " already exists");
         }
+    }
+
+    private boolean hasCurrentDelivery(final DeliveryTarget target) {
+        return findOutbound(target)
+                .filter(delivery -> delivery.getStatus() != DeliveryLifecycleStatus.CANCELED)
+                .isPresent();
     }
 }

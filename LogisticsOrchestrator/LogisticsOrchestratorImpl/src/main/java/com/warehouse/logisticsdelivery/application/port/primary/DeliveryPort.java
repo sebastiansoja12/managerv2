@@ -20,8 +20,10 @@ import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDe
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreatePalletDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.RecordDeliveryAttemptCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.RevertPalletDeliveryCommand;
+import com.warehouse.logisticsdelivery.application.port.primary.command.UnloadPalletDeliveryCommand;
 import com.warehouse.logisticsdelivery.domain.model.Signature;
 import com.warehouse.logisticsdelivery.domain.vo.DeliverySnapshot;
+import com.warehouse.logisticsdelivery.domain.vo.RecipientAddress;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,11 +38,15 @@ public interface DeliveryPort {
 
     void revertPalletDelivery(final RevertPalletDeliveryCommand command);
 
+    void unloadPalletDelivery(final UnloadPalletDeliveryCommand command);
+
     void completeDelivery(final CompleteDeliveryCommand command);
 
     DeliverySnapshot recordAttempt(final RecordDeliveryAttemptCommand command);
 
-    void changeDestinationDepartment(final ShipmentId shipmentId, final DepartmentId destinationDepartmentId);
+    void changeRecipientAddress(final ShipmentId shipmentId, final RecipientAddress recipientAddress);
+
+    DeliverySnapshot resolveDestinationDepartment(final DeliveryId deliveryId);
 
     List<DeliveryRelation> findRelatedDeliveries(final DeliveryId deliveryId);
 

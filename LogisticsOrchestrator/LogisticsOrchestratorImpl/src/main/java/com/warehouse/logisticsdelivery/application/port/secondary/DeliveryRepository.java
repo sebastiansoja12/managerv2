@@ -15,7 +15,7 @@ public interface DeliveryRepository {
 
     Optional<Delivery> findById(final DeliveryId deliveryId);
 
-    Optional<Delivery> findByTargetAndType(final DeliveryTarget target, final DeliveryType type);
+    Optional<Delivery> findCurrentByTargetAndType(final DeliveryTarget target, final DeliveryType type);
 
     Optional<Delivery> findActiveByTargetAndType(final DeliveryTarget target, final DeliveryType type);
 

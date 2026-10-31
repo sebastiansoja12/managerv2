@@ -21,6 +21,7 @@ public record DeliveryReadFilter(List<ShipmentId> shipmentIds,
                                  DeliveryTargetType targetType,
                                  DeliveryMethod method,
                                  DepartmentId departmentId,
+                                 boolean missingDestination,
                                  LocalDate createdFrom,
                                  LocalDate createdTo) {
 
@@ -33,6 +34,6 @@ public record DeliveryReadFilter(List<ShipmentId> shipmentIds,
 
     public static DeliveryReadFilter byShipments(final List<ShipmentId> shipmentIds) {
         return new DeliveryReadFilter(shipmentIds, null, List.of(), false, false, List.of(), null, null, null, null,
-                null, null);
+                false, null, null);
     }
 }

@@ -41,13 +41,22 @@ public class DeliveryRepositoryImpl implements DeliveryRepository {
     }
 
     @Override
-    public Optional<Delivery> findByTargetAndType(final DeliveryTarget target, final DeliveryType type) {
+    public Optional<Delivery> findCurrentByTargetAndType(final DeliveryTarget target, final DeliveryType type) {
         return repository.createCriteria(DeliveryEntity.class)
                 .eq("targetType", target.type())
                 .eq("targetId", target.id())
                 .eq("type", type)
+                .ne("status", DeliveryLifecycleStatus.CANCELED)
+                .desc("created")
                 .maxResults(1)
                 .one()
+                .or(() -> repository.createCriteria(DeliveryEntity.class)
+                        .eq("targetType", target.type())
+                        .eq("targetId", target.id())
+                        .eq("type", type)
+                        .desc("created")
+                        .maxResults(1)
+                        .one())
                 .map(mapper::toDomain);
     }
 
@@ -58,6 +67,7 @@ public class DeliveryRepositoryImpl implements DeliveryRepository {
                 .eq("targetId", target.id())
                 .eq("type", type)
                 .notIn("status", List.of(DeliveryLifecycleStatus.CANCELED, DeliveryLifecycleStatus.COMPLETED))
+                .desc("created")
                 .maxResults(1)
                 .one()
                 .map(mapper::toDomain);
