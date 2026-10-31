@@ -1,9 +1,11 @@
 package com.warehouse.logisticsdelivery.configuration;
 
+import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.repository.BaseRepository;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
+import com.warehouse.geocoding.api.GeocodingCoordinatesService;
 import com.warehouse.logisticsdelivery.api.DeliveryApiService;
 import com.warehouse.logisticsdelivery.api.DeliveryReadModelRebuildApiService;
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryHistoryPort;
@@ -12,10 +14,12 @@ import com.warehouse.logisticsdelivery.application.port.primary.DeliveryPort;
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryPortImpl;
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryReadModelPort;
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryReadModelPortImpl;
+import com.warehouse.logisticsdelivery.application.port.secondary.AuditLogServicePort;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryEventDataMapperPort;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryHistoryRepository;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryReadModelRepository;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryRepository;
+import com.warehouse.logisticsdelivery.application.port.secondary.DestinationDepartmentResolverPort;
 import com.warehouse.logisticsdelivery.application.port.secondary.ShipmentServicePort;
 import com.warehouse.logisticsdelivery.application.port.secondary.SignatureRepository;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.DeliveryApiServiceAdapter;
@@ -24,9 +28,11 @@ import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.mapper.Del
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.mapper.DeliveryReadModelResponseMapper;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.mapper.DeliveryRequestMapper;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.mapper.DeliveryResponseMapper;
+import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.AuditLogServiceAdapter;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.DeliveryHistoryRepositoryImpl;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.DeliveryReadModelRepositoryImpl;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.DeliveryRepositoryImpl;
+import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.DestinationDepartmentResolverAdapter;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.ShipmentServiceAdapter;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.SignatureReadRepository;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.SignatureRepositoryImpl;
@@ -36,15 +42,28 @@ import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.entity.D
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.mapper.DeliveryEventDataMapper;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.mapper.DeliveryHistoryEntityMapper;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.mapper.DeliveryReadModelMapper;
+import com.warehouse.organisationstructure.deliveryarea.api.DeliveryAreaApiService;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.shipment.infrastructure.ShipmentApiService;
+import com.warehouse.voronoi.VoronoiService;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class DeliveryConfiguration {
+
+    @Bean("deliveryAuditLogServicePort")
+    @ConditionalOnProperty(
+            name = {"manager.kafka.integration-events.enabled", "manager.kafka.outbox.enabled"},
+            havingValue = "true")
+    public AuditLogServicePort deliveryAuditLogServicePort(
+            final IntegrationEventPublisher integrationEventPublisher) {
+        return new AuditLogServiceAdapter(integrationEventPublisher);
+    }
 
     @Bean
     public BaseRepository<DeliveryEntity> deliveryEntityRepository(
@@ -97,9 +116,20 @@ public class DeliveryConfiguration {
                                      final ShipmentServicePort shipmentServicePort,
                                      final DomainEventPublisher domainEventPublisher,
                                      final OperatorContextProvider operatorContextProvider,
-                                     final SignatureRepository signatureRepository) {
+                                     final SignatureRepository signatureRepository,
+                                     final DestinationDepartmentResolverPort destinationDepartmentResolverPort) {
         return new DeliveryPortImpl(deliveryRepository, shipmentServicePort, domainEventPublisher,
-                operatorContextProvider, signatureRepository);
+                operatorContextProvider, signatureRepository, destinationDepartmentResolverPort);
+    }
+
+    @Bean
+    public DestinationDepartmentResolverPort destinationDepartmentResolverPort(
+            final GeocodingCoordinatesService geocodingCoordinatesService,
+            final DeliveryAreaApiService deliveryAreaApiService,
+            final VoronoiService voronoiService,
+            final DepartmentApiService departmentApiService) {
+        return new DestinationDepartmentResolverAdapter(geocodingCoordinatesService, deliveryAreaApiService,
+                voronoiService, departmentApiService);
     }
 
     @Bean
