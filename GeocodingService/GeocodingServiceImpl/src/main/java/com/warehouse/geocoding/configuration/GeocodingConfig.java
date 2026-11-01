@@ -1,9 +1,13 @@
 package com.warehouse.geocoding.configuration;
 
+import java.time.Duration;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
 
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.commonassets.security.CredentialCipher;
@@ -59,23 +63,41 @@ public class GeocodingConfig {
     }
 
     @Bean
-    public GeocodingProviderServicePort positionStackProviderServicePort() {
-        return new GeolocationPositionStackClientServiceAdapter();
+    public RestTemplate geocodingRestTemplate(
+            @Value("${geocoding.http.connect-timeout:2s}") final Duration connectTimeout,
+            @Value("${geocoding.http.read-timeout:5s}") final Duration readTimeout) {
+        final SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(connectTimeout);
+        requestFactory.setReadTimeout(readTimeout);
+        return new RestTemplate(requestFactory);
     }
 
     @Bean
-    public GeocodingProviderServicePort geoapifyProviderServicePort() {
-        return new GeolocationGeoapifyClientServiceAdapter();
+    public GeocodingProviderServicePort positionStackProviderServicePort(final RestTemplate geocodingRestTemplate) {
+        final GeolocationPositionStackClientServiceAdapter adapter = new GeolocationPositionStackClientServiceAdapter();
+        adapter.setRestTemplate(geocodingRestTemplate);
+        return adapter;
     }
 
     @Bean
-    public GeocodingProviderServicePort openCageProviderServicePort() {
-        return new GeolocationOpenCageClientServiceAdapter();
+    public GeocodingProviderServicePort geoapifyProviderServicePort(final RestTemplate geocodingRestTemplate) {
+        final GeolocationGeoapifyClientServiceAdapter adapter = new GeolocationGeoapifyClientServiceAdapter();
+        adapter.setRestTemplate(geocodingRestTemplate);
+        return adapter;
     }
 
     @Bean
-    public GeocodingProviderServicePort geocodifyProviderServicePort() {
-        return new GeolocationGeocodifyClientServiceAdapter();
+    public GeocodingProviderServicePort openCageProviderServicePort(final RestTemplate geocodingRestTemplate) {
+        final GeolocationOpenCageClientServiceAdapter adapter = new GeolocationOpenCageClientServiceAdapter();
+        adapter.setRestTemplate(geocodingRestTemplate);
+        return adapter;
+    }
+
+    @Bean
+    public GeocodingProviderServicePort geocodifyProviderServicePort(final RestTemplate geocodingRestTemplate) {
+        final GeolocationGeocodifyClientServiceAdapter adapter = new GeolocationGeocodifyClientServiceAdapter();
+        adapter.setRestTemplate(geocodingRestTemplate);
+        return adapter;
     }
 
     @Bean
