@@ -44,7 +44,7 @@ public class CsvControllerIntegrationTest {
         final ShipmentPartyDto party = new ShipmentPartyDto("Jan", "Kowalski", "jan@test.pl", "123456789",
                 "Katowice", "40-000", "Mariacka 1", "PL");
         when(shipmentApiService.getShipmentDocument(any())).thenReturn(new ShipmentDocumentDto(
-                new ShipmentId(parcelId), null, null, null, null, party, party));
+                new ShipmentId(parcelId), null, null, null, null, party, party, null, null, null));
         // when
         mockMvc.perform(get("/v1/api/csv/{id}", parcelId).contextPath("/v1/api"))
         // then

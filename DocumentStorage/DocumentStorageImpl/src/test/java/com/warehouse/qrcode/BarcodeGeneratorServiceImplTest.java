@@ -1,12 +1,9 @@
 package com.warehouse.qrcode;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import java.io.IOException;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
-import com.itextpdf.text.BadElementException;
 import com.lowagie.text.Image;
 import com.warehouse.qrcode.domain.service.BarcodeGeneratorService;
 import com.warehouse.qrcode.domain.service.BarcodeGeneratorServiceImpl;
@@ -14,7 +11,7 @@ import com.warehouse.qrcode.domain.service.BarcodeGeneratorServiceImpl;
 public class BarcodeGeneratorServiceImplTest {
 
     @Test
-    public void shouldCreateQrCodeImage() throws BadElementException, IOException {
+    public void shouldCreateQrCodeImage() throws Exception {
         // given
         final BarcodeGeneratorService barcodeGeneratorService = new BarcodeGeneratorServiceImpl();
         final String barcodeText = "INP000000123";
@@ -23,6 +20,8 @@ public class BarcodeGeneratorServiceImplTest {
         final Image resultImage = barcodeGeneratorService.generateQRCodeImage(barcodeText);
 
         // then
-        assertNotNull(resultImage);
+        assertThat(resultImage).isNotNull();
+        assertThat(resultImage.getWidth()).isEqualTo(400);
+        assertThat(resultImage.getHeight()).isEqualTo(400);
     }
 }

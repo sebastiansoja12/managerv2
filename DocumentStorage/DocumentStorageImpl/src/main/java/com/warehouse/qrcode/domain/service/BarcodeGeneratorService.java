@@ -1,14 +1,11 @@
 package com.warehouse.qrcode.domain.service;
 
-import com.google.zxing.WriterException;
-import com.itextpdf.text.BadElementException;
-import com.lowagie.text.Image;
-
 import java.io.IOException;
+
+import com.google.zxing.WriterException;
+import com.lowagie.text.Image;
 
 public interface BarcodeGeneratorService {
 
-    Image getQRCodeImage(Long text) throws WriterException, IOException, BadElementException;
-
-    Image generateQRCodeImage(String barcodeText) throws BadElementException, IOException;
+    Image generateQRCodeImage(final String barcodeText) throws WriterException, IOException;
 }
