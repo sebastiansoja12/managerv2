@@ -34,6 +34,7 @@ under `/v1/api`.
 | `ProcessHub` | Process logs and process details used by the GUI. |
 | `DepartmentMap` | Department floor plans (`department_maps`, elements), storage-location occupancy with optimistic locking, pallet placement, reservations and location history (`/department-maps`). |
 | `Device` | Device pairing, device verification and terminal/device access validation. |
+| `AuditLog` | Shared operator-scoped audit log (`/audit-log`): what was done (resource, action, changed fields) and who did it (user, department). Modules translate their domain events into `AuditLogEntryIntegrationEvent`, publish it through the Kafka outbox (`audit-log.entries`) and `AuditLogKafkaEventListener` stores it idempotently by event ID. |
 | `McpServer` | Read-only MCP server (`/v1/api/mcp`) exposing shipment, process and device lookups to AI assistants. |
 | `SupplierServiceManagement` | Suppliers, package types, delivery areas, vehicle data and supplier updates. |
 | `GeocodingService` | Geocoding provider configuration and geocoding API. |
