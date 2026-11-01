@@ -37,8 +37,10 @@ public interface McpCommandPort {
     DepartmentDetails changeDepartmentAddress(final DepartmentCode departmentCode, final DepartmentAddress address);
     DepartmentDetails changeDepartmentType(final DepartmentCode departmentCode, final String type);
     DepartmentDetails changeDepartmentEmail(final DepartmentCode departmentCode, final String email);
-    DepartmentDetails changeDepartmentStatus(final DepartmentCode departmentCode, final String status);
-    DepartmentDetails changeDepartmentActive(final DepartmentCode departmentCode, final boolean active);
+    DepartmentDetails changeDepartmentStatus(final DepartmentCode departmentCode, final String status,
+                                             final String reason);
+    DepartmentDetails changeDepartmentActive(final DepartmentCode departmentCode, final boolean active,
+                                             final String reason);
     SupplierCode createCourier(final CourierDraft courier);
     void updateCourier(final CourierChange change);
     void changeCourierActive(final SupplierCode courierCode, final boolean active);
