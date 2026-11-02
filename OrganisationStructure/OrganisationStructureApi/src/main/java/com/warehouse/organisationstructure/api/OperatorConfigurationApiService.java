@@ -7,7 +7,9 @@ import com.warehouse.organisationstructure.api.dto.ShipmentLimitsDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentNotificationConfigurationDto;
 
 import java.util.Optional;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.organisationstructure.api.dto.DepartmentConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.DepartmentConfigurationsDto;
 import com.warehouse.organisationstructure.api.dto.FleetConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.CommunicationConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.RegionalConfigurationDto;
@@ -29,6 +31,10 @@ public interface OperatorConfigurationApiService {
     DepartmentConfigurationDto getCurrentDepartmentConfiguration();
 
     DepartmentConfigurationDto updateCurrentDepartmentConfiguration(final DepartmentConfigurationDto configuration);
+
+    DepartmentConfigurationDto getDepartmentConfiguration(final DepartmentId departmentId);
+
+    DepartmentConfigurationsDto getDepartmentConfigurations();
 
     FleetConfigurationDto getCurrentFleetConfiguration();
 
