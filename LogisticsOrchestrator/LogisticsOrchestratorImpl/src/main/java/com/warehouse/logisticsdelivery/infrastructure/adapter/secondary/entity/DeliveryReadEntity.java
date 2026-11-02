@@ -53,6 +53,10 @@ public class DeliveryReadEntity extends BelongsToOperator {
     @AttributeOverride(name = "value", column = @Column(name = "destination_department_id"))
     private DepartmentId destinationDepartmentId;
 
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "current_department_id"))
+    private DepartmentId currentDepartmentId;
+
     @Column(name = "delivery_method")
     @Enumerated(EnumType.STRING)
     private DeliveryMethod method;
@@ -79,6 +83,7 @@ public class DeliveryReadEntity extends BelongsToOperator {
                                final DeliveryLifecycleStatus status,
                                final DepartmentId originDepartmentId,
                                final DepartmentId destinationDepartmentId,
+                               final DepartmentId currentDepartmentId,
                                final DeliveryMethod method,
                                final Integer stepCount,
                                final LocalDateTime created,
@@ -92,6 +97,7 @@ public class DeliveryReadEntity extends BelongsToOperator {
         this.status = status;
         this.originDepartmentId = originDepartmentId;
         this.destinationDepartmentId = destinationDepartmentId;
+        this.currentDepartmentId = currentDepartmentId;
         this.method = method;
         this.stepCount = stepCount;
         this.created = created;
@@ -107,6 +113,7 @@ public class DeliveryReadEntity extends BelongsToOperator {
     public DeliveryLifecycleStatus getStatus() { return status; }
     public DepartmentId getOriginDepartmentId() { return originDepartmentId; }
     public DepartmentId getDestinationDepartmentId() { return destinationDepartmentId; }
+    public DepartmentId getCurrentDepartmentId() { return currentDepartmentId; }
     public DeliveryMethod getMethod() { return method; }
     public Integer getStepCount() { return stepCount; }
     public LocalDateTime getCreated() { return created; }
