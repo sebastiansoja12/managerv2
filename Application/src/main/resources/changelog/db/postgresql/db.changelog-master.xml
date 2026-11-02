@@ -119,4 +119,12 @@
     <include file="changes/2026-10-31-mail-templates-shipment-status-collected.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-31-activity-stream.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-11-01-audit-log-rename.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-01-geocoding-addresses.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-02-operator-shipment-policy-configuration.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-03-operator-fleet-communication-regional-configuration.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-03-operator-sorting-configuration.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-03-operator-department-policies.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-03-operator-pickup-point-configuration.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-03-department-map-directions.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-03-delivery-rd-current-department.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
