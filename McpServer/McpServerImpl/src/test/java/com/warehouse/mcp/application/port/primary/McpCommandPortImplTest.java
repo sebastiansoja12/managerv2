@@ -85,7 +85,7 @@ class McpCommandPortImplTest {
     void shouldRequireAdministratorToChangeDepartmentStatus() {
         when(currentUserServicePort.currentUser()).thenReturn(McpFixture.user("MANAGER"));
 
-        assertThatThrownBy(() -> port(true).changeDepartmentStatus(new DepartmentCode("KT1"), "SUSPENDED"))
+        assertThatThrownBy(() -> port(true).changeDepartmentStatus(new DepartmentCode("KT1"), "SUSPENDED", null))
                 .isInstanceOf(McpToolAccessException.class);
         verifyNoInteractions(departmentServicePort);
     }
