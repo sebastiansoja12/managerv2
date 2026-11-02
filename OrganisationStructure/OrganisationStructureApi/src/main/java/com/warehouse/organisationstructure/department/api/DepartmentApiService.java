@@ -11,6 +11,7 @@ import com.warehouse.organisationstructure.department.api.dto.DepartmentDto;
 
 import java.util.List;
 import java.util.Optional;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentAddressDto;
 
 public interface DepartmentApiService {
     List<DepartmentDto> getAllDepartments();
@@ -23,4 +24,14 @@ public interface DepartmentApiService {
     boolean checkIfAnyExistsWithCountryCode(final CountryCode countryCode);
     List<DepartmentDetailsDto> getDepartmentDetails();
     DepartmentCodeDto createDepartment(final CreateDepartmentApiRequest request);
+
+    void changeAddress(final DepartmentCode departmentCode, final DepartmentAddressDto address);
+
+    void changeDepartmentType(final DepartmentCode departmentCode, final String departmentType);
+
+    void changeEmail(final DepartmentCode departmentCode, final String email);
+
+    void changeStatus(final DepartmentCode departmentCode, final String status);
+
+    void changeActive(final DepartmentCode departmentCode, final boolean active);
 }
