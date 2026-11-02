@@ -10,5 +10,6 @@ public record MapElementApi(String elementId,
                             Double rotation,
                             String color,
                             String locationCode,
-                            Integer capacity) {
+                            Integer capacity,
+                            String destinationDepartmentCode) {
 }
