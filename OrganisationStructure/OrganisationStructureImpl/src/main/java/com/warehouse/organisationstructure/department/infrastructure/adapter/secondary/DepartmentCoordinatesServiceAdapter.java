@@ -17,7 +17,8 @@ public class DepartmentCoordinatesServiceAdapter implements DepartmentCoordinate
 
     @Override
     public Coordinates getCoordinates(final Address address) {
-        final GeocodingAddressDto request = new GeocodingAddressDto(address.city(), address.street(), address.postalCode());
+        final GeocodingAddressDto request = new GeocodingAddressDto(address.city(), address.street(), address.postalCode(),
+                address.countryCode() == null ? null : address.countryCode().name());
         final GeocodingCoordinatesDto coordinates = this.geocodingCoordinatesService.findCoordinates(request);
         return new Coordinates(coordinates.latitude(), coordinates.longitude());
     }
