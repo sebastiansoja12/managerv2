@@ -1,5 +1,7 @@
 package com.warehouse.auth.infrastructure.adapter.primary;
 
+import java.time.Instant;
+
 import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.primary.CurrentUserAuthenticationPort;
@@ -48,7 +50,7 @@ class CurrentUserControllerTest {
     }
 
     @Test
-    void shouldReturnCurrentApiKeyWithoutCachingTheProfile() throws Exception {
+    void shouldReportApiKeyPresenceWithoutExposingStoredKey() throws Exception {
         final UserId userId = new UserId(17L);
         final DepartmentId departmentId = new DepartmentId(11L);
         final OrganizationUser user = OrganizationUser.of(userId, "profile-user", "password", "Profile", "User",
@@ -61,7 +63,14 @@ class CurrentUserControllerTest {
         mockMvc.perform(get("/auth/me"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Cache-Control", "no-store"))
-                .andExpect(jsonPath("$.apiKey").value("mgr_existing-key"));
+                .andExpect(jsonPath("$.apiKey").doesNotExist())
+                .andExpect(jsonPath("$.hasApiKey").value(false));
+
+        user.issueApiKey("issued-key-hash", Instant.now());
+
+        mockMvc.perform(get("/auth/me"))
+                .andExpect(jsonPath("$.apiKey").doesNotExist())
+                .andExpect(jsonPath("$.hasApiKey").value(true));
     }
 
     @Test
