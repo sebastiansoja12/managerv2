@@ -35,7 +35,7 @@ class DepartmentMapControllerTest {
         final InMemoryDepartmentMapStore store = new InMemoryDepartmentMapStore(Set.of(DEPARTMENT_ID), OPERATOR_ID,
                 USER_ID);
         final DepartmentMapController controller = new DepartmentMapController(
-                new DepartmentMapPortImpl(store, store, store, store, new StorageLocationSynchronizer()),
+                new DepartmentMapPortImpl(store, store, store, store, store, new StorageLocationSynchronizer()),
                 new PalletLocationPortImpl(store, store, store, store));
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new DepartmentMapExceptionHandler())
@@ -59,7 +59,9 @@ class DepartmentMapControllerTest {
                                 + "\"x\":1,\"y\":1,\"width\":1.2,\"height\":0.8,\"rotation\":90,"
                                 + "\"locationCode\":\"a-01\",\"capacity\":1},"
                                 + "{\"type\":\"sorter\",\"label\":\"Sorter\",\"x\":5,\"y\":10,\"width\":20,"
-                                + "\"height\":1.2,\"rotation\":0}]}"))
+                                + "\"height\":1.2,\"rotation\":0},"
+                                + "{\"type\":\"ramp\",\"label\":\"KT1\",\"x\":30,\"y\":17,\"width\":3,"
+                                + "\"height\":2,\"destinationDepartmentCode\":\"KT1\"}]}"))
                 .andReturn(), 200);
         final JsonNode placed = json(mockMvc.perform(post("/department-maps/locations/" + locationId + "/pallets")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -70,6 +72,8 @@ class DepartmentMapControllerTest {
         assertEquals(1, saved.get("version").asLong());
         assertEquals("A-01", saved.get("elements").get(0).get("locationCode").asText());
         assertEquals("SORTER", saved.get("elements").get(1).get("type").asText());
+        assertEquals("KT1", saved.get("elements").get(2).get("destinationDepartmentCode").asText());
+        assertEquals("PO1", saved.get("directions").get(1).get("departmentCode").asText());
         assertEquals("PAL000000000001", placed.get("palletTrackingNumber").asText());
         assertEquals("A-01", placed.get("locationCode").asText());
         assertEquals("OCCUPIED", map.get("locations").get(0).get("status").asText());
