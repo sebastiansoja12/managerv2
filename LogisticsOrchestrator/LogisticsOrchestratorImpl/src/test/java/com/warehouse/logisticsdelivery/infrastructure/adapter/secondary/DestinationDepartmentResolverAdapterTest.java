@@ -2,6 +2,7 @@ package com.warehouse.logisticsdelivery.infrastructure.adapter.secondary;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.geocoding.api.GeocodingAddressDto;
 import com.warehouse.geocoding.api.GeocodingCoordinatesDto;
 import com.warehouse.geocoding.api.GeocodingCoordinatesService;
 import com.warehouse.logisticsdelivery.domain.vo.RecipientAddress;
@@ -20,6 +21,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -42,6 +44,17 @@ class DestinationDepartmentResolverAdapterTest {
 
         assertThat(adapter.resolve(ADDRESS)).contains(new DepartmentId(5L));
         verifyNoInteractions(voronoiService);
+    }
+
+    @Test
+    void shouldGeocodeRecipientAddressWithCountryCode() {
+        when(geocodingCoordinatesService.findCoordinates(any())).thenReturn(new GeocodingCoordinatesDto(52.2, 21.0));
+        when(deliveryAreaApiService.findServingDepartment(any())).thenReturn(Optional.of(new DepartmentId(5L)));
+
+        adapter.resolve(ADDRESS);
+
+        verify(geocodingCoordinatesService).findCoordinates(
+                new GeocodingAddressDto("Warszawa", "Długa 1", "00-001", "PL"));
     }
 
     @Test
