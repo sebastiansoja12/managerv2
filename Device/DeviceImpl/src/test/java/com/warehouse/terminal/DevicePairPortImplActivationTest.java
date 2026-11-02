@@ -224,7 +224,7 @@ class DevicePairPortImplActivationTest {
                 new DevicePairKey(DeviceAccessFixture.PAIR_KEY), "1.1.0", null, null, null, null)).updateRequired();
 
         verify(deviceGenericService).updateVersionField(DeviceAccessFixture.DEVICE_ID, "1.1.0");
-        verify(devicePairService).markSeen(devicePair);
+        verify(devicePairService).recordHeartbeat(devicePair);
         verify(deviceGenericService, never()).updateHardware(any(), any());
         verify(deviceGenericService, never()).updateSoftware(any(), any());
         assertFalse(updateRequired);
