@@ -33,7 +33,7 @@ class ReadModelRebuildApiServiceAdapterTest {
 
     @Test
     void shouldExposeAllReadModelTypes() {
-        assertThat(adapter.readModelTypes()).containsExactly("SHIPMENT", "DEPARTMENT", "DELIVERY");
+        assertThat(adapter.readModelTypes()).containsExactly("SHIPMENT", "DEPARTMENT", "DELIVERY", "PICKUP_POINT");
     }
 
     @Test
