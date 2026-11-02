@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-02-operator-shipment-policy-configuration" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="operator_configurations"/>
+                <not>
+                    <columnExists tableName="operator_configurations" columnName="shipment_require_delivery_token"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="operator_configurations">
+            <column name="shipment_require_delivery_token" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_proof_of_delivery" type="VARCHAR(32)" defaultValue="SIGNATURE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_max_delivery_attempts" type="INT" defaultValueNumeric="2">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_allow_neighbour_delivery" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_allow_safe_place_delivery" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_redirect_to_pickup_point_after_failure" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_allow_returns" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_return_window_days" type="INT" defaultValueNumeric="14">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_auto_return_after_failed_delivery" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_pickup_point_storage_days" type="INT" defaultValueNumeric="7">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_require_return_reason" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_allow_cash_on_delivery" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_max_cash_on_delivery_amount" type="DOUBLE PRECISION" defaultValueNumeric="5000.0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_cash_on_delivery_payment_method" type="VARCHAR(32)" defaultValue="BOTH">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_require_insurance_above_value" type="DOUBLE PRECISION" defaultValueNumeric="0.0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_economy_sla_hours" type="INT" defaultValueNumeric="96">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_standard_sla_hours" type="INT" defaultValueNumeric="48">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_express_sla_hours" type="INT" defaultValueNumeric="24">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_flag_delayed_after_hours" type="INT" defaultValueNumeric="24">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_require_exception_note" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_escalate_delays_to_department_manager" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_anonymize_recipient_data_after_days" type="INT" defaultValueNumeric="365">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_archive_closed_shipments_after_days" type="INT" defaultValueNumeric="90">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_delivery_photo_retention_days" type="INT" defaultValueNumeric="180">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2026-11-02-operator-shipment-policy-configuration-aud" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="operator_configurations_aud"/>
+                <not>
+                    <columnExists tableName="operator_configurations_aud" columnName="shipment_require_delivery_token"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="operator_configurations_aud">
+            <column name="shipment_require_delivery_token" type="BOOLEAN"/>
+            <column name="shipment_proof_of_delivery" type="VARCHAR(32)"/>
+            <column name="shipment_max_delivery_attempts" type="INT"/>
+            <column name="shipment_allow_neighbour_delivery" type="BOOLEAN"/>
+            <column name="shipment_allow_safe_place_delivery" type="BOOLEAN"/>
+            <column name="shipment_redirect_to_pickup_point_after_failure" type="BOOLEAN"/>
+            <column name="shipment_allow_returns" type="BOOLEAN"/>
+            <column name="shipment_return_window_days" type="INT"/>
+            <column name="shipment_auto_return_after_failed_delivery" type="BOOLEAN"/>
+            <column name="shipment_pickup_point_storage_days" type="INT"/>
+            <column name="shipment_require_return_reason" type="BOOLEAN"/>
+            <column name="shipment_allow_cash_on_delivery" type="BOOLEAN"/>
+            <column name="shipment_max_cash_on_delivery_amount" type="DOUBLE PRECISION"/>
+            <column name="shipment_cash_on_delivery_payment_method" type="VARCHAR(32)"/>
+            <column name="shipment_require_insurance_above_value" type="DOUBLE PRECISION"/>
+            <column name="shipment_economy_sla_hours" type="INT"/>
+            <column name="shipment_standard_sla_hours" type="INT"/>
+            <column name="shipment_express_sla_hours" type="INT"/>
+            <column name="shipment_flag_delayed_after_hours" type="INT"/>
+            <column name="shipment_require_exception_note" type="BOOLEAN"/>
+            <column name="shipment_escalate_delays_to_department_manager" type="BOOLEAN"/>
+            <column name="shipment_anonymize_recipient_data_after_days" type="INT"/>
+            <column name="shipment_archive_closed_shipments_after_days" type="INT"/>
+            <column name="shipment_delivery_photo_retention_days" type="INT"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
