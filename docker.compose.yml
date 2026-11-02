@@ -23,6 +23,23 @@ services:
     networks:
       - manager_network
 
+  redis:
+    image: redis:7.4-alpine
+    container_name: manager-redis
+    restart: unless-stopped
+    environment:
+      REDISCLI_AUTH: ${REDIS_PASSWORD:-manager}
+    command: ["redis-server", "--save", "", "--appendonly", "no", "--requirepass", "${REDIS_PASSWORD:-manager}"]
+    ports:
+      - "127.0.0.1:${REDIS_PORT:-6380}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - manager_network
+
   mongodb:
     image: mongo:latest
     container_name: manager-mongodb
