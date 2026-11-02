@@ -14,6 +14,8 @@ public interface RefreshTokenRepository {
 
     void delete(final String refreshToken);
 
+    void expireAt(final String refreshToken, final LocalDateTime expiryDate);
+
     void delete(final LocalDateTime time);
 
 }
