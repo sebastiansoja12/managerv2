@@ -50,7 +50,7 @@ public class DestinationDepartmentResolverAdapter implements DestinationDepartme
         try {
             final GeocodingCoordinatesDto coordinates = this.geocodingCoordinatesService.findCoordinates(
                     new GeocodingAddressDto(recipientAddress.city(), recipientAddress.street(),
-                            recipientAddress.postalCode()));
+                            recipientAddress.postalCode(), recipientAddress.countryCode()));
             if (coordinates == null || coordinates.latitude() == null || coordinates.longitude() == null) {
                 return Optional.empty();
             }

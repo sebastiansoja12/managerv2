@@ -84,6 +84,9 @@ public class DeliveryReadModelRepositoryImpl implements DeliveryReadModelReposit
                     criteriaBuilder.equal(root.get("destinationDepartmentId").get("value"),
                             filter.departmentId().getValue())));
         }
+        if (filter.currentDepartmentId() != null) {
+            criteria.eq("currentDepartmentId.value", filter.currentDepartmentId().getValue());
+        }
         if (filter.missingDestination()) {
             criteria.eq("targetType", DeliveryTargetType.SHIPMENT);
             criteria.isNull("destinationDepartmentId.value");
