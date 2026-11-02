@@ -7,6 +7,7 @@ import com.warehouse.departmentmap.application.port.primary.command.SaveDepartme
 import com.warehouse.departmentmap.application.port.primary.result.DepartmentMapSummary;
 import com.warehouse.departmentmap.application.port.primary.result.DepartmentMapView;
 import com.warehouse.departmentmap.application.port.secondary.CurrentUserServicePort;
+import com.warehouse.departmentmap.application.port.secondary.DeliveryNetworkServicePort;
 import com.warehouse.departmentmap.application.port.secondary.DepartmentMapRepository;
 import com.warehouse.departmentmap.application.port.secondary.DepartmentServicePort;
 import com.warehouse.departmentmap.application.port.secondary.StorageLocationRepository;
@@ -15,6 +16,7 @@ import com.warehouse.departmentmap.domain.exception.DepartmentMapException;
 import com.warehouse.departmentmap.domain.model.DepartmentMap;
 import com.warehouse.departmentmap.domain.model.StorageLocation;
 import com.warehouse.departmentmap.domain.service.StorageLocationSynchronizer;
+import com.warehouse.departmentmap.domain.vo.DepartmentDirection;
 import com.warehouse.departmentmap.domain.vo.Plan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DepartmentMapPortImpl implements DepartmentMapPort {
 
@@ -31,17 +34,20 @@ public class DepartmentMapPortImpl implements DepartmentMapPort {
     private final StorageLocationRepository storageLocationRepository;
     private final DepartmentServicePort departmentServicePort;
     private final CurrentUserServicePort currentUserServicePort;
+    private final DeliveryNetworkServicePort deliveryNetworkServicePort;
     private final StorageLocationSynchronizer storageLocationSynchronizer;
 
     public DepartmentMapPortImpl(final DepartmentMapRepository departmentMapRepository,
                                  final StorageLocationRepository storageLocationRepository,
                                  final DepartmentServicePort departmentServicePort,
                                  final CurrentUserServicePort currentUserServicePort,
+                                 final DeliveryNetworkServicePort deliveryNetworkServicePort,
                                  final StorageLocationSynchronizer storageLocationSynchronizer) {
         this.departmentMapRepository = departmentMapRepository;
         this.storageLocationRepository = storageLocationRepository;
         this.departmentServicePort = departmentServicePort;
         this.currentUserServicePort = currentUserServicePort;
+        this.deliveryNetworkServicePort = deliveryNetworkServicePort;
         this.storageLocationSynchronizer = storageLocationSynchronizer;
     }
 
@@ -57,7 +63,8 @@ public class DepartmentMapPortImpl implements DepartmentMapPort {
     @Transactional(readOnly = true)
     public DepartmentMapView getMap(final DepartmentMapId departmentMapId) {
         final DepartmentMap departmentMap = loadMap(departmentMapId);
-        return new DepartmentMapView(departmentMap, this.storageLocationRepository.findByMap(departmentMapId));
+        return new DepartmentMapView(departmentMap, this.storageLocationRepository.findByMap(departmentMapId),
+                this.deliveryNetworkServicePort.findDirections(departmentMap.getDepartmentId()));
     }
 
     @Override
@@ -74,7 +81,8 @@ public class DepartmentMapPortImpl implements DepartmentMapPort {
         final DepartmentMap departmentMap = this.departmentMapRepository.save(map);
         log.info("Department map {} created for department {}", departmentMap.getDepartmentMapId().value(),
                 departmentMap.getDepartmentId().getValue());
-        return new DepartmentMapView(departmentMap, List.of());
+        return new DepartmentMapView(departmentMap, List.of(),
+                this.deliveryNetworkServicePort.findDirections(departmentMap.getDepartmentId()));
     }
 
     @Override
@@ -83,8 +91,11 @@ public class DepartmentMapPortImpl implements DepartmentMapPort {
                                         final SaveDepartmentMapLayoutCommand command) {
         final DepartmentMap departmentMap = loadMap(departmentMapId);
         departmentMap.verifyVersion(command.version());
+        final List<DepartmentDirection> directions = this.deliveryNetworkServicePort.findDirections(
+                departmentMap.getDepartmentId());
         departmentMap.changeLayout(command.name(), command.width(), command.height(), command.gridSize(),
-                command.elements(), Instant.now());
+                command.elements(), directions.stream().map(DepartmentDirection::departmentCode)
+                        .collect(Collectors.toSet()), Instant.now());
         final Plan plan = this.storageLocationSynchronizer.plan(departmentMap,
                 this.storageLocationRepository.findByMap(departmentMapId));
         final DepartmentMap savedMap = this.departmentMapRepository.save(departmentMap);
@@ -94,7 +105,7 @@ public class DepartmentMapPortImpl implements DepartmentMapPort {
         log.info("Department map {} layout saved: {} elements, {} locations created, {} changed, {} removed",
                 departmentMapId.value(), departmentMap.getElements().size(), plan.created().size(),
                 plan.changed().size(), plan.removed().size());
-        return new DepartmentMapView(savedMap, this.storageLocationRepository.findByMap(departmentMapId));
+        return new DepartmentMapView(savedMap, this.storageLocationRepository.findByMap(departmentMapId), directions);
     }
 
     @Override
