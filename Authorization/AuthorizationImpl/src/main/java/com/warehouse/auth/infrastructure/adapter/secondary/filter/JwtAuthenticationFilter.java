@@ -8,6 +8,8 @@ import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.domain.service.OperatorAccessPolicy;
 import com.warehouse.auth.domain.service.UserService;
 import com.warehouse.auth.domain.vo.Impersonation;
+import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
+import io.jsonwebtoken.JwtException;
 import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,6 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -25,6 +28,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -84,8 +88,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.setContext(context);
                 }
             }
-        } catch (RuntimeException exception) {
+        } catch (JwtException | IllegalArgumentException | UserNotFoundException exception) {
             SecurityContextHolder.clearContext();
+        } catch (RuntimeException exception) {
+            // Infrastructure failure (database, operator status lookup): a 401 would make clients drop the session.
+            SecurityContextHolder.clearContext();
+            log.warn("Access token verification failed", exception);
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return;
         }
 		filterChain.doFilter(request, response);
 	}
