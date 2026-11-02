@@ -52,6 +52,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import com.warehouse.logisticsdelivery.api.DeliveryManagementApiService;
+import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.DeliveryManagementApiServiceAdapter;
 
 @Configuration
 public class DeliveryConfiguration {
@@ -187,5 +189,13 @@ public class DeliveryConfiguration {
     public DeliveryApiService deliveryApiService(final DeliveryPort deliveryPort,
                                                  final DeliveryApiMapper deliveryApiMapper) {
         return new DeliveryApiServiceAdapter(deliveryPort, deliveryApiMapper);
+    }
+
+    @Bean
+    public DeliveryManagementApiService deliveryManagementApiService(
+            final DeliveryPort deliveryPort,
+            final DeliveryRequestMapper deliveryRequestMapper,
+            final DeliveryResponseMapper deliveryResponseMapper) {
+        return new DeliveryManagementApiServiceAdapter(deliveryPort, deliveryRequestMapper, deliveryResponseMapper);
     }
 }
