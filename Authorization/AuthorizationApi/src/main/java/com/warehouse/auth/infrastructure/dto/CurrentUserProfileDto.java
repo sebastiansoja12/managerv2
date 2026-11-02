@@ -12,7 +12,7 @@ public record CurrentUserProfileDto(
         String role,
         String departmentCode,
         String language,
-        String apiKey,
+        boolean hasApiKey,
         Set<RolePermissionApi> rolePermissions,
         Boolean deleted,
         OperatorIdDto operatorId,
