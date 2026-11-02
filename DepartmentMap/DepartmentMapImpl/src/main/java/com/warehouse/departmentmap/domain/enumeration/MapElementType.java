@@ -6,6 +6,15 @@ public enum MapElementType {
     AISLE,
     ZONE,
     RACK,
+    INBOUND,
+    INBOUND_RAMP,
+    WORKSTATION,
     SORTER,
-    STORAGE_LOCATION
+    CHUTE,
+    RAMP,
+    STORAGE_LOCATION;
+
+    public boolean isDirectional() {
+        return this == CHUTE || this == RAMP;
+    }
 }
