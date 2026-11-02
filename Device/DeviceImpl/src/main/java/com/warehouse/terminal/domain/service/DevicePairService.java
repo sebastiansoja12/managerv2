@@ -24,5 +24,5 @@ public interface DevicePairService {
 
     void endOperatorSession(final DevicePair devicePair, final UserId userId);
 
-    void markSeen(final DevicePair devicePair);
+    void recordHeartbeat(final DevicePair devicePair);
 }
