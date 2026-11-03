@@ -13,6 +13,12 @@ import com.warehouse.organisationstructure.operatorconfiguration.domain.model.Sh
 import com.warehouse.organisationstructure.operatorconfiguration.domain.port.primary.OperatorConfigurationPort;
 
 import java.util.Optional;
+import com.warehouse.organisationstructure.api.dto.DepartmentConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.FleetConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.CommunicationConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.RegionalConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.SortingConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.PickupPointConfigurationDto;
 
 public class OperatorConfigurationServiceAdapter implements OperatorConfigurationApiService, OperatorCapabilityService {
 
@@ -61,5 +67,71 @@ public class OperatorConfigurationServiceAdapter implements OperatorConfiguratio
                 .map(OperatorConfiguration::getShippingCapabilities)
                 .map(ShippingCapabilities::isSupportsReturnShipments)
                 .orElse(false);
+    }
+
+    @Override
+    public DepartmentConfigurationDto getCurrentDepartmentConfiguration() {
+        return OperatorMapper.toDtoDepartmentConfiguration(operatorConfigurationPort.getCurrentDepartmentConfiguration());
+    }
+
+    @Override
+    public DepartmentConfigurationDto updateCurrentDepartmentConfiguration(final DepartmentConfigurationDto configuration) {
+        return OperatorMapper.toDtoDepartmentConfiguration(operatorConfigurationPort.updateCurrentDepartmentConfiguration(
+                OperatorMapper.toModelDepartmentConfiguration(configuration)));
+    }
+
+    @Override
+    public FleetConfigurationDto getCurrentFleetConfiguration() {
+        return OperatorMapper.toDtoFleetConfiguration(operatorConfigurationPort.getCurrentFleetConfiguration());
+    }
+
+    @Override
+    public FleetConfigurationDto updateCurrentFleetConfiguration(final FleetConfigurationDto configuration) {
+        return OperatorMapper.toDtoFleetConfiguration(operatorConfigurationPort.updateCurrentFleetConfiguration(
+                OperatorMapper.toModelFleetConfiguration(configuration)));
+    }
+
+    @Override
+    public CommunicationConfigurationDto getCurrentCommunicationConfiguration() {
+        return OperatorMapper.toDtoCommunicationConfiguration(operatorConfigurationPort.getCurrentCommunicationConfiguration());
+    }
+
+    @Override
+    public CommunicationConfigurationDto updateCurrentCommunicationConfiguration(final CommunicationConfigurationDto configuration) {
+        return OperatorMapper.toDtoCommunicationConfiguration(operatorConfigurationPort.updateCurrentCommunicationConfiguration(
+                OperatorMapper.toModelCommunicationConfiguration(configuration)));
+    }
+
+    @Override
+    public RegionalConfigurationDto getCurrentRegionalConfiguration() {
+        return OperatorMapper.toDtoRegionalConfiguration(operatorConfigurationPort.getCurrentRegionalConfiguration());
+    }
+
+    @Override
+    public RegionalConfigurationDto updateCurrentRegionalConfiguration(final RegionalConfigurationDto configuration) {
+        return OperatorMapper.toDtoRegionalConfiguration(operatorConfigurationPort.updateCurrentRegionalConfiguration(
+                OperatorMapper.toModelRegionalConfiguration(configuration)));
+    }
+
+    @Override
+    public SortingConfigurationDto getCurrentSortingConfiguration() {
+        return OperatorMapper.toDtoSortingConfiguration(operatorConfigurationPort.getCurrentSortingConfiguration());
+    }
+
+    @Override
+    public SortingConfigurationDto updateCurrentSortingConfiguration(final SortingConfigurationDto configuration) {
+        return OperatorMapper.toDtoSortingConfiguration(operatorConfigurationPort.updateCurrentSortingConfiguration(
+                OperatorMapper.toModelSortingConfiguration(configuration)));
+    }
+
+    @Override
+    public PickupPointConfigurationDto getCurrentPickupPointConfiguration() {
+        return OperatorMapper.toDtoPickupPointConfiguration(operatorConfigurationPort.getCurrentPickupPointConfiguration());
+    }
+
+    @Override
+    public PickupPointConfigurationDto updateCurrentPickupPointConfiguration(final PickupPointConfigurationDto configuration) {
+        return OperatorMapper.toDtoPickupPointConfiguration(operatorConfigurationPort.updateCurrentPickupPointConfiguration(
+                OperatorMapper.toModelPickupPointConfiguration(configuration)));
     }
 }
