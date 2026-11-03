@@ -21,4 +21,11 @@ public interface SupplierApiService {
     Optional<SupplierProfileDto> findProfileByCode(final SupplierCode supplierCode);
     Optional<SupplierProfileDto> findProfileByUserId(final UserId userId);
     List<SupplierProfileDto> findProfiles();
+
+    void updateBasicData(final SupplierCode supplierCode, final String firstName, final String lastName,
+                         final String telephoneNumber);
+
+    void activate(final SupplierCode supplierCode);
+
+    void deactivate(final SupplierCode supplierCode);
 }
