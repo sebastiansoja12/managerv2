@@ -1,5 +1,6 @@
 package com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary;
 
+import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.cache.NoOpOperatorConfigurationCache;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -68,7 +69,8 @@ class OperatorRepositoryImplTest {
     @Test
     void shouldSaveAndReadOperatorConfigurationUsingRealJpaRepository() {
         final OperatorConfigurationRepository repository =
-                new OperatorConfigurationRepositoryImpl(operatorConfigurationReadRepository);
+                new OperatorConfigurationRepositoryImpl(operatorConfigurationReadRepository,
+                        new NoOpOperatorConfigurationCache());
 
         repository.save(OperatorTestFixtures.OPERATOR_ID, OperatorTestFixtures.configuration());
         flushAndClear();
