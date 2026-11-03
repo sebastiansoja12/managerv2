@@ -15,6 +15,8 @@ public interface PickupPointRepository {
 
     List<PickupPoint> findByIds(final List<PickupPointId> pickupPointIds);
 
+    List<PickupPoint> findAll();
+
     boolean existsByCode(final PickupPointCode code);
 
     PickupPoint save(final PickupPoint pickupPoint);
