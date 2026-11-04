@@ -35,6 +35,7 @@ public class ReturnPackageResponseMapper {
     private CreatedReturn map(final RtmCreateResponse.CreatedReturnApi response) {
         return new CreatedReturn(
                 new ShipmentId(response.shipmentId().value()),
+                response.returnShipmentId() == null ? null : new ShipmentId(response.returnShipmentId().value()),
                 new ReturnPackageId(response.returnId().value()),
                 ReturnStatus.valueOf(response.processStatus())
         );
