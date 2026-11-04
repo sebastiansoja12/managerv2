@@ -1,5 +1,15 @@
 package com.warehouse.logisticsdelivery.configuration;
 
+import com.warehouse.logisticsdelivery.application.port.primary.DepartmentWorkloadPort;
+import com.warehouse.logisticsdelivery.application.port.primary.DepartmentWorkloadPortImpl;
+import com.warehouse.logisticsdelivery.application.port.secondary.DepartmentCapacityServicePort;
+import com.warehouse.logisticsdelivery.application.service.DestinationCapacityAllocator;
+import com.warehouse.logisticsdelivery.domain.service.DepartmentCapacityBalancer;
+import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.DeliveryDepartmentLifecycleParticipant;
+import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.DepartmentCapacityServiceAdapter;
+import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
+import com.warehouse.organisationstructure.department.api.DepartmentLifecycleParticipant;
+import java.time.Clock;
 import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
@@ -119,9 +129,40 @@ public class DeliveryConfiguration {
                                      final DomainEventPublisher domainEventPublisher,
                                      final OperatorContextProvider operatorContextProvider,
                                      final SignatureRepository signatureRepository,
-                                     final DestinationDepartmentResolverPort destinationDepartmentResolverPort) {
+                                     final DestinationDepartmentResolverPort destinationDepartmentResolverPort,
+                                     final DestinationCapacityAllocator destinationCapacityAllocator) {
         return new DeliveryPortImpl(deliveryRepository, shipmentServicePort, domainEventPublisher,
-                operatorContextProvider, signatureRepository, destinationDepartmentResolverPort);
+                operatorContextProvider, signatureRepository, destinationDepartmentResolverPort,
+                destinationCapacityAllocator);
+    }
+
+    @Bean
+    public DepartmentCapacityServicePort departmentCapacityServicePort(
+            final OperatorConfigurationApiService operatorConfigurationApiService,
+            final DepartmentApiService departmentApiService) {
+        return new DepartmentCapacityServiceAdapter(operatorConfigurationApiService, departmentApiService);
+    }
+
+    @Bean
+    public DestinationCapacityAllocator destinationCapacityAllocator(
+            final DeliveryRepository deliveryRepository,
+            final DepartmentCapacityServicePort departmentCapacityServicePort) {
+        return new DestinationCapacityAllocator(deliveryRepository, departmentCapacityServicePort,
+                new DepartmentCapacityBalancer(), Clock.systemDefaultZone());
+    }
+
+    @Bean
+    public DepartmentWorkloadPort departmentWorkloadPort(final DeliveryRepository deliveryRepository,
+                                                         final DomainEventPublisher domainEventPublisher,
+                                                         final DestinationCapacityAllocator destinationCapacityAllocator) {
+        return new DepartmentWorkloadPortImpl(deliveryRepository, domainEventPublisher,
+                destinationCapacityAllocator);
+    }
+
+    @Bean
+    public DepartmentLifecycleParticipant deliveryDepartmentLifecycleParticipant(
+            final DepartmentWorkloadPort departmentWorkloadPort) {
+        return new DeliveryDepartmentLifecycleParticipant(departmentWorkloadPort);
     }
 
     @Bean
@@ -129,9 +170,10 @@ public class DeliveryConfiguration {
             final GeocodingCoordinatesService geocodingCoordinatesService,
             final DeliveryAreaApiService deliveryAreaApiService,
             final VoronoiService voronoiService,
-            final DepartmentApiService departmentApiService) {
+            final DepartmentApiService departmentApiService,
+            final OperatorConfigurationApiService operatorConfigurationApiService) {
         return new DestinationDepartmentResolverAdapter(geocodingCoordinatesService, deliveryAreaApiService,
-                voronoiService, departmentApiService);
+                voronoiService, departmentApiService, operatorConfigurationApiService);
     }
 
     @Bean
