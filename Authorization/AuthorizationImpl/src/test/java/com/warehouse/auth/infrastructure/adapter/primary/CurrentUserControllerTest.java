@@ -1,6 +1,7 @@
 package com.warehouse.auth.infrastructure.adapter.primary;
 
 import java.time.Instant;
+import java.util.Optional;
 
 import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.model.User;
@@ -59,6 +60,8 @@ class CurrentUserControllerTest {
         user.assignOperator(new OperatorId(1L));
         when(currentUserAuthenticationPort.getCurrentUser()).thenReturn(user);
         when(userPort.getDepartmentCode(departmentId)).thenReturn(new DepartmentCode("KT1"));
+        when(currentUserAuthenticationPort.getActingDepartmentCode(user, Optional.empty()))
+                .thenReturn(new DepartmentCode("KT1"));
 
         mockMvc.perform(get("/auth/me"))
                 .andExpect(status().isOk())
@@ -100,5 +103,22 @@ class CurrentUserControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(userPort).deleteApiKey(userId);
+    }
+
+    @Test
+    void shouldReturnActingDepartmentNextToHomeDepartment() throws Exception {
+        final DepartmentId departmentId = new DepartmentId(11L);
+        final OrganizationUser user = OrganizationUser.of(new UserId(18L), "superadmin", "password", "Super", "Admin",
+                "super@example.com", OrganizationUser.Role.SUPERADMIN, departmentId, null);
+        user.assignOperator(new OperatorId(1L));
+        when(currentUserAuthenticationPort.getCurrentUser()).thenReturn(user);
+        when(userPort.getDepartmentCode(departmentId)).thenReturn(new DepartmentCode("KT1"));
+        when(currentUserAuthenticationPort.getActingDepartmentCode(user, Optional.of(new DepartmentCode("WAW"))))
+                .thenReturn(new DepartmentCode("WAW"));
+
+        mockMvc.perform(get("/auth/me").header("X-Acting-Department", "WAW"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.departmentCode").value("WAW"))
+                .andExpect(jsonPath("$.homeDepartmentCode").value("KT1"));
     }
 }
