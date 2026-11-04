@@ -61,7 +61,8 @@ public class DeliveryNetworkEditorApiMapper {
     private DepartmentConnectionCommand toCommand(final DepartmentConnectionApi connection) {
         return new DepartmentConnectionCommand(
                 toModel(connection.firstDepartmentId()),
-                toModel(connection.secondDepartmentId()));
+                toModel(connection.secondDepartmentId()),
+                connection.bidirectional());
     }
 
     private DepartmentId toModel(final DepartmentIdApi departmentId) {
@@ -71,7 +72,8 @@ public class DeliveryNetworkEditorApiMapper {
     private DepartmentConnectionApi toApi(final DepartmentConnection connection) {
         return new DepartmentConnectionApi(
                 toApi(connection.firstDepartmentId()),
-                toApi(connection.secondDepartmentId()));
+                toApi(connection.secondDepartmentId()),
+                connection.bidirectional());
     }
 
     private DepartmentIdApi toApi(final DepartmentId departmentId) {
