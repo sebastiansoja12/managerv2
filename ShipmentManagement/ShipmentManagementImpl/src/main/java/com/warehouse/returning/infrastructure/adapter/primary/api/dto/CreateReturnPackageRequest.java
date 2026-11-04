@@ -1,13 +1,13 @@
 package com.warehouse.returning.infrastructure.adapter.primary.api.dto;
 
 import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public record CreateReturnPackageRequest(
-        @NotNull ShipmentId shipmentId,
+        @NotNull TrackingNumber trackingNumber,
         @NotBlank String reason,
         @NotNull DepartmentId departmentId,
         @NotBlank

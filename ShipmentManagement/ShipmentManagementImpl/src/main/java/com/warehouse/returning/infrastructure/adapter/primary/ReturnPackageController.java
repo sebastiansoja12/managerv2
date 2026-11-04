@@ -11,6 +11,7 @@ import com.warehouse.returning.application.port.primary.ReturnQueryPort;
 import com.warehouse.returning.application.port.primary.command.ChangeReturnPackageStatusCommand;
 import com.warehouse.returning.application.port.primary.command.CreateReturnPackageCommand;
 import com.warehouse.returning.domain.enumeration.ReasonCode;
+import com.warehouse.returning.domain.exception.ReturnDepartmentAccessDeniedException;
 import com.warehouse.returning.domain.vo.CreatedReturn;
 import com.warehouse.returning.domain.vo.ReturnPackageId;
 import com.warehouse.returning.domain.vo.ReturnToken;
@@ -116,6 +117,11 @@ public class ReturnPackageController {
             throw new IllegalArgumentException("Page must be non-negative and size must be between 1 and 100");
         }
         return ResponseEntity.ok(returnQueryPort.getReturns(departmentId, page, size));
+    }
+
+    @ExceptionHandler(ReturnDepartmentAccessDeniedException.class)
+    public ResponseEntity<String> handleDepartmentAccessDenied(final ReturnDepartmentAccessDeniedException exception) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exception.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
