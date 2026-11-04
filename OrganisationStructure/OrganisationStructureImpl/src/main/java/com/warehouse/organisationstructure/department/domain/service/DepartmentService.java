@@ -21,13 +21,16 @@ public interface DepartmentService {
 
     void activateDepartment(final DepartmentCode departmentCode, final UserId modifiedBy);
 
-    void deactivateDepartment(final DepartmentCode departmentCode, final UserId modifiedBy);
+    void deactivateDepartment(final DepartmentCode departmentCode, final UserId modifiedBy, final String reason);
 
     void changeDepartmentType(final DepartmentCode departmentCode, final DepartmentType departmentType);
 
     void changeAdminUser(final DepartmentCode departmentCode, final UserId userId);
 
-    void changeStatus(final DepartmentCode departmentCode, final Department.Status status);
+    void changeStatus(final DepartmentCode departmentCode, final Department.Status status, final String reason,
+                      final UserId modifiedBy);
+
+    int archiveInactiveDepartments();
 
     void changeEmail(final DepartmentCode departmentCode, final String email);
 
