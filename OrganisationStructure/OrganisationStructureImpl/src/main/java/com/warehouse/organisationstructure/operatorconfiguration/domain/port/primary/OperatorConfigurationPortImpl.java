@@ -1,6 +1,14 @@
 package com.warehouse.organisationstructure.operatorconfiguration.domain.port.primary;
 
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.DepartmentConfigurationOverride;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.DepartmentConfigurations;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.port.secondary.DepartmentConfigurationOverrideRepository;
+import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 import com.warehouse.auth.CurrentOperatorService;
+import com.warehouse.auth.CurrentUserApiService;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.exception.DepartmentConfigurationAccessDeniedException;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.DepartmentConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.FleetConfiguration;
@@ -30,11 +38,17 @@ public class OperatorConfigurationPortImpl implements OperatorConfigurationPort 
 
     private final OperatorConfigurationService operatorConfigurationService;
     private final CurrentOperatorService currentOperatorService;
+    private final DepartmentConfigurationOverrideRepository departmentConfigurationOverrideRepository;
+    private final CurrentUserApiService currentUserApiService;
 
     public OperatorConfigurationPortImpl(final OperatorConfigurationService operatorConfigurationService,
-                                         final CurrentOperatorService currentOperatorService) {
+                                         final CurrentOperatorService currentOperatorService,
+                                         final DepartmentConfigurationOverrideRepository departmentConfigurationOverrideRepository,
+                                         final CurrentUserApiService currentUserApiService) {
         this.operatorConfigurationService = operatorConfigurationService;
         this.currentOperatorService = currentOperatorService;
+        this.departmentConfigurationOverrideRepository = departmentConfigurationOverrideRepository;
+        this.currentUserApiService = currentUserApiService;
     }
 
     @Override
@@ -141,6 +155,46 @@ public class OperatorConfigurationPortImpl implements OperatorConfigurationPort 
         return operatorConfigurationService.create(operatorId,
                 currentConfiguration.withDepartmentConfiguration(departmentConfiguration))
                 .getDepartmentConfiguration();
+    }
+
+    @Override
+    public DepartmentConfiguration getDepartmentConfiguration(final DepartmentId departmentId) {
+        final DepartmentConfiguration defaults = getCurrentDepartmentConfiguration();
+        if (departmentId == null) {
+            return defaults;
+        }
+        return departmentConfigurationOverrideRepository.findByDepartmentId(departmentId)
+                .map(override -> override.applyTo(defaults))
+                .orElse(defaults);
+    }
+
+    @Override
+    public DepartmentConfigurations getDepartmentConfigurations() {
+        final DepartmentConfiguration defaults = getCurrentDepartmentConfiguration();
+        return new DepartmentConfigurations(defaults, departmentConfigurationOverrideRepository.findAll().stream()
+                .collect(Collectors.toMap(DepartmentConfigurationOverride::departmentId,
+                        override -> override.applyTo(defaults))));
+    }
+
+    @Override
+    public DepartmentConfigurationOverride getDepartmentConfigurationOverride(final DepartmentId departmentId) {
+        return departmentConfigurationOverrideRepository.findByDepartmentId(departmentId)
+                .orElseGet(() -> DepartmentConfigurationOverride.empty(departmentId));
+    }
+
+    @Override
+    @Transactional
+    public DepartmentConfigurationOverride updateDepartmentConfigurationOverride(
+            final DepartmentConfigurationOverride override) {
+        if (!currentUserApiService.canAccessDepartment(override.departmentId())) {
+            throw new DepartmentConfigurationAccessDeniedException(override.departmentId());
+        }
+        if (override.isEmpty()) {
+            departmentConfigurationOverrideRepository.delete(override.departmentId());
+        } else {
+            departmentConfigurationOverrideRepository.save(override);
+        }
+        return override;
     }
 
     @Override
