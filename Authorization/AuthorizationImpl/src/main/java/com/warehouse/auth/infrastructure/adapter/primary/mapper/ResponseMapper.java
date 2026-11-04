@@ -38,7 +38,9 @@ public class ResponseMapper {
                 operatorId, createdAt, updatedAt);
     }
 
-    public CurrentUserProfileDto mapCurrentUser(final OrganizationUser user, final DepartmentCode departmentCode) {
+    public CurrentUserProfileDto mapCurrentUser(final OrganizationUser user,
+                                                final DepartmentCode departmentCode,
+                                                final DepartmentCode homeDepartmentCode) {
         final UserDto userDto = map(user, departmentCode);
         if (userDto == null) {
             return null;
@@ -52,6 +54,7 @@ public class ResponseMapper {
                 userDto.email(),
                 userDto.role(),
                 userDto.departmentCode(),
+                homeDepartmentCode == null ? null : homeDepartmentCode.getValue(),
                 userDto.language(),
                 user.canAuthenticateWithApiKey(),
                 userDto.rolePermissions(),
