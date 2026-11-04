@@ -31,7 +31,7 @@ public interface DepartmentApiService {
 
     void changeEmail(final DepartmentCode departmentCode, final String email);
 
-    void changeStatus(final DepartmentCode departmentCode, final String status);
+    void changeStatus(final DepartmentCode departmentCode, final String status, final String reason);
 
-    void changeActive(final DepartmentCode departmentCode, final boolean active);
+    void changeActive(final DepartmentCode departmentCode, final boolean active, final String reason);
 }
