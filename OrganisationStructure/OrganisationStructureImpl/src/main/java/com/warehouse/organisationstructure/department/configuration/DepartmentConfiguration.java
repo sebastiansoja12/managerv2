@@ -11,12 +11,20 @@ import com.warehouse.organisationstructure.department.application.port.primary.D
 import com.warehouse.organisationstructure.department.application.port.secondary.CurrentUserServicePort;
 import com.warehouse.organisationstructure.department.application.port.secondary.DepartmentCoordinatesServicePort;
 import com.warehouse.organisationstructure.department.application.port.secondary.DepartmentReadRepository;
+import com.warehouse.organisationstructure.department.application.port.secondary.DepartmentLifecycleServicePort;
 import com.warehouse.organisationstructure.department.application.port.secondary.DepartmentRepository;
+import com.warehouse.organisationstructure.department.application.port.secondary.DepartmentStatusPolicyServicePort;
 import com.warehouse.organisationstructure.department.application.port.secondary.TenantAdminProvisioningPort;
 import com.warehouse.organisationstructure.department.domain.service.AuthenticationService;
 import com.warehouse.organisationstructure.department.domain.service.AuthenticationServiceImpl;
 import com.warehouse.organisationstructure.department.domain.service.DepartmentService;
 import com.warehouse.organisationstructure.department.domain.service.DepartmentServiceImpl;
+import com.warehouse.organisationstructure.department.domain.service.WorkTransferTargetSelector;
+import com.warehouse.organisationstructure.department.api.DepartmentLifecycleParticipant;
+import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.InactiveDepartmentArchiveJob;
+import com.warehouse.organisationstructure.api.OperatorApiService;
+import com.warehouse.commonassets.context.OperatorContext;
+import org.springframework.beans.factory.ObjectProvider;
 import com.warehouse.organisationstructure.department.domain.validator.Validator;
 import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.DepartmentServiceAdapter;
 import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.validator.DepartmentCreateApiDepartmentRequestValidator;
@@ -24,6 +32,7 @@ import com.warehouse.organisationstructure.department.infrastructure.adapter.sec
 import com.warehouse.organisationstructure.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
 import com.warehouse.organisationstructure.department.infrastructure.adapter.secondary.entity.readmodel.DepartmentReadEntity;
 import com.warehouse.geocoding.api.GeocodingCoordinatesService;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.port.primary.OperatorConfigurationPort;
 
 @Configuration
 public class DepartmentConfiguration {
@@ -73,8 +82,30 @@ public class DepartmentConfiguration {
     }
 
     @Bean
-    public DepartmentService departmentService(final DepartmentRepository departmentRepository) {
-        return new DepartmentServiceImpl(departmentRepository);
+    public DepartmentService departmentService(final DepartmentRepository departmentRepository,
+                                               final DepartmentStatusPolicyServicePort departmentStatusPolicyServicePort,
+                                               final DepartmentLifecycleServicePort departmentLifecycleServicePort) {
+        return new DepartmentServiceImpl(departmentRepository, departmentStatusPolicyServicePort,
+                departmentLifecycleServicePort, new WorkTransferTargetSelector());
+    }
+
+    @Bean
+    public DepartmentLifecycleServicePort departmentLifecycleServicePort(
+            final ObjectProvider<DepartmentLifecycleParticipant> departmentLifecycleParticipants) {
+        return new DepartmentLifecycleServiceAdapter(departmentLifecycleParticipants);
+    }
+
+    @Bean
+    public InactiveDepartmentArchiveJob inactiveDepartmentArchiveJob(final DepartmentPort departmentPort,
+                                                                     final OperatorApiService operatorApiService,
+                                                                     final OperatorContext operatorContext) {
+        return new InactiveDepartmentArchiveJob(departmentPort, operatorApiService, operatorContext);
+    }
+
+    @Bean
+    public DepartmentStatusPolicyServicePort departmentStatusPolicyServicePort(
+            final OperatorConfigurationPort operatorConfigurationPort) {
+        return new DepartmentStatusPolicyServiceAdapter(operatorConfigurationPort);
     }
 
     @Bean

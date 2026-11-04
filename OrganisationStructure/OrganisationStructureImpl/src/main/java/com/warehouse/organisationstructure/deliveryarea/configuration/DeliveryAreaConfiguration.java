@@ -13,6 +13,7 @@ import com.warehouse.organisationstructure.deliveryarea.api.DeliveryAreaApiServi
 import com.warehouse.organisationstructure.deliveryarea.infrastructure.adapter.primary.DeliveryAreaServiceAdapter;
 import com.warehouse.organisationstructure.deliveryarea.infrastructure.adapter.primary.DepartmentCreatedEventListener;
 import com.warehouse.organisationstructure.deliveryarea.infrastructure.adapter.primary.DepartmentDeletedEventListener;
+import com.warehouse.organisationstructure.deliveryarea.infrastructure.adapter.primary.DepartmentStatusChangedEventListener;
 import com.warehouse.organisationstructure.deliveryarea.infrastructure.adapter.primary.mapper.DeliveryAreaApiMapper;
 import com.warehouse.organisationstructure.deliveryarea.infrastructure.adapter.secondary.CountryBoundaryServiceAdapter;
 import com.warehouse.organisationstructure.deliveryarea.infrastructure.adapter.secondary.DeliveryAreaConfigurationServiceAdapter;
@@ -79,6 +80,12 @@ public class DeliveryAreaConfiguration {
     public DepartmentDeletedEventListener deliveryAreaDepartmentDeletedEventListener(
             final DeliveryAreaPort deliveryAreaPort) {
         return new DepartmentDeletedEventListener(deliveryAreaPort);
+    }
+
+    @Bean
+    public DepartmentStatusChangedEventListener deliveryAreaDepartmentStatusChangedEventListener(
+            final DeliveryAreaPort deliveryAreaPort) {
+        return new DepartmentStatusChangedEventListener(deliveryAreaPort);
     }
 
     @Bean

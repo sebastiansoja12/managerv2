@@ -1,6 +1,7 @@
 package com.warehouse.organisationstructure.operatorconfiguration.configuration;
 
 import com.warehouse.auth.CurrentOperatorService;
+import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.port.primary.OperatorConfigurationPort;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.port.primary.OperatorConfigurationPortImpl;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.port.secondary.OperatorConfigurationRepository;
@@ -12,9 +13,17 @@ import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.
 import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.cache.NoOpOperatorConfigurationCache;
 import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.cache.OperatorConfigurationCache;
 import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.cache.RedisOperatorConfigurationCache;
+import com.warehouse.commonassets.repository.BaseRepository;
+import com.warehouse.commonassets.repository.OperatorContextProvider;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.port.secondary.DepartmentConfigurationOverrideRepository;
+import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.DepartmentConfigurationOverrideRepositoryImpl;
+import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.entity.DepartmentConfigurationOverrideEntity;
+import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.mapper.DepartmentConfigurationOverrideMapper;
+import jakarta.persistence.EntityManager;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 @Configuration
@@ -49,8 +58,25 @@ public class OperatorConfigurationConfiguration {
     @Bean
     public OperatorConfigurationPort operatorConfigurationPort(
             final OperatorConfigurationService operatorConfigurationService,
-            final CurrentOperatorService currentOperatorService) {
-        return new OperatorConfigurationPortImpl(operatorConfigurationService, currentOperatorService);
+            final CurrentOperatorService currentOperatorService,
+            final DepartmentConfigurationOverrideRepository departmentConfigurationOverrideRepository,
+            @Lazy final CurrentUserApiService currentUserApiService) {
+        return new OperatorConfigurationPortImpl(operatorConfigurationService, currentOperatorService,
+                departmentConfigurationOverrideRepository, currentUserApiService);
+    }
+
+    @Bean
+    public BaseRepository<DepartmentConfigurationOverrideEntity> departmentConfigurationOverrideEntityRepository(
+            final EntityManager entityManager,
+            final OperatorContextProvider operatorContextProvider) {
+        return new BaseRepository<>(entityManager, operatorContextProvider);
+    }
+
+    @Bean
+    public DepartmentConfigurationOverrideRepository departmentConfigurationOverrideRepository(
+            final BaseRepository<DepartmentConfigurationOverrideEntity> departmentConfigurationOverrideEntityRepository) {
+        return new DepartmentConfigurationOverrideRepositoryImpl(departmentConfigurationOverrideEntityRepository,
+                new DepartmentConfigurationOverrideMapper());
     }
 
     @Bean
