@@ -105,6 +105,44 @@ public class DeliveryRepositoryImpl implements DeliveryRepository {
 
     @Override
     @Transactional(readOnly = true)
+    public long countCreatedForDestinationBetween(final DepartmentId departmentId,
+                                                  final LocalDateTime createdFromInclusive,
+                                                  final LocalDateTime createdToExclusive) {
+        return repository.createCriteria(DeliveryEntity.class)
+                .eq("destinationDepartmentId.value", departmentId.getValue())
+                .ge("created", createdFromInclusive)
+                .lt("created", createdToExclusive)
+                .ne("status", DeliveryLifecycleStatus.CANCELED)
+                .count();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countActiveByDepartment(final DepartmentId departmentId) {
+        return activeByDepartment(departmentId).count();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Delivery> findActiveByDepartment(final DepartmentId departmentId) {
+        return activeByDepartment(departmentId).list().stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
+    private Criteria<DeliveryEntity> activeByDepartment(final DepartmentId departmentId) {
+        final Criteria<DeliveryEntity> criteria = repository.createCriteria(DeliveryEntity.class);
+        final CriteriaBuilder criteriaBuilder = criteria.getCriteriaBuilder();
+        final Root<DeliveryEntity> root = criteria.getRoot();
+        return criteria
+                .and(criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get("originDepartmentId").get("value"), departmentId.getValue()),
+                        criteriaBuilder.equal(root.get("destinationDepartmentId").get("value"), departmentId.getValue())))
+                .notIn("status", List.of(DeliveryLifecycleStatus.CANCELED, DeliveryLifecycleStatus.COMPLETED));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Delivery> findBySupplier(final SupplierId supplierId, final int offset, final int limit) {
         return repository.createCriteria(DeliveryEntity.class)
                 .eq("supplierId.value", supplierId.value())

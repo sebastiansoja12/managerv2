@@ -8,6 +8,9 @@ import com.warehouse.geocoding.api.GeocodingCoordinatesDto;
 import com.warehouse.geocoding.api.GeocodingCoordinatesService;
 import com.warehouse.logisticsdelivery.application.port.secondary.DestinationDepartmentResolverPort;
 import com.warehouse.logisticsdelivery.domain.vo.RecipientAddress;
+import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
+import com.warehouse.organisationstructure.api.dto.DepartmentConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.UncoveredPostalCodePolicyDto;
 import com.warehouse.organisationstructure.deliveryarea.api.DeliveryAreaApiService;
 import com.warehouse.organisationstructure.deliveryarea.api.dto.DeliveryLocationDto;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
@@ -27,6 +30,8 @@ public class DestinationDepartmentResolverAdapter implements DestinationDepartme
 
     private static final Logger log = LoggerFactory.getLogger(DestinationDepartmentResolverAdapter.class);
 
+    private static final String ACTIVE_STATUS = "ACTIVE";
+
     private final GeocodingCoordinatesService geocodingCoordinatesService;
 
     private final DeliveryAreaApiService deliveryAreaApiService;
@@ -35,14 +40,18 @@ public class DestinationDepartmentResolverAdapter implements DestinationDepartme
 
     private final DepartmentApiService departmentApiService;
 
+    private final OperatorConfigurationApiService operatorConfigurationApiService;
+
     public DestinationDepartmentResolverAdapter(final GeocodingCoordinatesService geocodingCoordinatesService,
                                                 final DeliveryAreaApiService deliveryAreaApiService,
                                                 final VoronoiService voronoiService,
-                                                final DepartmentApiService departmentApiService) {
+                                                final DepartmentApiService departmentApiService,
+                                                final OperatorConfigurationApiService operatorConfigurationApiService) {
         this.geocodingCoordinatesService = geocodingCoordinatesService;
         this.deliveryAreaApiService = deliveryAreaApiService;
         this.voronoiService = voronoiService;
         this.departmentApiService = departmentApiService;
+        this.operatorConfigurationApiService = operatorConfigurationApiService;
     }
 
     @Override
@@ -56,7 +65,7 @@ public class DestinationDepartmentResolverAdapter implements DestinationDepartme
             }
             return this.deliveryAreaApiService.findServingDepartment(
                             new DeliveryLocationDto(coordinates.latitude(), coordinates.longitude()))
-                    .or(() -> nearestDepartment(recipientAddress, coordinates));
+                    .or(() -> uncoveredAddressDepartment(recipientAddress, coordinates));
         } catch (final RuntimeException exception) {
             log.error("Destination department lookup failed for {}, {}: {}", recipientAddress.postalCode(),
                     recipientAddress.city(), exception.getMessage());
@@ -64,10 +73,38 @@ public class DestinationDepartmentResolverAdapter implements DestinationDepartme
         }
     }
 
+    private Optional<DepartmentId> uncoveredAddressDepartment(final RecipientAddress recipientAddress,
+                                                              final GeocodingCoordinatesDto coordinates) {
+        final Optional<DepartmentId> nearestDepartment = nearestDepartment(recipientAddress, coordinates);
+        final UncoveredPostalCodePolicyDto policy = uncoveredPostalCodePolicy(nearestDepartment.orElse(null));
+        if (policy == UncoveredPostalCodePolicyDto.BLOCK) {
+            log.warn("Address {}, {} is not covered by any delivery area and automatic assignment is blocked",
+                    recipientAddress.postalCode(), recipientAddress.city());
+            return Optional.empty();
+        }
+        if (policy == UncoveredPostalCodePolicyDto.WARN) {
+            log.warn("Address {}, {} is not covered by any delivery area, the nearest department is assigned",
+                    recipientAddress.postalCode(), recipientAddress.city());
+        }
+        return nearestDepartment;
+    }
+
+    private UncoveredPostalCodePolicyDto uncoveredPostalCodePolicy(final DepartmentId nearestDepartmentId) {
+        final DepartmentConfigurationDto configuration = nearestDepartmentId == null
+                ? this.operatorConfigurationApiService.getCurrentDepartmentConfiguration()
+                : this.operatorConfigurationApiService.getDepartmentConfiguration(nearestDepartmentId);
+        if (configuration == null || configuration.deliveryAreaPolicy() == null
+                || configuration.deliveryAreaPolicy().uncoveredPostalCodePolicy() == null) {
+            return UncoveredPostalCodePolicyDto.WARN;
+        }
+        return configuration.deliveryAreaPolicy().uncoveredPostalCodePolicy();
+    }
+
     private Optional<DepartmentId> nearestDepartment(final RecipientAddress recipientAddress,
                                                      final GeocodingCoordinatesDto coordinates) {
         final List<DepartmentDto> departments = this.departmentApiService.getAllDepartments()
                 .stream()
+                .filter(department -> department.status() == null || ACTIVE_STATUS.equals(department.status()))
                 .filter(department -> department.coordinates() != null
                         && department.coordinates().latitude() != null
                         && department.coordinates().longitude() != null)
