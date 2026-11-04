@@ -26,7 +26,8 @@ public abstract class DepartmentToModelMapper {
 					Department.Status.valueOf(department.getStatus().name()),
                     map(department.getDepartmentCoordinates()), department.getCreatedAt(),
 					department.getUpdatedAt(), department.getAdminUserId(), department.getCreatedBy(),
-					department.getLastModifiedBy());
+					department.getLastModifiedBy(), department.getStatusChangeReason(),
+					department.getStatusChangedAt());
             model.assignOperator(department.operatorId());
             return model;
         }
@@ -44,7 +45,8 @@ public abstract class DepartmentToModelMapper {
                     Department.Status.valueOf(department.getStatus().name()),
                     map(department.getDepartmentCoordinates()), department.getCreatedAt(),
                     department.getUpdatedAt(), department.getAdminUserId(), department.getCreatedBy(),
-                    department.getLastModifiedBy());
+                    department.getLastModifiedBy(), department.getStatusChangeReason(),
+                    department.getStatusChangedAt());
             model.assignOperator(department.operatorId());
             return model;
         }
