@@ -21,18 +21,33 @@ public final class DepartmentStatusChangedIntegrationEvent extends OperatorAware
     private final DepartmentIdDto affectedDepartmentId;
     private final DepartmentCodeDto departmentCode;
     private final DepartmentStatusDto status;
+    private final String reason;
+
+    public DepartmentStatusChangedIntegrationEvent(
+            final DepartmentIdDto affectedDepartmentId,
+            final DepartmentCodeDto departmentCode,
+            final DepartmentStatusDto status) {
+        this(affectedDepartmentId, departmentCode, status, null);
+    }
 
     @JsonCreator
     public DepartmentStatusChangedIntegrationEvent(
             @JsonProperty("affectedDepartmentId") final DepartmentIdDto affectedDepartmentId,
             @JsonProperty("departmentCode") final DepartmentCodeDto departmentCode,
-            @JsonProperty("status") final DepartmentStatusDto status) {
+            @JsonProperty("status") final DepartmentStatusDto status,
+            @JsonProperty("reason") final String reason) {
         this.affectedDepartmentId = Objects.requireNonNull(
                 affectedDepartmentId, "Affected department ID cannot be null");
         Objects.requireNonNull(this.affectedDepartmentId.value(), "Affected department ID value cannot be null");
         this.departmentCode = Objects.requireNonNull(departmentCode, "Department code cannot be null");
         Objects.requireNonNull(this.departmentCode.value(), "Department code value cannot be null");
         this.status = Objects.requireNonNull(status, "Department status cannot be null");
+        this.reason = reason;
+    }
+
+    @JsonProperty("reason")
+    public String reason() {
+        return this.reason;
     }
 
     @JsonProperty("affectedDepartmentId")
