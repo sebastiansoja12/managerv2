@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 
 import java.time.Instant;
 import java.util.List;
@@ -62,6 +63,17 @@ class DeliveryAreaGeneratorTest {
         assertThat(areas).hasSize(1);
         assertThat(areas.get(0).getBoundary().toPolygon(1).getArea())
                 .isCloseTo(COUNTRY.toPolygon(1).getArea(), offset(1e-6));
+    }
+
+    @Test
+    void shouldLimitAreasToConfiguredRadiusInRadiusMode() {
+        final DeliveryArea area = generator.generate(List.of(warsaw, krakow), NOW, department -> department == warsaw ? 50 : 0).get(warsaw).get(0);
+        final Polygon polygon = area.getBoundary().toPolygon(1);
+
+        assertThat(polygon.contains(point(52.23, 21.01))).isTrue();
+        assertThat(polygon.contains(point(52.50, 21.01))).isTrue();
+        assertThat(polygon.contains(point(52.80, 21.01))).isFalse();
+        assertThat(polygon.contains(point(52.23, 22.0))).isFalse();
     }
 
     @Test
