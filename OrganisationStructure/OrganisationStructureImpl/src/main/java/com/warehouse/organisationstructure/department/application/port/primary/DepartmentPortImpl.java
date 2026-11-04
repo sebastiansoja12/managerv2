@@ -135,13 +135,20 @@ public class DepartmentPortImpl implements DepartmentPort {
     }
 
     @Override
-    public void changeDepartmentActive(final DepartmentCode departmentCode, final Boolean active) {
+    @Transactional
+    public void changeDepartmentActive(final DepartmentCode departmentCode, final Boolean active, final String reason) {
         final UserId userId = DomainRegistry.authenticationService().currentUser();
         if (active) {
             this.departmentService.activateDepartment(departmentCode, userId);
         } else {
-            this.departmentService.deactivateDepartment(departmentCode, userId);
+            this.departmentService.deactivateDepartment(departmentCode, userId, reason);
         }
+    }
+
+    @Override
+    @Transactional
+    public int archiveInactiveDepartments() {
+        return this.departmentService.archiveInactiveDepartments();
     }
 
     @Override
@@ -160,7 +167,8 @@ public class DepartmentPortImpl implements DepartmentPort {
     public void changeStatus(final ChangeDepartmentStatusCommand command) {
         final DepartmentCode departmentCode = command.departmentCode();
         final Department.Status status = Department.Status.valueOf(command.status());
-        this.departmentService.changeStatus(departmentCode, status);
+        this.departmentService.changeStatus(departmentCode, status, command.reason(),
+                DomainRegistry.authenticationService().currentUser());
     }
 
     @Override
