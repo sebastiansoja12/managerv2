@@ -1,9 +1,11 @@
 package com.warehouse.chat.application.port.secondary;
 
+import com.warehouse.chat.domain.vo.ChatParticipant;
 import com.warehouse.chat.domain.vo.ChatRecipient;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ChatUserServicePort {
@@ -13,4 +15,6 @@ public interface ChatUserServicePort {
     OperatorId currentOperatorId();
 
     Optional<ChatRecipient> findRecipient(final UserId userId);
+
+    List<ChatParticipant> findActiveParticipants();
 }
