@@ -5,15 +5,18 @@ package com.warehouse.returning.domain.model;
 import com.warehouse.returning.domain.vo.DepartmentId;
 import com.warehouse.returning.domain.vo.OperatorId;
 import com.warehouse.returning.domain.enumeration.ReasonCode;
+import com.warehouse.returning.domain.event.ReturnPackageCanceled;
 import com.warehouse.returning.domain.event.ReturnPackageProcessingStarted;
 import com.warehouse.returning.domain.exception.StatusChangeException;
 import com.warehouse.returning.domain.vo.*;
 
 import java.time.Instant;
+import java.util.Optional;
 
 public class ReturnPackage {
     private ReturnPackageId returnPackageId;
     private ShipmentId shipmentId;
+    private ShipmentId returnShipmentId;
     private String reason;
     private ReturnStatus returnStatus;
     private ReturnToken returnToken;
@@ -35,12 +38,13 @@ public class ReturnPackage {
                          final UserId assignedTo,
                          final UserId processedBy,
                          final ReasonCode reasonCode) {
-        this(returnPackageId, shipmentId, reason, returnToken, assignedDepartmentId,
+        this(returnPackageId, shipmentId, null, reason, returnToken, assignedDepartmentId,
                 returnedDepartmentId, assignedTo, processedBy, reasonCode, null);
     }
 
     public ReturnPackage(final ReturnPackageId returnPackageId,
                          final ShipmentId shipmentId,
+                         final ShipmentId returnShipmentId,
                          final String reason,
                          final ReturnToken returnToken,
                          final DepartmentId assignedDepartmentId,
@@ -51,6 +55,7 @@ public class ReturnPackage {
                          final OperatorId operatorId) {
         this.returnPackageId = returnPackageId;
         this.shipmentId = shipmentId;
+        this.returnShipmentId = returnShipmentId;
         this.reason = reason;
         this.returnStatus = ReturnStatus.CREATED;
         this.returnToken = returnToken;
@@ -144,12 +149,21 @@ public class ReturnPackage {
         return updatedAt;
     }
 
-    public void markAsCanceled() {
+    public ShipmentId getReturnShipmentId() {
+        return returnShipmentId;
+    }
+
+
+    public Optional<ReturnPackageCanceled> markAsCanceled() {
+        if (this.returnStatus == ReturnStatus.CANCELLED) {
+            return Optional.empty();
+        }
         if (this.returnStatus == ReturnStatus.COMPLETED) {
             throw new StatusChangeException("Return package is already completed, cannot override status");
         }
         changeReturnStatus(ReturnStatus.CANCELLED);
         markAsModified();
+        return Optional.of(new ReturnPackageCanceled(toSnapshot(), updatedAt));
     }
 
     public ReturnPackageProcessingStarted markAsProcessing() {
@@ -185,6 +199,7 @@ public class ReturnPackage {
         return new ReturnPackageSnapshot(
                 returnPackageId,
                 shipmentId,
+                returnShipmentId,
                 reason,
                 returnStatus,
                 returnToken,
@@ -206,6 +221,7 @@ public class ReturnPackage {
     public ReturnPackage(final ReturnPackageBuilder builder) {
         this.returnPackageId = builder.returnPackageId;
         this.shipmentId = builder.shipmentId;
+        this.returnShipmentId = builder.returnShipmentId;
         this.reason = builder.reason;
         this.returnStatus = builder.returnStatus;
         this.returnToken = builder.returnToken;
@@ -231,6 +247,7 @@ public class ReturnPackage {
     public static class ReturnPackageBuilder {
         private ReturnPackageId returnPackageId;
         private ShipmentId shipmentId;
+        private ShipmentId returnShipmentId;
         private String reason;
         private ReturnStatus returnStatus;
         private ReturnToken returnToken;
@@ -250,6 +267,11 @@ public class ReturnPackage {
 
         public ReturnPackageBuilder shipmentId(ShipmentId shipmentId) {
             this.shipmentId = shipmentId;
+            return this;
+        }
+
+        public ReturnPackageBuilder returnShipmentId(final ShipmentId returnShipmentId) {
+            this.returnShipmentId = returnShipmentId;
             return this;
         }
 
