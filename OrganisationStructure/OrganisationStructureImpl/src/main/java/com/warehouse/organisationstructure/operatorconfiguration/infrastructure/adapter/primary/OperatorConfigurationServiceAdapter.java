@@ -1,5 +1,8 @@
 package com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.primary;
 
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.organisationstructure.api.dto.DepartmentConfigurationsDto;
+import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.primary.mapper.DepartmentConfigurationOverrideApiMapper;
 import com.warehouse.auth.OperatorCapabilityService;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
@@ -23,6 +26,9 @@ import com.warehouse.organisationstructure.api.dto.PickupPointConfigurationDto;
 public class OperatorConfigurationServiceAdapter implements OperatorConfigurationApiService, OperatorCapabilityService {
 
     private final OperatorConfigurationPort operatorConfigurationPort;
+
+    private final DepartmentConfigurationOverrideApiMapper departmentConfigurationOverrideApiMapper =
+            new DepartmentConfigurationOverrideApiMapper();
 
     public OperatorConfigurationServiceAdapter(final OperatorConfigurationPort operatorConfigurationPort) {
         this.operatorConfigurationPort = operatorConfigurationPort;
@@ -78,6 +84,16 @@ public class OperatorConfigurationServiceAdapter implements OperatorConfiguratio
     public DepartmentConfigurationDto updateCurrentDepartmentConfiguration(final DepartmentConfigurationDto configuration) {
         return OperatorMapper.toDtoDepartmentConfiguration(operatorConfigurationPort.updateCurrentDepartmentConfiguration(
                 OperatorMapper.toModelDepartmentConfiguration(configuration)));
+    }
+
+    @Override
+    public DepartmentConfigurationDto getDepartmentConfiguration(final DepartmentId departmentId) {
+        return OperatorMapper.toDtoDepartmentConfiguration(operatorConfigurationPort.getDepartmentConfiguration(departmentId));
+    }
+
+    @Override
+    public DepartmentConfigurationsDto getDepartmentConfigurations() {
+        return departmentConfigurationOverrideApiMapper.toDto(operatorConfigurationPort.getDepartmentConfigurations());
     }
 
     @Override
