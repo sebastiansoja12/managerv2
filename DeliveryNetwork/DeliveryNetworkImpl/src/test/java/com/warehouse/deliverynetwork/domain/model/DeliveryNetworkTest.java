@@ -70,6 +70,32 @@ class DeliveryNetworkTest {
     }
 
     @Test
+    void shouldKeepDirectionOfOneWayConnection() {
+        final DeliveryNetwork deliveryNetwork = DeliveryNetwork.empty(OPERATOR_ID);
+
+        deliveryNetwork.replaceConnections(
+                List.of(DepartmentConnection.oneWay(new DepartmentId(2L), new DepartmentId(1L)),
+                        DepartmentConnection.oneWay(new DepartmentId(1L), new DepartmentId(2L))),
+                List.of(branch(1L, "KT1"), sortingFacility(2L, "NCS")));
+
+        assertTrue(deliveryNetwork.directlyConnects(new DepartmentId(2L), new DepartmentId(1L)));
+        assertTrue(deliveryNetwork.directlyConnects(new DepartmentId(1L), new DepartmentId(2L)));
+        assertEquals(2, deliveryNetwork.connections().size());
+    }
+
+    @Test
+    void shouldRejectOneWayConnectionOverlappingBidirectionalConnection() {
+        final DeliveryNetwork deliveryNetwork = DeliveryNetwork.empty(OPERATOR_ID);
+
+        assertThrows(
+                DuplicateDepartmentConnectionException.class,
+                () -> deliveryNetwork.replaceConnections(
+                        List.of(connection(1L, 2L), DepartmentConnection.oneWay(new DepartmentId(2L),
+                                new DepartmentId(1L))),
+                        List.of(branch(1L, "KT1"), sortingFacility(2L, "NCS"))));
+    }
+
+    @Test
     void shouldReportAllDepartmentsWithoutSortingFacilityConnection() {
         final DeliveryNetwork deliveryNetwork = DeliveryNetwork.empty(OPERATOR_ID);
 
