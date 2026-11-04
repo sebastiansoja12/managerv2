@@ -30,7 +30,9 @@ public interface DepartmentPort {
 
     void changeAddress(final UpdateAddressCommand command);
 
-    void changeDepartmentActive(final DepartmentCode departmentCodeValue, final Boolean active);
+    void changeDepartmentActive(final DepartmentCode departmentCodeValue, final Boolean active, final String reason);
+
+    int archiveInactiveDepartments();
 
     void changeDepartmentType(final DepartmentCode departmentCodeValue, final DepartmentType departmentType);
 
