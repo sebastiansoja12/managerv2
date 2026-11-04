@@ -24,6 +24,10 @@ public interface DeliveryNetworkPort {
 
     void removeDepartmentConnections(final DepartmentId departmentId);
 
+    void connectDepartmentToSortingFacilities(final DepartmentId departmentId);
+
+    boolean canActivateDepartment(final DepartmentId departmentId);
+
     boolean areDirectlyConnected(final DepartmentId firstDepartmentId, final DepartmentId secondDepartmentId);
 
     DeliveryPath findDeliveryPath(final DepartmentId sourceDepartmentId, final DepartmentId targetDepartmentId);
