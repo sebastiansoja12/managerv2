@@ -77,7 +77,7 @@ class OperatorDirectoryControllerTest {
         mockMvc.perform(post("/operators/1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"firstName":"Jan","lastName":"Kowalski","username":"jkowalski","password":"secret",
+                                {"firstName":"Jan","lastName":"Kowalski","username":"jkowalski",
                                  "email":"jan@test.pl","role":"OWNER","departmentCode":"KT1","language":"pl"}
                                 """))
                 .andExpect(status().isBadRequest());
