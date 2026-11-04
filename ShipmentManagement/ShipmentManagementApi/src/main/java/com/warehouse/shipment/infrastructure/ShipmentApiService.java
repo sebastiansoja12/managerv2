@@ -17,11 +17,15 @@ import com.warehouse.shipment.infrastructure.dto.SourceShipmentDto;
 public interface ShipmentApiService {
     ShipmentDetailsDto getShipment(final ShipmentId shipmentId);
 
+    ShipmentDetailsDto getShipment(final TrackingNumber trackingNumber);
+
     ShipmentDocumentDto getShipmentDocument(final ShipmentId shipmentId);
 
     ShipmentTrackingDto getShipmentTracking(final TrackingNumber trackingNumber);
 
     ShipmentDetailsDto collectShipment(final TrackingNumber trackingNumber);
+
+    ShipmentDetailsDto acceptShipmentInDepartment(final TrackingNumber trackingNumber);
 
     ShipmentDetailsDto handOverShipment(final ShipmentHandoverRequestDto shipmentHandoverRequest);
 
@@ -38,6 +42,10 @@ public interface ShipmentApiService {
     ShipmentRejectResponseDto rejectShipment(final ShipmentRejectRequestDto shipmentRejectRequest);
 
     void markReturned(final ShipmentId shipmentId);
+
+    void markReturned(final ShipmentId shipmentId, final ShipmentId returnShipmentId);
+
+    ShipmentId createReturnShipmentDraft(final ShipmentId shipmentId);
 
     // Ends the shipment's lifecycle as returned and creates the return shipment (recipient -> sender).
     ShipmentReturnResponseDto returnShipment(final ShipmentId shipmentId);
