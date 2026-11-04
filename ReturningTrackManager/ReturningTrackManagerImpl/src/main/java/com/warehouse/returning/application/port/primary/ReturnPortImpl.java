@@ -53,10 +53,10 @@ public class ReturnPortImpl implements ReturnPort {
 					returnPackageRequest.getShipmentId(), returnPackageRequest.getDepartmentId(),
 					returnPackageRequest.getUserId());
 			final ReturnPackage returnPackage = new ReturnPackage(returnPackageId, returnPackageRequest.getShipmentId(),
-					returnPackageRequest.getReason(), returnToken, returnPackageRequest.getDepartmentId(),
+					returnPackageRequest.getReturnShipmentId(), returnPackageRequest.getReason(), returnToken, returnPackageRequest.getDepartmentId(),
 					request.getIssuerDepartmentId(), returnPackageRequest.getUserId(), request.getIssuerUserId(),
 					returnPackageRequest.getReasonCode(), request.getOperatorId());
-            this.returnService.saveOrUpdate(returnPackage);
+            this.returnProcessingService.register(returnPackage);
 
             processReturns.add(ProcessReturn.from(returnPackage));
         }
@@ -66,7 +66,7 @@ public class ReturnPortImpl implements ReturnPort {
 
     @Override
     public void changeReasonCode(final ChangeReasonCodeRequest request) {
-        this.returnService.changeReasonCode(request.returnPackageId(), request.reasonCode());
+        this.returnProcessingService.changeReasonCode(request.returnPackageId(), request.reasonCode());
     }
 
     @Override
@@ -76,7 +76,7 @@ public class ReturnPortImpl implements ReturnPort {
 
     @Override
     public void complete(final ReturnPackageId returnPackageId) {
-        this.returnService.completeReturn(returnPackageId);
+        this.returnProcessingService.complete(returnPackageId);
     }
 
     @Override
