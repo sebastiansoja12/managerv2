@@ -29,6 +29,7 @@ import com.warehouse.logisticsdelivery.application.port.secondary.DestinationDep
 import com.warehouse.logisticsdelivery.application.port.secondary.ShipmentServicePort;
 import com.warehouse.logisticsdelivery.application.port.secondary.SignatureRepository;
 import com.warehouse.logisticsdelivery.application.port.secondary.SourceShipment;
+import com.warehouse.logisticsdelivery.application.service.DestinationCapacityAllocator;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryLifecycleStatus;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryMethod;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryRelationType;
@@ -83,18 +84,22 @@ public class DeliveryPortImpl implements DeliveryPort {
 
     private final DestinationDepartmentResolverPort destinationDepartmentResolverPort;
 
+    private final DestinationCapacityAllocator destinationCapacityAllocator;
+
     public DeliveryPortImpl(final DeliveryRepository deliveryRepository,
                             final ShipmentServicePort shipmentServicePort,
                             final DomainEventPublisher domainEventPublisher,
                             final OperatorContextProvider operatorContextProvider,
                             final SignatureRepository signatureRepository,
-                            final DestinationDepartmentResolverPort destinationDepartmentResolverPort) {
+                            final DestinationDepartmentResolverPort destinationDepartmentResolverPort,
+                            final DestinationCapacityAllocator destinationCapacityAllocator) {
         this.deliveryRepository = deliveryRepository;
         this.shipmentServicePort = shipmentServicePort;
         this.domainEventPublisher = domainEventPublisher;
         this.operatorContextProvider = operatorContextProvider;
         this.signatureRepository = signatureRepository;
         this.destinationDepartmentResolverPort = destinationDepartmentResolverPort;
+        this.destinationCapacityAllocator = destinationCapacityAllocator;
     }
 
     @Override
@@ -220,7 +225,9 @@ public class DeliveryPortImpl implements DeliveryPort {
     public void changeRecipientAddress(final ShipmentId shipmentId, final RecipientAddress recipientAddress) {
         findActiveShipmentDelivery(shipmentId).ifPresent(delivery -> {
             final DeliverySnapshot before = delivery.snapshot();
-            delivery.changeRecipientAddress(recipientAddress, this.destinationDepartmentResolverPort::resolve);
+            delivery.changeRecipientAddress(recipientAddress, address -> this.destinationDepartmentResolverPort
+                    .resolve(address)
+                    .map(this.destinationCapacityAllocator::allocate));
             saveModifiedWhen(delivery, !delivery.snapshot().equals(before));
         });
     }
@@ -469,7 +476,8 @@ public class DeliveryPortImpl implements DeliveryPort {
             return Optional.empty();
         }
         final Optional<DepartmentId> destinationDepartmentId = this.shipmentServicePort.findRecipientAddress(shipmentId)
-                .flatMap(this.destinationDepartmentResolverPort::resolve);
+                .flatMap(this.destinationDepartmentResolverPort::resolve)
+                .map(this.destinationCapacityAllocator::allocate);
         if (destinationDepartmentId.isEmpty()) {
             log.warn("Destination department of shipment {} could not be resolved", shipmentId.getValue());
         }
