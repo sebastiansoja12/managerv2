@@ -37,7 +37,9 @@ public abstract class RequestMapper {
 
     private static ReturnPackageRequest map(final ReturnPackageRequestApi request) {
         return new ReturnPackageRequest(request.departmentId(), request.reason(),
-                new ShipmentId(request.shipmentId().value()), new UserId(request.userId().value()),
+                new ShipmentId(request.shipmentId().value()),
+                request.returnShipmentId() == null ? null : new ShipmentId(request.returnShipmentId().value()),
+                new UserId(request.userId().value()),
                 ReasonCode.valueOf(request.reasonCode().value()));
     }
 

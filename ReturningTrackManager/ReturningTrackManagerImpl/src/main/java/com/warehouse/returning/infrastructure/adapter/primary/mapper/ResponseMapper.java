@@ -18,6 +18,8 @@ public abstract class ResponseMapper {
 	public static ReturnResponseApi toResponseApi(final ReturnResponse res) {
 		return new ReturnResponseApi(res.processReturn().stream()
 				.map(processReturn -> new ProcessReturnDto(new ShipmentIdDto(processReturn.shipmentId().value()),
+						processReturn.returnShipmentId() == null ? null
+								: new ShipmentIdDto(processReturn.returnShipmentId().value()),
 						new ReturnIdDto(processReturn.returnId().getValue()), processReturn.processStatus().name()))
                 .toList());
 	}
@@ -25,6 +27,8 @@ public abstract class ResponseMapper {
 	public static ReturnPackageApi toResponseApi(final ReturnPackage returnPackage) {
 		final ReturnPackageIdApi returnPackageId = new ReturnPackageIdApi(returnPackage.getReturnPackageId().value());
 		final ShipmentIdApi shipmentId = new ShipmentIdApi(returnPackage.getShipmentId().value());
+		final ShipmentIdApi returnShipmentId = returnPackage.getReturnShipmentId() == null ? null
+				: new ShipmentIdApi(returnPackage.getReturnShipmentId().value());
 		final String reason = returnPackage.getReason();
 		final ReturnStatusApi returnStatus = ReturnStatusApi.valueOf(returnPackage.getReturnStatus().name());
 		final ReturnTokenApi returnToken = new ReturnTokenApi(returnPackage.getReturnToken().value());
@@ -35,7 +39,7 @@ public abstract class ResponseMapper {
 		final ReasonCodeApi reasonCode = new ReasonCodeApi(returnPackage.getReasonCode().name());
 		final Instant createdAt = returnPackage.getCreatedAt();
 		final Instant updatedAt = returnPackage.getUpdatedAt();
-		return new ReturnPackageApi(returnPackageId, shipmentId, reason, returnStatus, returnToken,
+		return new ReturnPackageApi(returnPackageId, shipmentId, returnShipmentId, reason, returnStatus, returnToken,
 				assignedDepartmentId, returnedDepartmentId, assignedTo, processedBy, reasonCode,
                 returnPackage.getOperatorId(), createdAt,
 				updatedAt);
