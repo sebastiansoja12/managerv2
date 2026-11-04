@@ -12,10 +12,12 @@ import com.warehouse.organisationstructure.deliveryarea.application.port.seconda
 import com.warehouse.organisationstructure.deliveryarea.domain.enumeration.DeliveryAreaSource;
 import com.warehouse.organisationstructure.deliveryarea.domain.exception.DeliveryAreaDepartmentNotFoundException;
 import com.warehouse.organisationstructure.deliveryarea.domain.exception.DeliveryAreaNotFoundException;
+import com.warehouse.organisationstructure.deliveryarea.domain.exception.ManualDeliveryAreaEditDisabledException;
 import com.warehouse.organisationstructure.deliveryarea.domain.exception.NoDepartmentsSelectedException;
 import com.warehouse.organisationstructure.deliveryarea.domain.model.DeliveryArea;
 import com.warehouse.organisationstructure.deliveryarea.domain.service.DeliveryAreaGenerator;
 import com.warehouse.organisationstructure.deliveryarea.domain.vo.DeliveryAreaDepartment;
+import com.warehouse.organisationstructure.deliveryarea.domain.vo.DeliveryAreaPolicies;
 import com.warehouse.organisationstructure.deliveryarea.domain.vo.DeliveryAreaDraft;
 import com.warehouse.organisationstructure.deliveryarea.domain.vo.GeoPoint;
 import com.warehouse.commonassets.identificator.DeliveryAreaId;
@@ -25,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -72,6 +75,7 @@ public class DeliveryAreaPortImpl implements DeliveryAreaPort {
     @Override
     @Transactional
     public DeliveryArea create(final CreateDeliveryAreaCommand command) {
+        requireManualEditAllowed(command.departmentId());
         loadDepartment(command.departmentId());
         return deliveryAreaRepository.create(new DeliveryArea(command.departmentId(), command.name(),
                 command.boundary(), DeliveryAreaSource.MANUAL, clock.instant()));
@@ -81,6 +85,7 @@ public class DeliveryAreaPortImpl implements DeliveryAreaPort {
     @Transactional
     public DeliveryArea update(final UpdateDeliveryAreaCommand command) {
         final DeliveryArea deliveryArea = loadArea(command.deliveryAreaId());
+        requireManualEditAllowed(deliveryArea.getDepartmentId());
         deliveryArea.update(command.name(), command.boundary(), clock.instant());
         return deliveryAreaRepository.update(deliveryArea);
     }
@@ -88,13 +93,14 @@ public class DeliveryAreaPortImpl implements DeliveryAreaPort {
     @Override
     @Transactional
     public void delete(final DeliveryAreaId deliveryAreaId) {
-        loadArea(deliveryAreaId);
+        requireManualEditAllowed(loadArea(deliveryAreaId).getDepartmentId());
         deliveryAreaRepository.delete(deliveryAreaId);
     }
 
     @Override
     @Transactional
     public List<DeliveryArea> replaceDepartmentAreas(final ReplaceDepartmentDeliveryAreasCommand command) {
+        requireManualEditAllowed(command.departmentId());
         loadDepartment(command.departmentId());
         final Instant now = clock.instant();
         final Map<DeliveryAreaId, DeliveryArea> existing = new LinkedHashMap<>();
@@ -137,7 +143,8 @@ public class DeliveryAreaPortImpl implements DeliveryAreaPort {
     @Override
     @Transactional
     public void assignAutomaticallyAfterDepartmentCreated(final DepartmentId departmentId) {
-        if (!deliveryAreaConfigurationServicePort.isAutomaticAssignmentEnabled()) {
+        final DeliveryAreaPolicies policies = deliveryAreaConfigurationServicePort.currentPolicies();
+        if (!policies.forDepartment(departmentId).automaticAssignment()) {
             return;
         }
         final Map<DepartmentId, DeliveryAreaDepartment> departments = new LinkedHashMap<>();
@@ -145,14 +152,11 @@ public class DeliveryAreaPortImpl implements DeliveryAreaPort {
                 .forEach(department -> departments.put(department.departmentId(), department));
         deliveryAreaDepartmentServicePort.findDepartment(departmentId)
                 .ifPresent(department -> departments.put(department.departmentId(), department));
-        final List<DeliveryAreaDepartment> eligible = departments.values().stream()
-                .filter(deliveryAreaGenerator::isEligible)
-                .toList();
+        final List<DeliveryAreaDepartment> eligible = automaticallyAssigned(departments.values(), policies);
         if (eligible.isEmpty()) {
             return;
         }
-        final List<DepartmentDeliveryAreas> result = replaceWithGenerated(
-                deliveryAreaGenerator.generate(eligible, clock.instant()));
+        final List<DepartmentDeliveryAreas> result = replaceWithGenerated(generateAreas(eligible, policies));
         log.info("Delivery areas reassigned for {} departments after department {} was created",
                 result.size(), departmentId.getValue());
     }
@@ -162,19 +166,40 @@ public class DeliveryAreaPortImpl implements DeliveryAreaPort {
     public void reassignAfterDepartmentDeleted(final DepartmentId departmentId) {
         deliveryAreaRepository.findByDepartmentId(departmentId)
                 .forEach(area -> deliveryAreaRepository.delete(area.getDeliveryAreaId()));
-        if (!deliveryAreaConfigurationServicePort.isAutomaticAssignmentEnabled()) {
-            return;
-        }
-        final List<DeliveryAreaDepartment> eligible = deliveryAreaDepartmentServicePort.findDepartments().stream()
-                .filter(department -> !department.departmentId().equals(departmentId))
-                .filter(deliveryAreaGenerator::isEligible)
-                .toList();
+        final DeliveryAreaPolicies policies = deliveryAreaConfigurationServicePort.currentPolicies();
+        final List<DeliveryAreaDepartment> eligible = automaticallyAssigned(
+                deliveryAreaDepartmentServicePort.findDepartments().stream()
+                        .filter(department -> !department.departmentId().equals(departmentId))
+                        .toList(), policies);
         if (eligible.isEmpty()) {
             return;
         }
-        final List<DepartmentDeliveryAreas> result = replaceWithGenerated(
-                deliveryAreaGenerator.generate(eligible, clock.instant()));
+        final List<DepartmentDeliveryAreas> result = replaceWithGenerated(generateAreas(eligible, policies));
         log.info("Delivery areas reassigned for {} departments after department {} was deleted",
+                result.size(), departmentId.getValue());
+    }
+
+    @Override
+    @Transactional
+    public void recalculateAfterDepartmentStatusChanged(final DepartmentId departmentId) {
+        final DeliveryAreaPolicies policies = deliveryAreaConfigurationServicePort.currentPolicies();
+        if (!policies.forDepartment(departmentId).recalculateOnStatusChange()) {
+            return;
+        }
+        final boolean active = deliveryAreaDepartmentServicePort.findDepartment(departmentId)
+                .map(DeliveryAreaDepartment::active)
+                .orElse(false);
+        if (!active) {
+            deliveryAreaRepository.findByDepartmentId(departmentId)
+                    .forEach(area -> deliveryAreaRepository.delete(area.getDeliveryAreaId()));
+        }
+        final List<DeliveryAreaDepartment> eligible = automaticallyAssigned(
+                deliveryAreaDepartmentServicePort.findDepartments(), policies);
+        if (eligible.isEmpty()) {
+            return;
+        }
+        final List<DepartmentDeliveryAreas> result = replaceWithGenerated(generateAreas(eligible, policies));
+        log.info("Delivery areas recalculated for {} departments after status of department {} changed",
                 result.size(), departmentId.getValue());
     }
 
@@ -213,7 +238,27 @@ public class DeliveryAreaPortImpl implements DeliveryAreaPort {
                 .filter(Objects::nonNull)
                 .map(this::loadDepartment)
                 .toList();
-        return deliveryAreaGenerator.generate(departments, clock.instant());
+        return generateAreas(departments, deliveryAreaConfigurationServicePort.currentPolicies());
+    }
+
+    private void requireManualEditAllowed(final DepartmentId departmentId) {
+        if (!deliveryAreaConfigurationServicePort.currentPolicies().forDepartment(departmentId).manualEditAllowed()) {
+            throw new ManualDeliveryAreaEditDisabledException();
+        }
+    }
+
+    private List<DeliveryAreaDepartment> automaticallyAssigned(final Collection<DeliveryAreaDepartment> departments,
+                                                               final DeliveryAreaPolicies policies) {
+        return departments.stream()
+                .filter(department -> policies.forDepartment(department.departmentId()).automaticAssignment())
+                .filter(deliveryAreaGenerator::isEligible)
+                .toList();
+    }
+
+    private Map<DeliveryAreaDepartment, List<DeliveryArea>> generateAreas(
+            final List<DeliveryAreaDepartment> departments, final DeliveryAreaPolicies policies) {
+        return deliveryAreaGenerator.generate(departments, clock.instant(),
+                department -> policies.forDepartment(department.departmentId()).maxRadiusInKilometers());
     }
 
     private DeliveryAreaDepartment loadDepartment(final DepartmentId departmentId) {
