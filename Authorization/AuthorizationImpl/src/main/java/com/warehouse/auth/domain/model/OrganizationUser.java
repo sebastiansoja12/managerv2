@@ -159,6 +159,10 @@ public abstract class OrganizationUser extends BelongsToOperator implements Acco
                 && canGrant(user.getLevel());
     }
 
+    public boolean canActOnBehalfOfAnyDepartment() {
+        return getLevel().isAtLeast(AccountLevel.SUPERADMIN);
+    }
+
     public boolean canAssignRole(final Role role) {
         return canGrant(role.getLevel());
     }
