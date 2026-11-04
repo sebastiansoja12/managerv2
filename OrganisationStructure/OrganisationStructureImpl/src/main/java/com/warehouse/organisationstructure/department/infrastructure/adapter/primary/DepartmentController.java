@@ -79,11 +79,13 @@ public class DepartmentController {
     @PutMapping("/active-departments")
     @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     public ResponseEntity<?> updateDepartmentActiveStatus(@RequestParam final Boolean active,
-                                                          @RequestParam final String departmentCode) {
+                                                          @RequestParam final String departmentCode,
+                                                          @RequestParam(required = false) final String reason) {
         final DepartmentCode departmentCodeValue = new DepartmentCode(departmentCode);
-        this.departmentPort.changeDepartmentActive(departmentCodeValue, active);
+        this.departmentPort.changeDepartmentActive(departmentCodeValue, active, reason);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
 
     @PutMapping("/department-type")
     @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
@@ -122,7 +124,8 @@ public class DepartmentController {
             return ResponseEntity.badRequest().body(result.getFailure());
         }
 		final ChangeDepartmentStatusCommand command = new ChangeDepartmentStatusCommand(
-				new DepartmentCode(departmentStatusRequest.departmentCode().value()), departmentStatusRequest.status());
+				new DepartmentCode(departmentStatusRequest.departmentCode().value()), departmentStatusRequest.status(),
+				departmentStatusRequest.reason());
         this.departmentPort.changeStatus(command);
         return ResponseEntity.ok().build();
     }
@@ -139,7 +142,8 @@ public class DepartmentController {
         }
 
         final ChangeDepartmentStatusCommand command = new ChangeDepartmentStatusCommand(
-                new DepartmentCode(departmentStatusRequest.departmentCode().value()), departmentStatusRequest.status());
+                new DepartmentCode(departmentStatusRequest.departmentCode().value()), departmentStatusRequest.status(),
+                departmentStatusRequest.reason());
         this.departmentPort.changeStatus(command);
         return ResponseEntity.ok().build();
     }

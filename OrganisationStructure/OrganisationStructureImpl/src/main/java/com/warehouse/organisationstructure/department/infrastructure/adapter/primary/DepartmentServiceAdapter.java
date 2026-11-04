@@ -121,15 +121,15 @@ public class DepartmentServiceAdapter implements DepartmentApiService {
     }
 
     @Override
-    public void changeStatus(final DepartmentCode departmentCode, final String status) {
+    public void changeStatus(final DepartmentCode departmentCode, final String status, final String reason) {
         requireValid(new ChangeDepartmentStatusApiValidator().validateBody(
-                new ChangeDepartmentStatusApi(new DepartmentCodeApi(departmentCode.value()), status)));
-        this.departmentPort.changeStatus(new ChangeDepartmentStatusCommand(departmentCode, status));
+                new ChangeDepartmentStatusApi(new DepartmentCodeApi(departmentCode.value()), status, reason)));
+        this.departmentPort.changeStatus(new ChangeDepartmentStatusCommand(departmentCode, status, reason));
     }
 
     @Override
-    public void changeActive(final DepartmentCode departmentCode, final boolean active) {
-        this.departmentPort.changeDepartmentActive(departmentCode, active);
+    public void changeActive(final DepartmentCode departmentCode, final boolean active, final String reason) {
+        this.departmentPort.changeDepartmentActive(departmentCode, active, reason);
     }
 
     private void requireValid(final Result<Void, List<String>> result) {
