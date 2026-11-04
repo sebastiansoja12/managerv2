@@ -11,6 +11,7 @@ public record CurrentUserProfileDto(
         String email,
         String role,
         String departmentCode,
+        String homeDepartmentCode,
         String language,
         boolean hasApiKey,
         Set<RolePermissionApi> rolePermissions,
