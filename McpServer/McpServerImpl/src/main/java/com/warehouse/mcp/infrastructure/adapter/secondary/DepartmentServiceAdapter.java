@@ -52,13 +52,13 @@ public class DepartmentServiceAdapter implements DepartmentServicePort {
     }
 
     @Override
-    public void changeStatus(final DepartmentCode departmentCode, final String status) {
-        this.departmentApiService.changeStatus(departmentCode, status);
+    public void changeStatus(final DepartmentCode departmentCode, final String status, final String reason) {
+        this.departmentApiService.changeStatus(departmentCode, status, reason);
     }
 
     @Override
-    public void changeActive(final DepartmentCode departmentCode, final boolean active) {
-        this.departmentApiService.changeActive(departmentCode, active);
+    public void changeActive(final DepartmentCode departmentCode, final boolean active, final String reason) {
+        this.departmentApiService.changeActive(departmentCode, active, reason);
     }
 
     private DepartmentEntry map(final DepartmentDirectoryEntryDto department) {
