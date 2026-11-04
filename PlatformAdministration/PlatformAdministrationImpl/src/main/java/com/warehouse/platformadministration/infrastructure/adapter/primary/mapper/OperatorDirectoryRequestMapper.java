@@ -16,7 +16,6 @@ public abstract class OperatorDirectoryRequestMapper {
                 request.firstName(),
                 request.lastName(),
                 request.username(),
-                request.password(),
                 request.email(),
                 request.role(),
                 new DepartmentCode(request.departmentCode()),
