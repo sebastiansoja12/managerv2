@@ -13,6 +13,6 @@ public interface DepartmentServicePort {
     void changeAddress(final DepartmentCode departmentCode, final DepartmentAddress address);
     void changeType(final DepartmentCode departmentCode, final String type);
     void changeEmail(final DepartmentCode departmentCode, final String email);
-    void changeStatus(final DepartmentCode departmentCode, final String status);
-    void changeActive(final DepartmentCode departmentCode, final boolean active);
+    void changeStatus(final DepartmentCode departmentCode, final String status, final String reason);
+    void changeActive(final DepartmentCode departmentCode, final boolean active, final String reason);
 }

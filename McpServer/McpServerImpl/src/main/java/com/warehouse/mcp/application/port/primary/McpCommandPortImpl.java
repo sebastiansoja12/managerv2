@@ -176,19 +176,21 @@ public class McpCommandPortImpl implements McpCommandPort {
     }
 
     @Override
-    public DepartmentDetails changeDepartmentStatus(final DepartmentCode departmentCode, final String status) {
+    public DepartmentDetails changeDepartmentStatus(final DepartmentCode departmentCode, final String status,
+                                                    final String reason) {
         requireChangeAccess();
         if (!currentUser().isAdministrator()) {
             throw new McpToolAccessException("Changing department status requires the ADMIN role or higher");
         }
-        this.departmentServicePort.changeStatus(departmentCode, status);
+        this.departmentServicePort.changeStatus(departmentCode, status, reason);
         return this.departmentServicePort.findDepartment(departmentCode);
     }
 
     @Override
-    public DepartmentDetails changeDepartmentActive(final DepartmentCode departmentCode, final boolean active) {
+    public DepartmentDetails changeDepartmentActive(final DepartmentCode departmentCode, final boolean active,
+                                                    final String reason) {
         requireChangeAccess();
-        this.departmentServicePort.changeActive(departmentCode, active);
+        this.departmentServicePort.changeActive(departmentCode, active, reason);
         return this.departmentServicePort.findDepartment(departmentCode);
     }
 
