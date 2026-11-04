@@ -252,19 +252,23 @@ public class ManagerMcpCommandTools {
             + "SUSPENDED or ARCHIVED. Requires the ADMIN role or higher." + CHANGES_DATA)
     public DepartmentDetailsToolResponse changeDepartmentStatus(
             @ToolParam(description = "Department code") final String departmentCode,
-            @ToolParam(description = "New status") final String status) {
+            @ToolParam(description = "New status") final String status,
+            @ToolParam(description = "Reason of the status change; required when the operator configuration "
+                    + "demands a reason for deactivation and archiving", required = false) final String reason) {
         return executor.execute("change_department_status", () -> responseMapper.map(
                 mcpCommandPort.changeDepartmentStatus(arguments.departmentCode(departmentCode),
-                        arguments.upper(arguments.required(status, "status")))));
+                        arguments.upper(arguments.required(status, "status")), arguments.optional(reason))));
     }
 
     @Tool(name = "set_department_active", description = "Activates or deactivates a department." + CHANGES_DATA)
     public DepartmentDetailsToolResponse setDepartmentActive(
             @ToolParam(description = "Department code") final String departmentCode,
-            @ToolParam(description = "true to activate, false to deactivate") final Boolean active) {
+            @ToolParam(description = "true to activate, false to deactivate") final Boolean active,
+            @ToolParam(description = "Reason of the deactivation; required when the operator configuration "
+                    + "demands a reason", required = false) final String reason) {
         return executor.execute("set_department_active", () -> responseMapper.map(
                 mcpCommandPort.changeDepartmentActive(arguments.departmentCode(departmentCode),
-                        arguments.required(active, "active"))));
+                        arguments.required(active, "active"), arguments.optional(reason))));
     }
 
     @Tool(name = "create_courier", description = "Adds a courier (supplier) and creates the courier's user account, "
