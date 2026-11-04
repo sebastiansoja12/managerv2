@@ -1,5 +1,8 @@
 package com.warehouse.organisationstructure.operatorconfiguration.domain.port.primary;
 
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.DepartmentConfigurationOverride;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.DepartmentConfigurations;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.DepartmentConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.FleetConfiguration;
@@ -32,6 +35,14 @@ public interface OperatorConfigurationPort {
     DepartmentConfiguration getCurrentDepartmentConfiguration();
 
     DepartmentConfiguration updateCurrentDepartmentConfiguration(final DepartmentConfiguration departmentConfiguration);
+
+    DepartmentConfiguration getDepartmentConfiguration(final DepartmentId departmentId);
+
+    DepartmentConfigurations getDepartmentConfigurations();
+
+    DepartmentConfigurationOverride getDepartmentConfigurationOverride(final DepartmentId departmentId);
+
+    DepartmentConfigurationOverride updateDepartmentConfigurationOverride(final DepartmentConfigurationOverride override);
 
     void create(final OperatorId operatorId, final OperatorConfiguration configuration);
 
