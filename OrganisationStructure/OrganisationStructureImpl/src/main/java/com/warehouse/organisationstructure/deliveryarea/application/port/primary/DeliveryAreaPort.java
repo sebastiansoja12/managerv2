@@ -35,5 +35,7 @@ public interface DeliveryAreaPort {
 
     void reassignAfterDepartmentDeleted(final DepartmentId departmentId);
 
+    void recalculateAfterDepartmentStatusChanged(final DepartmentId departmentId);
+
     Optional<DepartmentId> findServingDepartment(final GeoPoint location);
 }
