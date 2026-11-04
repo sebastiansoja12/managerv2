@@ -439,6 +439,18 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     @Transactional
+    public ShipmentResult acceptShipmentInDepartment(final TrackingNumber trackingNumber) {
+        final Shipment shipment = this.find(trackingNumber);
+        final ShipmentSnapshot previousSnapshot = shipment.snapshot();
+        shipment.acceptInDepartment();
+        this.shipmentRepository.createOrUpdate(shipment);
+        this.domainEventPublisher.publish(new ShipmentStatusChanged(previousSnapshot, shipment.snapshot(),
+                Instant.now()));
+        return this.shipmentResultFactory.create(shipment);
+    }
+
+    @Override
+    @Transactional
     public ShipmentResult handOverShipment(final ShipmentHandoverCommand command) {
         final Shipment shipment = this.find(command.trackingNumber());
         shipment.ensureCanBeHandedOver();
@@ -545,6 +557,32 @@ public class ShipmentPortImpl implements ShipmentPort {
         shipment.notifyShipmentReturned(ShipmentId.nextId());
         this.shipmentRepository.createOrUpdate(shipment);
         this.domainEventPublisher.publish(new ShipmentReturned(shipment.snapshot(), Instant.now()));
+    }
+
+    @Override
+    @Transactional
+    public void markReturned(final ShipmentId shipmentId, final ShipmentId returnShipmentId) {
+        final Shipment shipment = shipmentRepository.findById(shipmentId);
+        final ShipmentSnapshot previousSnapshot = shipment.snapshot();
+        shipment.notifyShipmentReturned(returnShipmentId);
+        this.shipmentRepository.createOrUpdate(shipment);
+        this.domainEventPublisher.publish(new ShipmentStatusChanged(previousSnapshot, shipment.snapshot(),
+                Instant.now()));
+    }
+
+    @Override
+    @Transactional
+    public ShipmentId createReturnShipmentDraft(final ShipmentId shipmentId) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        final ShipmentId returnShipmentId = ShipmentId.nextId();
+        final OperatorShipmentConfiguration cfg = this.shipmentConfigurationServicePort.getCurrentOperatorShipmentConfiguration();
+        final TrackingNumber trackingNumber = this.trackingNumberGenerationService.generate(cfg.workflowSettings(),
+                cfg.trackingNumberRule(), returnShipmentId);
+        final Shipment returnShipment = shipment.prepareReturnShipmentDraft(returnShipmentId, trackingNumber,
+                cfg.workflowSettings(), ExternalId.randomUUID());
+        this.shipmentRepository.createOrUpdate(returnShipment);
+        this.domainEventPublisher.publish(new ShipmentCreated(returnShipment.snapshot(), Instant.now()));
+        return returnShipmentId;
     }
 
     @Override
