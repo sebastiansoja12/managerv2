@@ -1,5 +1,10 @@
 package com.warehouse.logisticsdelivery.infrastructure.adapter.secondary;
 
+import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
+import com.warehouse.organisationstructure.api.dto.DeliveryAreaModeDto;
+import com.warehouse.organisationstructure.api.dto.DepartmentConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.DepartmentDeliveryAreaPolicyDto;
+import com.warehouse.organisationstructure.api.dto.UncoveredPostalCodePolicyDto;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.geocoding.api.GeocodingAddressDto;
@@ -33,9 +38,12 @@ class DestinationDepartmentResolverAdapterTest {
     private final DeliveryAreaApiService deliveryAreaApiService = mock(DeliveryAreaApiService.class);
     private final VoronoiService voronoiService = mock(VoronoiService.class);
     private final DepartmentApiService departmentApiService = mock(DepartmentApiService.class);
+    private final OperatorConfigurationApiService operatorConfigurationApiService =
+            mock(OperatorConfigurationApiService.class);
 
     private final DestinationDepartmentResolverAdapter adapter = new DestinationDepartmentResolverAdapter(
-            geocodingCoordinatesService, deliveryAreaApiService, voronoiService, departmentApiService);
+            geocodingCoordinatesService, deliveryAreaApiService, voronoiService, departmentApiService,
+            operatorConfigurationApiService);
 
     @Test
     void shouldUseServingDeliveryArea() {
@@ -69,6 +77,23 @@ class DestinationDepartmentResolverAdapterTest {
                 .thenReturn(department(7L, "WA1", new CoordinatesDto(52.23, 21.01)));
 
         assertThat(adapter.resolve(ADDRESS)).contains(new DepartmentId(7L));
+    }
+
+    @Test
+    void shouldNotAssignNearestDepartmentWhenItBlocksUncoveredAddresses() {
+        when(operatorConfigurationApiService.getDepartmentConfiguration(new DepartmentId(7L))).thenReturn(
+                new DepartmentConfigurationDto(false, false, false, false,
+                        new DepartmentDeliveryAreaPolicyDto(DeliveryAreaModeDto.COUNTRY_PARTITION, 50, true, false,
+                                UncoveredPostalCodePolicyDto.BLOCK), null, null, null));
+        when(geocodingCoordinatesService.findCoordinates(any())).thenReturn(new GeocodingCoordinatesDto(52.2, 21.0));
+        when(deliveryAreaApiService.findServingDepartment(any())).thenReturn(Optional.empty());
+        when(departmentApiService.getAllDepartments()).thenReturn(List.of(
+                department(7L, "WA1", new CoordinatesDto(52.23, 21.01))));
+        when(voronoiService.findFastestRoute(any())).thenReturn(new VoronoiResponseDto(new DepartmentCodeDto("WA1"), "Warszawa"));
+        when(departmentApiService.getDepartmentByCode(new DepartmentCode("WA1")))
+                .thenReturn(department(7L, "WA1", new CoordinatesDto(52.23, 21.01)));
+
+        assertThat(adapter.resolve(ADDRESS)).isEmpty();
     }
 
     @Test

@@ -1,5 +1,8 @@
 package com.warehouse.logisticsdelivery.application.port.primary;
 
+import com.warehouse.logisticsdelivery.application.service.DestinationCapacityAllocator;
+import com.warehouse.logisticsdelivery.domain.service.DepartmentCapacityBalancer;
+import java.time.Clock;
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.event.domain.model.DomainEvent;
@@ -92,7 +95,8 @@ class DeliveryPortImplTest {
         this.destinationDepartmentResolverPort = mock(DestinationDepartmentResolverPort.class);
         this.deliveryPort = new DeliveryPortImpl(this.deliveryRepository, this.shipmentServicePort,
                 this.domainEventPublisher, this.operatorContextProvider, this.signatureRepository,
-                this.destinationDepartmentResolverPort);
+                this.destinationDepartmentResolverPort, new DestinationCapacityAllocator(this.deliveryRepository,
+                        List::of, new DepartmentCapacityBalancer(), Clock.systemDefaultZone()));
     }
 
     @Test
@@ -372,8 +376,8 @@ class DeliveryPortImplTest {
         assertThat(continuation.getDeliveryId()).isNotEqualTo(shipmentDelivery.getDeliveryId());
         assertThat(continuation.getShipmentId()).isEqualTo(new ShipmentId(10L));
         assertThat(continuation.getOriginDepartmentId()).isEqualTo(ORIGIN_DEPARTMENT_ID);
-        assertThat(continuation.getDeliverySteps()).last()
-                .extracting(DeliveryStep::commentCode).isEqualTo(DeliveryCommentCode.PALLET_LOADING_REVERTED);
+        assertThat(continuation.getDeliverySteps().getLast().commentCode())
+                .isEqualTo(DeliveryCommentCode.PALLET_LOADING_REVERTED);
         assertThat(publishedEvent(DeliveryCanceled.class).getSnapshot().deliveryId())
                 .isEqualTo(palletDelivery.getDeliveryId());
         assertThat(publishedEvent(DeliveryCreated.class).getSnapshot().deliveryId())
@@ -404,8 +408,8 @@ class DeliveryPortImplTest {
         assertThat(continuation.isActive()).isTrue();
         assertThat(continuation.getOriginDepartmentId()).isEqualTo(unloadDepartmentId);
         assertThat(continuation.getDestinationDepartmentId()).isEqualTo(DESTINATION_DEPARTMENT_ID);
-        assertThat(continuation.getDeliverySteps()).last()
-                .extracting(DeliveryStep::commentCode).isEqualTo(DeliveryCommentCode.UNLOADED_FROM_PALLET);
+        assertThat(continuation.getDeliverySteps().getLast().commentCode())
+                .isEqualTo(DeliveryCommentCode.UNLOADED_FROM_PALLET);
         assertThat(publishedEvent(DeliveryCompleted.class).getSnapshot().deliveryId())
                 .isEqualTo(palletDelivery.getDeliveryId());
         assertThat(publishedEvent(DeliveryCreated.class).getSnapshot().deliveryId())
