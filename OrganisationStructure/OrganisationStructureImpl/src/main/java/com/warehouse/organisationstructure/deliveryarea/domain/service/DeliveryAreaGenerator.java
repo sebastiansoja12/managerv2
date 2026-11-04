@@ -26,12 +26,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.ToIntFunction;
 
 public class DeliveryAreaGenerator {
 
     private static final CountryCode SUPPORTED_COUNTRY = CountryCode.PL;
 
     private static final double LONGITUDE_SCALE = Math.cos(Math.toRadians(52));
+
+    private static final double KILOMETERS_PER_DEGREE = 111.32;
+
+    private static final int CIRCLE_SEGMENTS_PER_QUADRANT = 16;
 
     private final GeometryFactory geometryFactory = new GeometryFactory();
 
@@ -54,6 +59,13 @@ public class DeliveryAreaGenerator {
 
     public Map<DeliveryAreaDepartment, List<DeliveryArea>> generate(final List<DeliveryAreaDepartment> departments,
                                                                     final Instant now) {
+        return generate(departments, now, department -> 0);
+    }
+
+    public Map<DeliveryAreaDepartment, List<DeliveryArea>> generate(
+            final List<DeliveryAreaDepartment> departments,
+            final Instant now,
+            final ToIntFunction<DeliveryAreaDepartment> maxRadiusInKilometers) {
         if (departments.isEmpty()) {
             throw new NoDepartmentsSelectedException();
         }
@@ -75,7 +87,8 @@ public class DeliveryAreaGenerator {
         final Map<DeliveryAreaDepartment, List<DeliveryArea>> result = new LinkedHashMap<>();
         for (int index = 0; index < departments.size(); index++) {
             final DeliveryAreaDepartment department = departments.get(index);
-            final Geometry clipped = cells.get(index).intersection(scaledCountryBoundary);
+            final Geometry clipped = withinRadius(cells.get(index).intersection(scaledCountryBoundary),
+                    sites.get(index), maxRadiusInKilometers.applyAsInt(department));
             final List<DeliveryArea> areas = new ArrayList<>();
             for (int part = 0; part < clipped.getNumGeometries(); part++) {
                 if (clipped.getGeometryN(part) instanceof Polygon polygon && !polygon.isEmpty()) {
@@ -91,6 +104,14 @@ public class DeliveryAreaGenerator {
             result.put(department, areas);
         }
         return result;
+    }
+
+    private Geometry withinRadius(final Geometry cell, final Coordinate site, final int maxRadiusInKilometers) {
+        if (maxRadiusInKilometers <= 0) {
+            return cell;
+        }
+        return cell.intersection(geometryFactory.createPoint(site)
+                .buffer(maxRadiusInKilometers / KILOMETERS_PER_DEGREE, CIRCLE_SEGMENTS_PER_QUADRANT));
     }
 
     private List<Geometry> cells(final List<Coordinate> sites) {
