@@ -23,6 +23,11 @@ import com.warehouse.deliverynetwork.infrastructure.adapter.primary.spreadsheet.
 import com.warehouse.deliverynetwork.infrastructure.adapter.secondary.AuditLogServiceAdapter;
 import com.warehouse.deliverynetwork.infrastructure.adapter.secondary.DeliveryNetworkRepositoryImpl;
 import com.warehouse.deliverynetwork.infrastructure.adapter.secondary.DepartmentDirectoryServiceAdapter;
+import com.warehouse.deliverynetwork.infrastructure.adapter.secondary.DeliveryNetworkConfigurationServiceAdapter;
+import com.warehouse.deliverynetwork.infrastructure.adapter.primary.DeliveryNetworkDepartmentLifecycleParticipant;
+import com.warehouse.deliverynetwork.application.port.secondary.DeliveryNetworkConfigurationServicePort;
+import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
+import com.warehouse.organisationstructure.department.api.DepartmentLifecycleParticipant;
 import com.warehouse.deliverynetwork.infrastructure.adapter.secondary.ShipmentDeliveryServiceAdapter;
 import com.warehouse.deliverynetwork.infrastructure.adapter.secondary.document.PdfShipmentRouteDocumentServiceAdapter;
 import com.warehouse.deliverynetwork.infrastructure.adapter.secondary.entity.DeliveryNetworkEntity;
@@ -134,7 +139,8 @@ public class DeliveryNetworkConfiguration {
             final DomainEventPublisher domainEventPublisher,
             final ShipmentDeliveryServicePort shipmentDeliveryServicePort,
             final ShipmentRouteDocumentService shipmentRouteDocumentService,
-            final ShipmentDeliveryRouteFactory shipmentDeliveryRouteFactory) {
+            final ShipmentDeliveryRouteFactory shipmentDeliveryRouteFactory,
+            final DeliveryNetworkConfigurationServicePort deliveryNetworkConfigurationServicePort) {
         return new DeliveryNetworkPortImpl(
                 deliveryNetworkRepository,
                 departmentDirectoryServicePort,
@@ -143,7 +149,20 @@ public class DeliveryNetworkConfiguration {
                 domainEventPublisher,
                 shipmentDeliveryServicePort,
                 shipmentRouteDocumentService,
-                shipmentDeliveryRouteFactory);
+                shipmentDeliveryRouteFactory,
+                deliveryNetworkConfigurationServicePort);
+    }
+
+    @Bean
+    public DeliveryNetworkConfigurationServicePort deliveryNetworkConfigurationServicePort(
+            final OperatorConfigurationApiService operatorConfigurationApiService) {
+        return new DeliveryNetworkConfigurationServiceAdapter(operatorConfigurationApiService);
+    }
+
+    @Bean
+    public DepartmentLifecycleParticipant deliveryNetworkDepartmentLifecycleParticipant(
+            final DeliveryNetworkPort deliveryNetworkPort) {
+        return new DeliveryNetworkDepartmentLifecycleParticipant(deliveryNetworkPort);
     }
 
     @Bean
