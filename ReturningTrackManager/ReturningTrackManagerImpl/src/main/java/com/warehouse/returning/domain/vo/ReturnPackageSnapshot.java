@@ -10,6 +10,7 @@ import java.time.Instant;
 public record ReturnPackageSnapshot(
         ReturnPackageId returnPackageId,
         ShipmentId shipmentId,
+        ShipmentId returnShipmentId,
         String reason,
         ReturnStatus returnStatus,
         ReturnToken returnToken,
