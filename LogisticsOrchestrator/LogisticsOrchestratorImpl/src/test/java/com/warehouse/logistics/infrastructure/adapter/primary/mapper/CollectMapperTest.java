@@ -57,6 +57,7 @@ class CollectMapperTest {
         assertAll(
                 () -> assertEquals(PROCESS_ID.value().toString(), collectResponse.getProcessId()),
                 () -> assertFalse(collectResponse.isSuccess()),
+                () -> assertEquals("Shipment was not found", collectResponse.getErrorMessage()),
                 () -> assertEquals(2, details.size()),
                 () -> assertTrue(details.get(0).isSuccess()),
                 () -> assertEquals("TRK-001", details.get(0).getTrackingNumber()),
