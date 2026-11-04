@@ -38,6 +38,8 @@ public interface ShipmentPort {
 
     ShipmentResult collectShipment(final TrackingNumber trackingNumber);
 
+    ShipmentResult acceptShipmentInDepartment(final TrackingNumber trackingNumber);
+
     ShipmentResult handOverShipment(final ShipmentHandoverCommand command);
 
     ShipmentResult loadShipmentOnPallet(final ShipmentId shipmentId);
@@ -69,6 +71,10 @@ public interface ShipmentPort {
     void redirectShipmentToSender(final ShipmentId shipmentId);
 
     void markReturned(final ShipmentId shipmentId);
+
+    void markReturned(final ShipmentId shipmentId, final ShipmentId returnShipmentId);
+
+    ShipmentId createReturnShipmentDraft(final ShipmentId shipmentId);
 
     void restoreAfterReturnCancellation(final ShipmentId shipmentId);
 
