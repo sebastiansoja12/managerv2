@@ -35,20 +35,22 @@ public class ShipmentHandoverPortImpl implements ShipmentHandoverPort {
         final ShipmentHandoverResult handover = deliveryHandoverServicePort.handOver(command);
         return new ShipmentHandoverResult(handover.details()
                 .stream()
-                .map(detail -> completeDelivery(command.processId(), detail, handover.recipientSigned()))
+                .map(detail -> completeDelivery(command, detail, handover.recipientSigned()))
                 .toList(), handover.recipientSigned());
     }
 
-    private ShipmentHandoverDetail completeDelivery(final ProcessId processId,
+    private ShipmentHandoverDetail completeDelivery(final ShipmentHandoverCommand command,
                                                     final ShipmentHandoverDetail detail,
                                                     final boolean recipientSigned) {
+        final ProcessId processId = command.processId();
         if (!detail.handedOver()) {
             return detail;
         }
         final String request = "CompleteShipmentDeliveryRequest{shipmentId=%s, recipientSigned=%s}"
                 .formatted(detail.shipmentId().getValue(), recipientSigned);
         try {
-            deliveryServicePort.completeShipmentDelivery(detail.shipmentId(), recipientSigned);
+            deliveryServicePort.completeShipmentDelivery(detail.shipmentId(), recipientSigned,
+                    command.recipientName(), command.signature());
             registerCommunication(processId, request,
                     "CompleteShipmentDeliveryResponse{shipmentId=%s, completed=true}"
                             .formatted(detail.shipmentId().getValue()), null);

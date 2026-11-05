@@ -43,6 +43,7 @@ class DepartmentStatusIntegrationEventListenerTest {
         assertEquals(10L, publishedEvent.affectedDepartmentId().value());
         assertEquals("KT1", publishedEvent.departmentCode().value());
         assertEquals(DepartmentStatusDto.ARCHIVED, publishedEvent.status());
+        assertEquals("Closed", publishedEvent.reason());
         assertEquals("10", publishedEvent.eventKey());
         assertEquals(
                 "department.status.changed",
@@ -66,6 +67,8 @@ class DepartmentStatusIntegrationEventListenerTest {
                 null,
                 null,
                 null,
+                null,
+                "Closed",
                 null);
     }
 }

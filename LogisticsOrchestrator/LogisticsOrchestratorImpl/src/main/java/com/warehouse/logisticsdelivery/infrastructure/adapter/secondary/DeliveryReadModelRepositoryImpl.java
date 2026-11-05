@@ -11,6 +11,7 @@ import com.warehouse.logisticsdelivery.application.port.primary.result.DeliveryR
 import com.warehouse.logisticsdelivery.application.port.primary.result.DeliveryReadPage;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryReadModelRepository;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryLifecycleStatus;
+import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryTargetType;
 import com.warehouse.logisticsdelivery.domain.vo.DeliverySnapshot;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.entity.DeliveryReadEntity;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.mapper.DeliveryReadModelMapper;
@@ -82,6 +83,13 @@ public class DeliveryReadModelRepositoryImpl implements DeliveryReadModelReposit
                     criteriaBuilder.equal(root.get("originDepartmentId").get("value"), filter.departmentId().getValue()),
                     criteriaBuilder.equal(root.get("destinationDepartmentId").get("value"),
                             filter.departmentId().getValue())));
+        }
+        if (filter.currentDepartmentId() != null) {
+            criteria.eq("currentDepartmentId.value", filter.currentDepartmentId().getValue());
+        }
+        if (filter.missingDestination()) {
+            criteria.eq("targetType", DeliveryTargetType.SHIPMENT);
+            criteria.isNull("destinationDepartmentId.value");
         }
         if (filter.createdFrom() != null) {
             criteria.ge("created", filter.createdFrom().atStartOfDay());

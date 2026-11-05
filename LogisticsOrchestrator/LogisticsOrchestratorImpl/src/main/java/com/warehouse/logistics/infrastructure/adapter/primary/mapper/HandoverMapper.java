@@ -39,6 +39,7 @@ public class HandoverMapper {
         final HandoverResponse handoverResponse = new HandoverResponse();
         handoverResponse.setProcessId(processId.value().toString());
         handoverResponse.setSuccess(result.allHandedOver());
+        handoverResponse.setErrorMessage(result.failureDescription());
         handoverResponse.setHandoverResponseDetails(details);
         return handoverResponse;
     }

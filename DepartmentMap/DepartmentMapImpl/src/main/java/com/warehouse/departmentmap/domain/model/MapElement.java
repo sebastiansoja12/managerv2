@@ -1,5 +1,6 @@
 package com.warehouse.departmentmap.domain.model;
 
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.MapElementId;
 import com.warehouse.departmentmap.domain.enumeration.MapElementType;
 import com.warehouse.departmentmap.domain.exception.DepartmentMapException;
@@ -25,6 +26,7 @@ public class MapElement {
     private final String color;
     private final String locationCode;
     private final Integer capacity;
+    private final DepartmentCode destinationDepartmentCode;
 
     public MapElement(final MapElementId elementId,
                       final MapElementType type,
@@ -33,6 +35,17 @@ public class MapElement {
                       final String color,
                       final String locationCode,
                       final Integer capacity) {
+        this(elementId, type, label, geometry, color, locationCode, capacity, null);
+    }
+
+    public MapElement(final MapElementId elementId,
+                      final MapElementType type,
+                      final String label,
+                      final ElementGeometry geometry,
+                      final String color,
+                      final String locationCode,
+                      final Integer capacity,
+                      final DepartmentCode destinationDepartmentCode) {
         if (elementId == null || elementId.value() == null) {
             throw DepartmentMapException.invalid("Element id is required");
         }
@@ -54,10 +67,15 @@ public class MapElement {
             this.locationCode = null;
             this.capacity = null;
         }
+        this.destinationDepartmentCode = type.isDirectional() ? normalizeDestination(destinationDepartmentCode) : null;
     }
 
     public boolean isStorageLocation() {
         return type == MapElementType.STORAGE_LOCATION;
+    }
+
+    public boolean isDirectional() {
+        return type.isDirectional();
     }
 
     public Optional<StorageLocationDefinition> storageLocationDefinition() {
@@ -94,6 +112,10 @@ public class MapElement {
         return capacity;
     }
 
+    public DepartmentCode getDestinationDepartmentCode() {
+        return destinationDepartmentCode;
+    }
+
     public static String normalizeCode(final String code) {
         if (code == null || code.isBlank()) {
             throw DepartmentMapException.invalid("Storage location code is required");
@@ -104,6 +126,13 @@ public class MapElement {
                     + " may contain only letters, digits and . _ / - characters (max " + MAX_CODE_LENGTH + ")");
         }
         return normalized;
+    }
+
+    private static DepartmentCode normalizeDestination(final DepartmentCode departmentCode) {
+        if (departmentCode == null || departmentCode.value() == null || departmentCode.value().isBlank()) {
+            throw DepartmentMapException.invalid("Chutes and ramps require a destination department");
+        }
+        return new DepartmentCode(departmentCode.value().trim());
     }
 
     private static Integer validateCapacity(final Integer capacity) {

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.repository.BaseRepository;
-import com.warehouse.organisationstructure.department.domain.port.secondary.DepartmentReadRepository;
+import com.warehouse.organisationstructure.department.application.port.secondary.DepartmentReadRepository;
 import com.warehouse.organisationstructure.department.domain.vo.DepartmentSnapshot;
 import com.warehouse.organisationstructure.department.infrastructure.adapter.secondary.entity.readmodel.DepartmentReadEntity;
 import com.warehouse.organisationstructure.department.infrastructure.adapter.secondary.mapper.DepartmentReadFactory;

@@ -8,6 +8,7 @@ import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
+import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "shipment_rd")
@@ -122,16 +123,16 @@ public class ShipmentReadEntity extends BelongsToOperator {
     @Enumerated(EnumType.STRING)
     private PackagingType packagingType;
 
+    @Column(name = "source", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ShipmentSource source;
+
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "amount", column = @Column(name = "price_amount")),
             @AttributeOverride(name = "currency", column = @Column(name = "price_currency"))
     })
     private Money price;
-
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "signature_id"))
-    private SignatureId signatureId;
 
     @Column(name = "signature_required", nullable = false)
     private Boolean signatureRequired;
@@ -143,5 +144,19 @@ public class ShipmentReadEntity extends BelongsToOperator {
     @Column(name = "tracking_number", nullable = false)
     @AttributeOverride(name = "value", column = @Column(name = "tracking_number"))
     private TrackingNumber trackingNumber;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "origin_department_id"))
+    private DepartmentId originDepartmentId;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "destination_department_id"))
+    private DepartmentId destinationDepartmentId;
+
+    @Column(name = "planned_delivery_at")
+    private LocalDateTime plannedDeliveryAt;
+
+    @Column(name = "delivered_at")
+    private LocalDateTime deliveredAt;
 
 }

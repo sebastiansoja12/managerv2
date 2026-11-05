@@ -1,14 +1,18 @@
 package com.warehouse.pickuppoint.configuration;
 
+import com.warehouse.commonassets.context.OperatorContext;
+import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.repository.BaseRepository;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.pickuppoint.api.PickupPointApiService;
+import com.warehouse.pickuppoint.api.PickupPointReadModelRebuildApiService;
 import com.warehouse.pickuppoint.application.port.primary.PickupPointPort;
 import com.warehouse.pickuppoint.application.port.primary.PickupPointPortImpl;
 import com.warehouse.pickuppoint.application.port.primary.PickupPointReadModelSyncPort;
+import com.warehouse.pickuppoint.application.port.secondary.AuditLogServicePort;
 import com.warehouse.pickuppoint.application.port.secondary.DepartmentDirectoryServicePort;
 import com.warehouse.pickuppoint.application.port.secondary.PickupPointCoordinatesServicePort;
 import com.warehouse.pickuppoint.application.port.secondary.PickupPointReadModelRepository;
@@ -16,8 +20,10 @@ import com.warehouse.pickuppoint.application.port.secondary.PickupPointRepositor
 import com.warehouse.pickuppoint.application.port.secondary.PickupPointSearchRepository;
 import com.warehouse.pickuppoint.application.service.PickupPointReadModelSyncServiceImpl;
 import com.warehouse.pickuppoint.infrastructure.adapter.primary.PickupPointApiServiceAdapter;
+import com.warehouse.pickuppoint.infrastructure.adapter.primary.PickupPointReadModelRebuildApiServiceAdapter;
 import com.warehouse.pickuppoint.infrastructure.adapter.primary.mapper.PickupPointApiMapper;
 import com.warehouse.pickuppoint.infrastructure.adapter.primary.mapper.PickupPointWebMapper;
+import com.warehouse.pickuppoint.infrastructure.adapter.secondary.AuditLogServiceAdapter;
 import com.warehouse.pickuppoint.infrastructure.adapter.secondary.DepartmentDirectoryServiceAdapter;
 import com.warehouse.pickuppoint.infrastructure.adapter.secondary.PickupPointCoordinatesServiceAdapter;
 import com.warehouse.pickuppoint.infrastructure.adapter.secondary.PickupPointReadModelRepositoryImpl;
@@ -26,9 +32,10 @@ import com.warehouse.pickuppoint.infrastructure.adapter.secondary.PickupPointSea
 import com.warehouse.pickuppoint.infrastructure.adapter.secondary.entity.PickupPointEntity;
 import com.warehouse.pickuppoint.infrastructure.adapter.secondary.entity.PickupPointReadEntity;
 import com.warehouse.pickuppoint.infrastructure.adapter.secondary.mapper.PickupPointPersistenceMapper;
-import com.warehouse.voronoi.VoronoiCoordinatesService;
+import com.warehouse.geocoding.api.GeocodingCoordinatesService;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -81,6 +88,13 @@ public class PickupPointConfiguration {
     }
 
     @Bean
+    public PickupPointReadModelRebuildApiService pickupPointReadModelRebuildApiService(
+            final PickupPointReadModelSyncPort pickupPointReadModelSyncPort,
+            final OperatorContext operatorContext) {
+        return new PickupPointReadModelRebuildApiServiceAdapter(pickupPointReadModelSyncPort, operatorContext);
+    }
+
+    @Bean
     public PickupPointSearchRepository pickupPointSearchRepository(
             @Qualifier("pickupPointReadRepository")
             final OperatorFilteredRepository<PickupPointReadEntity> repository) {
@@ -93,9 +107,18 @@ public class PickupPointConfiguration {
         return new DepartmentDirectoryServiceAdapter(departmentApiService);
     }
 
+    @Bean("pickupPointAuditLogServicePort")
+    @ConditionalOnProperty(
+            name = {"manager.kafka.integration-events.enabled", "manager.kafka.outbox.enabled"},
+            havingValue = "true")
+    public AuditLogServicePort pickupPointAuditLogServicePort(
+            final IntegrationEventPublisher integrationEventPublisher) {
+        return new AuditLogServiceAdapter(integrationEventPublisher);
+    }
+
     @Bean
     public PickupPointCoordinatesServicePort pickupPointCoordinatesServicePort(
-            @Qualifier("voronoiCoordinatesService") final VoronoiCoordinatesService coordinatesService) {
+            final GeocodingCoordinatesService coordinatesService) {
         return new PickupPointCoordinatesServiceAdapter(coordinatesService);
     }
 

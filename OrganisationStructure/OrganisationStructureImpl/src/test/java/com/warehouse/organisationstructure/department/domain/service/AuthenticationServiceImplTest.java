@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.organisationstructure.department.domain.port.secondary.CurrentUserServicePort;
+import com.warehouse.organisationstructure.department.application.port.secondary.CurrentUserServicePort;
 
 @ExtendWith(MockitoExtension.class)
 class AuthenticationServiceImplTest {

@@ -10,7 +10,7 @@ import com.warehouse.commonassets.identificator.GeocodingConfigurationId;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.commonassets.security.CredentialCipher;
 import com.warehouse.geocoding.domain.model.GeocodingConfiguration;
-import com.warehouse.geocoding.domain.port.secondary.GeocodingRepository;
+import com.warehouse.geocoding.application.port.secondary.GeocodingRepository;
 import com.warehouse.geocoding.infrastructure.adapter.secondary.entity.GeocodingConfigurationEntity;
 
 public class GeocodingConfigurationRepositoryImpl implements GeocodingRepository {

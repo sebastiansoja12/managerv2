@@ -7,6 +7,7 @@ import com.warehouse.logisticsdelivery.api.dto.DeliveryAttemptResultDto;
 import com.warehouse.logisticsdelivery.api.dto.ShipmentDeliveryCompletionRequestDto;
 import com.warehouse.logisticsdelivery.api.dto.ShipmentDeliveryCompletionResultDto;
 import com.warehouse.logisticsdelivery.api.dto.ShipmentDeliveryDto;
+import com.warehouse.logisticsdelivery.api.dto.ShipmentDeliverySupplierAssignmentRequestDto;
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryPort;
 import com.warehouse.logisticsdelivery.domain.vo.DeliverySnapshot;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.mapper.DeliveryApiMapper;
@@ -31,8 +32,15 @@ public class DeliveryApiServiceAdapter implements DeliveryApiService {
     public ShipmentDeliveryCompletionResultDto completeShipmentDelivery(
             final ShipmentDeliveryCompletionRequestDto shipmentDeliveryCompletionRequest) {
         final DeliverySnapshot delivery = this.deliveryPort.completeShipmentDelivery(
-                shipmentDeliveryCompletionRequest.shipmentId(), shipmentDeliveryCompletionRequest.recipientSigned());
+                shipmentDeliveryCompletionRequest.shipmentId(), shipmentDeliveryCompletionRequest.recipientSigned(),
+                shipmentDeliveryCompletionRequest.recipientName(), shipmentDeliveryCompletionRequest.signature());
         return new ShipmentDeliveryCompletionResultDto(delivery.deliveryId(), delivery.shipmentId());
+    }
+
+    @Override
+    public void assignShipmentSupplier(final ShipmentDeliverySupplierAssignmentRequestDto supplierAssignmentRequest) {
+        this.deliveryPort.assignShipmentSupplier(supplierAssignmentRequest.shipmentId(),
+                supplierAssignmentRequest.supplierId(), supplierAssignmentRequest.vehicleId());
     }
 
     @Override

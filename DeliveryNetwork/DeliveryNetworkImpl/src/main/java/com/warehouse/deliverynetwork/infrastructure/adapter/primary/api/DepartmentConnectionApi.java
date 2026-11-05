@@ -5,5 +5,10 @@ import jakarta.validation.constraints.NotNull;
 
 public record DepartmentConnectionApi(
         @Valid @NotNull DepartmentIdApi firstDepartmentId,
-        @Valid @NotNull DepartmentIdApi secondDepartmentId) {
+        @Valid @NotNull DepartmentIdApi secondDepartmentId,
+        Boolean bidirectional) {
+
+    public DepartmentConnectionApi(final DepartmentIdApi firstDepartmentId, final DepartmentIdApi secondDepartmentId) {
+        this(firstDepartmentId, secondDepartmentId, true);
+    }
 }

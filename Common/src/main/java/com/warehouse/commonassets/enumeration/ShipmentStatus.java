@@ -7,6 +7,8 @@ public enum ShipmentStatus {
 
     PREPARED,
 
+    COLLECTED,
+
     ACCEPTED,
 
     REROUTE,

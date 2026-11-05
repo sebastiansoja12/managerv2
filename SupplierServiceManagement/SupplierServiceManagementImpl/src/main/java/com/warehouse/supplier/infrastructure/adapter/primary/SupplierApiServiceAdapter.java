@@ -16,6 +16,8 @@ import com.warehouse.supplier.domain.vo.SupplierCreateResponse;
 
 import java.util.List;
 import java.util.Optional;
+import com.warehouse.supplier.domain.vo.SupplierBasicDataUpdateCommand;
+import com.warehouse.commonassets.helper.Result;
 
 public class SupplierApiServiceAdapter implements SupplierApiService {
 
@@ -44,6 +46,26 @@ public class SupplierApiServiceAdapter implements SupplierApiService {
                 new DepartmentCode(request.departmentCode()));
         final SupplierCreateResponse response = supplyPort.create(command);
         return new SupplierCodeDto(response.supplierCode().value());
+    }
+
+    @Override
+    public void updateBasicData(final SupplierCode supplierCode, final String firstName, final String lastName,
+                                final String telephoneNumber) {
+        final Result<Void, String> result = supplyPort.updateBasicData(
+                new SupplierBasicDataUpdateCommand(supplierCode, firstName, lastName, telephoneNumber));
+        if (result.isFailure()) {
+            throw new IllegalArgumentException(result.getFailure());
+        }
+    }
+
+    @Override
+    public void activate(final SupplierCode supplierCode) {
+        supplyPort.activate(supplierCode);
+    }
+
+    @Override
+    public void deactivate(final SupplierCode supplierCode) {
+        supplyPort.deactivate(supplierCode);
     }
 
     private SupplierDetailsDto map(final Supplier supplier) {
@@ -95,6 +117,7 @@ public class SupplierApiServiceAdapter implements SupplierApiService {
                 supplier.getFirstName(),
                 supplier.getLastName(),
                 supplier.getDepartmentId(),
-                supplier.getStatus() != null ? supplier.getStatus().name() : null);
+                supplier.getStatus() != null ? supplier.getStatus().name() : null,
+                supplier.getVehicleId());
     }
 }

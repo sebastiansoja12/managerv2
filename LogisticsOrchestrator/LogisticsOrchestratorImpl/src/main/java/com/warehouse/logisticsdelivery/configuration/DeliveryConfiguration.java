@@ -1,9 +1,21 @@
 package com.warehouse.logisticsdelivery.configuration;
 
+import com.warehouse.logisticsdelivery.application.port.primary.DepartmentWorkloadPort;
+import com.warehouse.logisticsdelivery.application.port.primary.DepartmentWorkloadPortImpl;
+import com.warehouse.logisticsdelivery.application.port.secondary.DepartmentCapacityServicePort;
+import com.warehouse.logisticsdelivery.application.service.DestinationCapacityAllocator;
+import com.warehouse.logisticsdelivery.domain.service.DepartmentCapacityBalancer;
+import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.DeliveryDepartmentLifecycleParticipant;
+import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.DepartmentCapacityServiceAdapter;
+import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
+import com.warehouse.organisationstructure.department.api.DepartmentLifecycleParticipant;
+import java.time.Clock;
+import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.repository.BaseRepository;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
+import com.warehouse.geocoding.api.GeocodingCoordinatesService;
 import com.warehouse.logisticsdelivery.api.DeliveryApiService;
 import com.warehouse.logisticsdelivery.api.DeliveryReadModelRebuildApiService;
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryHistoryPort;
@@ -12,36 +24,58 @@ import com.warehouse.logisticsdelivery.application.port.primary.DeliveryPort;
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryPortImpl;
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryReadModelPort;
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryReadModelPortImpl;
+import com.warehouse.logisticsdelivery.application.port.secondary.AuditLogServicePort;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryEventDataMapperPort;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryHistoryRepository;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryReadModelRepository;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryRepository;
+import com.warehouse.logisticsdelivery.application.port.secondary.DestinationDepartmentResolverPort;
 import com.warehouse.logisticsdelivery.application.port.secondary.ShipmentServicePort;
+import com.warehouse.logisticsdelivery.application.port.secondary.SignatureRepository;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.DeliveryApiServiceAdapter;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.DeliveryReadModelRebuildApiServiceAdapter;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.mapper.DeliveryApiMapper;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.mapper.DeliveryReadModelResponseMapper;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.mapper.DeliveryRequestMapper;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.mapper.DeliveryResponseMapper;
+import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.AuditLogServiceAdapter;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.DeliveryHistoryRepositoryImpl;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.DeliveryReadModelRepositoryImpl;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.DeliveryRepositoryImpl;
+import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.DestinationDepartmentResolverAdapter;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.ShipmentServiceAdapter;
+import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.SignatureReadRepository;
+import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.SignatureRepositoryImpl;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.entity.DeliveryEntity;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.entity.DeliveryHistoryEntity;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.entity.DeliveryReadEntity;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.mapper.DeliveryEventDataMapper;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.mapper.DeliveryHistoryEntityMapper;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.mapper.DeliveryReadModelMapper;
+import com.warehouse.organisationstructure.deliveryarea.api.DeliveryAreaApiService;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.shipment.infrastructure.ShipmentApiService;
+import com.warehouse.voronoi.VoronoiService;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import com.warehouse.logisticsdelivery.api.DeliveryManagementApiService;
+import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.DeliveryManagementApiServiceAdapter;
 
 @Configuration
 public class DeliveryConfiguration {
+
+    @Bean("deliveryAuditLogServicePort")
+    @ConditionalOnProperty(
+            name = {"manager.kafka.integration-events.enabled", "manager.kafka.outbox.enabled"},
+            havingValue = "true")
+    public AuditLogServicePort deliveryAuditLogServicePort(
+            final IntegrationEventPublisher integrationEventPublisher) {
+        return new AuditLogServiceAdapter(integrationEventPublisher);
+    }
 
     @Bean
     public BaseRepository<DeliveryEntity> deliveryEntityRepository(
@@ -93,9 +127,58 @@ public class DeliveryConfiguration {
     public DeliveryPort deliveryPort(final DeliveryRepository deliveryRepository,
                                      final ShipmentServicePort shipmentServicePort,
                                      final DomainEventPublisher domainEventPublisher,
-                                     final OperatorContextProvider operatorContextProvider) {
+                                     final OperatorContextProvider operatorContextProvider,
+                                     final SignatureRepository signatureRepository,
+                                     final DestinationDepartmentResolverPort destinationDepartmentResolverPort,
+                                     final DestinationCapacityAllocator destinationCapacityAllocator) {
         return new DeliveryPortImpl(deliveryRepository, shipmentServicePort, domainEventPublisher,
-                operatorContextProvider);
+                operatorContextProvider, signatureRepository, destinationDepartmentResolverPort,
+                destinationCapacityAllocator);
+    }
+
+    @Bean
+    public DepartmentCapacityServicePort departmentCapacityServicePort(
+            final OperatorConfigurationApiService operatorConfigurationApiService,
+            final DepartmentApiService departmentApiService) {
+        return new DepartmentCapacityServiceAdapter(operatorConfigurationApiService, departmentApiService);
+    }
+
+    @Bean
+    public DestinationCapacityAllocator destinationCapacityAllocator(
+            final DeliveryRepository deliveryRepository,
+            final DepartmentCapacityServicePort departmentCapacityServicePort) {
+        return new DestinationCapacityAllocator(deliveryRepository, departmentCapacityServicePort,
+                new DepartmentCapacityBalancer(), Clock.systemDefaultZone());
+    }
+
+    @Bean
+    public DepartmentWorkloadPort departmentWorkloadPort(final DeliveryRepository deliveryRepository,
+                                                         final DomainEventPublisher domainEventPublisher,
+                                                         final DestinationCapacityAllocator destinationCapacityAllocator) {
+        return new DepartmentWorkloadPortImpl(deliveryRepository, domainEventPublisher,
+                destinationCapacityAllocator);
+    }
+
+    @Bean
+    public DepartmentLifecycleParticipant deliveryDepartmentLifecycleParticipant(
+            final DepartmentWorkloadPort departmentWorkloadPort) {
+        return new DeliveryDepartmentLifecycleParticipant(departmentWorkloadPort);
+    }
+
+    @Bean
+    public DestinationDepartmentResolverPort destinationDepartmentResolverPort(
+            final GeocodingCoordinatesService geocodingCoordinatesService,
+            final DeliveryAreaApiService deliveryAreaApiService,
+            final VoronoiService voronoiService,
+            final DepartmentApiService departmentApiService,
+            final OperatorConfigurationApiService operatorConfigurationApiService) {
+        return new DestinationDepartmentResolverAdapter(geocodingCoordinatesService, deliveryAreaApiService,
+                voronoiService, departmentApiService, operatorConfigurationApiService);
+    }
+
+    @Bean
+    public SignatureRepository signatureRepository(final SignatureReadRepository signatureReadRepository) {
+        return new SignatureRepositoryImpl(signatureReadRepository);
     }
 
     @Bean("logisticsDelivery.shipmentServicePort")
@@ -148,5 +231,13 @@ public class DeliveryConfiguration {
     public DeliveryApiService deliveryApiService(final DeliveryPort deliveryPort,
                                                  final DeliveryApiMapper deliveryApiMapper) {
         return new DeliveryApiServiceAdapter(deliveryPort, deliveryApiMapper);
+    }
+
+    @Bean
+    public DeliveryManagementApiService deliveryManagementApiService(
+            final DeliveryPort deliveryPort,
+            final DeliveryRequestMapper deliveryRequestMapper,
+            final DeliveryResponseMapper deliveryResponseMapper) {
+        return new DeliveryManagementApiServiceAdapter(deliveryPort, deliveryRequestMapper, deliveryResponseMapper);
     }
 }

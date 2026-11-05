@@ -7,6 +7,7 @@ import com.warehouse.commonassets.identificator.OperatorId;
 public record ReturnPackageApi(
         ReturnIdDto returnPackageId,
         ShipmentIdDto shipmentId,
+        ShipmentIdDto returnShipmentId,
         String reason,
         String returnStatus,
         ReturnTokenApi returnToken,

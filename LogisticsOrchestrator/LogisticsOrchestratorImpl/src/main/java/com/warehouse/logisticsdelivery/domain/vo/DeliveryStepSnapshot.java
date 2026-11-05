@@ -8,6 +8,7 @@ import com.warehouse.commonassets.identificator.SignatureId;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.identificator.VehicleId;
+import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryCommentCode;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryStepOutcome;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ public record DeliveryStepSnapshot(DeliveryStepId id,
                                    DepartmentId departmentId,
                                    VehicleId vehicleId,
                                    String comment,
+                                   DeliveryCommentCode commentCode,
                                    String failureReason,
                                    String token) {
 }

@@ -104,4 +104,31 @@
     <include file="changes/2026-10-23-device-activation.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-23-user-api-key-issued-at.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-24-courier-vehicle-and-audit-keys.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-26-supplier-driver-license-mail.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-26-postal-codes.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-26-mail-templates-shipment-status-reroute.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-27-signature-delivery.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-28-delivery-step-comment-code.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-28-shipment-source.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-28-mail-templates-shipment-created-external.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-28-delivery-areas.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-28-operator-department-configuration.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-29-delivery-current-target-unique.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-29-shipment-read-model-delivery.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-30-delivery-rd-missing-destination.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-31-mail-templates-shipment-status-collected.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-31-activity-stream.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-01-audit-log-rename.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-01-geocoding-addresses.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-02-operator-shipment-policy-configuration.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-03-operator-fleet-communication-regional-configuration.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-03-operator-sorting-configuration.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-03-operator-department-policies.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-03-operator-pickup-point-configuration.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-03-department-map-directions.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-03-delivery-rd-current-department.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-04-incident.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-04-department-lifecycle-capacity-connections.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-05-user-onboarding.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-05-fleet-tracking.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

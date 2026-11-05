@@ -1,9 +1,11 @@
 package com.warehouse.departmentmap.domain.model;
 
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.DepartmentMapId;
 import com.warehouse.commonassets.identificator.MapElementId;
 import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.departmentmap.domain.enumeration.MapElementType;
 import com.warehouse.departmentmap.domain.exception.DepartmentMapException;
 import com.warehouse.departmentmap.domain.vo.StorageLocationDefinition;
 
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class DepartmentMap {
 
@@ -80,6 +83,7 @@ public class DepartmentMap {
                              final double height,
                              final double gridSize,
                              final List<MapElement> elements,
+                             final Set<DepartmentCode> directions,
                              final Instant now) {
         validateDimensions(width, height, gridSize);
         if (elements == null) {
@@ -101,7 +105,12 @@ public class DepartmentMap {
                 throw DepartmentMapException.invalid("Storage location code " + element.getLocationCode()
                         + " is used more than once");
             }
+            if (element.isDirectional() && !directions.contains(element.getDestinationDepartmentCode())) {
+                throw DepartmentMapException.invalid("Department " + element.getDestinationDepartmentCode().value()
+                        + " used by " + describe(element) + " is not connected with this department");
+            }
         }
+        validateChutesHaveRamps(elements);
         this.name = normalizeName(name);
         this.width = width;
         this.height = height;
@@ -169,6 +178,21 @@ public class DepartmentMap {
 
     public Instant getUpdatedAt() {
         return updatedAt;
+    }
+
+    private static void validateChutesHaveRamps(final List<MapElement> elements) {
+        final Set<DepartmentCode> rampDirections = elements.stream()
+                .filter(element -> element.getType() == MapElementType.RAMP)
+                .map(MapElement::getDestinationDepartmentCode)
+                .collect(Collectors.toSet());
+        elements.stream()
+                .filter(element -> element.getType() == MapElementType.CHUTE)
+                .filter(element -> !rampDirections.contains(element.getDestinationDepartmentCode()))
+                .findFirst()
+                .ifPresent(element -> {
+                    throw DepartmentMapException.invalid("Chute " + describe(element) + " leads to "
+                            + element.getDestinationDepartmentCode().value() + " but no ramp serves that direction");
+                });
     }
 
     private static String describe(final MapElement element) {

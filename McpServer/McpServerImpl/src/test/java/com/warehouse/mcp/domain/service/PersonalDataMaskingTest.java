@@ -26,7 +26,7 @@ class PersonalDataMaskingTest {
 
     @Test
     void shouldHandleMissingAndShortValues() {
-        final MaskedShipmentParty party = masking.mask(new ShipmentParty(null, " ", "invalid", "12", null, null, null));
+        final MaskedShipmentParty party = masking.mask(new ShipmentParty(null, " ", "invalid", "12", null, null, null, null));
 
         assertThat(party.initials()).isNull();
         assertThat(party.email()).isEqualTo("***");

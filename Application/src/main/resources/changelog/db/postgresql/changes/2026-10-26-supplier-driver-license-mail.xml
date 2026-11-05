@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-26-mail-templates-supplier-driver-license-invalidated" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM mail_templates WHERE template_key = 'supplier.driver-license.invalidated'</sqlCheck>
+        </preConditions>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="eaad33a0-f911-4746-8698-2a81ebfe0777"/>
+            <column name="template_key" value="supplier.driver-license.invalidated"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Twoje prawo jazdy jest nieważne"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+prawo jazdy przypisane do Twojego konta kuriera ({{supplierCode}}) nie jest już ważne.
+Twoje konto zostało zawieszone, a przypisany pojazd, obszar doręczeń i klucz API zostały odłączone.
+
+Aby wznowić pracę, zaktualizuj dane prawa jazdy u swojego przełożonego.
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="1368d70f-06f8-4d24-812d-b0802734cdc9"/>
+            <column name="template_key" value="supplier.driver-license.invalidated"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Your driver license is no longer valid"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+the driver license assigned to your courier account ({{supplierCode}}) is no longer valid.
+Your account has been suspended and your vehicle, delivery area and API key have been unassigned.
+
+To resume work, please update your driver license details with your supervisor.
+
+Best regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="4321c08d-5dab-4630-aaaf-59771945059c"/>
+            <column name="template_key" value="supplier.driver-license.invalidated"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Ihr Führerschein ist nicht mehr gültig"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+der Ihrem Kurierkonto ({{supplierCode}}) zugeordnete Führerschein ist nicht mehr gültig.
+Ihr Konto wurde gesperrt, und Fahrzeug, Zustellgebiet sowie API-Schlüssel wurden entfernt.
+
+Um Ihre Arbeit wieder aufzunehmen, aktualisieren Sie bitte Ihre Führerscheindaten bei Ihrem Vorgesetzten.
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

@@ -4,8 +4,12 @@ import com.warehouse.returning.api.dto.ReturnDetailsDto;
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.auth.infrastructure.dto.CurrentUserAuthenticationDto;
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
+import com.warehouse.returning.domain.model.ReturnableShipment;
 import com.warehouse.returning.application.port.secondary.DepartmentServicePort;
+import com.warehouse.returning.application.port.secondary.ShipmentServicePort;
 import com.warehouse.returning.domain.vo.ReturnPackageId;
 import com.warehouse.returning.infrastructure.adapter.secondary.mapper.ReturnDetailsMapper;
 import com.warehouse.returning.infrastructure.adapter.secondary.mapper.ReturnPackageOutboundMapper;
@@ -25,6 +29,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 class ReturningTrackManagerServiceClientAdapterTest {
     private final DepartmentServicePort departments = mock(DepartmentServicePort.class);
+    private final ShipmentServicePort shipments = mock(ShipmentServicePort.class);
     private MockRestServiceServer server;
     private ReturningTrackManagerServiceClientAdapter client;
 
@@ -38,7 +43,7 @@ class ReturningTrackManagerServiceClientAdapterTest {
         final CurrentUserApiService user = mock(CurrentUserApiService.class);
         when(user.getCurrentUserAuthentication()).thenReturn(new CurrentUserAuthenticationDto("test-token", null));
         client = new ReturningTrackManagerServiceClientAdapter(builder, properties, user,
-                new ReturnPackageOutboundMapper(), new ReturnPackageResponseMapper(), new ReturnDetailsMapper(departments));
+                new ReturnPackageOutboundMapper(), new ReturnPackageResponseMapper(), new ReturnDetailsMapper(departments, shipments));
     }
 
     @Test
@@ -56,10 +61,14 @@ class ReturningTrackManagerServiceClientAdapterTest {
     }
 
     @Test
-    void shouldReadReturnDetailsAndResolveDepartmentCodes() {
+    void shouldReadReturnDetailsAndResolveDepartmentCodesAndTrackingNumber() {
         when(departments.getCode(new DepartmentId(3L))).thenReturn("KT1");
+        when(shipments.getShipment(new ShipmentId(456L))).thenReturn(new ReturnableShipment(new ShipmentId(456L),
+                new TrackingNumber("TRK456"), ShipmentStatus.RETURN, null));
+        when(shipments.getShipment(new ShipmentId(789L))).thenReturn(new ReturnableShipment(new ShipmentId(789L),
+                new TrackingNumber("TRK789"), ShipmentStatus.CREATED, null));
         server.expect(requestTo("http://rtm/returns/123")).andRespond(withSuccess("""
-                {"returnPackageId":{"value":123},"shipmentId":{"value":456},"reason":"Damaged",
+                {"returnPackageId":{"value":123},"shipmentId":{"value":456},"returnShipmentId":{"value":789},"reason":"Damaged",
                  "returnStatus":"CREATED","returnToken":{"value":"TOKEN"},
                  "assignedDepartmentId":{"value":3},"reasonCode":{"value":"DAMAGED"}}
                 """, MediaType.APPLICATION_JSON));
@@ -68,6 +77,8 @@ class ReturningTrackManagerServiceClientAdapterTest {
 
         assertEquals(123L, details.returnPackageId().value());
         assertEquals(456L, details.shipmentId().value());
+        assertEquals("TRK456", details.trackingNumber().value());
+        assertEquals("TRK789", details.returnTrackingNumber().value());
         assertEquals("KT1", details.assignedDepartmentCode().value());
         assertEquals("DAMAGED", details.reasonCode().value());
         assertNull(details.returnedDepartmentCode());

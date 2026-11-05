@@ -1,5 +1,7 @@
 package com.warehouse.auth.domain.port.primary;
 
+import java.time.Duration;
+
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.service.AuthenticationService;
@@ -39,7 +41,8 @@ class CurrentOperatorPortImplTest {
         final AuthenticationService authenticationService = new AuthenticationServiceImpl(
                 mock(RefreshTokenRepository.class),
                 mock(RefreshTokenGenerator.class),
-                mock(UserRepository.class)
+                mock(UserRepository.class),
+                Duration.ofSeconds(60)
         );
         final CurrentOperatorPort currentOperatorPort = new CurrentOperatorPortImpl(authenticationService);
 

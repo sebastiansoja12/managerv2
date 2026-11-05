@@ -11,6 +11,8 @@ public enum PalletHistoryEventType {
     CARRIER_ASSIGNED,
     STATUS_CHANGED,
     LOADED,
+    LOADING_REVERTED,
+    UNLOADED,
     CANCELLED,
     UNKNOWN
 }

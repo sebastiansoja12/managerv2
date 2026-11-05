@@ -16,10 +16,12 @@ class ReturnPackageResponseMapperTest {
         final RtmCreateResponse response = new RtmCreateResponse(List.of(
                 new RtmCreateResponse.CreatedReturnApi(
                         new RtmCreateResponse.ShipmentIdApi(11L),
+                        new RtmCreateResponse.ShipmentIdApi(711L),
                         new RtmCreateResponse.ReturnIdApi(21L),
                         "CREATED"),
                 new RtmCreateResponse.CreatedReturnApi(
                         new RtmCreateResponse.ShipmentIdApi(12L),
+                        null,
                         new RtmCreateResponse.ReturnIdApi(22L),
                         "CREATED")
         ));
@@ -28,9 +30,11 @@ class ReturnPackageResponseMapperTest {
 
         assertThat(result).hasSize(2);
         assertThat(result.get(0).shipmentId().getValue()).isEqualTo(11L);
+        assertThat(result.get(0).returnShipmentId().getValue()).isEqualTo(711L);
         assertThat(result.get(0).returnId().value()).isEqualTo(21L);
         assertThat(result.get(0).status()).isEqualTo(ReturnStatus.CREATED);
         assertThat(result.get(1).shipmentId().getValue()).isEqualTo(12L);
+        assertThat(result.get(1).returnShipmentId()).isNull();
         assertThat(result.get(1).returnId().value()).isEqualTo(22L);
     }
 }

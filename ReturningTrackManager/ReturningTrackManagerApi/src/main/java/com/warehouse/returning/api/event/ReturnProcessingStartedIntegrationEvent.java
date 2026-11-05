@@ -12,6 +12,7 @@ import java.util.UUID;
 public record ReturnProcessingStartedIntegrationEvent(
         UUID eventId,
         ShipmentId shipmentId,
+        ShipmentId returnShipmentId,
         ReturnPackageId returnPackageId,
         DepartmentId departmentId,
         OperatorId operatorId,

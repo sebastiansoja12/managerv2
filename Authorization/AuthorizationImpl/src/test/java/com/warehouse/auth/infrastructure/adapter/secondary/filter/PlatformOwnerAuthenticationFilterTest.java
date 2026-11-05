@@ -1,5 +1,6 @@
 package com.warehouse.auth.infrastructure.adapter.secondary.filter;
 
+import com.warehouse.auth.configuration.ApiExposureProperties;
 import com.warehouse.auth.configuration.AuthCookieService;
 import com.warehouse.auth.configuration.AuthProperties;
 import com.warehouse.auth.domain.model.PlatformOwner;
@@ -36,7 +37,7 @@ class PlatformOwnerAuthenticationFilterTest {
     void setUp() {
         final AuthProperties authProperties = new AuthProperties();
         filter = new PlatformOwnerAuthenticationFilter(platformOwnerAuthenticationPort,
-                new AuthCookieService(authProperties, new JwtProvider()));
+                new AuthCookieService(authProperties, new JwtProvider()), new ApiExposureProperties());
         when(platformOwnerAuthenticationPort.authenticate(PLATFORM_TOKEN)).thenReturn(Optional.of(
                 PlatformOwner.create(new PlatformOwnerId(3L), "owner", "encoded", "Platform", "Owner", "owner@test.pl")));
         SecurityContextHolder.clearContext();

@@ -23,11 +23,14 @@ import com.warehouse.pickuppoint.application.port.secondary.PickupPointSearchRep
 import com.warehouse.pickuppoint.domain.enumeration.PickupPointStatus;
 import com.warehouse.pickuppoint.domain.event.PickupPointClosed;
 import com.warehouse.pickuppoint.domain.event.PickupPointCreated;
+import com.warehouse.pickuppoint.domain.event.PickupPointDeleted;
 import com.warehouse.pickuppoint.domain.event.PickupPointResumed;
 import com.warehouse.pickuppoint.domain.event.PickupPointSuspended;
 import com.warehouse.pickuppoint.domain.event.PickupPointUpdated;
 import com.warehouse.pickuppoint.domain.exception.InvalidPickupPointConfigurationException;
+import com.warehouse.pickuppoint.domain.exception.InvalidPickupPointStatusTransitionException;
 import com.warehouse.pickuppoint.domain.model.PickupPoint;
+import com.warehouse.pickuppoint.domain.vo.PickupPointSnapshot;
 import com.warehouse.pickuppoint.domain.vo.GeoCoordinates;
 import com.warehouse.pickuppoint.domain.vo.PickupPointDepartment;
 import com.warehouse.pickuppoint.domain.vo.PickupPointSelectionCriteria;
@@ -106,11 +109,13 @@ public class PickupPointPortImpl implements PickupPointPort {
         final boolean requireActiveDepartment = pickupPoint.snapshot().status() == PickupPointStatus.ACTIVE;
         validateDepartment(command.configuration().departmentId(), requireActiveDepartment);
         final Instant timestamp = this.clock.instant();
+        final PickupPointSnapshot previousSnapshot = pickupPoint.snapshot();
         if (!configure(pickupPoint, command.configuration(), timestamp)) {
             return result(pickupPoint, timestamp, departmentsById());
         }
         final PickupPoint savedPickupPoint = this.pickupPointRepository.save(pickupPoint);
-        this.domainEventPublisher.publish(new PickupPointUpdated(savedPickupPoint.snapshot(), timestamp));
+        this.domainEventPublisher.publish(new PickupPointUpdated(previousSnapshot, savedPickupPoint.snapshot(),
+                timestamp));
         return result(savedPickupPoint, timestamp, departmentsById());
     }
 
@@ -119,13 +124,29 @@ public class PickupPointPortImpl implements PickupPointPort {
     public PickupPointResult changeStatus(final ChangePickupPointStatusCommand command) {
         final PickupPoint pickupPoint = find(command.pickupPointId());
         final Instant timestamp = this.clock.instant();
+        final PickupPointSnapshot previousSnapshot = pickupPoint.snapshot();
         final boolean changed = changeStatus(pickupPoint, command, timestamp);
         if (!changed) {
             return result(pickupPoint, timestamp, departmentsById());
         }
         final PickupPoint savedPickupPoint = this.pickupPointRepository.save(pickupPoint);
-        publishStatusChanged(savedPickupPoint, timestamp);
+        publishStatusChanged(previousSnapshot, savedPickupPoint, timestamp);
         return result(savedPickupPoint, timestamp, departmentsById());
+    }
+
+    @Override
+    @Transactional
+    public void delete(final PickupPointId pickupPointId) {
+        final PickupPoint pickupPoint = find(pickupPointId);
+        final PickupPointSnapshot previousSnapshot = pickupPoint.snapshot();
+        final Instant timestamp = this.clock.instant();
+        pickupPoint.delete(timestamp);
+        if (previousSnapshot.status() == pickupPoint.snapshot().status()) {
+            return;
+        }
+        final PickupPoint savedPickupPoint = this.pickupPointRepository.save(pickupPoint);
+        this.domainEventPublisher.publish(new PickupPointDeleted(previousSnapshot, savedPickupPoint.snapshot(),
+                timestamp));
     }
 
     @Override
@@ -224,18 +245,24 @@ public class PickupPointPortImpl implements PickupPointPort {
                     timestamp);
             case SUSPENDED -> pickupPoint.suspend(command.reason(), timestamp);
             case CLOSED -> pickupPoint.close(command.reason(), timestamp);
+            case DELETED -> throw new InvalidPickupPointStatusTransitionException(
+                    pickupPoint.snapshot().status(), PickupPointStatus.DELETED);
         };
     }
 
     private void publishStatusChanged(
+            final PickupPointSnapshot previousSnapshot,
             final PickupPoint pickupPoint,
             final Instant timestamp) {
         switch (pickupPoint.snapshot().status()) {
             case ACTIVE -> this.domainEventPublisher.publish(
-                    new PickupPointResumed(pickupPoint.snapshot(), timestamp));
+                    new PickupPointResumed(previousSnapshot, pickupPoint.snapshot(), timestamp));
             case SUSPENDED -> this.domainEventPublisher.publish(
-                    new PickupPointSuspended(pickupPoint.snapshot(), timestamp));
-            case CLOSED -> this.domainEventPublisher.publish(new PickupPointClosed(pickupPoint.snapshot(), timestamp));
+                    new PickupPointSuspended(previousSnapshot, pickupPoint.snapshot(), timestamp));
+            case CLOSED -> this.domainEventPublisher.publish(
+                    new PickupPointClosed(previousSnapshot, pickupPoint.snapshot(), timestamp));
+            case DELETED -> this.domainEventPublisher.publish(
+                    new PickupPointDeleted(previousSnapshot, pickupPoint.snapshot(), timestamp));
         }
     }
 

@@ -1,6 +1,7 @@
 package com.warehouse.shipment;
 
 import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
@@ -35,7 +36,7 @@ class ShipmentTest {
                 money(), false,
                 ShipmentPriority.MEDIUM, trackingNumber(), ShipmentStatus.CREATED,
                 dimensions, weight, customerReference, "Electronics", declaredValue,
-                ShipmentServiceLevel.EXPRESS, PackagingType.BOX
+                ShipmentServiceLevel.EXPRESS, PackagingType.BOX, ShipmentSource.WEB
         );
 
         assertAll(
@@ -252,6 +253,47 @@ class ShipmentTest {
     }
 
     @Test
+    void shouldMarkSentShipmentAsAcceptedWhenUnloadedFromPallet() {
+        final Shipment shipment = shipment(null);
+        shipment.notifyShipmentLoadedOnPallet();
+
+        shipment.unloadFromPallet();
+        shipment.unloadFromPallet();
+
+        assertEquals(ShipmentStatus.ACCEPTED, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldRejectUnloadingFromPalletOfShipmentThatIsNotSent() {
+        final Shipment shipment = shipment(null);
+
+        assertThrows(ShipmentModificationException.class, shipment::unloadFromPallet);
+    }
+
+    @Test
+    void shouldRevertPalletLoadingToConfiguredDefaultStatus() {
+        final Shipment shipment = shipment(null);
+        shipment.notifyShipmentLoadedOnPallet();
+
+        final boolean changed = shipment.revertLoadingFromPallet(
+                new ShipmentWorkflowSettings(ShipmentStatus.PREPARED, null, false, false, true, 0, null));
+
+        assertAll(
+                () -> assertTrue(changed),
+                () -> assertEquals(ShipmentStatus.PREPARED, shipment.getShipmentStatus())
+        );
+    }
+
+    @Test
+    void shouldIgnorePalletLoadingRevertOfShipmentThatIsNotSent() {
+        final Shipment shipment = shipment(null);
+        shipment.changeShipmentStatus(ShipmentStatus.ACCEPTED);
+
+        assertFalse(shipment.revertLoadingFromPallet(ShipmentWorkflowSettings.defaults()));
+        assertEquals(ShipmentStatus.ACCEPTED, shipment.getShipmentStatus());
+    }
+
+    @Test
     void shouldRejectPalletLoadingOfDeliveredShipment() {
         final Shipment shipment = shipment(null);
         shipment.markAsDelivered();
@@ -273,22 +315,101 @@ class ShipmentTest {
     }
 
     @Test
-    void shouldMarkCreatedShipmentAsSentWhenCollectedFromClient() {
+    void shouldAcceptCreatedShipmentInDepartment() {
+        final Shipment shipment = shipment(null);
+
+        shipment.acceptInDepartment();
+
+        assertEquals(ShipmentStatus.ACCEPTED, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldAcceptCollectedShipmentInDepartmentWhenScannedInDepartment() {
+        final Shipment shipment = shipment(null);
+        shipment.notifyShipmentCollected();
+
+        shipment.acceptInDepartment();
+
+        assertEquals(ShipmentStatus.ACCEPTED, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldRejectAcceptingAlreadyAcceptedShipmentInDepartment() {
+        final Shipment shipment = shipment(null);
+        shipment.acceptInDepartment();
+
+        assertThrows(ShipmentModificationException.class, shipment::acceptInDepartment);
+    }
+
+    @Test
+    void shouldRejectAcceptingDeliveredShipmentInDepartment() {
+        final Shipment shipment = shipment(null);
+        shipment.markAsDelivered();
+
+        assertThrows(ShipmentModificationException.class, shipment::acceptInDepartment);
+    }
+
+    @Test
+    void shouldMarkCreatedShipmentAsCollectedWhenCollectedFromClient() {
         final Shipment shipment = shipment(null);
 
         shipment.notifyShipmentCollected();
 
-        assertEquals(ShipmentStatus.SENT, shipment.getShipmentStatus());
+        assertEquals(ShipmentStatus.COLLECTED, shipment.getShipmentStatus());
     }
 
     @Test
-    void shouldMarkPreparedShipmentAsSentWhenCollectedFromClient() {
+    void shouldMarkPlannedReturnShipmentDraftAsCollectedWhenCollectedFromClient() {
+        final Shipment shipment = shipment(null);
+        shipment.markAsDelivered();
+        shipment.prepareReturnShipmentDraft(new ShipmentId(21L), new TrackingNumber("RETURN-DRAFT-TRACKING-NUMBER"),
+                ShipmentWorkflowSettings.defaults(), ExternalId.randomUUID());
+
+        shipment.notifyShipmentCollected();
+
+        assertEquals(ShipmentStatus.COLLECTED, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldMarkPreparedShipmentAsCollectedWhenCollectedFromClient() {
         final Shipment shipment = shipment(null);
         shipment.changeShipmentStatus(ShipmentStatus.PREPARED);
 
         shipment.notifyShipmentCollected();
 
+        assertEquals(ShipmentStatus.COLLECTED, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldAcceptCollectedShipmentInDepartment() {
+        final Shipment shipment = shipment(null);
+        shipment.notifyShipmentCollected();
+
+        shipment.notifyShipmentAccepted();
+
+        assertEquals(ShipmentStatus.ACCEPTED, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldLoadCollectedShipmentOnPallet() {
+        final Shipment shipment = shipment(null);
+        shipment.notifyShipmentCollected();
+
+        assertTrue(shipment.notifyShipmentLoadedOnPallet());
         assertEquals(ShipmentStatus.SENT, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldRejectCollectingShipmentTwice() {
+        final Shipment shipment = shipment(null);
+        shipment.notifyShipmentCollected();
+
+        final ShipmentModificationException exception = assertThrows(
+                ShipmentModificationException.class,
+                shipment::notifyShipmentCollected
+        );
+
+        assertEquals("Shipment cannot be collected from status COLLECTED", exception.getMessage());
     }
 
     @Test
@@ -583,7 +704,91 @@ class ShipmentTest {
 
         shipment.notifyShipmentReturnCanceled();
 
-        assertEquals(ShipmentStatus.DELIVERY, shipment.getShipmentStatus());
+        assertAll(
+                () -> assertEquals(ShipmentStatus.DELIVERY, shipment.getShipmentStatus()),
+                () -> assertTrue(shipment.getLocked()),
+                () -> assertNull(shipment.getShipmentRelatedId())
+        );
+    }
+
+    @Test
+    void shouldCreateUnlockedReturnShipmentAddressedToOriginalSender() {
+        final Shipment shipment = shipment(null);
+        final Party originalSender = shipment.getSender();
+        final ShipmentId returnShipmentId = new ShipmentId(20L);
+        final TrackingNumber returnTrackingNumber = new TrackingNumber("RETURN-TRACKING-NUMBER");
+        shipment.markAsDelivered();
+        shipment.notifyShipmentReturned(returnShipmentId);
+
+        final Shipment returnShipment = shipment.returnToSender(returnShipmentId, returnTrackingNumber,
+                ShipmentWorkflowSettings.defaults(), ExternalId.randomUUID());
+
+        assertAll(
+                () -> assertEquals(returnShipmentId, returnShipment.getShipmentId()),
+                () -> assertNull(returnShipment.getShipmentRelatedId()),
+                () -> assertEquals(ShipmentStatus.CREATED, returnShipment.getShipmentStatus()),
+                () -> assertEquals(returnTrackingNumber, returnShipment.getTrackingNumber()),
+                () -> assertEquals(originalSender.getFirstName(), returnShipment.getRecipient().getFirstName()),
+                () -> assertFalse(returnShipment.getLocked())
+        );
+    }
+
+    @Test
+    void shouldPrepareReturnShipmentDraftForDeliveredShipment() {
+        final Shipment shipment = shipment(null);
+        final Party originalSender = shipment.getSender();
+        final ShipmentId draftShipmentId = new ShipmentId(21L);
+        final TrackingNumber draftTrackingNumber = new TrackingNumber("RETURN-DRAFT-TRACKING-NUMBER");
+        shipment.markAsDelivered();
+
+        final Shipment draft = shipment.prepareReturnShipmentDraft(draftShipmentId, draftTrackingNumber,
+                ShipmentWorkflowSettings.defaults(), ExternalId.randomUUID());
+
+        assertAll(
+                () -> assertEquals(draftShipmentId, draft.getShipmentId()),
+                () -> assertEquals(ShipmentStatus.PLANNED, draft.getShipmentStatus()),
+                () -> assertEquals(draftTrackingNumber, draft.getTrackingNumber()),
+                () -> assertEquals(originalSender.getFirstName(), draft.getRecipient().getFirstName()),
+                () -> assertFalse(draft.getLocked()),
+                () -> assertNull(draft.getShipmentRelatedId())
+        );
+    }
+
+    @Test
+    void shouldRejectReturnShipmentDraftForShipmentThatWasNotDelivered() {
+        final Shipment shipment = shipment(null);
+
+        assertThrows(ShipmentModificationException.class, () -> shipment.prepareReturnShipmentDraft(
+                new ShipmentId(21L), new TrackingNumber("RETURN-DRAFT-TRACKING-NUMBER"),
+                ShipmentWorkflowSettings.defaults(), ExternalId.randomUUID()));
+    }
+
+    @Test
+    void shouldKeepReturnStatusAndLockShipmentWhenReturnIsCompleted() {
+        final Shipment shipment = shipment(null);
+        shipment.markAsDelivered();
+        shipment.notifyShipmentReturned(new ShipmentId(20L));
+
+        shipment.notifyShipmentReturnCompleted();
+
+        assertAll(
+                () -> assertEquals(ShipmentStatus.RETURN, shipment.getShipmentStatus()),
+                () -> assertTrue(shipment.getLocked()),
+                () -> assertEquals(new ShipmentId(20L), shipment.getShipmentRelatedId())
+        );
+    }
+
+    @Test
+    void shouldRejectReturnCompletionForShipmentThatWasNotReturned() {
+        final Shipment shipment = shipment(null);
+        shipment.markAsDelivered();
+
+        final ShipmentModificationException exception = assertThrows(
+                ShipmentModificationException.class,
+                shipment::notifyShipmentReturnCompleted
+        );
+
+        assertEquals("Cannot complete return for not returned shipment", exception.getMessage());
     }
 
     @Test

@@ -66,6 +66,8 @@ class DepartmentUserIntegrationEventListenerTest {
                 null,
                 new UserId(20L),
                 null,
+                null,
+                null,
                 null);
     }
 }

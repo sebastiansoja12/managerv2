@@ -1,5 +1,6 @@
 package com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary;
 
+import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.cache.NoOpOperatorConfigurationCache;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -7,10 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -68,7 +69,8 @@ class OperatorRepositoryImplTest {
     @Test
     void shouldSaveAndReadOperatorConfigurationUsingRealJpaRepository() {
         final OperatorConfigurationRepository repository =
-                new OperatorConfigurationRepositoryImpl(operatorConfigurationReadRepository);
+                new OperatorConfigurationRepositoryImpl(operatorConfigurationReadRepository,
+                        new NoOpOperatorConfigurationCache());
 
         repository.save(OperatorTestFixtures.OPERATOR_ID, OperatorTestFixtures.configuration());
         flushAndClear();

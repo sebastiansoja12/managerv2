@@ -4,5 +4,6 @@ import com.warehouse.returning.api.dto.ReturnDetailsDto;
 import com.warehouse.shipment.domain.vo.RouteLogRecord;
 
 public record ShipmentRouteLogResponseApi(
-        ShipmentDto shipment, RouteLogRecord routeLog, ReturnDetailsDto returnPackage) {
+        ShipmentDto shipment, RouteLogRecord routeLog, ReturnDetailsDto returnPackage,
+        boolean returnPackageUnavailable) {
 }

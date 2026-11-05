@@ -6,6 +6,9 @@ import com.warehouse.commonassets.kafka.domain.model.KafkaOutboxStatus;
 import com.warehouse.commonassets.kafka.domain.port.KafkaMessagePublisherPort;
 import com.warehouse.commonassets.kafka.domain.port.KafkaOutboxPort;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.ArgumentCaptor;
 
 import java.time.Instant;
 import java.util.List;
@@ -13,6 +16,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -36,7 +41,7 @@ class KafkaOutboxPublicationServiceTest {
                 headers
         );
         final KafkaOutboxPublicationService service =
-                new KafkaOutboxPublicationService(outboxPort, publisherPort, 50, 30_000, 5_000, 10);
+                new KafkaOutboxPublicationService(outboxPort, publisherPort, 50, 30_000, 5_000, 300_000);
         final KafkaOutboxRecord claimedRecord = new KafkaOutboxRecord(
                 record.eventId(), record.topic(), record.messageKey(), record.eventType(), record.eventVersion(),
                 record.occurredAt(), record.operatorId(), record.payload(), record.headers(),
@@ -59,7 +64,7 @@ class KafkaOutboxPublicationServiceTest {
         final KafkaMessagePublisherPort publisherPort = mock(KafkaMessagePublisherPort.class);
         final KafkaOutboxRecord record = record();
         final KafkaOutboxPublicationService service =
-                new KafkaOutboxPublicationService(outboxPort, publisherPort, 50, 30_000, 5_000, 10);
+                new KafkaOutboxPublicationService(outboxPort, publisherPort, 50, 30_000, 5_000, 300_000);
         when(outboxPort.claim(eq(record.eventId()), anyString(), any(Instant.class), any(Instant.class)))
                 .thenReturn(true);
         when(publisherPort.publish(record.topic(), record.messageKey(), record.payload(), record.headers()))
@@ -77,7 +82,7 @@ class KafkaOutboxPublicationServiceTest {
         final KafkaMessagePublisherPort publisherPort = mock(KafkaMessagePublisherPort.class);
         final KafkaOutboxRecord record = record();
         final KafkaOutboxPublicationService service =
-                new KafkaOutboxPublicationService(outboxPort, publisherPort, 50, 30_000, 5_000, 10);
+                new KafkaOutboxPublicationService(outboxPort, publisherPort, 50, 30_000, 5_000, 300_000);
         when(outboxPort.claim(eq(record.eventId()), anyString(), any(Instant.class), any(Instant.class)))
                 .thenReturn(false);
 
@@ -93,7 +98,7 @@ class KafkaOutboxPublicationServiceTest {
         final KafkaOutboxRecord record = record();
         final RuntimeException failure = new RuntimeException("Kafka unavailable");
         final KafkaOutboxPublicationService service =
-                new KafkaOutboxPublicationService(outboxPort, publisherPort, 50, 30_000, 5_000, 10);
+                new KafkaOutboxPublicationService(outboxPort, publisherPort, 50, 30_000, 5_000, 300_000);
         when(outboxPort.claim(eq(record.eventId()), anyString(), any(Instant.class), any(Instant.class)))
                 .thenReturn(true);
         when(publisherPort.publish(record.topic(), record.messageKey(), record.payload(), record.headers()))
@@ -102,7 +107,7 @@ class KafkaOutboxPublicationServiceTest {
         service.publish(record);
 
         verify(outboxPort).markFailed(
-                eq(record.eventId()), anyString(), eq(failure), any(Instant.class), eq(10));
+                eq(record.eventId()), anyString(), eq(failure), any(Instant.class));
         verify(outboxPort, never()).markPublished(any(), anyString());
     }
 
@@ -113,7 +118,7 @@ class KafkaOutboxPublicationServiceTest {
         final KafkaOutboxRecord record = record();
         final RuntimeException failure = new RuntimeException("Producer closed");
         final KafkaOutboxPublicationService service =
-                new KafkaOutboxPublicationService(outboxPort, publisherPort, 50, 30_000, 5_000, 10);
+                new KafkaOutboxPublicationService(outboxPort, publisherPort, 50, 30_000, 5_000, 300_000);
         when(outboxPort.claim(eq(record.eventId()), anyString(), any(Instant.class), any(Instant.class)))
                 .thenReturn(true);
         when(publisherPort.publish(record.topic(), record.messageKey(), record.payload(), record.headers()))
@@ -122,7 +127,50 @@ class KafkaOutboxPublicationServiceTest {
         service.publish(record);
 
         verify(outboxPort).markFailed(
-                eq(record.eventId()), anyString(), eq(failure), any(Instant.class), eq(10));
+                eq(record.eventId()), anyString(), eq(failure), any(Instant.class));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"0, 300000", "5000, 0", "5000, 1000"})
+    void shouldRejectInvalidRetryDelays(final long retryDelayMs, final long maxRetryDelayMs) {
+        final KafkaOutboxPort outboxPort = mock(KafkaOutboxPort.class);
+        final KafkaMessagePublisherPort publisherPort = mock(KafkaMessagePublisherPort.class);
+
+        assertThatThrownBy(() ->
+                new KafkaOutboxPublicationService(outboxPort, publisherPort, 50, 30_000,
+                        retryDelayMs, maxRetryDelayMs))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("retry delays");
+    }
+
+    @ParameterizedTest
+    @CsvSource({"0, 5000", "1, 10000", "5, 160000", "6, 300000", "10, 300000", "1000, 300000"})
+    void shouldIncreaseRetryDelayAndCapItWithoutStoppingRetries(final int attemptCount,
+                                                               final long expectedDelayMs) {
+        final KafkaOutboxPort outboxPort = mock(KafkaOutboxPort.class);
+        final KafkaMessagePublisherPort publisherPort = mock(KafkaMessagePublisherPort.class);
+        final KafkaOutboxRecord original = record();
+        final KafkaOutboxRecord record = new KafkaOutboxRecord(
+                original.eventId(), original.topic(), original.messageKey(), original.eventType(),
+                original.eventVersion(), original.occurredAt(), original.operatorId(), original.payload(),
+                original.headers(), KafkaOutboxStatus.PROCESSING, attemptCount);
+        final KafkaOutboxPublicationService service =
+                new KafkaOutboxPublicationService(outboxPort, publisherPort, 50, 30_000, 5_000, 300_000);
+        final RuntimeException failure = new RuntimeException("Kafka unavailable");
+        when(outboxPort.claimPending(eq(50), anyString(), any(Instant.class), any(Instant.class)))
+                .thenReturn(List.of(record));
+        when(publisherPort.publish(record.topic(), record.messageKey(), record.payload(), record.headers()))
+                .thenReturn(CompletableFuture.failedFuture(failure));
+        final Instant before = Instant.now();
+
+        service.publishPending();
+
+        final Instant after = Instant.now();
+        final ArgumentCaptor<Instant> nextAttempt = ArgumentCaptor.forClass(Instant.class);
+        verify(outboxPort).markFailed(eq(record.eventId()), anyString(), eq(failure), nextAttempt.capture());
+        assertThat(nextAttempt.getValue()).isBetween(
+                before.plusMillis(expectedDelayMs), after.plusMillis(expectedDelayMs));
+        verify(outboxPort, never()).markPublished(any(), anyString());
     }
 
     private KafkaOutboxRecord record() {

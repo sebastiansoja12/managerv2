@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -51,27 +51,6 @@ public class DeliveryReturnPortImplIntegrationTest {
 	@EnableAutoConfiguration
 	public static class DeliveryReturnPortIntegrationTestConfiguration {
 
-		@MockBean
-		public ShipmentProperties shipmentProperties;
-
-		@MockBean
-		public ShipmentRepositoryServicePort shipmentRepositoryServicePort;
-
-		@MockBean
-		public ReturnTokenServicePort returnTokenServicePort;
-
-		@MockBean
-		public MailServicePort mailServicePort;
-
-		@MockBean
-		public ShipmentIdentificationServicePort shipmentIdentificationServicePort;
-
-		@MockBean
-		public ReturnShipmentServicePort returnShipmentServicePort;
-
-		@MockBean
-		public SupplierValidatorProperties supplierValidatorProperties;
-
 		@Bean
 		public RestClient restClient(RestClient.Builder builder) {
 			return builder.baseUrl("http://localhost:8080").build();
@@ -81,25 +60,28 @@ public class DeliveryReturnPortImplIntegrationTest {
 	@Autowired
 	private DeliveryReturnPort deliveryReturnPort;
 
+	@MockitoBean
+	private SupplierValidatorProperties supplierValidatorProperties;
+
 	@Autowired
 	private RestClient restClient;
 
-	@Autowired
+	@MockitoBean
 	private ShipmentProperties shipmentProperties;
 
-	@Autowired
+	@MockitoBean
 	private ShipmentRepositoryServicePort shipmentRepositoryServicePort;
 
-	@Autowired
+	@MockitoBean
 	private ReturnTokenServicePort returnTokenServicePort;
 
-	@Autowired
+	@MockitoBean
 	private MailServicePort mailServicePort;
 
-	@Autowired
+	@MockitoBean
 	private ShipmentIdentificationServicePort shipmentIdentificationServicePort;
 
-	@Autowired
+	@MockitoBean
 	private ReturnShipmentServicePort returnShipmentServicePort;
 
 	private final DeviceInformation deviceInformation = DeviceInformation.builder()

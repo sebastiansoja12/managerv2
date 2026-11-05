@@ -15,6 +15,7 @@ import com.warehouse.auth.domain.provider.RefreshTokenProvider;
 import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.auth.domain.service.*;
 import com.warehouse.auth.infrastructure.adapter.primary.CurrentUserApiServiceAdapter;
+import com.warehouse.auth.infrastructure.adapter.primary.ActingDepartmentHeader;
 import com.warehouse.auth.infrastructure.adapter.primary.UserApiServiceAdapter;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.ResponseMapper;
 import com.warehouse.auth.infrastructure.adapter.secondary.*;
@@ -80,15 +81,16 @@ public class UserConfiguration {
 
     @Bean
     public CurrentUserAuthenticationPort currentUserAuthenticationPort(
-            final CurrentUserAuthenticationService currentUserAuthenticationService) {
-        return new CurrentUserAuthenticationPortImpl(currentUserAuthenticationService);
+            final CurrentUserAuthenticationService currentUserAuthenticationService,
+            final DepartmentService departmentService) {
+        return new CurrentUserAuthenticationPortImpl(currentUserAuthenticationService, departmentService);
     }
 
     @Bean
     public CurrentUserApiService currentUserService(final CurrentUserAuthenticationPort currentUserAuthenticationPort,
-                                                    final ResponseMapper responseMapper,
-                                                    final UserService userService) {
-        return new CurrentUserApiServiceAdapter(currentUserAuthenticationPort, responseMapper, userService);
+                                                    final ResponseMapper responseMapper) {
+        return new CurrentUserApiServiceAdapter(currentUserAuthenticationPort, responseMapper,
+                new ActingDepartmentHeader());
     }
 
     @Bean

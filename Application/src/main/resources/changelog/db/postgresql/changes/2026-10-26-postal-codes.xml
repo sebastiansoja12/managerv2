@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-26-postgresql-table-postal-codes" author="s-soja">
+        <createTable tableName="postal_codes">
+            <column name="country_code" type="VARCHAR(2)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_postal_codes"/>
+            </column>
+            <column name="postal_code" type="VARCHAR(20)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_postal_codes"/>
+            </column>
+            <column name="city" type="VARCHAR(180)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_postal_codes"/>
+            </column>
+            <column name="region_code" type="VARCHAR(10)"/>
+            <column name="latitude" type="DOUBLE PRECISION"/>
+            <column name="longitude" type="DOUBLE PRECISION"/>
+        </createTable>
+        <createIndex tableName="postal_codes" indexName="idx_postal_codes_postal_code">
+            <column name="postal_code"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2026-10-26-postal-codes-pl-geonames" author="s-soja">
+        <loadData tableName="postal_codes" file="data/postal_codes_pl.csv" relativeToChangelogFile="true"
+                  separator=";" encoding="UTF-8">
+            <column name="country_code" type="STRING"/>
+            <column name="postal_code" type="STRING"/>
+            <column name="city" type="STRING"/>
+            <column name="region_code" type="STRING"/>
+            <column name="latitude" type="NUMERIC"/>
+            <column name="longitude" type="NUMERIC"/>
+        </loadData>
+    </changeSet>
+</databaseChangeLog>

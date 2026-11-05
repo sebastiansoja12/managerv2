@@ -18,6 +18,8 @@ public class ReturnPackageToEntityMapper {
     public static ReturnPackageEntity map(final ReturnPackage returnPackage) {
         final ReturnId returnId = new ReturnId(returnPackage.getReturnPackageId().value());
         final ShipmentId shipmentId = new ShipmentId(returnPackage.getShipmentId().value());
+        final ShipmentId returnShipmentId = returnPackage.getReturnShipmentId() == null ? null
+                : new ShipmentId(returnPackage.getReturnShipmentId().value());
         final String reason = returnPackage.getReason();
         final Status status = ReturnStatusMapper.toEntityStatus(returnPackage.getReturnStatus());
         final ReturnToken returnToken = returnPackage.getReturnToken() != null ?
@@ -34,7 +36,7 @@ public class ReturnPackageToEntityMapper {
         final ReasonCode reasonCode = returnPackage.getReasonCode();
         final Instant createdAt = returnPackage.getCreatedAt();
         final Instant updatedAt = returnPackage.getUpdatedAt();
-		return new ReturnPackageEntity(returnId, shipmentId, reason, status, returnToken, assignedDepartmentId,
+		return new ReturnPackageEntity(returnId, shipmentId, returnShipmentId, reason, status, returnToken, assignedDepartmentId,
 				returnedDepartmentId, assignedTo, processedBy, reasonCode, operatorId,
                 createdAt, updatedAt);
     }

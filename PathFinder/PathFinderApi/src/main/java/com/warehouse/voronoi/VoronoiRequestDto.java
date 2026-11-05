@@ -1,8 +1,15 @@
 package com.warehouse.voronoi;
 
-import java.util.List;
-
+import com.warehouse.voronoi.dto.AddressDto;
+import com.warehouse.voronoi.dto.CoordinatesDto;
 import com.warehouse.voronoi.dto.DepartmentDto;
 
-public record VoronoiRequestDto(String city, String street, String zipCode, List<DepartmentDto> departments) {
+import java.util.List;
+
+public record VoronoiRequestDto(AddressDto address, CoordinatesDto coordinatesOfGivenLocation, List<DepartmentDto> departments) {
+
+
+    public String city() {
+        return address.city();
+    }
 }

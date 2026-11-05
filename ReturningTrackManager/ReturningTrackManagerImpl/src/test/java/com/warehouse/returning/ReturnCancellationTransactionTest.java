@@ -18,7 +18,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = ReturnPersistenceTestConfiguration.class, properties = {
         "spring.liquibase.enabled=false", "spring.sql.init.mode=never",
-        "manager.kafka.integration-events.routes.return.cancelled=return.cancelled"})
+        "manager.kafka.integration-events.routes.return.cancelled=return.cancelled",
+        "manager.kafka.integration-events.routes.return.read-model.changed=return.read-model.sync"})
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class ReturnCancellationTransactionTest {
     private final ReturnProcessingService service;
@@ -49,15 +50,18 @@ class ReturnCancellationTransactionTest {
         service.cancel(new ReturnPackageId(123L));
 
         assertEquals(ReturnStatus.CANCELLED, returns.findDetailsById(new ReturnPackageId(123L)).getReturnStatus());
-        assertEquals(1L, outbox.count());
-        final String payload = jdbc.queryForObject("SELECT payload_json FROM returning_event_outbox", String.class);
+        assertEquals(1L, jdbc.queryForObject(
+                "SELECT COUNT(*) FROM returning_event_outbox WHERE event_type = 'return.cancelled'", Long.class));
+        final String payload = jdbc.queryForObject(
+                "SELECT payload_json FROM returning_event_outbox WHERE event_type = 'return.cancelled'", String.class);
         assertTrue(payload.contains("\"eventType\":\"return.cancelled\""));
         assertTrue(payload.contains("\"shipmentId\":{\"value\":456}"));
         assertTrue(payload.contains("\"returnPackageId\":{\"value\":123}"));
         assertTrue(payload.contains("\"departmentId\":{\"value\":3}"));
         assertTrue(payload.contains("\"operatorId\":{\"value\":7}"));
         assertTrue(payload.contains("\"userId\":{\"value\":12}"));
-        final String headers = jdbc.queryForObject("SELECT headers_json FROM returning_event_outbox", String.class);
+        final String headers = jdbc.queryForObject(
+                "SELECT headers_json FROM returning_event_outbox WHERE event_type = 'return.cancelled'", String.class);
         assertTrue(headers.contains("com.warehouse.returning.api.event.ReturnCancelledIntegrationEvent"));
     }
 

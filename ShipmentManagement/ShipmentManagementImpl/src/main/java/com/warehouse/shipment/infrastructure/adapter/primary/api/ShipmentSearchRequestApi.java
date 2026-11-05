@@ -17,6 +17,7 @@ public record ShipmentSearchRequestApi(
         Boolean locked,
         LocalDateTime createdFrom,
         LocalDateTime createdTo,
+        DepartmentIdDto departmentId,
         Integer page,
         Integer size
 ) {

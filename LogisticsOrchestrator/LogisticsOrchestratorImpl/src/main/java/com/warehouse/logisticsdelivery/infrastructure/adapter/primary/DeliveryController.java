@@ -7,6 +7,7 @@ import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryHistoryPort;
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryPort;
 import com.warehouse.logisticsdelivery.domain.exception.DeliveryModificationException;
+import com.warehouse.logisticsdelivery.domain.exception.DestinationDepartmentNotResolvedException;
 import com.warehouse.logisticsdelivery.domain.exception.DeliveryNotFoundException;
 import com.warehouse.logisticsdelivery.domain.exception.DeliveryStepNotFoundException;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.api.DeliveryAttemptRegisterRequestDto;
@@ -20,6 +21,7 @@ import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.api.Delive
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.api.DeliveryStepSignatureRequestDto;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.api.DeliveryStepStatusRequestDto;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.api.DeliverySupplierRequestDto;
+import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.api.SignatureResponseDto;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.mapper.DeliveryRequestMapper;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.mapper.DeliveryResponseMapper;
 import org.springframework.http.HttpStatus;
@@ -114,6 +116,11 @@ public class DeliveryController {
         return responseMapper.map(deliveryPort.changeRoute(requestMapper.map(new DeliveryId(deliveryId), request)));
     }
 
+    @PostMapping("/{deliveryId}/destination/resolve")
+    public DeliveryResponseDto resolveDestinationDepartment(@PathVariable final String deliveryId) {
+        return responseMapper.map(deliveryPort.resolveDestinationDepartment(new DeliveryId(deliveryId)));
+    }
+
     @PutMapping("/{deliveryId}/conditions")
     public DeliveryResponseDto changeConditions(@PathVariable final String deliveryId,
                                                 @RequestBody final DeliveryConditionsRequestDto request) {
@@ -170,6 +177,11 @@ public class DeliveryController {
                 requestMapper.map(new DeliveryId(deliveryId), stepNumber, request)));
     }
 
+    @GetMapping("/{deliveryId}/signature")
+    public ResponseEntity<SignatureResponseDto> findSignature(@PathVariable final String deliveryId) {
+        return ResponseEntity.of(deliveryPort.findSignature(new DeliveryId(deliveryId)).map(responseMapper::map));
+    }
+
     @PutMapping("/{deliveryId}/steps/{stepNumber}/carrier")
     public DeliveryResponseDto reassignStepCarrier(@PathVariable final String deliveryId,
                                                    @PathVariable final int stepNumber,
@@ -196,5 +208,10 @@ public class DeliveryController {
     @ExceptionHandler(DeliveryModificationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public void conflict() {
+    }
+
+    @ExceptionHandler(DestinationDepartmentNotResolvedException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public void destinationNotResolved() {
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,6 +19,7 @@ import com.warehouse.auth.domain.vo.Impersonation;
 import com.warehouse.auth.infrastructure.adapter.secondary.filter.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import com.warehouse.auth.domain.model.OrganizationUser;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.auth.domain.port.primary.CurrentUserAuthenticationPort;
 import com.warehouse.auth.domain.port.primary.UserPort;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.ResponseMapper;
@@ -35,6 +37,8 @@ public class CurrentUserController {
 
     private final ResponseMapper responseMapper;
 
+    private final ActingDepartmentHeader actingDepartmentHeader = new ActingDepartmentHeader();
+
     public CurrentUserController(final CurrentUserAuthenticationPort currentUserAuthenticationPort,
                                  final UserPort userPort,
                                  final PasswordEncoder passwordEncoder,
@@ -46,9 +50,13 @@ public class CurrentUserController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getCurrentUser() {
+    public ResponseEntity<?> getCurrentUser(
+            @RequestHeader(value = ActingDepartmentHeader.NAME, required = false) final String actingDepartment) {
         final OrganizationUser user = currentUserAuthenticationPort.getCurrentUser();
-        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(map(user));
+        final DepartmentCode actingDepartmentCode = currentUserAuthenticationPort.getActingDepartmentCode(user,
+                actingDepartmentHeader.fromValue(actingDepartment));
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(responseMapper.mapCurrentUser(user,
+                actingDepartmentCode, userPort.getDepartmentCode(user.getDepartmentId())));
     }
 
     @GetMapping("/impersonation")
@@ -115,7 +123,8 @@ public class CurrentUserController {
     }
 
     private CurrentUserProfileDto map(final OrganizationUser user) {
-        return responseMapper.mapCurrentUser(user, userPort.getDepartmentCode(user.getDepartmentId()));
+        final DepartmentCode homeDepartmentCode = userPort.getDepartmentCode(user.getDepartmentId());
+        return responseMapper.mapCurrentUser(user, homeDepartmentCode, homeDepartmentCode);
     }
 
     private boolean isBlank(final String value) {

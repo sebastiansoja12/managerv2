@@ -25,6 +25,8 @@ public record DepartmentSnapshot(
         Instant updatedAt,
         UserId adminUserId,
         UserId createdBy,
-        UserId lastModifiedBy
+        UserId lastModifiedBy,
+        String statusChangeReason,
+        Instant statusChangedAt
 ) {
 }

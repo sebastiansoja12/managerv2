@@ -18,7 +18,6 @@ import com.warehouse.reroute.infrastructure.adapter.primary.api.RerouteShipmentA
 import com.warehouse.reroute.infrastructure.adapter.primary.api.RerouteTokenIssuedApiResponse;
 import com.warehouse.reroute.infrastructure.adapter.primary.api.RerouteTokenVerificationApiRequest;
 import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteApiMapper;
-import com.warehouse.reroute.infrastructure.adapter.primary.validator.RerouteRequestValidator;
 
 import jakarta.validation.Valid;
 
@@ -30,14 +29,10 @@ public class RerouteController {
 
     private final RerouteApiMapper rerouteApiMapper;
 
-    private final RerouteRequestValidator rerouteRequestValidator;
-
     public RerouteController(final RerouteTokenPort rerouteTokenPort,
-                             final RerouteApiMapper rerouteApiMapper,
-                             final RerouteRequestValidator rerouteRequestValidator) {
+                             final RerouteApiMapper rerouteApiMapper) {
         this.rerouteTokenPort = rerouteTokenPort;
         this.rerouteApiMapper = rerouteApiMapper;
-        this.rerouteRequestValidator = rerouteRequestValidator;
     }
 
     @GetMapping("/{trackingNumber}")
@@ -64,7 +59,6 @@ public class RerouteController {
     public ResponseEntity<RerouteAcceptedApiResponse> reroute(
             @PathVariable final String trackingNumber,
             @Valid @RequestBody final RerouteShipmentApiRequest request) {
-        rerouteRequestValidator.validate(request);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(rerouteApiMapper.map(
                 rerouteTokenPort.reroute(rerouteApiMapper.map(trackingNumber, request))));
     }

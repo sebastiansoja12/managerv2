@@ -4,10 +4,13 @@ import com.warehouse.auth.CurrentOperatorService;
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.auth.UserApiService;
 import com.warehouse.chat.application.port.secondary.ChatUserServicePort;
+import com.warehouse.chat.domain.vo.ChatParticipant;
 import com.warehouse.chat.domain.vo.ChatRecipient;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 
+import java.util.List;
 import java.util.Optional;
 
 public class ChatUserServiceAdapter implements ChatUserServicePort {
@@ -40,5 +43,18 @@ public class ChatUserServiceAdapter implements ChatUserServicePort {
                 .map(recipient -> new ChatRecipient(
                         recipient.operatorId() == null ? null : OperatorId.of(recipient.operatorId().value()),
                         !Boolean.TRUE.equals(recipient.deleted())));
+    }
+
+    @Override
+    public List<ChatParticipant> findActiveParticipants() {
+        return userApiService.findAll()
+                .stream()
+                .filter(user -> !Boolean.TRUE.equals(user.deleted()))
+                .map(user -> new ChatParticipant(new UserId(user.userId().value()), user.username(),
+                        user.firstName(), user.lastName(),
+                        user.departmentCode() == null ? null : new DepartmentCode(user.departmentCode()),
+                        user.role(),
+                        user.operatorId() == null ? null : OperatorId.of(user.operatorId().value())))
+                .toList();
     }
 }

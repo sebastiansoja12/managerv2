@@ -18,4 +18,12 @@ public record CurrentUserProfile(UserId userId,
     public boolean canManageDevices() {
         return role != null && MANAGING_ROLES.contains(role);
     }
+
+    public boolean canChangeData() {
+        return canManageDevices();
+    }
+
+    public boolean isAdministrator() {
+        return "ADMIN".equals(role) || "SUPERADMIN".equals(role);
+    }
 }

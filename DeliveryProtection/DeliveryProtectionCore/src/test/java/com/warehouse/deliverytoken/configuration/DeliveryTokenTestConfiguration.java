@@ -1,7 +1,8 @@
 package com.warehouse.deliverytoken.configuration;
 
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mockito;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
@@ -12,7 +13,9 @@ import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
 @EnableJpaRepositories(basePackages = { "com.warehouse.deliverytoken"})
 public class DeliveryTokenTestConfiguration {
 
-    @MockBean
-    public ParcelServicePort parcelServicePort;
+    @Bean
+    public ParcelServicePort parcelServicePort() {
+        return Mockito.mock(ParcelServicePort.class);
+    }
 
 }

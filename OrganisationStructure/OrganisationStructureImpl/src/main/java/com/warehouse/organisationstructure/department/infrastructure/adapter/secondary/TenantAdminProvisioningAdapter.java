@@ -4,7 +4,7 @@ import com.warehouse.auth.infrastructure.adapter.primary.event.AdminUserCommand;
 import com.warehouse.commonassets.enumeration.Language;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.organisationstructure.department.domain.event.DepartmentAdminChanged;
-import com.warehouse.organisationstructure.department.domain.port.secondary.TenantAdminProvisioningPort;
+import com.warehouse.organisationstructure.department.application.port.secondary.TenantAdminProvisioningPort;
 import com.warehouse.organisationstructure.department.domain.registry.DomainRegistry;
 import com.warehouse.organisationstructure.department.domain.vo.DepartmentSnapshot;
 

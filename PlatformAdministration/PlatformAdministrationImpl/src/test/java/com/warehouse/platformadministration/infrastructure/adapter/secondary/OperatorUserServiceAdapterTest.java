@@ -59,7 +59,7 @@ class OperatorUserServiceAdapterTest {
         });
 
         final UserId userId = adapter.create(OPERATOR_SCOPE, new CreateOperatorUserCommand("Jan", "Kowalski",
-                "jkowalski", "secret", "jan@test.pl", "USER", new DepartmentCode("KT1"), "pl"));
+                "jkowalski", "jan@test.pl", "USER", new DepartmentCode("KT1"), "pl"));
 
         assertThat(userId).isEqualTo(new UserId(99L));
         assertThat(operatorDuringCall.get()).isEqualTo(OperatorId.of(20L));

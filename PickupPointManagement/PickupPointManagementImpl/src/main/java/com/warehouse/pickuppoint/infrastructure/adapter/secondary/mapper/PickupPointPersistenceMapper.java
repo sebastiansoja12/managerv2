@@ -68,17 +68,17 @@ public class PickupPointPersistenceMapper {
                 snapshot.type(),
                 snapshot.status(),
                 joined(snapshot.capabilities()),
-                address.countryCode(),
-                address.postalCode(),
-                address.city(),
-                address.street(),
-                address.buildingNumber(),
-                address.unitNumber(),
-                coordinates.latitude(),
-                coordinates.longitude(),
+                address == null ? null : address.countryCode(),
+                address == null ? null : address.postalCode(),
+                address == null ? null : address.city(),
+                address == null ? null : address.street(),
+                address == null ? null : address.buildingNumber(),
+                address == null ? null : address.unitNumber(),
+                coordinates == null ? null : coordinates.latitude(),
+                coordinates == null ? null : coordinates.longitude(),
                 snapshot.departmentId(),
-                joined(servicePolicy.allowedShipmentSizes()),
-                servicePolicy.acceptsDangerousGoods(),
+                servicePolicy == null ? "" : joined(servicePolicy.allowedShipmentSizes()),
+                servicePolicy == null ? null : servicePolicy.acceptsDangerousGoods(),
                 snapshot.externalReference() == null ? null : snapshot.externalReference().networkCode(),
                 snapshot.version());
     }
@@ -92,12 +92,13 @@ public class PickupPointPersistenceMapper {
         final PickupPointServicePolicy servicePolicy = snapshot.servicePolicy();
         final ExternalPointReference externalReference = snapshot.externalReference();
         final String pickupPointKey = snapshot.pickupPointId().value().toString();
-        final Set<PickupPointOpeningDayEntity> openingDays = schedule.days().stream()
+        final Set<PickupPointOpeningDayEntity> openingDays = schedule == null ? Set.of() : schedule.days().stream()
                 .map(day -> toEntity(pickupPointKey, day))
                 .collect(Collectors.toSet());
-        final Set<PickupPointScheduleExceptionEntity> exceptions = schedule.exceptions().stream()
-                .map(exception -> toEntity(pickupPointKey, exception))
-                .collect(Collectors.toSet());
+        final Set<PickupPointScheduleExceptionEntity> exceptions = schedule == null ? Set.of()
+                : schedule.exceptions().stream()
+                        .map(exception -> toEntity(pickupPointKey, exception))
+                        .collect(Collectors.toSet());
         return new PickupPointEntity(
                 snapshot.pickupPointId(),
                 snapshot.code().value(),
@@ -105,24 +106,24 @@ public class PickupPointPersistenceMapper {
                 snapshot.type(),
                 snapshot.status(),
                 snapshot.capabilities(),
-                address.countryCode(),
-                address.postalCode(),
-                address.city(),
-                address.street(),
-                address.buildingNumber(),
-                address.unitNumber(),
-                coordinates.latitude(),
-                coordinates.longitude(),
+                address == null ? null : address.countryCode(),
+                address == null ? null : address.postalCode(),
+                address == null ? null : address.city(),
+                address == null ? null : address.street(),
+                address == null ? null : address.buildingNumber(),
+                address == null ? null : address.unitNumber(),
+                coordinates == null ? null : coordinates.latitude(),
+                coordinates == null ? null : coordinates.longitude(),
                 snapshot.departmentId(),
                 contact == null ? null : contact.telephoneNumber(),
                 contact == null ? null : contact.email(),
                 snapshot.accessInstructions(),
-                schedule.timeZone().getId(),
-                schedule.mode(),
+                schedule == null ? null : schedule.timeZone().getId(),
+                schedule == null ? null : schedule.mode(),
                 openingDays,
                 exceptions,
-                servicePolicy.allowedShipmentSizes(),
-                servicePolicy.acceptsDangerousGoods(),
+                servicePolicy == null ? Set.of() : servicePolicy.allowedShipmentSizes(),
+                servicePolicy == null ? null : servicePolicy.acceptsDangerousGoods(),
                 externalReference == null ? null : externalReference.networkCode(),
                 externalReference == null ? null : externalReference.pointCode(),
                 snapshot.statusReason(),

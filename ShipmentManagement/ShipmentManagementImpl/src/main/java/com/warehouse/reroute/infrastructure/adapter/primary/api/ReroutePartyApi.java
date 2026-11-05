@@ -11,5 +11,5 @@ public record ReroutePartyApi(@NotBlank @Size(max = 100) String firstName,
                               @NotBlank @Size(max = 100) String city,
                               @NotBlank @Size(max = 20) String postalCode,
                               @NotBlank @Size(max = 255) String street,
-                              @NotBlank @Size(min = 2, max = 2) String countryCode) {
+                              String countryCode) {
 }

@@ -3,7 +3,8 @@ package com.warehouse.palletmanagement.infrastructure.adapter.secondary;
 import com.warehouse.palletmanagement.domain.vo.PalletUpdate;
 import com.warehouse.palletmanagement.domain.enumeration.PalletStatus;
 import com.warehouse.palletmanagement.infrastructure.adapter.secondary.api.PalletHandlingStatusRequestApi;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.commonassets.resilience.CircuitBreakerExecutor;
@@ -133,6 +134,28 @@ public class PalletHandlingManagerServiceClientAdapter implements PalletHandling
                 .header(HttpHeaders.AUTHORIZATION, authorization)
                 .retrieve()
                 .body(PalletHandlingPageApi.class)));
+    }
+
+    @Override
+    public PalletDetails revertLoading(final PalletId palletId) {
+        final String authorization = authorization();
+        final URI uri = palletUri("/{palletId}/revert-loading", palletId.value());
+        return this.responseMapper.map(write(() -> this.restClient.put()
+                .uri(uri)
+                .header(HttpHeaders.AUTHORIZATION, authorization)
+                .retrieve()
+                .body(PalletHandlingPalletApi.class)));
+    }
+
+    @Override
+    public PalletDetails unload(final PalletId palletId) {
+        final String authorization = authorization();
+        final URI uri = palletUri("/{palletId}/unload", palletId.value());
+        return this.responseMapper.map(write(() -> this.restClient.put()
+                .uri(uri)
+                .header(HttpHeaders.AUTHORIZATION, authorization)
+                .retrieve()
+                .body(PalletHandlingPalletApi.class)));
     }
 
     @Override
@@ -301,7 +324,7 @@ public class PalletHandlingManagerServiceClientAdapter implements PalletHandling
             return new PalletRequestRejectedException(status,
                     error.code() == null ? "PALLET_REQUEST_REJECTED" : error.code(),
                     error.message() == null ? "Pallet request rejected" : error.message());
-        } catch (final IOException exception) {
+        } catch (final IOException | JacksonException exception) {
             return new PalletRequestRejectedException(status, "PALLET_REQUEST_REJECTED", "Pallet request rejected");
         }
     }

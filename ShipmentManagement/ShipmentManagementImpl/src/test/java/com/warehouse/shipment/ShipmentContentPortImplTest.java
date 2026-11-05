@@ -1,5 +1,6 @@
 package com.warehouse.shipment;
 
+import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.shipment.application.port.primary.ShipmentContentPortImpl;
@@ -9,6 +10,7 @@ import com.warehouse.shipment.application.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.exception.ShipmentNotFoundException;
 import com.warehouse.shipment.domain.model.ShipmentDocumentFile;
 import com.warehouse.shipment.domain.model.ShipmentNote;
+import com.warehouse.shipment.domain.event.ShipmentNoteAdded;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,11 +41,15 @@ class ShipmentContentPortImplTest {
     @Mock
     private ShipmentActorServicePort actorServicePort;
 
+    @Mock
+    private DomainEventPublisher domainEventPublisher;
+
     private ShipmentContentPortImpl shipmentContentPort;
 
     @BeforeEach
     void setUp() {
-        shipmentContentPort = new ShipmentContentPortImpl(shipmentRepository, contentRepository, actorServicePort);
+        shipmentContentPort = new ShipmentContentPortImpl(shipmentRepository, contentRepository, actorServicePort,
+                domainEventPublisher);
     }
 
     @Test
@@ -93,5 +99,18 @@ class ShipmentContentPortImplTest {
                 () -> shipmentContentPort.addDocument(SHIPMENT_ID, "page.html", "text/html", new byte[] {1}));
 
         verify(contentRepository, never()).saveDocument(any());
+    }
+
+    @Test
+    void shouldPublishNoteAddedEvent() {
+        when(shipmentRepository.exists(SHIPMENT_ID)).thenReturn(true);
+        when(actorServicePort.currentUserId()).thenReturn(new UserId(7L));
+
+        shipmentContentPort.addNote(SHIPMENT_ID, "Handle with care", true);
+
+        final ArgumentCaptor<ShipmentNoteAdded> eventCaptor = ArgumentCaptor.forClass(ShipmentNoteAdded.class);
+        verify(domainEventPublisher).publish(eventCaptor.capture());
+        assertEquals(SHIPMENT_ID, eventCaptor.getValue().getShipmentId());
+        assertTrue(eventCaptor.getValue().isInternal());
     }
 }

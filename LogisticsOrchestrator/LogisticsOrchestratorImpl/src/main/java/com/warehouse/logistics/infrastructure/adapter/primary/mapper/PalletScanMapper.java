@@ -1,16 +1,21 @@
 package com.warehouse.logistics.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.logistics.application.port.primary.command.PalletScanCommand;
+import com.warehouse.logistics.application.port.primary.command.PalletUnloadCommand;
 import com.warehouse.logistics.application.port.primary.result.PalletScanDetail;
 import com.warehouse.logistics.application.port.primary.result.PalletScanOutcome;
+import com.warehouse.logistics.application.port.primary.result.PalletUnloadOutcome;
 import java.util.function.Function;
 
+import com.warehouse.commonassets.identificator.PalletTrackingNumber;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.terminal.jaxb.PalletScanRequest;
 import com.warehouse.terminal.jaxb.PalletScanResponse;
 import com.warehouse.terminal.jaxb.PalletScanResponseDetailType;
 import com.warehouse.terminal.jaxb.PalletScanResponseDetailsType;
+import com.warehouse.terminal.jaxb.PalletUnloadRequest;
+import com.warehouse.terminal.jaxb.PalletUnloadResponse;
 
 public class PalletScanMapper {
 
@@ -33,6 +38,32 @@ public class PalletScanMapper {
         response.setPalletID(outcome.palletId());
         response.setPalletStatus(outcome.palletStatus());
         response.setAlreadyLoaded(outcome.alreadyLoaded());
+        response.setErrorCode(outcome.errorCode());
+        response.setErrorMessage(outcome.errorMessage());
+        response.setPalletScanResponseDetails(details);
+        return response;
+    }
+
+    public PalletUnloadCommand map(final ProcessId processId, final PalletUnloadRequest palletUnloadRequest) {
+        final String trackingNumber = palletUnloadRequest.getPalletTrackingNumber();
+        return new PalletUnloadCommand(processId,
+                trackingNumber == null ? null : new PalletTrackingNumber(trackingNumber.trim()));
+    }
+
+    public PalletUnloadResponse map(final ProcessId processId, final PalletUnloadOutcome outcome,
+                                    final Function<ShipmentId, String> trackingNumberResolver) {
+        final PalletScanResponseDetailsType details = new PalletScanResponseDetailsType();
+        outcome.details().stream()
+                .map(detail -> map(detail, trackingNumberResolver))
+                .forEach(details.getPalletScanResponseDetail()::add);
+
+        final PalletUnloadResponse response = new PalletUnloadResponse();
+        response.setProcessId(processId.value().toString());
+        response.setSuccess(outcome.success());
+        response.setPalletTrackingNumber(outcome.trackingNumber() == null ? null : outcome.trackingNumber().value());
+        response.setPalletID(outcome.palletId() == null ? null : outcome.palletId().value());
+        response.setPalletStatus(outcome.palletStatus());
+        response.setAlreadyUnloaded(outcome.alreadyUnloaded());
         response.setErrorCode(outcome.errorCode());
         response.setErrorMessage(outcome.errorMessage());
         response.setPalletScanResponseDetails(details);

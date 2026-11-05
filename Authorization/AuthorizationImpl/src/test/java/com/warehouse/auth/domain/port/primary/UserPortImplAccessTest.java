@@ -44,6 +44,75 @@ class UserPortImplAccessTest {
     }
 
     @Test
+    void shouldReturnOnlyOwnDepartmentUsersForAdmin() {
+        final OrganizationUser admin = givenCurrentUser(OrganizationUser.Role.ADMIN, OWN_DEPARTMENT);
+        final OrganizationUser ownDepartmentUser = user(2L, OrganizationUser.Role.USER, OWN_DEPARTMENT);
+        final OrganizationUser otherDepartmentUser = user(3L, OrganizationUser.Role.USER, OTHER_DEPARTMENT);
+        when(userService.findAll()).thenReturn(List.of(admin, ownDepartmentUser, otherDepartmentUser));
+
+        assertThat(userPort.findAllInCurrentDepartment()).containsExactly(admin, ownDepartmentUser);
+    }
+
+    @Test
+    void shouldReturnUsersOfAllDepartmentsForSuperadmin() {
+        final OrganizationUser superadmin = givenCurrentUser(OrganizationUser.Role.SUPERADMIN, OWN_DEPARTMENT);
+        final OrganizationUser otherDepartmentUser = user(2L, OrganizationUser.Role.USER, OTHER_DEPARTMENT);
+        when(userService.findAll()).thenReturn(List.of(superadmin, otherDepartmentUser));
+
+        assertThat(userPort.findAllInCurrentDepartment()).containsExactly(superadmin, otherDepartmentUser);
+    }
+
+    @Test
+    void shouldNotReturnUserFromOtherDepartmentByUsername() {
+        givenCurrentUser(OrganizationUser.Role.MANAGER, OWN_DEPARTMENT);
+        final OrganizationUser target = user(2L, OrganizationUser.Role.USER, OTHER_DEPARTMENT);
+        when(userService.findUser(target.getUsername())).thenReturn(target);
+
+        assertThrows(UserAccessDeniedException.class,
+                () -> userPort.findUserInCurrentDepartment(target.getUsername()));
+    }
+
+    @Test
+    void shouldAllowAdminToDeleteUserFromOwnDepartment() {
+        givenCurrentUser(OrganizationUser.Role.ADMIN, OWN_DEPARTMENT);
+        final OrganizationUser target = user(2L, OrganizationUser.Role.MANAGER, OWN_DEPARTMENT);
+        when(userService.findUserById(target.getUserId())).thenReturn(target);
+
+        userPort.delete(target.getUserId());
+
+        verify(userService).deleteDataForUser(target.getUserId());
+    }
+
+    @Test
+    void shouldNotAllowAdminToDeleteUserFromOtherDepartment() {
+        givenCurrentUser(OrganizationUser.Role.ADMIN, OWN_DEPARTMENT);
+        final OrganizationUser target = user(2L, OrganizationUser.Role.USER, OTHER_DEPARTMENT);
+        when(userService.findUserById(target.getUserId())).thenReturn(target);
+
+        assertThrows(UserAccessDeniedException.class, () -> userPort.delete(target.getUserId()));
+
+        verify(userService, never()).deleteDataForUser(any());
+    }
+
+    @Test
+    void shouldNotAllowAdminToDeleteAnotherAdmin() {
+        givenCurrentUser(OrganizationUser.Role.ADMIN, OWN_DEPARTMENT);
+        final OrganizationUser target = user(2L, OrganizationUser.Role.ADMIN, OWN_DEPARTMENT);
+        when(userService.findUserById(target.getUserId())).thenReturn(target);
+
+        assertThrows(UserAccessDeniedException.class, () -> userPort.delete(target.getUserId()));
+    }
+
+    @Test
+    void shouldNotAllowAdminToDeleteThemselves() {
+        final OrganizationUser admin = givenCurrentUser(OrganizationUser.Role.ADMIN, OWN_DEPARTMENT);
+
+        assertThrows(UserAccessDeniedException.class, () -> userPort.delete(admin.getUserId()));
+
+        verify(userService, never()).deleteDataForUser(any());
+    }
+
+    @Test
     void shouldNotAllowAdminToEditUserFromOtherDepartment() {
         givenCurrentUser(OrganizationUser.Role.ADMIN, OWN_DEPARTMENT);
         final OrganizationUser target = user(2L, OrganizationUser.Role.USER, OTHER_DEPARTMENT);

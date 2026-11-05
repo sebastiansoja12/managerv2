@@ -95,6 +95,7 @@ public class MessageController {
             case PLANNED -> PLANNED;
             case CREATED -> CREATED;
             case PREPARED -> PREPARED;
+            case COLLECTED -> COLLECTED;
             case ACCEPTED -> ACCEPTED;
             case REROUTE -> REROUTE;
             case SENT -> SENT;

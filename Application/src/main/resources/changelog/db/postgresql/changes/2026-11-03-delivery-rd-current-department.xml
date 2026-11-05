@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-03-delivery-rd-current-department" author="s-soja">
+        <addColumn tableName="delivery_rd">
+            <column name="current_department_id" type="BIGINT"/>
+        </addColumn>
+        <sql>UPDATE delivery_rd rd
+             SET current_department_id = COALESCE(
+                 (SELECT step.department_id
+                  FROM delivery_step step
+                  WHERE step.delivery_id = rd.id AND step.department_id IS NOT NULL
+                  ORDER BY step.step_number DESC
+                  LIMIT 1),
+                 rd.origin_department_id)</sql>
+        <createIndex tableName="delivery_rd" indexName="idx_delivery_rd_current_department">
+            <column name="operator_id"/>
+            <column name="current_department_id"/>
+            <column name="delivery_status"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

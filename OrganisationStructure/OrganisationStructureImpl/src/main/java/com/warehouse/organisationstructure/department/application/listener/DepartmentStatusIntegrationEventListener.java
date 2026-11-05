@@ -38,6 +38,7 @@ public class DepartmentStatusIntegrationEventListener {
         this.integrationEventPublisher.publish(new DepartmentStatusChangedIntegrationEvent(
                 new DepartmentIdDto(event.getSnapshot().departmentId().getValue()),
                 new DepartmentCodeDto(event.getSnapshot().departmentCode().getValue()),
-                status));
+                status,
+                event.getSnapshot().statusChangeReason()));
     }
 }

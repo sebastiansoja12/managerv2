@@ -1,8 +1,8 @@
 package com.warehouse.commonassets.kafka.infrastructure.adapter.secondary;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.commonassets.event.integration.annotation.IntegrationEventType;
 import com.warehouse.commonassets.event.integration.context.OperatorAwareEvent;
@@ -163,7 +163,7 @@ public class OutboxIntegrationEventPublisher implements IntegrationEventPublishe
                 putIdentifier(message, "departmentId", departmentId == null ? null : departmentId.getValue());
             }
             return this.objectMapper.writeValueAsString(message);
-        } catch (final JsonProcessingException exception) {
+        } catch (final JacksonException exception) {
             throw new IllegalStateException("Cannot serialize event: " + event.getClass().getName(), exception);
         }
     }

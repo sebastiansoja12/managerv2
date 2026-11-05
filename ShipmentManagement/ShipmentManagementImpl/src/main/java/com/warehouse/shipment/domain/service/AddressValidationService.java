@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 public class AddressValidationService {
     public Result<Void, ErrorCode> validateAddresses(final Address sender, final Address recipient,
                                                      final ShipmentValidationRules shipmentValidationRules) {
-        final Boolean validateAddressData = shipmentValidationRules.validateAddressData();
         return Result.success();
     }
 }

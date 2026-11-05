@@ -7,8 +7,8 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.ResourceAccessException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
 import com.warehouse.tracking.domain.exception.TrackingErrorCode;
 import com.warehouse.tracking.domain.enumeration.TrackingEnvironment;
 import com.warehouse.tracking.domain.model.TrackingIntegrationConfiguration;
@@ -53,8 +53,11 @@ public class InPostOAuthClient {
                         }
                         throw oauthFailure(status);
                     });
+        } catch (final JacksonException exception) {
+            throw failure(TrackingErrorCode.INVALID_PROVIDER_RESPONSE, 502,
+                    "InPost returned an invalid OAuth response", false);
         } catch (final ResourceAccessException exception) {
-            if (hasCause(exception, JsonProcessingException.class)) {
+            if (hasCause(exception, JacksonException.class)) {
                 throw failure(TrackingErrorCode.INVALID_PROVIDER_RESPONSE, 502,
                         "InPost returned an invalid OAuth response", false);
             }

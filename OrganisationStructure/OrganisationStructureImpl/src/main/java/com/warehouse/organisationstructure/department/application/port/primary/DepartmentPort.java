@@ -1,0 +1,48 @@
+package com.warehouse.organisationstructure.department.application.port.primary;
+
+import com.warehouse.commonassets.enumeration.CountryCode;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.organisationstructure.department.domain.enumeration.DepartmentType;
+import com.warehouse.organisationstructure.department.domain.model.Department;
+import com.warehouse.organisationstructure.department.domain.model.DepartmentCreateCommand;
+import com.warehouse.organisationstructure.department.domain.vo.*;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface DepartmentPort {
+
+    Department findByDepartmentCode(final DepartmentCode departmentCode);
+
+    Department findByDepartmentId(final DepartmentId departmentId);
+
+    Optional<DepartmentCode> findDepartmentCode(final DepartmentId departmentId);
+
+    List<Department> findAll();
+
+    List<Department> findAllArchived();
+
+    DepartmentCreateResponse createDepartments(final DepartmentCreateCommand command);
+
+    IdentificationNumberChangeResponse changeIdentificationNumber(final IdentificationNumberChangeCommand command);
+
+    void changeAddress(final UpdateAddressCommand command);
+
+    void changeDepartmentActive(final DepartmentCode departmentCodeValue, final Boolean active, final String reason);
+
+    int archiveInactiveDepartments();
+
+    void changeDepartmentType(final DepartmentCode departmentCodeValue, final DepartmentType departmentType);
+
+    void changeAdminUser(final DepartmentCode departmentCode, final UserId userId);
+
+    void changeStatus(final ChangeDepartmentStatusCommand command);
+
+    void changeEmail(final DepartmentCode departmentCode, final String email);
+
+    Boolean checkExists(final DepartmentCode departmentCode);
+
+    boolean checkExistsAnyWithCountryCode(final CountryCode countryCode);
+}

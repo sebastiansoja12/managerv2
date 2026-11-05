@@ -1,4 +1,6 @@
 package com.warehouse.terminal.response;
 
-public record DeviceHeartbeatResponseDto(Boolean updateRequired) {
+import java.time.Instant;
+
+public record DeviceHeartbeatResponseDto(Boolean updateRequired, Instant operatorSessionExpiresAt) {
 }

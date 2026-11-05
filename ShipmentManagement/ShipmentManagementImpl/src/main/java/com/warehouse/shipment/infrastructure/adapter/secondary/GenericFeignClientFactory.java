@@ -1,7 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
-import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpHeaders;
 
 import com.warehouse.auth.CurrentUserApiService;
@@ -10,6 +9,7 @@ import com.warehouse.auth.infrastructure.dto.CurrentUserAuthenticationDto;
 import feign.Feign;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
+import org.springframework.cloud.openfeign.support.FeignHttpMessageConverters;
 import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
 import org.springframework.cloud.openfeign.support.SpringDecoder;
 import org.springframework.cloud.openfeign.support.SpringEncoder;
@@ -23,7 +23,7 @@ public class GenericFeignClientFactory {
 
 	private final Encoder encoder;
 
-	public GenericFeignClientFactory(final ObjectFactory<HttpMessageConverters> messageConverters,
+	public GenericFeignClientFactory(final ObjectProvider<FeignHttpMessageConverters> messageConverters,
 									 final CurrentUserApiService currentUserApiService) {
 		this.currentUserApiService = currentUserApiService;
 		this.decoder = new ResponseEntityDecoder(new SpringDecoder(messageConverters));

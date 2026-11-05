@@ -6,5 +6,6 @@
 
     <include file="tables/returning_return_package.xml" relativeToChangelogFile="true"/>
     <include file="tables/returning_event_outbox.xml" relativeToChangelogFile="true"/>
+    <include file="tables/returning_return_read_model.xml" relativeToChangelogFile="true"/>
     <include file="schema-objects.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

@@ -40,7 +40,6 @@ public abstract class OperatorDirectoryServiceMapper {
                 command.firstName(),
                 command.lastName(),
                 command.username(),
-                command.password(),
                 command.email(),
                 command.role(),
                 command.departmentCode().getValue(),

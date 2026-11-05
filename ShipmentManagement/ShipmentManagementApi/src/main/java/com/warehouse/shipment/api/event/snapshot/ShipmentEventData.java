@@ -23,7 +23,8 @@ public record ShipmentEventData(
         TrackingNumber trackingNumber,
         ExternalId<UUID> externalShipmentId,
         ShipmentServiceLevel serviceLevel,
-        String packagingType
+        String packagingType,
+        String source
 ) {
     public enum ShipmentServiceLevel {
         ECONOMY,

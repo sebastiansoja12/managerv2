@@ -33,7 +33,8 @@ public class ShipmentEventDataMapper implements ShipmentEventDataMapperPort {
                 shipment.externalShipmentId(),
                 shipment.serviceLevel() == null ? null
                         : ShipmentEventData.ShipmentServiceLevel.valueOf(shipment.serviceLevel().name()),
-                shipment.packagingType() == null ? null : shipment.packagingType().name()
+                shipment.packagingType() == null ? null : shipment.packagingType().name(),
+                shipment.source() == null ? null : shipment.source().name()
         );
     }
 

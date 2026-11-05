@@ -15,7 +15,7 @@ public interface DeliveryRepository {
 
     Optional<Delivery> findById(final DeliveryId deliveryId);
 
-    Optional<Delivery> findByTargetAndType(final DeliveryTarget target, final DeliveryType type);
+    Optional<Delivery> findCurrentByTargetAndType(final DeliveryTarget target, final DeliveryType type);
 
     Optional<Delivery> findActiveByTargetAndType(final DeliveryTarget target, final DeliveryType type);
 
@@ -31,6 +31,14 @@ public interface DeliveryRepository {
     List<Delivery> findByTarget(final DeliveryTarget target);
 
     List<Delivery> findReplacedBy(final DeliveryId replacingDeliveryId);
+
+    long countCreatedForDestinationBetween(final DepartmentId departmentId,
+                                           final LocalDateTime createdFromInclusive,
+                                           final LocalDateTime createdToExclusive);
+
+    long countActiveByDepartment(final DepartmentId departmentId);
+
+    List<Delivery> findActiveByDepartment(final DepartmentId departmentId);
 
     void createOrUpdate(final Delivery delivery);
 }

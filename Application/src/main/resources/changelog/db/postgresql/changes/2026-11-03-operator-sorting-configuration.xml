@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-03-operator-sorting-configuration" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="operator_configurations"/>
+                <not>
+                    <columnExists tableName="operator_configurations" columnName="sorting_require_inbound_scan"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="operator_configurations">
+            <column name="sorting_require_inbound_scan" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sorting_require_sort_scan" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sorting_require_outbound_scan" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sorting_duplicate_scan_policy" type="VARCHAR(32)" defaultValue="WARN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sorting_unresolved_destination_policy" type="VARCHAR(32)" defaultValue="ROUTE_TO_EXCEPTION_RAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sorting_exception_ramp_code" type="VARCHAR(32)" defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sorting_require_damage_photo_on_inbound" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sorting_scan_error_feedback" type="VARCHAR(32)" defaultValue="SOUND_AND_VIBRATION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sorting_missing_in_warehouse_after_hours" type="INT" defaultValueNumeric="24">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2026-11-03-operator-sorting-configuration-aud" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="operator_configurations_aud"/>
+                <not>
+                    <columnExists tableName="operator_configurations_aud" columnName="sorting_require_inbound_scan"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="operator_configurations_aud">
+            <column name="sorting_require_inbound_scan" type="BOOLEAN"/>
+            <column name="sorting_require_sort_scan" type="BOOLEAN"/>
+            <column name="sorting_require_outbound_scan" type="BOOLEAN"/>
+            <column name="sorting_duplicate_scan_policy" type="VARCHAR(32)"/>
+            <column name="sorting_unresolved_destination_policy" type="VARCHAR(32)"/>
+            <column name="sorting_exception_ramp_code" type="VARCHAR(32)"/>
+            <column name="sorting_require_damage_photo_on_inbound" type="BOOLEAN"/>
+            <column name="sorting_scan_error_feedback" type="VARCHAR(32)"/>
+            <column name="sorting_missing_in_warehouse_after_hours" type="INT"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

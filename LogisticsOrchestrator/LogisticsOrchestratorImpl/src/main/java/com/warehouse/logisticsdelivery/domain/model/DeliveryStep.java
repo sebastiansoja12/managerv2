@@ -2,6 +2,7 @@ package com.warehouse.logisticsdelivery.domain.model;
 
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.*;
+import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryCommentCode;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryStepOutcome;
 import com.warehouse.logisticsdelivery.domain.exception.DeliveryModificationException;
 import com.warehouse.logisticsdelivery.domain.vo.DeliveryStepSnapshot;
@@ -22,6 +23,7 @@ public class DeliveryStep {
 	private DepartmentId departmentId;
 	private VehicleId vehicleId;
 	private String comment;
+	private DeliveryCommentCode commentCode;
 	private String failureReason;
 	private String token;
 	private int deliveryStep;
@@ -30,7 +32,8 @@ public class DeliveryStep {
 						final DeliveryStepOutcome outcome, final DeliveryStatus deliveryStatus,
 			final SignatureId signatureId, final UserId userId, final SupplierId supplierId,
 			final DepartmentId departmentId, final VehicleId vehicleId,
-			final String comment, final String failureReason, final String token, final int deliveryStep) {
+			final String comment, final DeliveryCommentCode commentCode, final String failureReason, final String token,
+			final int deliveryStep) {
 
 		this.id = id;
 		this.deliveryId = deliveryId;
@@ -43,6 +46,7 @@ public class DeliveryStep {
 		this.departmentId = departmentId;
 		this.vehicleId = vehicleId;
 		this.comment = comment;
+		this.commentCode = commentCode;
 		this.failureReason = failureReason;
 		this.token = token;
 		this.deliveryStep = deliveryStep;
@@ -53,7 +57,8 @@ public class DeliveryStep {
 						final DeliveryStepOutcome outcome, final DeliveryStatus deliveryStatus,
 						final SignatureId signatureId, final UserId userId, final SupplierId supplierId,
 						final DepartmentId departmentId, final VehicleId vehicleId,
-						final String comment, final String failureReason, final String token, final int deliverySteps) {
+						final String comment, final DeliveryCommentCode commentCode, final String failureReason,
+						final String token, final int deliverySteps) {
 
 		this.id = id;
 		this.deliveryId = deliveryId;
@@ -66,6 +71,7 @@ public class DeliveryStep {
 		this.departmentId = departmentId;
 		this.vehicleId = vehicleId;
 		this.comment = comment;
+		this.commentCode = commentCode;
 		this.failureReason = failureReason;
 		this.token = token;
 		this.deliveryStep = deliverySteps + 1;
@@ -75,7 +81,7 @@ public class DeliveryStep {
 			final SignatureId signatureId, final String comment, final UserId userId) {
 
 		return new DeliveryStep(DeliveryStepId.generate(), deliveryId, createdAt, DeliveryStepOutcome.IN_PROGRESS,
-				DeliveryStatus.DEPOT, signatureId, userId, null, null, null, comment, null, null, 0);
+				DeliveryStatus.DEPOT, signatureId, userId, null, null, null, comment, null, null, null, 0);
 	}
 
 	public static DeliveryStep attempt(final DeliveryId deliveryId, final DeliveryStatus deliveryStatus, final UserId userId,
@@ -86,7 +92,16 @@ public class DeliveryStep {
 		final String failureReason = outcome == DeliveryStepOutcome.FAILED ? comment : null;
 
 		return new DeliveryStep(DeliveryStepId.generate(), deliveryId, LocalDateTime.now(), outcome, deliveryStatus,
-				null, userId, supplierId, departmentId, vehicleId, comment, failureReason, token, deliverySteps);
+				null, userId, supplierId, departmentId, vehicleId, comment, null, failureReason, token, deliverySteps);
+	}
+
+	public static DeliveryStep attempt(final DeliveryId deliveryId, final DeliveryStatus deliveryStatus, final UserId userId,
+			final SupplierId supplierId, final DepartmentId departmentId, final VehicleId vehicleId,
+			final DeliveryCommentCode commentCode, final int deliverySteps) {
+
+		return new DeliveryStep(DeliveryStepId.generate(), deliveryId, LocalDateTime.now(), outcome(deliveryStatus),
+				deliveryStatus, null, userId, supplierId, departmentId, vehicleId, null, commentCode, null, null,
+				deliverySteps);
 	}
 
 	private static DeliveryStepOutcome outcome(final DeliveryStatus deliveryStatus) {
@@ -108,7 +123,7 @@ public class DeliveryStep {
 		final DeliveryStepOutcome outcome = outcome(DeliveryStatus.DELIVERED);
 		return new DeliveryStep(DeliveryStepId.generate(), deliveryId, LocalDateTime.now(), outcome,
 				DeliveryStatus.DELIVERED, null, userId,
-				supplierId, departmentId, null, null, null, null,
+				supplierId, departmentId, null, null, null, null, null,
 				deliverySteps);
 	}
 
@@ -155,7 +170,7 @@ public class DeliveryStep {
 
 	public DeliveryStepSnapshot snapshot() {
 		return new DeliveryStepSnapshot(id, deliveryId, deliveryStep, attemptedAt, outcome, deliveryStatus, signatureId,
-				userId, supplierId, departmentId, vehicleId, comment, failureReason, token);
+				userId, supplierId, departmentId, vehicleId, comment, commentCode, failureReason, token);
 	}
 
 	public DeliveryStepId id() {
@@ -200,6 +215,10 @@ public class DeliveryStep {
 
 	public String comment() {
 		return comment;
+	}
+
+	public DeliveryCommentCode commentCode() {
+		return commentCode;
 	}
 
 	public String failureReason() {

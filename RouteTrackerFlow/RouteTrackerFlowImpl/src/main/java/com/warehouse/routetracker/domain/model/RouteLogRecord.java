@@ -137,7 +137,7 @@ public class RouteLogRecord {
         return switch (shipmentStatus) {
             case PLANNED, CREATED, PREPARED, ACCEPTED -> ProcessType.CREATED;
             case REROUTE -> ProcessType.REROUTE;
-            case SENT, DELIVERY -> ProcessType.ROUTE;
+            case COLLECTED, SENT, DELIVERY -> ProcessType.ROUTE;
             case RETURN -> ProcessType.RETURN;
             case REDIRECT -> ProcessType.REDIRECT;
             case CANCELED -> ProcessType.CANCELED;

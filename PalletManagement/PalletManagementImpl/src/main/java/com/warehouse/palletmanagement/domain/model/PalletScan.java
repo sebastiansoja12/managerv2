@@ -54,7 +54,7 @@ public class PalletScan {
 
     public PalletLoadedSnapshot loadedSnapshot() {
         return new PalletLoadedSnapshot(this.pallet.palletId(), this.pallet.trackingNumber(),
-                this.pallet.shipmentIds());
+                this.pallet.shipmentIds(), this.pallet.originDepartmentId(), this.pallet.destinationDepartmentId());
     }
 
     private PalletScanErrorCode map(final PalletLoadBlockReason reason) {

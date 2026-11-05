@@ -96,8 +96,11 @@ public class DevicePairServiceImpl implements DevicePairService {
     }
 
     @Override
-    public void markSeen(final DevicePair devicePair) {
-        devicePair.markSeen(Instant.now());
+    public void recordHeartbeat(final DevicePair devicePair) {
+        final Instant now = Instant.now();
+        devicePair.markSeen(now);
+        // A device in use keeps its operator signed in; the session ends after this long without heartbeats.
+        devicePair.extendOperatorSession(now, now.plus(operatorSessionValidity));
         this.devicePairRepository.update(devicePair);
     }
 

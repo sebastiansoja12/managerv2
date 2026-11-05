@@ -1,6 +1,9 @@
 package com.warehouse.process.infrastructure.adapter.primary;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -11,8 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import com.warehouse.auth.CurrentOperatorService;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
 import com.warehouse.process.domain.port.primary.ProcessPort;
+import com.warehouse.process.domain.port.secondary.UserServicePort;
 import com.warehouse.process.domain.vo.ShipmentUpdated;
 import com.warehouse.process.infrastructure.adapter.primary.mapper.ProcessLogResponseMapper;
 import com.warehouse.process.infrastructure.adapter.primary.mapper.RequestMapper;
@@ -29,24 +34,33 @@ public class ProcessLogController {
 
     private final CurrentOperatorService currentOperatorService;
 
+    private final UserServicePort userServicePort;
+
     public ProcessLogController(final ProcessPort processPort,
-                                final CurrentOperatorService currentOperatorService) {
+                                final CurrentOperatorService currentOperatorService,
+                                final UserServicePort userServicePort) {
         this.processPort = processPort;
         this.currentOperatorService = currentOperatorService;
+        this.userServicePort = userServicePort;
+    }
+
+    private Function<UserId, String> usernames() {
+        final Map<UserId, String> cache = new HashMap<>();
+        return userId -> cache.computeIfAbsent(userId, userServicePort::getUsername);
     }
 
     @GetMapping
     @Operation(summary = "Find process logs for current department")
     public ResponseEntity<?> findAllForCurrentDepartment(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable) {
-        return ResponseEntity.ok(ProcessLogResponseMapper.map(processPort.findAllForCurrentDepartment(pageable)));
+        return ResponseEntity.ok(ProcessLogResponseMapper.map(processPort.findAllForCurrentDepartment(pageable), usernames()));
     }
 
     @GetMapping("/{processId}")
     @Operation(summary = "Find process log by process id for current department")
     public ResponseEntity<?> findByIdForCurrentDepartment(@PathVariable final String processId) {
         final ProcessId id = new ProcessId(UUID.fromString(processId));
-        return ResponseEntity.ok(ProcessLogResponseMapper.map(processPort.findByIdForCurrentDepartment(id)));
+        return ResponseEntity.ok(ProcessLogResponseMapper.map(processPort.findByIdForCurrentDepartment(id), usernames()));
     }
 
     @PostMapping

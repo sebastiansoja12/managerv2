@@ -1,7 +1,7 @@
 package com.warehouse.palletmanagement.infrastructure.adapter.secondary;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.auth.infrastructure.dto.CurrentUserAuthenticationDto;
@@ -57,6 +57,7 @@ class PalletHandlingManagerServiceClientAdapterTest {
               "loadBlockReason": null,
               "grossWeight": {"value": 120.5, "unit": "KG"},
               "maxGrossWeight": null,
+              "refrigerated": false,
               "created": "2026-10-17T10:00:00Z",
               "modified": "2026-10-17T10:05:00Z"
             }
@@ -87,7 +88,7 @@ class PalletHandlingManagerServiceClientAdapterTest {
         final CurrentUserApiService currentUserApiService = mock(CurrentUserApiService.class);
         when(currentUserApiService.getCurrentUserAuthentication())
                 .thenReturn(new CurrentUserAuthenticationDto("user-jwt", null));
-        final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        final ObjectMapper objectMapper = JsonMapper.builder().configureForJackson2().build();
         this.adapter = new PalletHandlingManagerServiceClientAdapter(restClientBuilder, BASE_URL,
                 new CircuitBreakerExecutor(this.circuitBreakerRegistry), readRetry, currentUserApiService,
                 objectMapper, new PalletHandlingManagerResponseMapper());

@@ -2,10 +2,13 @@ package com.warehouse.auth.domain.service;
 
 import org.springframework.stereotype.Service;
 
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.port.secondary.DepartmentServicePort;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
+
+import java.util.Optional;
 
 @Service("user.departmentService")
 public class DepartmentService {
@@ -30,5 +33,13 @@ public class DepartmentService {
 
     public DepartmentCode getDepartmentCode(final DepartmentId departmentId) {
         return departmentServicePort.getDepartmentCode(departmentId);
+    }
+
+    public Optional<DepartmentId> findActingDepartmentId(final OrganizationUser user,
+                                                         final Optional<DepartmentCode> requestedDepartmentCode) {
+        return requestedDepartmentCode
+                .filter(departmentCode -> user.canActOnBehalfOfAnyDepartment())
+                .filter(this::existsByDepartmentCode)
+                .map(this::getDepartmentId);
     }
 }

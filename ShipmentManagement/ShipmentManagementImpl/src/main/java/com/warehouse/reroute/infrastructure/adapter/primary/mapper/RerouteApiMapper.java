@@ -1,6 +1,5 @@
 package com.warehouse.reroute.infrastructure.adapter.primary.mapper;
 
-import java.util.Locale;
 
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.reroute.application.port.primary.command.RerouteShipmentCommand;
@@ -76,7 +75,7 @@ public class RerouteApiMapper {
                 party.city().trim(),
                 party.postalCode().trim(),
                 party.street().trim(),
-                party.countryCode().trim().toUpperCase(Locale.ROOT));
+                null);
     }
 
     private ReroutePartyApi map(final RerouteParty party) {

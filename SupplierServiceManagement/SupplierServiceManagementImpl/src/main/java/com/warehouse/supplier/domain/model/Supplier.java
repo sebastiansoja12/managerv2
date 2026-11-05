@@ -354,6 +354,9 @@ public class Supplier {
         if (this.driverLicense != null) {
             changeStatus(SupplierStatus.SUSPENDED);
             this.driverLicense = null;
+            this.deliveryArea = null;
+            this.vehicleId = null;
+            this.apiKey = null;
         }
     }
 

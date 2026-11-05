@@ -1,7 +1,7 @@
 package com.warehouse.supplierconfiguration.infrastructure.adapter.primary;
 
 import com.warehouse.auth.AccessUserControl;
-import com.warehouse.commonassets.enumeration.UserPermission;
+import com.warehouse.commonassets.enumeration.AccountLevel;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.supplierconfiguration.application.exception.SupplierConfigurationAccessDeniedException;
 import com.warehouse.supplierconfiguration.application.exception.SupplierConfigurationConflictException;
@@ -80,8 +80,7 @@ public class SupplierConfigurationController {
     }
 
     @GetMapping("/suppliers/{supplierCode}/configuration")
-    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_READ, UserPermission.ROLE_MANAGER_READ,
-            UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
+    @AccessUserControl(minimumLevel = AccountLevel.ADMIN)
     public ResponseEntity<SupplierConfigurationApiResponse> getSupplierConfiguration(
             @PathVariable final String supplierCode) {
         return ResponseEntity.ok(SupplierConfigurationWebMapper.map(
@@ -89,7 +88,7 @@ public class SupplierConfigurationController {
     }
 
     @PutMapping("/suppliers/{supplierCode}/configuration")
-    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
+    @AccessUserControl(minimumLevel = AccountLevel.ADMIN)
     public ResponseEntity<SupplierConfigurationApiResponse> updateSupplierConfiguration(
             @PathVariable final String supplierCode,
             @RequestBody final SupplierConfigurationUpdateApiRequest updateRequest) {
@@ -98,7 +97,7 @@ public class SupplierConfigurationController {
     }
 
     @PostMapping("/suppliers/{supplierCode}/configuration/reset")
-    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
+    @AccessUserControl(minimumLevel = AccountLevel.ADMIN)
     public ResponseEntity<SupplierConfigurationApiResponse> resetSupplierConfiguration(
             @PathVariable final String supplierCode,
             @RequestBody final SupplierConfigurationResetApiRequest resetRequest) {
@@ -107,8 +106,7 @@ public class SupplierConfigurationController {
     }
 
     @GetMapping("/suppliers/{supplierCode}/configuration/history")
-    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_READ, UserPermission.ROLE_MANAGER_READ,
-            UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
+    @AccessUserControl(minimumLevel = AccountLevel.ADMIN)
     public ResponseEntity<List<SupplierConfigurationRevisionApi>> getSupplierConfigurationHistory(
             @PathVariable final String supplierCode) {
         return ResponseEntity.ok(this.supplierConfigurationPort.getHistory(managedSupplier(supplierCode))
@@ -118,8 +116,7 @@ public class SupplierConfigurationController {
     }
 
     @GetMapping("/suppliers/{supplierCode}/configuration/substitute-candidates")
-    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_READ, UserPermission.ROLE_MANAGER_READ,
-            UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
+    @AccessUserControl(minimumLevel = AccountLevel.ADMIN)
     public ResponseEntity<List<SubstituteSupplierApi>> getSupplierSubstituteCandidates(
             @PathVariable final String supplierCode) {
         return ResponseEntity.ok(this.supplierConfigurationPort.getSubstituteCandidates(managedSupplier(supplierCode))
@@ -134,7 +131,7 @@ public class SupplierConfigurationController {
     }
 
     @PutMapping("/supplier-configuration-policy")
-    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE})
+    @AccessUserControl(minimumLevel = AccountLevel.SUPERADMIN)
     public ResponseEntity<SupplierConfigurationPolicyApi> updatePolicy(
             @RequestBody final SupplierConfigurationPolicyUpdateApiRequest policyUpdateRequest) {
         return ResponseEntity.ok(SupplierConfigurationWebMapper.map(

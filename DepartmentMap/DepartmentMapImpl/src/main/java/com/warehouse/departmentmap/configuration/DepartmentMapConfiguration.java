@@ -8,6 +8,7 @@ import com.warehouse.departmentmap.application.port.primary.DepartmentMapPortImp
 import com.warehouse.departmentmap.application.port.primary.PalletLocationPort;
 import com.warehouse.departmentmap.application.port.primary.PalletLocationPortImpl;
 import com.warehouse.departmentmap.application.port.secondary.CurrentUserServicePort;
+import com.warehouse.departmentmap.application.port.secondary.DeliveryNetworkServicePort;
 import com.warehouse.departmentmap.application.port.secondary.DepartmentMapRepository;
 import com.warehouse.departmentmap.application.port.secondary.DepartmentServicePort;
 import com.warehouse.departmentmap.application.port.secondary.PalletMovementRepository;
@@ -15,6 +16,7 @@ import com.warehouse.departmentmap.application.port.secondary.StorageLocationRep
 import com.warehouse.departmentmap.domain.service.StorageLocationSynchronizer;
 import com.warehouse.departmentmap.infrastructure.adapter.primary.PalletLocationApiServiceAdapter;
 import com.warehouse.departmentmap.infrastructure.adapter.secondary.CurrentUserServiceAdapter;
+import com.warehouse.departmentmap.infrastructure.adapter.secondary.DeliveryNetworkServiceAdapter;
 import com.warehouse.departmentmap.infrastructure.adapter.secondary.DepartmentMapRepositoryImpl;
 import com.warehouse.departmentmap.infrastructure.adapter.secondary.DepartmentServiceAdapter;
 import com.warehouse.departmentmap.infrastructure.adapter.secondary.PalletMovementRepositoryImpl;
@@ -23,6 +25,7 @@ import com.warehouse.departmentmap.infrastructure.adapter.secondary.StorageLocat
 import com.warehouse.departmentmap.infrastructure.adapter.secondary.entity.DepartmentMapEntity;
 import com.warehouse.departmentmap.infrastructure.adapter.secondary.entity.PalletMovementEntity;
 import com.warehouse.departmentmap.infrastructure.adapter.secondary.entity.StorageLocationEntity;
+import com.warehouse.deliverynetwork.api.DeliveryNetworkApiService;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -82,6 +85,13 @@ public class DepartmentMapConfiguration {
     }
 
     @Bean
+    public DeliveryNetworkServicePort departmentMapDeliveryNetworkServicePort(
+            final DeliveryNetworkApiService deliveryNetworkApiService,
+            final DepartmentApiService departmentApiService) {
+        return new DeliveryNetworkServiceAdapter(deliveryNetworkApiService, departmentApiService);
+    }
+
+    @Bean
     public CurrentUserServicePort departmentMapCurrentUserServicePort(
             final OperatorContextProvider operatorContextProvider) {
         return new CurrentUserServiceAdapter(operatorContextProvider);
@@ -91,10 +101,11 @@ public class DepartmentMapConfiguration {
     public DepartmentMapPort departmentMapPort(final DepartmentMapRepository departmentMapRepository,
                                                final StorageLocationRepository departmentMapStorageLocationRepository,
                                                final DepartmentServicePort departmentMapDepartmentServicePort,
-                                               final CurrentUserServicePort departmentMapCurrentUserServicePort) {
+                                               final CurrentUserServicePort departmentMapCurrentUserServicePort,
+                                               final DeliveryNetworkServicePort departmentMapDeliveryNetworkServicePort) {
         return new DepartmentMapPortImpl(departmentMapRepository, departmentMapStorageLocationRepository,
                 departmentMapDepartmentServicePort, departmentMapCurrentUserServicePort,
-                new StorageLocationSynchronizer());
+                departmentMapDeliveryNetworkServicePort, new StorageLocationSynchronizer());
     }
 
     @Bean

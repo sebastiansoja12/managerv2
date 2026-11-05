@@ -164,6 +164,22 @@ public class PalletStorageController {
                 .toList());
     }
 
+    @PutMapping("/{palletId}/revert-loading")
+    public ResponseEntity<PalletApi> revertLoading(
+            @AuthenticationPrincipal final UserContext userContext,
+            @PathVariable final String palletId) {
+        final Pallet pallet = this.palletPort.revertLoading(new PalletId(palletId), userContext.operatorId());
+        return ResponseEntity.ok(PalletApiMapper.map(pallet));
+    }
+
+    @PutMapping("/{palletId}/unload")
+    public ResponseEntity<PalletApi> unload(
+            @AuthenticationPrincipal final UserContext userContext,
+            @PathVariable final String palletId) {
+        final Pallet pallet = this.palletPort.unload(new PalletId(palletId), userContext.operatorId());
+        return ResponseEntity.ok(PalletApiMapper.map(pallet));
+    }
+
     @PutMapping("/{palletId}/cancel")
     public ResponseEntity<PalletApi> cancelPallet(
             @AuthenticationPrincipal final UserContext userContext,

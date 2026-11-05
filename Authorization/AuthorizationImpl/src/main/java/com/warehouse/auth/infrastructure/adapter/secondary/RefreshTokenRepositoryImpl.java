@@ -48,6 +48,11 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
     }
 
     @Override
+    public void expireAt(final String refreshToken, final LocalDateTime expiryDate) {
+        repository.shortenExpiry(hash(refreshToken), expiryDate);
+    }
+
+    @Override
     public void delete(final LocalDateTime time) {
         repository.deleteAllExpiredSince(time);
     }

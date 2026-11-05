@@ -7,12 +7,15 @@ import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.organisationstructure.department.domain.enumeration.DepartmentType;
 import com.warehouse.organisationstructure.department.domain.event.DepartmentTypeChanged;
+import com.warehouse.organisationstructure.department.domain.exception.DepartmentStatusChangeForbiddenException;
 import com.warehouse.organisationstructure.department.domain.exception.ForbiddenDepartmentTypeException;
 import com.warehouse.organisationstructure.department.domain.exception.WrongUserAssignedException;
 import com.warehouse.organisationstructure.department.domain.registry.DomainRegistry;
 import com.warehouse.organisationstructure.department.domain.vo.Address;
 import com.warehouse.organisationstructure.department.domain.vo.Coordinates;
 import com.warehouse.organisationstructure.department.domain.vo.DepartmentSnapshot;
+import com.warehouse.organisationstructure.department.domain.vo.DepartmentStatusChange;
+import com.warehouse.organisationstructure.department.domain.vo.DepartmentStatusPolicy;
 import com.warehouse.organisationstructure.department.domain.vo.TaxId;
 import org.apache.commons.lang3.Validate;
 
@@ -50,6 +53,10 @@ public class Department extends BelongsToOperator {
 
     private UserId lastModifiedBy;
 
+    private String statusChangeReason;
+
+    private Instant statusChangedAt;
+
     public Department() {
     }
 
@@ -68,7 +75,9 @@ public class Department extends BelongsToOperator {
             final Instant updatedAt,
             final UserId adminUserId,
             final UserId createdBy,
-            final UserId lastModifiedBy
+            final UserId lastModifiedBy,
+            final String statusChangeReason,
+            final Instant statusChangedAt
     ) {
         this.departmentId = departmentId;
         this.address = address;
@@ -85,6 +94,8 @@ public class Department extends BelongsToOperator {
         this.adminUserId = adminUserId;
         this.createdBy = createdBy;
         this.lastModifiedBy = lastModifiedBy;
+        this.statusChangeReason = statusChangeReason;
+        this.statusChangedAt = statusChangedAt;
     }
 
     public Department(
@@ -171,7 +182,7 @@ public class Department extends BelongsToOperator {
     public DepartmentSnapshot snapshot() {
 		return new DepartmentSnapshot(departmentId, departmentCode, address, taxId, telephoneNumber, openingHours, email,
 				departmentType, status, coordinates, operatorId(), createdAt, updatedAt, adminUserId, createdBy,
-				lastModifiedBy);
+				lastModifiedBy, statusChangeReason, statusChangedAt);
     }
 
     public void changeCoordinates(final Coordinates coordinates) {
@@ -337,45 +348,58 @@ public class Department extends BelongsToOperator {
         markAsModified();
     }
 
-    public void activate(final UserId modifiedBy) {
-        if (this.status == Status.DELETED) {
-            throw new IllegalStateException("Department cannot be activated because it is deleted");
+    public void changeStatus(final Status targetStatus, final DepartmentStatusChange change) {
+        if (this.status == Status.DELETED && targetStatus != Status.DELETED) {
+            throw new DepartmentStatusChangeForbiddenException(
+                    "Department " + departmentCode.getValue() + " cannot change status because it is deleted");
         }
-        this.status = Status.ACTIVE;
-        this.lastModifiedBy = modifiedBy;
+        if (targetStatus == Status.ACTIVE) {
+            if (!change.activationBlockers().isEmpty()) {
+                throw new DepartmentStatusChangeForbiddenException("Department " + departmentCode.getValue()
+                        + " cannot be activated: " + String.join("; ", change.activationBlockers()));
+            }
+        } else {
+            final DepartmentStatusPolicy policy = change.policy();
+            if (targetStatus == Status.ARCHIVED && policy.archivingPrevented()) {
+                throw new DepartmentStatusChangeForbiddenException("Department " + departmentCode.getValue()
+                        + " cannot be archived because archiving is disabled");
+            }
+            if (targetStatus == Status.DELETED && policy.deletionPrevented()) {
+                throw new DepartmentStatusChangeForbiddenException("Department " + departmentCode.getValue()
+                        + " cannot be deleted because deletion is disabled");
+            }
+            if (policy.statusChangeReasonRequired() && change.reason() == null) {
+                throw new DepartmentStatusChangeForbiddenException("Department " + departmentCode.getValue()
+                        + " status change to " + targetStatus + " requires a reason");
+            }
+            if (policy.deactivationWithActiveWorkBlocked() && !change.activeWork().isEmpty()) {
+                throw new DepartmentStatusChangeForbiddenException("Department " + departmentCode.getValue()
+                        + " has active work: " + String.join("; ", change.activeWork()));
+            }
+        }
+        this.status = targetStatus;
+        if (targetStatus == Status.DELETED) {
+            this.adminUserId = null;
+        }
+        this.statusChangeReason = change.reason();
+        this.statusChangedAt = Instant.now();
+        this.lastModifiedBy = change.modifiedBy();
         markAsModified();
     }
 
-    public void deactivate(final UserId modifiedBy) {
-        this.status = Status.INACTIVE;
-        this.lastModifiedBy = modifiedBy;
-        markAsModified();
+
+    public boolean isActive() {
+        return this.status == Status.ACTIVE;
     }
 
-    public void markAsArchived() {
-        this.status = Status.ARCHIVED;
-        this.lastModifiedBy = DomainRegistry.authenticationService().currentUser();
-        markAsModified();
+    public String getStatusChangeReason() {
+        return statusChangeReason;
     }
 
-    public void markAsDeleted() {
-        this.status = Status.DELETED;
-        this.adminUserId = null;
-        this.lastModifiedBy = DomainRegistry.authenticationService().currentUser();
-        markAsModified();
+    public Instant getStatusChangedAt() {
+        return statusChangedAt;
     }
 
-    public void markAsSuspended() {
-        this.status = Status.SUSPENDED;
-        this.lastModifiedBy = DomainRegistry.authenticationService().currentUser();
-        markAsModified();
-    }
-
-    public void markAsActive() {
-        this.status = Status.ACTIVE;
-        this.lastModifiedBy = DomainRegistry.authenticationService().currentUser();
-        markAsModified();
-    }
 
     public void changeDepartmentType(final DepartmentType departmentType) {
         if (this.departmentType == DepartmentType.HEADQUARTERS) {

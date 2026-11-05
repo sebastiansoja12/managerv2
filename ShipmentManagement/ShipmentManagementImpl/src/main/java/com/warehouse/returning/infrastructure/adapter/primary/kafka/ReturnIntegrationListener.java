@@ -8,7 +8,10 @@ import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.returning.api.event.ReturnPackageStatusChangedIntegrationEvent;
 import com.warehouse.returning.api.event.ReturnProcessingStartedIntegrationEvent;
 import com.warehouse.returning.api.event.ReturnCancelledIntegrationEvent;
+import com.warehouse.returning.api.event.ReturnCompletedIntegrationEvent;
+import com.warehouse.returning.api.event.ReturnLifecycleIntegrationEvent;
 import com.warehouse.returning.application.port.primary.command.ApplyReturnCancelledCommand;
+import com.warehouse.returning.application.port.primary.command.ApplyReturnCompletedCommand;
 import com.warehouse.returning.application.port.primary.ReturnProcessingPort;
 import com.warehouse.returning.application.port.primary.command.ApplyReturnProcessingStartedCommand;
 import org.springframework.stereotype.Component;
@@ -31,7 +34,8 @@ public class ReturnIntegrationListener {
             groupId = "shipment-management")
     public void handle(final ReturnProcessingStartedIntegrationEvent event) {
         returnProcessingPort.applyProcessingStarted(new ApplyReturnProcessingStartedCommand(
-                event.eventId(), new ShipmentId(event.shipmentId().value()), event.returnPackageId(),
+                event.eventId(), new ShipmentId(event.shipmentId().value()), returnShipmentId(event),
+                event.returnPackageId(),
                 new DepartmentId(event.departmentId().value()), new OperatorId(event.operatorId().value()),
                 event.userId() == null ? null : new UserId(event.userId().value())));
     }
@@ -40,8 +44,23 @@ public class ReturnIntegrationListener {
             groupId = "shipment-management")
     public void handle(final ReturnCancelledIntegrationEvent event) {
         returnProcessingPort.applyCancelled(new ApplyReturnCancelledCommand(
-                event.eventId(), new ShipmentId(event.shipmentId().value()), event.returnPackageId(),
+                event.eventId(), new ShipmentId(event.shipmentId().value()), returnShipmentId(event),
+                event.returnPackageId(),
                 new DepartmentId(event.departmentId().value()), new OperatorId(event.operatorId().value()),
                 event.userId() == null ? null : new UserId(event.userId().value())));
+    }
+
+    @KafkaEventListener(topics = "${manager.kafka.topics.return-completed:return.completed}",
+            groupId = "shipment-management")
+    public void handle(final ReturnCompletedIntegrationEvent event) {
+        returnProcessingPort.applyCompleted(new ApplyReturnCompletedCommand(
+                event.eventId(), new ShipmentId(event.shipmentId().value()), returnShipmentId(event),
+                event.returnPackageId(),
+                new DepartmentId(event.departmentId().value()), new OperatorId(event.operatorId().value()),
+                event.userId() == null ? null : new UserId(event.userId().value())));
+    }
+
+    private ShipmentId returnShipmentId(final ReturnLifecycleIntegrationEvent event) {
+        return event.returnShipmentId() == null ? null : new ShipmentId(event.returnShipmentId().value());
     }
 }

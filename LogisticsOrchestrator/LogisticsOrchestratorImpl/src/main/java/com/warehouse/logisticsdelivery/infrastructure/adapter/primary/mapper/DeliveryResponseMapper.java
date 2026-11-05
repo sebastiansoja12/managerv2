@@ -2,13 +2,16 @@ package com.warehouse.logisticsdelivery.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.logisticsdelivery.application.port.primary.result.DeliveryHistoryEntry;
 import com.warehouse.logisticsdelivery.application.port.primary.result.DeliveryRelation;
+import com.warehouse.logisticsdelivery.domain.model.Signature;
 import com.warehouse.logisticsdelivery.domain.vo.DeliverySnapshot;
 import com.warehouse.logisticsdelivery.domain.vo.DeliveryStepSnapshot;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.api.DeliveryHistoryEntryResponseDto;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.api.DeliveryRelationResponseDto;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.api.DeliveryResponseDto;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.api.DeliveryStepResponseDto;
+import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.api.SignatureResponseDto;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class DeliveryResponseMapper {
@@ -72,6 +75,12 @@ public class DeliveryResponseMapper {
                 entry.signatureRequired(), entry.instructions(), entry.plannedAt(), entry.stepCount());
     }
 
+    public SignatureResponseDto map(final Signature signature) {
+        return new SignatureResponseDto(String.valueOf(signature.getSignatureId().getValue()), signature.getSignerName(),
+                signature.getSignedAt(), signature.getSignatureMethod().name(), signature.getDocumentReference(),
+                new String(signature.getSignature(), StandardCharsets.UTF_8));
+    }
+
     public DeliveryStepResponseDto map(final DeliveryStepSnapshot step) {
         return new DeliveryStepResponseDto(step.stepNumber(), step.attemptedAt(), step.outcome().name(),
                 step.deliveryStatus() == null ? null : step.deliveryStatus().name(),
@@ -80,6 +89,6 @@ public class DeliveryResponseMapper {
                 step.supplierId() == null ? null : String.valueOf(step.supplierId().value()),
                 step.vehicleId() == null ? null : String.valueOf(step.vehicleId().value()),
                 step.signatureId() == null ? null : String.valueOf(step.signatureId().getValue()),
-                step.comment(), step.failureReason());
+                step.comment(), step.commentCode() == null ? null : step.commentCode().name(), step.failureReason());
     }
 }

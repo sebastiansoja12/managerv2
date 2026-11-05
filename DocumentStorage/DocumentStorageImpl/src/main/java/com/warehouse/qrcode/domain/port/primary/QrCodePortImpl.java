@@ -1,36 +1,48 @@
 package com.warehouse.qrcode.domain.port.primary;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-import com.warehouse.qrcode.domain.service.ShipmentExportService;
+import com.warehouse.qrcode.domain.model.Shipment;
+import com.warehouse.qrcode.domain.port.secondary.LabelConfigurationServicePort;
+import com.warehouse.qrcode.domain.port.secondary.ShipmentServicePort;
+import com.warehouse.qrcode.domain.service.ShipmentLabelGenerator;
+import com.warehouse.qrcode.domain.service.ShipmentLabelGeneratorFactory;
 import com.warehouse.qrcode.domain.vo.ShipmentId;
 
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@AllArgsConstructor
 @Slf4j
 public class QrCodePortImpl implements QrCodePort {
 
-    private final ShipmentExportService shipmentExportService;
+    private static final DateTimeFormatter FILE_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
-    private final DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+    private final ShipmentServicePort shipmentServicePort;
 
-    private final String headerKey = "Content-Disposition";
+    private final LabelConfigurationServicePort labelConfigurationServicePort;
 
-    private final String headerValue = "attachment; filename=%s";
+    private final ShipmentLabelGeneratorFactory shipmentLabelGeneratorFactory;
 
+    public QrCodePortImpl(final ShipmentServicePort shipmentServicePort,
+                          final LabelConfigurationServicePort labelConfigurationServicePort,
+                          final ShipmentLabelGeneratorFactory shipmentLabelGeneratorFactory) {
+        this.shipmentServicePort = shipmentServicePort;
+        this.labelConfigurationServicePort = labelConfigurationServicePort;
+        this.shipmentLabelGeneratorFactory = shipmentLabelGeneratorFactory;
+    }
 
     @Override
     public void exportShipment(final HttpServletResponse response, final ShipmentId shipmentId) throws Exception {
         log.info("Request label generate has been recorded for shipment: {}", shipmentId.getValue());
-        response.setContentType("application/pdf");
-        final String currentDateTime = dateFormatter.format(new java.util.Date());
-        final String fileName = shipmentId.getValue() + "_" + currentDateTime + ".pdf";
-        response.setHeader(headerKey, String.format(headerValue, fileName));
-        shipmentExportService.exportToPdf(response, shipmentId);
-        log.info("Label has been successfully generated with name: {}", fileName);
+        final ShipmentLabelGenerator generator =
+                shipmentLabelGeneratorFactory.forFormat(labelConfigurationServicePort.currentLabelFormat());
+        final Shipment shipment = shipmentServicePort.find(shipmentId);
+        final String fileName = shipmentId.getValue() + "_" + LocalDateTime.now().format(FILE_DATE_FORMATTER)
+                + "." + generator.fileExtension();
+        response.setContentType(generator.contentType());
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+        generator.generate(response.getOutputStream(), shipment);
+        log.info("Label {} has been successfully generated with name: {}", generator.format(), fileName);
     }
 }

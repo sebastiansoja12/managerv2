@@ -2,12 +2,12 @@ package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResponse;
 import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
+import com.warehouse.shipment.application.port.primary.result.ShipmentPageResult;
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.model.Money;
-import com.warehouse.shipment.domain.model.Signature;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import org.mapstruct.Mapper;
@@ -30,11 +30,6 @@ public interface ShipmentResponseMapper {
     }
 
     default ShipmentDto map(final ShipmentSnapshot shipment) {
-        return map(shipment, null);
-    }
-
-    default ShipmentDto map(final ShipmentSnapshot shipment,
-                            final com.warehouse.shipment.domain.model.Signature signature) {
         if (shipment == null) {
             return null;
         }
@@ -50,7 +45,6 @@ public interface ShipmentResponseMapper {
                 shipment.trackingNumber() == null ? null : new TrackingNumberDto(shipment.trackingNumber().value()),
                 map(shipment.price()),
                 shipment.locked(),
-                map(signature),
                 shipment.createdAt(),
                 shipment.updatedAt(),
                 map(shipment.dimensions()),
@@ -66,7 +60,33 @@ public interface ShipmentResponseMapper {
     }
 
     default ShipmentDto map(final ShipmentResult shipmentResult) {
-        return map(shipmentResult.snapshot(), shipmentResult.signature());
+        final ShipmentDto shipment = map(shipmentResult.snapshot());
+        if (shipment == null || shipmentResult.deliveryDetails() == null) {
+            return shipment;
+        }
+        return new ShipmentDto(shipment.getShipmentId(), shipment.getSender(), shipment.getRecipient(),
+                shipment.getShipmentStatus(), shipment.getShipmentRelatedId(), shipment.getShipmentPriority(),
+                shipment.getTrackingNumber(), shipment.getPrice(), shipment.getLocked(), shipment.getCreatedAt(),
+                shipment.getUpdatedAt(), shipment.getDimensions(), shipment.getWeight(),
+                shipment.getCustomerReference(), shipment.getContentDescription(), shipment.getDeclaredValue(),
+                shipment.getPackagingType(), shipment.getServiceLevel(), map(shipmentResult.deliveryDetails()));
+    }
+
+    default ShipmentDeliveryApi map(final ShipmentDeliveryDetails deliveryDetails) {
+        return new ShipmentDeliveryApi(
+                DepartmentIdDto.from(deliveryDetails.originDepartmentId()),
+                DepartmentIdDto.from(deliveryDetails.destinationDepartmentId()),
+                deliveryDetails.plannedDeliveryAt(),
+                deliveryDetails.deliveredAt());
+    }
+
+    default ShipmentPageDto map(final ShipmentPageResult shipmentPage) {
+        return new ShipmentPageDto(
+                shipmentPage.content().stream().map(this::map).toList(),
+                shipmentPage.page(),
+                shipmentPage.size(),
+                shipmentPage.totalElements(),
+                shipmentPage.totalPages());
     }
 
     default PersonApi map(final Party person) {
@@ -91,19 +111,11 @@ public interface ShipmentResponseMapper {
     default ShipmentRouteLogResponseApi mapShipmentRouteLog(final ShipmentRouteLog shipmentRouteLog,
                                                             @Context final DepartmentServicePort departmentServicePort) {
         return new ShipmentRouteLogResponseApi(map(shipmentRouteLog.shipment()), shipmentRouteLog.routeLog(),
-                shipmentRouteLog.returnPackage());
+                shipmentRouteLog.returnPackage(), shipmentRouteLog.returnPackageUnavailable());
     }
 
     default List<String> map(String value) {
         return List.of(value);
-    }
-
-    default SignatureDto map(final Signature signature) {
-        if (signature == null) {
-            return null;
-        }
-        return new SignatureDto(signature.getSignerName(), signature.getSignedAt(), signature.getSignatureMethod().name(),
-                map(signature.getSignature()));
     }
 
     default String map(final byte[] bytes) {

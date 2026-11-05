@@ -7,6 +7,7 @@ import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.PalletTrackingNumber;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.departmentmap.application.port.secondary.CurrentUserServicePort;
+import com.warehouse.departmentmap.application.port.secondary.DeliveryNetworkServicePort;
 import com.warehouse.departmentmap.application.port.secondary.DepartmentMapRepository;
 import com.warehouse.departmentmap.application.port.secondary.DepartmentServicePort;
 import com.warehouse.departmentmap.application.port.secondary.PalletMovementRepository;
@@ -14,6 +15,7 @@ import com.warehouse.departmentmap.application.port.secondary.StorageLocationRep
 import com.warehouse.departmentmap.domain.model.DepartmentMap;
 import com.warehouse.departmentmap.domain.model.PalletMovement;
 import com.warehouse.departmentmap.domain.model.StorageLocation;
+import com.warehouse.departmentmap.domain.vo.DepartmentDirection;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -25,7 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public class InMemoryDepartmentMapStore implements DepartmentMapRepository, StorageLocationRepository,
-        PalletMovementRepository, DepartmentServicePort, CurrentUserServicePort {
+        PalletMovementRepository, DepartmentServicePort, CurrentUserServicePort, DeliveryNetworkServicePort {
 
     private final Map<DepartmentMapId, DepartmentMap> maps = new LinkedHashMap<>();
     private final Map<MapElementId, StorageLocation> locations = new LinkedHashMap<>();
@@ -124,6 +126,11 @@ public class InMemoryDepartmentMapStore implements DepartmentMapRepository, Stor
     @Override
     public boolean departmentExists(final DepartmentId departmentId) {
         return departments.contains(departmentId);
+    }
+
+    @Override
+    public List<DepartmentDirection> findDirections(final DepartmentId departmentId) {
+        return DepartmentMapFixture.DIRECTIONS;
     }
 
     @Override

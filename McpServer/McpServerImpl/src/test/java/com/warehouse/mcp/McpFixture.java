@@ -8,11 +8,14 @@ import java.util.stream.IntStream;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.mcp.domain.vo.CurrentUserProfile;
+import com.warehouse.mcp.domain.vo.DepartmentEntry;
 import com.warehouse.mcp.domain.vo.DeviceAccess;
 import com.warehouse.mcp.domain.vo.ShipmentEvent;
 import com.warehouse.mcp.domain.vo.ShipmentParty;
@@ -32,7 +35,7 @@ public final class McpFixture {
 
     public static ShipmentParty recipient() {
         return new ShipmentParty("Jan", "Nowak", "jan.nowak@example.com", "+48 600 123 789", "Katowice", "40-001",
-                "PL");
+                "Mariacka 1", "PL");
     }
 
     public static ShipmentTracking shipmentTracking(final int eventCount) {
@@ -43,6 +46,11 @@ public final class McpFixture {
         return new ShipmentTracking(new ShipmentId(1L), "TRK-001", ShipmentStatus.SENT,
                 LocalDateTime.of(2026, 10, 20, 7, 0), LocalDateTime.of(2026, 10, 21, 9, 0),
                 recipient(), recipient(), events);
+    }
+
+    public static DepartmentEntry department(final String departmentCode, final String type, final String status) {
+        return new DepartmentEntry(new DepartmentId((long) departmentCode.hashCode()), new DepartmentCode(departmentCode),
+                type, status);
     }
 
     public static DeviceAccess device(final String deviceId, final String status, final String departmentCode) {

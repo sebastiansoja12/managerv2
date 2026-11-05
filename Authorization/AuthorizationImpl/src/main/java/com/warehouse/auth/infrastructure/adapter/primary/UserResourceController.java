@@ -57,7 +57,7 @@ public class UserResourceController {
 
     @GetMapping
     public ResponseEntity<List<UserDto>> findAllUsers() {
-        return ResponseEntity.ok(userPort.findAll()
+        return ResponseEntity.ok(userPort.findAllInCurrentDepartment()
                 .stream()
                 .map(this::map)
                 .toList());
@@ -74,7 +74,7 @@ public class UserResourceController {
 
     @GetMapping("/{username}")
     public ResponseEntity<?> findUserByUsername(@PathVariable final String username) {
-        final OrganizationUser user = userPort.findUser(username);
+        final OrganizationUser user = userPort.findUserInCurrentDepartment(username);
         return new ResponseEntity<>(map(user), HttpStatus.OK);
     }
 
@@ -84,6 +84,13 @@ public class UserResourceController {
                                               @Valid @RequestBody final UpdateUserApiRequest request) {
         final UpdateUserCommand command = UserRequestMapper.toCommand(new UserId(id), request);
         return ResponseEntity.ok(map(userPort.update(command)));
+    }
+
+    @DeleteMapping("/{id}")
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_DELETE})
+    public ResponseEntity<Void> deleteUser(@PathVariable final Long id) {
+        this.userPort.delete(new UserId(id));
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/roles/{id}")

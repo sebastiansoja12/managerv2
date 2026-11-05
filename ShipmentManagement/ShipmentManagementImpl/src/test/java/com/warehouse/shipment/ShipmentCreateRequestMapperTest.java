@@ -7,8 +7,8 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.enumeration.Currency;
 import com.warehouse.shipment.application.port.primary.command.ShipmentCreateCommand;
@@ -62,7 +62,7 @@ class ShipmentCreateRequestMapperTest {
     }
 
     @Test
-    void shouldDeserializeCreateRequestWithPeopleAndServiceOptions() throws JsonProcessingException {
+    void shouldDeserializeCreateRequestWithPeopleAndServiceOptions() throws JacksonException {
         final String json = """
                 {
                   "sender": {
@@ -80,7 +80,7 @@ class ShipmentCreateRequestMapperTest {
                 }
                 """;
 
-        final ShipmentCreateRequestApi request = new ObjectMapper().readValue(json, ShipmentCreateRequestApi.class);
+        final ShipmentCreateRequestApi request = JsonMapper.builder().configureForJackson2().build().readValue(json, ShipmentCreateRequestApi.class);
 
         assertThat(request.sender().firstName()).isEqualTo("Jan");
         assertThat(request.sender().countryCode().name()).isEqualTo("PL");

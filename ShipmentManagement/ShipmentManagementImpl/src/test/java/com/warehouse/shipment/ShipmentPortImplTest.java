@@ -22,7 +22,6 @@ import com.warehouse.shipment.application.service.status.*;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
 import com.warehouse.shipment.domain.enumeration.PickupMethod;
-import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
@@ -32,12 +31,16 @@ import com.warehouse.commonassets.event.domain.model.DomainEvent;
 import com.warehouse.shipment.domain.vo.ShipmentDeliveryPlan;
 import com.warehouse.shipment.domain.vo.Dimensions;
 import com.warehouse.shipment.domain.vo.LengthUnit;
-import com.warehouse.shipment.domain.vo.VoronoiResponse;
 import com.warehouse.shipment.domain.vo.Weight;
 import com.warehouse.shipment.domain.vo.WeightUnit;
 import com.warehouse.shipment.domain.vo.conf.OperatorShipmentConfiguration;
 import com.warehouse.shipment.domain.vo.conf.ShipmentLimits;
 import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
+import com.warehouse.shipment.domain.vo.conf.TrackingNumberDateFormat;
+import com.warehouse.shipment.domain.vo.conf.TrackingNumberPrefixMode;
+import com.warehouse.shipment.domain.vo.conf.TrackingNumberRule;
+import com.warehouse.shipment.domain.vo.conf.TrackingNumberSource;
+import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ShipmentNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,7 +52,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -62,9 +64,6 @@ import static org.mockito.Mockito.*;
 class ShipmentPortImplTest {
 
     @Mock
-    private PathFinderServicePort pathFinderServicePort;
-
-    @Mock
     private RouteLogService routeLogService;
 
     @Mock
@@ -75,6 +74,9 @@ class ShipmentPortImplTest {
 
     @Mock
     private MailNotificationServicePort mailNotificationServicePort;
+
+    @Mock
+    private OperatorServicePort operatorServicePort;
 
 
     @Mock
@@ -93,9 +95,6 @@ class ShipmentPortImplTest {
     private DepartmentCountryAvailabilityService departmentCountryAvailabilityService;
 
     @Mock
-    private SignatureService signatureService;
-
-    @Mock
     private Logger logger;
 
     @Mock
@@ -106,6 +105,9 @@ class ShipmentPortImplTest {
 
     @Mock
     private PickupPointServicePort pickupPointServicePort;
+
+    @Mock
+    private PostalCodeServicePort postalCodeServicePort;
 
     private final AddressValidationService addressValidationService = new AddressValidationService();
 
@@ -130,14 +132,16 @@ class ShipmentPortImplTest {
 		final ShipmentResultFactory shipmentResultFactory = new ShipmentResultFactory(
 				departmentServicePort, routeLogService, returningServicePort);
 		final ShipmentDepartmentResolutionService shipmentDepartmentResolutionService =
-				new ShipmentDepartmentResolutionService(pickupPointServicePort, departmentServicePort,
-						pathFinderServicePort, operatorContextProvider);
+				new ShipmentDepartmentResolutionService(pickupPointServicePort, operatorContextProvider);
 		shipmentPort = new ShipmentPortImpl(shipmentRepository,
-				this.logger, pathFinderServicePort, this.departmentCountryAvailabilityService,
-				this.signatureService, shipmentResultFactory, mailNotificationServicePort,
+				this.logger, this.departmentCountryAvailabilityService,
+				shipmentResultFactory, mailNotificationServicePort,
                 this.trackingNumberGenerationService, this.shipmentConfigurationPort,
                 shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
-                this.domainEventPublisher, departmentServicePort, shipmentDepartmentResolutionService, addressValidationService);
+                this.domainEventPublisher, shipmentDepartmentResolutionService, addressValidationService,
+                this.postalCodeServicePort, operatorServicePort);
+        lenient().when(this.postalCodeServicePort.findCountryCode("00-000", "test"))
+                .thenReturn(Optional.of(CountryCode.PL), Optional.of(CountryCode.DE));
 	}
 
     @Test
@@ -150,10 +154,6 @@ class ShipmentPortImplTest {
         when(this.shipmentConfigurationPort.getCurrentOperatorShipmentConfiguration()).thenReturn(configuration);
         when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.PL)).thenReturn(true);
         when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.DE)).thenReturn(true);
-        when(this.pathFinderServicePort.determineDeliveryDepartment(any()))
-                .thenReturn(Result.success(new VoronoiResponse(new DepartmentCode("KT2"))));
-        when(this.departmentServicePort.getDepartmentId(new DepartmentCode("KT2")))
-                .thenReturn(new DepartmentId(12L));
         when(this.operatorContextProvider.currentDepartmentId()).thenReturn(new DepartmentId(9L));
         when(this.trackingNumberGenerationService.generate(eq(configuration.workflowSettings()),
                 eq(configuration.trackingNumberRule()), any(ShipmentId.class)))
@@ -166,7 +166,7 @@ class ShipmentPortImplTest {
         assertEquals(trackingNumber.value(), response.getSuccess().trackingNumber());
         verify(this.shipmentRepository).createOrUpdate(shipmentCaptor.capture());
         final ShipmentDeliveryPlan deliveryPlan = publishedDeliveryPlan();
-        assertEquals(new DepartmentId(12L), deliveryPlan.destinationDepartmentId());
+        assertNull(deliveryPlan.destinationDepartmentId());
         assertEquals(new DepartmentId(9L), deliveryPlan.originDepartmentId());
         assertEquals(PickupMethod.DEPARTMENT, deliveryPlan.pickupMethod());
         assertEquals(DeliveryMethod.COURIER, deliveryPlan.deliveryMethod());
@@ -178,6 +178,31 @@ class ShipmentPortImplTest {
         verifyNoInteractions(pickupPointServicePort);
     }
 
+    @Test
+    void shouldShipExternalWithTemporaryTrackingNumberAndUnknownOrigin() {
+        final ShipmentCreateCommand request = shipmentCreateCommand();
+        request.setSource(ShipmentSource.EXTERNAL);
+        final OperatorShipmentConfiguration defaults = permissiveConfiguration();
+        final OperatorShipmentConfiguration configuration = new OperatorShipmentConfiguration(
+                defaults.validationRules(), defaults.labelSettings(), defaults.limits(), defaults.workflowSettings(),
+                new TrackingNumberRule(TrackingNumberPrefixMode.DEPARTMENT_CODE, null, "-",
+                        TrackingNumberSource.SEQUENCE, 8, true, TrackingNumberDateFormat.YYYYMMDD, true),
+                defaults.notificationSettings());
+        final TrackingNumber temporary = new TrackingNumber("tmp-1");
+        when(this.shipmentConfigurationPort.getCurrentOperatorShipmentConfiguration()).thenReturn(configuration);
+        when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.PL)).thenReturn(true);
+        when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.DE)).thenReturn(true);
+        when(this.trackingNumberGenerationService.temporary()).thenReturn(temporary);
+
+        final Result<ShipmentCreateResponse, ErrorCode> response = shipmentPort.ship(request);
+
+        assertTrue(response.isSuccess());
+        assertEquals(temporary.value(), response.getSuccess().trackingNumber());
+        assertNull(publishedDeliveryPlan().originDepartmentId());
+        verify(this.trackingNumberGenerationService, never()).generate(any(), any(), any());
+        verify(this.operatorContextProvider, never()).currentDepartmentId();
+    }
+
     @ParameterizedTest
     @EnumSource(value = PickupMethod.class, names = {"LOCKER", "PICKUP_POINT"})
     void shouldCreatePlannedPickupPointShipmentWithDeliveryDepartment(
@@ -187,14 +212,9 @@ class ShipmentPortImplTest {
         final PickupPointId pickupPointId = new PickupPointId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
         request.setPickupPointId(pickupPointId);
         final OperatorShipmentConfiguration configuration = permissiveConfiguration();
-        final DepartmentCode destination = new DepartmentCode("KT2");
-        final DepartmentId targetDepartmentId = new DepartmentId(10L);
         when(this.shipmentConfigurationPort.getCurrentOperatorShipmentConfiguration()).thenReturn(configuration);
         when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.PL)).thenReturn(true);
         when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.DE)).thenReturn(true);
-        when(this.pathFinderServicePort.determineDeliveryDepartment(any()))
-                .thenReturn(Result.success(new VoronoiResponse(destination)));
-        when(this.departmentServicePort.getDepartmentId(destination)).thenReturn(targetDepartmentId);
         when(this.pickupPointServicePort.findDepartmentId(pickupPointId))
                 .thenReturn(Optional.of(new DepartmentId(11L)));
         when(this.trackingNumberGenerationService.generate(eq(configuration.workflowSettings()),
@@ -210,7 +230,7 @@ class ShipmentPortImplTest {
         final ShipmentDeliveryPlan deliveryPlan = publishedDeliveryPlan();
         assertEquals(pickupMethod, deliveryPlan.pickupMethod());
         assertEquals(DeliveryMethod.COURIER, deliveryPlan.deliveryMethod());
-        assertEquals(targetDepartmentId, deliveryPlan.destinationDepartmentId());
+        assertNull(deliveryPlan.destinationDepartmentId());
         assertEquals(new DepartmentId(11L), deliveryPlan.originDepartmentId());
         assertEquals(pickupPointId, deliveryPlan.pickupPointId());
         verify(this.operatorContextProvider, never()).currentDepartmentId();
@@ -225,13 +245,9 @@ class ShipmentPortImplTest {
         final PickupPointId pickupPointId = PickupPointId.generate();
         request.setPickupPointId(pickupPointId);
         final OperatorShipmentConfiguration configuration = permissiveConfiguration();
-        final DepartmentCode destination = new DepartmentCode("KT2");
         when(this.shipmentConfigurationPort.getCurrentOperatorShipmentConfiguration()).thenReturn(configuration);
         when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.PL)).thenReturn(true);
         when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.DE)).thenReturn(true);
-        when(this.pathFinderServicePort.determineDeliveryDepartment(any()))
-                .thenReturn(Result.success(new VoronoiResponse(destination)));
-        when(this.departmentServicePort.getDepartmentId(destination)).thenReturn(new DepartmentId(10L));
         when(this.pickupPointServicePort.findDepartmentId(pickupPointId)).thenReturn(Optional.empty());
 
         final Result<ShipmentCreateResponse, ErrorCode> result = shipmentPort.ship(request);
@@ -269,7 +285,7 @@ class ShipmentPortImplTest {
         final ShipmentDeliveryPlan deliveryPlan = publishedDeliveryPlan();
         assertEquals(new DepartmentId(12L), deliveryPlan.destinationDepartmentId());
         assertEquals(deliveryPickupPointId, deliveryPlan.deliveryPickupPointId());
-        verifyNoInteractions(this.pathFinderServicePort, this.departmentServicePort);
+        verifyNoInteractions(this.departmentServicePort);
     }
 
     @Test
@@ -524,6 +540,19 @@ class ShipmentPortImplTest {
     }
 
     @Test
+    void shouldRejectShipmentWhenSenderPostalCodeIsUnknown() {
+        when(this.shipmentConfigurationPort.getCurrentOperatorShipmentConfiguration())
+                .thenReturn(permissiveConfiguration());
+        when(this.postalCodeServicePort.findCountryCode("00-000", "test")).thenReturn(Optional.empty());
+
+        final Result<ShipmentCreateResponse, ErrorCode> result = this.shipmentPort.ship(shipmentCreateCommand());
+
+        assertTrue(result.isFailure());
+        assertEquals(ErrorCode.SENDER_POSTAL_CODE_NOT_FOUND, result.getFailure());
+        verify(this.shipmentRepository, never()).createOrUpdate(any());
+    }
+
+    @Test
     void shouldRejectShipmentWhenOriginCountryIsUnavailable() {
         when(this.shipmentConfigurationPort.getCurrentOperatorShipmentConfiguration())
                 .thenReturn(permissiveConfiguration());
@@ -532,7 +561,6 @@ class ShipmentPortImplTest {
 
         assertTrue(result.isFailure());
         assertEquals(ErrorCode.ORIGIN_DEPARTMENT_NOT_AVAILABLE, result.getFailure());
-        verifyNoInteractions(this.pathFinderServicePort);
         verify(this.shipmentRepository, never()).createOrUpdate(any());
     }
 
@@ -546,62 +574,18 @@ class ShipmentPortImplTest {
 
         assertTrue(result.isFailure());
         assertEquals(ErrorCode.DESTINATION_DEPARTMENT_NOT_AVAILABLE, result.getFailure());
-        verifyNoInteractions(this.pathFinderServicePort);
-    }
-
-    @ParameterizedTest
-    @EnumSource(PickupMethod.class)
-    void shouldRejectShipmentWhenPathFinderCannotDetermineDestination(final PickupMethod pickupMethod) {
-        final ShipmentCreateCommand request = shipmentCreateCommand();
-        request.setPickupMethod(pickupMethod);
-        when(this.shipmentConfigurationPort.getCurrentOperatorShipmentConfiguration())
-                .thenReturn(permissiveConfiguration());
-        when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.PL)).thenReturn(true);
-        when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.DE)).thenReturn(true);
-        when(this.pathFinderServicePort.determineDeliveryDepartment(any()))
-                .thenReturn(Result.failure(ErrorCode.DESTINATION_DEPARTMENT_NOT_AVAILABLE));
-
-        final Result<ShipmentCreateResponse, ErrorCode> result = this.shipmentPort.ship(request);
-
-        assertTrue(result.isFailure());
-        assertEquals(ErrorCode.DESTINATION_DEPARTMENT_NOT_AVAILABLE, result.getFailure());
-        verify(this.shipmentRepository, never()).createOrUpdate(any());
     }
 
     @Test
     void shouldRejectStandardShipmentWithoutSendingDepartment() {
         final OperatorShipmentConfiguration configuration = permissiveConfiguration();
-        final DepartmentCode destination = new DepartmentCode("KT2");
         when(this.shipmentConfigurationPort.getCurrentOperatorShipmentConfiguration()).thenReturn(configuration);
         when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.PL)).thenReturn(true);
         when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.DE)).thenReturn(true);
-        when(this.pathFinderServicePort.determineDeliveryDepartment(any()))
-                .thenReturn(Result.success(new VoronoiResponse(destination)));
-        when(this.departmentServicePort.getDepartmentId(destination)).thenReturn(new DepartmentId(10L));
         when(this.operatorContextProvider.currentDepartmentId())
                 .thenThrow(new IllegalStateException("Department context is required"));
 
         assertThrows(IllegalStateException.class, () -> this.shipmentPort.ship(shipmentCreateCommand()));
-        verify(this.shipmentRepository, never()).createOrUpdate(any());
-    }
-
-    @ParameterizedTest
-    @EnumSource(PickupMethod.class)
-    void shouldRejectShipmentWithoutDeliveryDepartment(final PickupMethod pickupMethod) {
-        final ShipmentCreateCommand request = shipmentCreateCommand();
-        request.setPickupMethod(pickupMethod);
-        final OperatorShipmentConfiguration configuration = permissiveConfiguration();
-        final DepartmentCode destination = new DepartmentCode("KT2");
-        when(this.shipmentConfigurationPort.getCurrentOperatorShipmentConfiguration()).thenReturn(configuration);
-        when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.PL)).thenReturn(true);
-        when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.DE)).thenReturn(true);
-        when(this.pathFinderServicePort.determineDeliveryDepartment(any()))
-                .thenReturn(Result.success(new VoronoiResponse(destination)));
-
-        final Result<ShipmentCreateResponse, ErrorCode> result = this.shipmentPort.ship(request);
-
-        assertTrue(result.isFailure());
-        assertEquals(ErrorCode.DESTINATION_DEPARTMENT_NOT_AVAILABLE, result.getFailure());
         verify(this.shipmentRepository, never()).createOrUpdate(any());
     }
 
@@ -636,7 +620,7 @@ class ShipmentPortImplTest {
     }
 
     @Test
-    void shouldChangeRecipientWithoutReroutingWhenCityIsUnchanged() {
+    void shouldChangeRecipientWithoutDestinationChangeWhenAddressIsUnchanged() {
         final Shipment shipment = shipment();
         final com.warehouse.shipment.domain.vo.Party newRecipient = recipient();
         when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
@@ -644,61 +628,38 @@ class ShipmentPortImplTest {
         this.shipmentPort.changeRecipientTo(shipmentId(), newRecipient);
 
         assertSame(newRecipient, shipment.getRecipient());
-        verifyNoInteractions(this.pathFinderServicePort);
         verify(this.shipmentRepository).createOrUpdate(shipment);
-    }
-
-    @Test
-    void shouldRerouteShipmentWhenRecipientCityChanges() {
-        final Shipment shipment = shipment();
-        final DepartmentCode newDestination = new DepartmentCode("PO2");
-        final com.warehouse.shipment.domain.vo.Party newRecipient =
-                com.warehouse.shipment.domain.vo.Party.builder().firstName("Jan").city("Poznan").build();
-        when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
-        when(this.pathFinderServicePort.determineDeliveryDepartment(any()))
-                .thenReturn(Result.success(new VoronoiResponse(newDestination)));
-        when(this.departmentServicePort.getDepartmentId(newDestination)).thenReturn(new DepartmentId(12L));
-
-        this.shipmentPort.changeRecipientTo(shipmentId(), newRecipient);
-
-        assertSame(newRecipient, shipment.getRecipient());
-        assertEquals(new DepartmentId(12L), publishedDestinationDepartmentId());
-        verify(this.shipmentRepository).createOrUpdate(shipment);
-    }
-
-    @Test
-    void shouldKeepCurrentDestinationWhenRecipientReroutingFails() {
-        final Shipment shipment = shipment();
-        final com.warehouse.shipment.domain.vo.Party newRecipient =
-                com.warehouse.shipment.domain.vo.Party.builder().firstName("Jan").city("Poznan").build();
-        when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
-        when(this.pathFinderServicePort.determineDeliveryDepartment(any()))
-                .thenReturn(Result.failure(ErrorCode.DESTINATION_DEPARTMENT_NOT_AVAILABLE));
-
-        this.shipmentPort.changeRecipientTo(shipmentId(), newRecipient);
-
-        assertSame(newRecipient, shipment.getRecipient());
+        verify(this.domainEventPublisher).publish(any(ShipmentRecipientChanged.class));
         verify(this.domainEventPublisher, never()).publish(any(ShipmentDestinationChanged.class));
-        verify(this.logger).warn(anyString(), same(newRecipient));
     }
 
     @Test
-    void shouldCreateSignatureFromRequest() {
-        final com.warehouse.shipment.application.port.primary.command.SignatureChangeRequest request =
-                new com.warehouse.shipment.application.port.primary.command.SignatureChangeRequest(
-                        shipmentId(), "signed", "Jan", "DOC-1");
-        final ArgumentCaptor<com.warehouse.shipment.domain.model.Signature> signatureCaptor =
-                ArgumentCaptor.forClass(com.warehouse.shipment.domain.model.Signature.class);
+    void shouldPublishDestinationChangeWithNewRecipientWhenRecipientCityChanges() {
+        final Shipment shipment = shipment();
+        final com.warehouse.shipment.domain.vo.Party newRecipient =
+                com.warehouse.shipment.domain.vo.Party.builder().firstName("Jan").city("Poznan").build();
+        when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
 
-        this.shipmentPort.changeShipmentSignatureTo(request, SignatureMethod.DIGITAL);
+        this.shipmentPort.changeRecipientTo(shipmentId(), newRecipient);
 
-        verify(this.signatureService).createSignature(signatureCaptor.capture());
-        assertEquals(shipmentId(), signatureCaptor.getValue().getShipmentId());
-        assertEquals("Jan", signatureCaptor.getValue().getSignerName());
-        assertEquals("DOC-1", signatureCaptor.getValue().getDocumentReference());
-        assertEquals(SignatureMethod.DIGITAL, signatureCaptor.getValue().getSignatureMethod());
-        assertArrayEquals("signed".getBytes(StandardCharsets.UTF_8),
-                signatureCaptor.getValue().getSignature());
+        assertSame(newRecipient, shipment.getRecipient());
+        verify(this.shipmentRepository).createOrUpdate(shipment);
+        assertEquals("Poznan", publishedEvent(ShipmentDestinationChanged.class).getSnapshot().recipient().getCity());
+    }
+
+    @Test
+    void shouldPublishDestinationChangeWhenRecipientStreetChangesWithinCity() {
+        final Shipment shipment = shipment();
+        final com.warehouse.shipment.domain.vo.Party current = shipment.getRecipient();
+        final com.warehouse.shipment.domain.vo.Party newRecipient = com.warehouse.shipment.domain.vo.Party.builder()
+                .firstName("Jan").city(current.getCity()).postalCode(current.getPostalCode())
+                .street(current.getStreet() + " 2").build();
+        when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
+
+        this.shipmentPort.changeRecipientTo(shipmentId(), newRecipient);
+
+        assertEquals(newRecipient.getStreet(),
+                publishedEvent(ShipmentDestinationChanged.class).getSnapshot().recipient().getStreet());
     }
 
     @Test
@@ -781,19 +742,6 @@ class ShipmentPortImplTest {
     }
 
     @Test
-    void shouldChangeDestinationAndPublishEvent() {
-        final Shipment shipment = shipment();
-        final DepartmentCode destination = new DepartmentCode("LU2");
-        when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
-        when(this.departmentServicePort.getDepartmentId(destination)).thenReturn(new DepartmentId(12L));
-
-        this.shipmentPort.changeDestination(shipmentId(), destination);
-
-        assertEquals(new DepartmentId(12L), publishedDestinationDepartmentId());
-        verify(this.shipmentRepository, never()).createOrUpdate(any());
-    }
-
-    @Test
     void shouldPublishCreatedEventWithoutRouteWhenReturningShipmentToSender() {
         final ShipmentId returnedShipmentId = new ShipmentId(2L);
         final Shipment shipment = DataTestCreator.shipment(returnedShipmentId, false);
@@ -812,6 +760,25 @@ class ShipmentPortImplTest {
     }
 
     @Test
+    void shouldCreatePlannedReturnShipmentDraftAndPublishCreatedEvent() {
+        final Shipment shipment = DataTestCreator.shipment(null, false);
+        shipment.markAsDelivered();
+        final OperatorShipmentConfiguration configuration = permissiveConfiguration();
+        when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
+        when(this.shipmentConfigurationPort.getCurrentOperatorShipmentConfiguration()).thenReturn(configuration);
+        when(this.trackingNumberGenerationService.generate(eq(configuration.workflowSettings()),
+                eq(configuration.trackingNumberRule()), any(ShipmentId.class)))
+                .thenReturn(new TrackingNumber("MGR-RETURN-DRAFT"));
+
+        final ShipmentId draftShipmentId = this.shipmentPort.createReturnShipmentDraft(shipmentId());
+
+        final ShipmentCreated created = publishedEvent(ShipmentCreated.class);
+        assertEquals(draftShipmentId, created.getSnapshot().shipmentId());
+        assertEquals(ShipmentStatus.PLANNED, created.getSnapshot().shipmentStatus());
+        verify(this.shipmentRepository).createOrUpdate(shipment);
+    }
+
+    @Test
     void shouldFindSourceShipmentByRelatedShipmentId() {
         final ShipmentId returnedShipmentId = new ShipmentId(2L);
         final Shipment sourceShipment = DataTestCreator.shipment(returnedShipmentId, false);
@@ -825,10 +792,6 @@ class ShipmentPortImplTest {
 
     private ShipmentDeliveryPlan publishedDeliveryPlan() {
         return publishedEvent(ShipmentCreated.class).getDeliveryPlan().orElseThrow();
-    }
-
-    private DepartmentId publishedDestinationDepartmentId() {
-        return publishedEvent(ShipmentDestinationChanged.class).getDestinationDepartmentId();
     }
 
     private <T extends DomainEvent> T publishedEvent(final Class<T> eventType) {
@@ -877,7 +840,7 @@ class ShipmentPortImplTest {
 
     private ReturnDetailsDto returnDetails(final ReturnId returnId) {
         return new ReturnDetailsDto(new LongValueDto(returnId.getId()), new LongValueDto(shipmentId().getValue()),
-                "Damaged package", com.warehouse.commonassets.enumeration.ReturnStatus.CREATED,
+                null, null, null, "Damaged package", com.warehouse.commonassets.enumeration.ReturnStatus.CREATED,
                 new StringValueDto("TOKEN"), new DepartmentId(1L), new DepartmentId(1L),
                 new StringValueDto("KT1"), new StringValueDto("KT1"), new LongValueDto(1L), new LongValueDto(2L),
                 new StringValueDto("DAMAGED"), new OperatorId(77L), null, null);

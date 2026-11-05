@@ -70,7 +70,7 @@ Korzeń agregatu: `PickupPoint`. Nie zawiera kolekcji przesyłek ani oddziałowy
 | `status` | `ACTIVE` / `SUSPENDED` / `CLOSED` | Cykl życia punktu. |
 | `capabilities` | niepusty zbiór `DROP_OFF`, `COLLECTION` | Nadanie przez nadawcę / odbiór przez odbiorcę. |
 | `address` | `PickupPointAddress` | Kraj, kod pocztowy, miasto, ulica, numer budynku, opcjonalny lokal. |
-| `coordinates` | `GeoCoordinates` | Szerokość i długość wyznaczane przez backend z adresu za pomocą PathFinder. |
+| `coordinatesOfGivenLocation` | `GeoCoordinates` | Szerokość i długość wyznaczane przez backend z adresu za pomocą PathFinder. |
 | `departmentId` | `DepartmentId` | Aktywny oddział obsługujący. |
 | `contact` | opcjonalny `PickupPointContact` | Telefon i e-mail punktu. |
 | `accessInstructions` | opcjonalny tekst, do 1000 znaków | Np. wejście od parkingu, lokalizacja automatu. |
@@ -196,7 +196,7 @@ Hibernate przez `@Version` encji persystencji. Identyczny zapis nie publikuje zm
 | `PUT /pickup-points/{id}/status` | `{status, reason}`; wykonuje dozwolone przejście i zwraca szczegóły. |
 
 Create przenosi pola konfiguracyjne z tabeli modelu; nie przyjmuje `id`, `operatorId`, współrzędnych,
-statusu ani znaczników audytu. Backend geokoduje adres przez `VoronoiCoordinatesService` z modułu PathFinder.
+statusu ani znaczników audytu. Backend geokoduje adres przez `GeocodingCoordinatesService` z modułu GeocodingService.
 Update nie przyjmuje kodu, właściciela, współrzędnych ani statusu; zmiana adresu uruchamia ponowne geokodowanie.
 UUID w ścieżce ma postać tekstową. Identyfikatory w JSON mają postać `{ "value": "..." }`.
 `DepartmentId` jest dziesiętnym stringiem w polu `value`, aby uniknąć utraty precyzji w JavaScript.

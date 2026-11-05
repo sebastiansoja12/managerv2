@@ -10,11 +10,24 @@ import com.warehouse.organisationstructure.department.api.dto.DepartmentDetailsD
 import com.warehouse.organisationstructure.department.api.dto.DepartmentDirectoryEntryDto;
 import com.warehouse.organisationstructure.department.api.dto.DepartmentDto;
 import com.warehouse.organisationstructure.department.domain.model.Department;
-import com.warehouse.organisationstructure.department.domain.port.primary.DepartmentPort;
+import com.warehouse.organisationstructure.department.application.port.primary.DepartmentPort;
 import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.mapper.RequestMapper;
 import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.mapper.ResponseMapper;
 
 import java.util.List;
+import java.util.Optional;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentAddressDto;
+import com.warehouse.organisationstructure.department.domain.enumeration.DepartmentType;
+import com.warehouse.organisationstructure.department.domain.vo.ChangeDepartmentStatusCommand;
+import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.api.dto.AddressApi;
+import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.api.dto.ChangeDepartmentEmailApiRequest;
+import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.api.dto.ChangeDepartmentStatusApi;
+import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.api.dto.DepartmentCodeApi;
+import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.api.dto.UpdateAddressApiRequest;
+import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.validator.ChangeDepartmentEmailApiRequestValidator;
+import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.validator.ChangeDepartmentStatusApiValidator;
+import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.validator.UpdateAddressApiRequestValidator;
+import com.warehouse.organisationstructure.department.domain.helper.Result;
 
 public class DepartmentServiceAdapter implements DepartmentApiService {
 
@@ -49,7 +62,12 @@ public class DepartmentServiceAdapter implements DepartmentApiService {
     @Override
     public DepartmentDto getDepartmentById(final DepartmentId departmentId) {
         final Department department = this.departmentPort.findByDepartmentId(departmentId);
-        return ResponseMapper.mapToDto(department);
+        return department == null ? null : ResponseMapper.mapToDto(department);
+    }
+
+    @Override
+    public Optional<DepartmentCode> findDepartmentCode(final DepartmentId departmentId) {
+        return this.departmentPort.findDepartmentCode(departmentId);
     }
 
     @Override
@@ -79,5 +97,44 @@ public class DepartmentServiceAdapter implements DepartmentApiService {
     public DepartmentCodeDto createDepartment(final CreateDepartmentApiRequest request) {
         this.departmentPort.createDepartments(RequestMapper.map(request));
         return request.departmentCode();
+    }
+
+    @Override
+    public void changeAddress(final DepartmentCode departmentCode, final DepartmentAddressDto address) {
+        final UpdateAddressApiRequest request = new UpdateAddressApiRequest(new DepartmentCodeApi(departmentCode.value()),
+                address == null ? null : new AddressApi(address.city(), address.street(), address.postalCode(),
+                        address.countryCode()));
+        requireValid(new UpdateAddressApiRequestValidator().validateBody(request));
+        this.departmentPort.changeAddress(RequestMapper.map(request));
+    }
+
+    @Override
+    public void changeDepartmentType(final DepartmentCode departmentCode, final String departmentType) {
+        this.departmentPort.changeDepartmentType(departmentCode, DepartmentType.valueOf(departmentType));
+    }
+
+    @Override
+    public void changeEmail(final DepartmentCode departmentCode, final String email) {
+        requireValid(new ChangeDepartmentEmailApiRequestValidator().validateBody(
+                new ChangeDepartmentEmailApiRequest(new DepartmentCodeApi(departmentCode.value()), email)));
+        this.departmentPort.changeEmail(departmentCode, email);
+    }
+
+    @Override
+    public void changeStatus(final DepartmentCode departmentCode, final String status, final String reason) {
+        requireValid(new ChangeDepartmentStatusApiValidator().validateBody(
+                new ChangeDepartmentStatusApi(new DepartmentCodeApi(departmentCode.value()), status, reason)));
+        this.departmentPort.changeStatus(new ChangeDepartmentStatusCommand(departmentCode, status, reason));
+    }
+
+    @Override
+    public void changeActive(final DepartmentCode departmentCode, final boolean active, final String reason) {
+        this.departmentPort.changeDepartmentActive(departmentCode, active, reason);
+    }
+
+    private void requireValid(final Result<Void, List<String>> result) {
+        if (result.isFailure()) {
+            throw new IllegalArgumentException(String.join(", ", result.getFailure()));
+        }
     }
 }

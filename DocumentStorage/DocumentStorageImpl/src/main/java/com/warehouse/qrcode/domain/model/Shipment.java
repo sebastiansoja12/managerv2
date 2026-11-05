@@ -1,47 +1,31 @@
 package com.warehouse.qrcode.domain.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.math.BigDecimal;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class Shipment {
+import com.warehouse.commonassets.enumeration.ShipmentPriority;
+import com.warehouse.commonassets.identificator.TrackingNumber;
+import com.warehouse.qrcode.domain.vo.LabelParty;
+import com.warehouse.qrcode.domain.vo.ParcelDimensions;
+import com.warehouse.qrcode.domain.vo.ShipmentId;
 
-    private Long id;
+public record Shipment(ShipmentId shipmentId,
+                       TrackingNumber trackingNumber,
+                       LabelParty sender,
+                       LabelParty recipient,
+                       BigDecimal weightInKilograms,
+                       ParcelDimensions dimensions,
+                       ShipmentPriority priority,
+                       String serviceLevel) {
 
-    private String trackingNumber;
+    public String trackingNumberValue() {
+        return trackingNumber == null ? null : trackingNumber.value();
+    }
 
-    private String firstName;
+    public String formattedWeight() {
+        return weightInKilograms == null ? null : weightInKilograms.stripTrailingZeros().toPlainString() + " kg";
+    }
 
-    private String lastName;
-
-    private String senderTelephone;
-
-    private String senderEmail;
-
-    private String senderCity;
-
-    private String senderStreet;
-
-    private String senderPostalCode;
-
-    private String recipientEmail;
-
-    private String recipientTelephone;
-
-    private String recipientFirstName;
-
-    private String recipientLastName;
-
-    private String recipientCity;
-
-    private String recipientStreet;
-
-    private String recipientPostalCode;
-
-    private String destination;
+    public String formattedDimensions() {
+        return dimensions == null ? null : dimensions.format();
+    }
 }

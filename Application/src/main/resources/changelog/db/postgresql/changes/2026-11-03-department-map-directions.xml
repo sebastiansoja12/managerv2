@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-03-postgresql-department-map-element-destination" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="department_map_elements"/>
+                <not>
+                    <columnExists tableName="department_map_elements" columnName="destination_department_code"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="department_map_elements">
+            <column name="destination_department_code" type="VARCHAR(40)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

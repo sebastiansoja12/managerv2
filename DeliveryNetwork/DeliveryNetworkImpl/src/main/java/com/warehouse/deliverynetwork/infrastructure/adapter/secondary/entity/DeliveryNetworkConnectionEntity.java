@@ -32,17 +32,22 @@ public class DeliveryNetworkConnectionEntity {
     @AttributeOverride(name = "value", column = @Column(name = "second_department_id", nullable = false))
     private DepartmentId secondDepartmentId;
 
+    @Column(name = "bidirectional", nullable = false)
+    private boolean bidirectional;
+
     protected DeliveryNetworkConnectionEntity() {
     }
 
     public DeliveryNetworkConnectionEntity(
             final DeliveryNetworkId deliveryNetworkId,
             final DepartmentId firstDepartmentId,
-            final DepartmentId secondDepartmentId) {
+            final DepartmentId secondDepartmentId,
+            final boolean bidirectional) {
         this.connectionId = DeliveryNetworkConnectionId.generate();
         this.deliveryNetworkId = deliveryNetworkId;
         this.firstDepartmentId = firstDepartmentId;
         this.secondDepartmentId = secondDepartmentId;
+        this.bidirectional = bidirectional;
     }
 
     public DeliveryNetworkConnectionId getConnectionId() {
@@ -61,6 +66,10 @@ public class DeliveryNetworkConnectionEntity {
         return this.secondDepartmentId;
     }
 
+    public boolean isBidirectional() {
+        return this.bidirectional;
+    }
+
     @Override
     public boolean equals(final Object object) {
         if (this == object) {
@@ -71,11 +80,12 @@ public class DeliveryNetworkConnectionEntity {
         }
         return Objects.equals(this.deliveryNetworkId, that.deliveryNetworkId)
                 && Objects.equals(this.firstDepartmentId, that.firstDepartmentId)
-                && Objects.equals(this.secondDepartmentId, that.secondDepartmentId);
+                && Objects.equals(this.secondDepartmentId, that.secondDepartmentId)
+                && this.bidirectional == that.bidirectional;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.deliveryNetworkId, this.firstDepartmentId, this.secondDepartmentId);
+        return Objects.hash(this.deliveryNetworkId, this.firstDepartmentId, this.secondDepartmentId, this.bidirectional);
     }
 }

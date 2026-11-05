@@ -33,7 +33,7 @@ class AsyncJobArchitectureTest {
                 .should().dependOnClassesThat().resideInAnyPackage(
                         ASYNC_JOB + ".infrastructure..", ASYNC_JOB + ".configuration..", ASYNC_JOB + ".api..",
                         "com.warehouse.shipment..", "com.warehouse.organisationstructure..",
-                        "com.warehouse.logisticsdelivery..", "jakarta.persistence..",
+                        "com.warehouse.logisticsdelivery..", "com.warehouse.pickuppoint..", "jakarta.persistence..",
                         "org.springframework.scheduling..")
                 .check(ASYNC_JOB_CLASSES);
     }

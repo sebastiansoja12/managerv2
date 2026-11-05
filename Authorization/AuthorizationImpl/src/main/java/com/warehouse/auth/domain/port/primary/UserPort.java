@@ -16,7 +16,11 @@ public interface UserPort {
 
     List<OrganizationUser> findAll();
 
+    List<OrganizationUser> findAllInCurrentDepartment();
+
     OrganizationUser findUser(String username);
+
+    OrganizationUser findUserInCurrentDepartment(final String username);
 
     OrganizationUser findUser(UserId userId);
 
@@ -43,4 +47,6 @@ public interface UserPort {
     DepartmentCode getDepartmentCode(final DepartmentId departmentId);
 
     void changeFullName(final FullNameChangeCommand fullNameChangeCommand);
+
+    void delete(final UserId userId);
 }

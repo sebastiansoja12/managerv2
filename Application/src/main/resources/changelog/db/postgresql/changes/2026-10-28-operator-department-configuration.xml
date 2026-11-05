@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-28-operator-department-configuration" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="operator_configurations"/>
+                <not>
+                    <columnExists tableName="operator_configurations" columnName="department_auto_assign_delivery_areas"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="operator_configurations">
+            <column name="department_auto_assign_delivery_areas" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_auto_connect" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_prevent_deletion" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_prevent_archiving" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2026-10-28-operator-department-configuration-aud" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="operator_configurations_aud"/>
+                <not>
+                    <columnExists tableName="operator_configurations_aud" columnName="department_auto_assign_delivery_areas"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="operator_configurations_aud">
+            <column name="department_auto_assign_delivery_areas" type="BOOLEAN"/>
+            <column name="department_auto_connect" type="BOOLEAN"/>
+            <column name="department_prevent_deletion" type="BOOLEAN"/>
+            <column name="department_prevent_archiving" type="BOOLEAN"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

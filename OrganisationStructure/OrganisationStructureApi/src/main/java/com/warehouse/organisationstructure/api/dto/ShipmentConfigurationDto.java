@@ -6,6 +6,21 @@ public record ShipmentConfigurationDto(
         ShipmentLimitsDto shipmentLimits,
         ShipmentWorkflowConfigurationDto workflowConfiguration,
         TrackingNumberRuleDto trackingNumberRule,
-        ShipmentNotificationConfigurationDto notificationConfiguration
+        ShipmentNotificationConfigurationDto notificationConfiguration,
+        ShipmentDeliveryConfigurationDto deliveryConfiguration,
+        ShipmentReturnConfigurationDto returnConfiguration,
+        ShipmentPaymentConfigurationDto paymentConfiguration,
+        ShipmentSlaConfigurationDto slaConfiguration,
+        ShipmentDataRetentionConfigurationDto dataRetentionConfiguration
 ) {
+
+    public ShipmentConfigurationDto(final ShipmentValidationConfigurationDto validationConfiguration,
+                                    final ShipmentLabelConfigurationDto labelConfiguration,
+                                    final ShipmentLimitsDto shipmentLimits,
+                                    final ShipmentWorkflowConfigurationDto workflowConfiguration,
+                                    final TrackingNumberRuleDto trackingNumberRule,
+                                    final ShipmentNotificationConfigurationDto notificationConfiguration) {
+        this(validationConfiguration, labelConfiguration, shipmentLimits, workflowConfiguration, trackingNumberRule,
+                notificationConfiguration, null, null, null, null, null);
+    }
 }

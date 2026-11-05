@@ -1,6 +1,7 @@
 package com.warehouse.returning.infrastructure.adapter.secondary;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.returning.application.port.secondary.ShipmentServicePort;
 import com.warehouse.returning.domain.model.ReturnableShipment;
 import com.warehouse.returning.infrastructure.adapter.secondary.mapper.ShipmentServiceMapper;
@@ -21,9 +22,25 @@ public class ShipmentServiceAdapter implements ShipmentServicePort {
     public ReturnableShipment getShipment(final ShipmentId shipmentId) {
         return mapper.map(shipmentApiService.getShipment(shipmentId));
     }
+
+    @Override
+    public ReturnableShipment getShipment(final TrackingNumber trackingNumber) {
+        return mapper.map(shipmentApiService.getShipment(trackingNumber));
+    }
+
     @Override
     public void markReturned(final ShipmentId shipmentId) {
         shipmentApiService.markReturned(shipmentId);
+    }
+
+    @Override
+    public void markReturned(final ShipmentId shipmentId, final ShipmentId returnShipmentId) {
+        shipmentApiService.markReturned(shipmentId, returnShipmentId);
+    }
+
+    @Override
+    public ShipmentId createReturnShipmentDraft(final ShipmentId shipmentId) {
+        return shipmentApiService.createReturnShipmentDraft(shipmentId);
     }
 
     @Override
@@ -34,6 +51,11 @@ public class ShipmentServiceAdapter implements ShipmentServicePort {
     @Override
     public void completeReturn(final ShipmentId shipmentId) {
         shipmentApiService.completeReturn(shipmentId);
+    }
+
+    @Override
+    public void markDelivered(final ShipmentId shipmentId) {
+        shipmentApiService.markDelivered(shipmentId);
     }
 
     @Override

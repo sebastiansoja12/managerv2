@@ -35,15 +35,19 @@ public abstract class ResponseMapper {
 		return new DepartmentApi(department.getDepartmentId().getValue(), departmentCode,
 				map(department.getAddress()), coordinates, department.getTaxId().value(),
 				department.getTelephoneNumber(), department.getOpeningHours(), department.getEmail(),
-                department.getDepartmentType().name(), department.getStatus().name(), department.getCreatedAt(), department.getUpdatedAt());
+                department.getDepartmentType().name(), department.getStatus().name(), department.getCreatedAt(), department.getUpdatedAt(),
+                department.getStatusChangeReason(), department.getStatusChangedAt());
     }
 
     public static DepartmentDto mapToDto(final Department department) {
         final String departmentCode = department.getDepartmentCode().getValue();
-        final CoordinatesDto coordinates = new CoordinatesDto(department.getCoordinates().lat(), department.getCoordinates().lon());
+        final CoordinatesDto coordinates = department.getCoordinates() == null
+                ? null
+                : new CoordinatesDto(department.getCoordinates().lat(), department.getCoordinates().lon());
         return new DepartmentDto(department.getDepartmentId().getValue(), departmentCode,
                 department.getCity(), department.getStreet(),
-                department.getPostalCode(), department.getCountryCode().name(), coordinates);
+                department.getPostalCode(), department.getCountryCode().name(), coordinates,
+                department.getStatus().name());
     }
 
     public static DepartmentDetailsDto mapToDetailsDto(final Department department) {

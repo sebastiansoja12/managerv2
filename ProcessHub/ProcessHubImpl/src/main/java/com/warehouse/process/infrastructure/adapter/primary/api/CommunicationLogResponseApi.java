@@ -9,6 +9,8 @@ public record CommunicationLogResponseApi(
         String serviceType,
         Long createdBy,
         Long updatedBy,
+        String createdByUsername,
+        String updatedByUsername,
         String departmentCode,
         String sourceService,
         String targetService,

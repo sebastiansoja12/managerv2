@@ -8,6 +8,7 @@ import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
+import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -125,6 +126,10 @@ public class ShipmentEntity extends BelongsToOperator {
     @Column(name = "packaging_type")
     @Enumerated(EnumType.STRING)
     private PackagingType packagingType;
+
+    @Column(name = "source", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ShipmentSource source;
 
     @Embedded
     @AttributeOverrides({

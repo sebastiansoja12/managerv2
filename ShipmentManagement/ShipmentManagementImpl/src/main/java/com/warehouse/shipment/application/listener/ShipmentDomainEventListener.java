@@ -1,7 +1,6 @@
 package com.warehouse.shipment.application.listener;
 
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
-import com.warehouse.shipment.application.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.event.ShipmentLocked;
 import com.warehouse.shipment.domain.event.ShipmentRedirected;
 import com.warehouse.shipment.domain.event.ShipmentReturned;
@@ -14,12 +13,9 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class ShipmentDomainEventListener {
 
     private final ShipmentPort shipmentPort;
-    private final PathFinderServicePort pathFinderServicePort;
 
-    public ShipmentDomainEventListener(final ShipmentPort shipmentPort,
-                                       final PathFinderServicePort pathFinderServicePort) {
+    public ShipmentDomainEventListener(final ShipmentPort shipmentPort) {
         this.shipmentPort = shipmentPort;
-        this.pathFinderServicePort = pathFinderServicePort;
     }
 
     @EventListener

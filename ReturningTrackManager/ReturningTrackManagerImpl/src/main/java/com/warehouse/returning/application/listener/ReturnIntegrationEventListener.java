@@ -7,7 +7,11 @@ import com.warehouse.returning.api.identificator.UserId;
 import com.warehouse.returning.application.port.secondary.ReturnEventPublisherServicePort;
 import com.warehouse.returning.api.event.ReturnProcessingStartedIntegrationEvent;
 import com.warehouse.returning.api.event.ReturnCancelledIntegrationEvent;
+import com.warehouse.returning.api.event.ReturnCompletedIntegrationEvent;
+import com.warehouse.returning.api.event.ReturnReadModelChangedIntegrationEvent;
 import com.warehouse.returning.domain.event.ReturnPackageCanceled;
+import com.warehouse.returning.domain.event.ReturnPackageChanged;
+import com.warehouse.returning.domain.event.ReturnPackageCompleted;
 import com.warehouse.returning.domain.event.ReturnPackageProcessingStarted;
 import com.warehouse.returning.domain.vo.ReturnPackageSnapshot;
 import org.springframework.context.event.EventListener;
@@ -28,7 +32,8 @@ public class ReturnIntegrationEventListener {
     public void handle(final ReturnPackageProcessingStarted event) {
         final ReturnPackageSnapshot snapshot = event.getSnapshot();
         integrationEventPublisher.publish(new ReturnProcessingStartedIntegrationEvent(
-                UUID.randomUUID(), new ShipmentId(snapshot.shipmentId().value()), snapshot.returnPackageId(),
+                UUID.randomUUID(), new ShipmentId(snapshot.shipmentId().value()),
+                returnShipmentId(snapshot), snapshot.returnPackageId(),
                 new DepartmentId(snapshot.assignedDepartmentId().value()),
                 new OperatorId(snapshot.operatorId().value()),
                 snapshot.processedBy() == null ? null : new UserId(snapshot.processedBy().value()),
@@ -39,10 +44,39 @@ public class ReturnIntegrationEventListener {
     public void handle(final ReturnPackageCanceled event) {
         final ReturnPackageSnapshot snapshot = event.getSnapshot();
         integrationEventPublisher.publish(new ReturnCancelledIntegrationEvent(
-                UUID.randomUUID(), new ShipmentId(snapshot.shipmentId().value()), snapshot.returnPackageId(),
+                UUID.randomUUID(), new ShipmentId(snapshot.shipmentId().value()),
+                returnShipmentId(snapshot), snapshot.returnPackageId(),
                 new DepartmentId(snapshot.assignedDepartmentId().value()),
                 new OperatorId(snapshot.operatorId().value()),
                 snapshot.processedBy() == null ? null : new UserId(snapshot.processedBy().value()),
                 event.getTimestamp()));
+    }
+
+    @EventListener
+    public void handle(final ReturnPackageCompleted event) {
+        final ReturnPackageSnapshot snapshot = event.getSnapshot();
+        integrationEventPublisher.publish(new ReturnCompletedIntegrationEvent(
+                UUID.randomUUID(), new ShipmentId(snapshot.shipmentId().value()),
+                returnShipmentId(snapshot), snapshot.returnPackageId(),
+                new DepartmentId(snapshot.assignedDepartmentId().value()),
+                new OperatorId(snapshot.operatorId().value()),
+                snapshot.processedBy() == null ? null : new UserId(snapshot.processedBy().value()),
+                event.getTimestamp()));
+    }
+
+    @EventListener
+    public void handle(final ReturnPackageChanged event) {
+        final ReturnPackageSnapshot snapshot = event.getSnapshot();
+        integrationEventPublisher.publish(new ReturnReadModelChangedIntegrationEvent(
+                UUID.randomUUID(), new ShipmentId(snapshot.shipmentId().value()),
+                returnShipmentId(snapshot), snapshot.returnPackageId(),
+                new DepartmentId(snapshot.assignedDepartmentId().value()),
+                new OperatorId(snapshot.operatorId().value()),
+                snapshot.processedBy() == null ? null : new UserId(snapshot.processedBy().value()),
+                event.getTimestamp()));
+    }
+
+    private ShipmentId returnShipmentId(final ReturnPackageSnapshot snapshot) {
+        return snapshot.returnShipmentId() == null ? null : new ShipmentId(snapshot.returnShipmentId().value());
     }
 }

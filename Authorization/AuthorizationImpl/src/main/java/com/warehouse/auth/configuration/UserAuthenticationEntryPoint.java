@@ -1,6 +1,6 @@
 package com.warehouse.auth.configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.warehouse.auth.configuration.exception.ApplicationAccessException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,7 +15,7 @@ import java.io.IOException;
 @Component
 public class UserAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final JsonMapper OBJECT_MAPPER = JsonMapper.builder().configureForJackson2().build();
 
 	@Override
     public void commence(HttpServletRequest request, HttpServletResponse response,

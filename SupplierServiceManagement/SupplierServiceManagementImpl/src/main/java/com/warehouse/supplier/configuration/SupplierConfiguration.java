@@ -1,6 +1,15 @@
 package com.warehouse.supplier.configuration;
 
+import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
+import com.warehouse.organisationstructure.department.api.DepartmentLifecycleParticipant;
+import com.warehouse.supplier.domain.port.secondary.CourierLimitServicePort;
+import com.warehouse.supplier.infrastructure.adapter.primary.SupplierDepartmentLifecycleParticipant;
+import com.warehouse.supplier.infrastructure.adapter.secondary.CourierLimitServiceAdapter;
+import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.auth.SupplierUserEventPublisher;
+import com.warehouse.commonassets.context.OperatorContext;
+import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
+import com.warehouse.organisationstructure.api.OperatorApiService;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.supplier.api.SupplierApiService;
 import com.warehouse.supplier.infrastructure.adapter.primary.SupplierApiServiceAdapter;
@@ -32,9 +41,29 @@ public class SupplierConfiguration {
                                  final DriverLicenseService driverLicenseService,
                                  final DeviceServicePort deviceServicePort,
                                  @Qualifier("supplier.departmentServicePort") final DepartmentServicePort departmentServicePort,
-                                 @Qualifier("supplier.userServicePort") final UserServicePort userServicePort) {
+                                 @Qualifier("supplier.userServicePort") final UserServicePort userServicePort,
+                                 final SupplierRepository supplierRepository,
+                                 final CourierLimitServicePort courierLimitServicePort,
+                                 @Qualifier("supplier.currentUserServicePort") final CurrentUserServicePort currentUserServicePort) {
         return new SupplyPortImpl(service, generatorService, validatorService, driverLicenseService, deviceServicePort,
-                departmentServicePort, userServicePort);
+                departmentServicePort, userServicePort, supplierRepository, courierLimitServicePort,
+                currentUserServicePort);
+    }
+
+    @Bean("supplier.currentUserServicePort")
+    public CurrentUserServicePort supplierCurrentUserServicePort(final CurrentUserApiService currentUserApiService) {
+        return new CurrentUserServiceAdapter(currentUserApiService);
+    }
+
+    @Bean
+    public CourierLimitServicePort courierLimitServicePort(
+            final OperatorConfigurationApiService operatorConfigurationApiService) {
+        return new CourierLimitServiceAdapter(operatorConfigurationApiService);
+    }
+
+    @Bean
+    public DepartmentLifecycleParticipant supplierDepartmentLifecycleParticipant(final SupplyPort supplyPort) {
+        return new SupplierDepartmentLifecycleParticipant(supplyPort);
     }
 
     @Bean("supplier.userServicePort")
@@ -50,20 +79,30 @@ public class SupplierConfiguration {
     @Bean
     public DriverLicenseObserverPort driverLicenseObserverPort(
             final DriverLicenseService driverLicenseService,
-            final SupplierNoDepartmentContextService supplierNoDepartmentContextService
-    ) {
-        return new DriverLicenseObserverPortImpl(driverLicenseService, supplierNoDepartmentContextService);
+            final SupplierInvalidatorService supplierInvalidatorService,
+            final OperatorServicePort operatorServicePort,
+            final SupplierRepository supplierRepository,
+            final OperatorContext operatorContext,
+            final MailServicePort mailServicePort) {
+        return new DriverLicenseObserverPortImpl(driverLicenseService, supplierInvalidatorService, operatorServicePort, supplierRepository, operatorContext, mailServicePort);
     }
 
     @Bean
-    public DangerousGoodObserverPort dangerousGoodObserverPort(final SupplierNoDepartmentContextService service) {
-        return new DangerousGoodObserverPortImpl(service);
+    public MailServicePort supplierMailServicePort(final IntegrationEventPublisher integrationEventPublisher) {
+        return new MailServiceAdapter(integrationEventPublisher);
     }
 
     @Bean
-    public SupplierNoDepartmentContextRepository supplierNoDepartmentContextRepository(
-            final SupplierReadRepository supplierReadRepository) {
-        return new SupplierNoDepartmentContextRepositoryImpl(supplierReadRepository);
+    public OperatorServicePort supplierOperatorServicePort(final OperatorApiService operatorApiService) {
+        return new OperatorServiceAdapter(operatorApiService);
+    }
+
+    @Bean
+    public DangerousGoodObserverPort dangerousGoodObserverPort(final SupplierInvalidatorService service,
+                                                               final OperatorServicePort operatorServicePort,
+                                                               final SupplierRepository supplierRepository,
+                                                               final OperatorContext operatorContext) {
+        return new DangerousGoodObserverPortImpl(service, operatorServicePort, supplierRepository, operatorContext);
     }
 
     @Bean

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-03-operator-pickup-point-configuration" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="operator_configurations"/>
+                <not>
+                    <columnExists tableName="operator_configurations" columnName="pickup_point_default_type"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="operator_configurations">
+            <column name="pickup_point_default_type" type="VARCHAR(32)" defaultValue="SERVICE_POINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_default_drop_off_enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_default_collection_enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_service_point_max_shipment_size" type="VARCHAR(32)" defaultValue="MEDIUM">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_parcel_locker_max_shipment_size" type="VARCHAR(32)" defaultValue="AVERAGE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_default_accepts_dangerous_goods" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_weekday_opening_time" type="VARCHAR(5)" defaultValue="08:00">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_weekday_closing_time" type="VARCHAR(5)" defaultValue="20:00">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_saturday_open" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_saturday_opening_time" type="VARCHAR(5)" defaultValue="09:00">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_saturday_closing_time" type="VARCHAR(5)" defaultValue="14:00">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_require_coordinates_for_activation" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_verification_method" type="VARCHAR(32)" defaultValue="PICKUP_CODE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_pickup_code_length" type="INT" defaultValueNumeric="6">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_pickup_code_validity_hours" type="INT" defaultValueNumeric="72">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_max_invalid_code_attempts" type="INT" defaultValueNumeric="5">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_allow_authorized_person" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_reminder_after_days" type="INT" defaultValueNumeric="2">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_allow_storage_extension" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_storage_extension_days" type="INT" defaultValueNumeric="2">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_courier_compartment_hold_minutes" type="INT" defaultValueNumeric="15">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_compartment_reservation_hours" type="INT" defaultValueNumeric="24">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_oversized_shipment_policy" type="VARCHAR(32)" defaultValue="REDIRECT_TO_SERVICE_POINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_suspend_after_compartment_failures" type="INT" defaultValueNumeric="3">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_max_distance_km" type="INT" defaultValueNumeric="5">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_preference" type="VARCHAR(32)" defaultValue="NEAREST">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_alternative_count" type="INT" defaultValueNumeric="3">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_full_point_policy" type="VARCHAR(32)" defaultValue="SELECT_NEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_same_department_only" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_default_capacity" type="INT" defaultValueNumeric="200">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_capacity_warning_threshold_percent" type="INT" defaultValueNumeric="85">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_block_intake_when_full" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_require_status_change_reason" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_suspended_point_shipment_policy" type="VARCHAR(32)" defaultValue="REDIRECT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_block_closing_with_pending_shipments" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pickup_point_auto_resume_suspended_after_days" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2026-11-03-operator-pickup-point-configuration-aud" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="operator_configurations_aud"/>
+                <not>
+                    <columnExists tableName="operator_configurations_aud" columnName="pickup_point_default_type"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="operator_configurations_aud">
+            <column name="pickup_point_default_type" type="VARCHAR(32)"/>
+            <column name="pickup_point_default_drop_off_enabled" type="BOOLEAN"/>
+            <column name="pickup_point_default_collection_enabled" type="BOOLEAN"/>
+            <column name="pickup_point_service_point_max_shipment_size" type="VARCHAR(32)"/>
+            <column name="pickup_point_parcel_locker_max_shipment_size" type="VARCHAR(32)"/>
+            <column name="pickup_point_default_accepts_dangerous_goods" type="BOOLEAN"/>
+            <column name="pickup_point_weekday_opening_time" type="VARCHAR(5)"/>
+            <column name="pickup_point_weekday_closing_time" type="VARCHAR(5)"/>
+            <column name="pickup_point_saturday_open" type="BOOLEAN"/>
+            <column name="pickup_point_saturday_opening_time" type="VARCHAR(5)"/>
+            <column name="pickup_point_saturday_closing_time" type="VARCHAR(5)"/>
+            <column name="pickup_point_require_coordinates_for_activation" type="BOOLEAN"/>
+            <column name="pickup_point_verification_method" type="VARCHAR(32)"/>
+            <column name="pickup_point_pickup_code_length" type="INT"/>
+            <column name="pickup_point_pickup_code_validity_hours" type="INT"/>
+            <column name="pickup_point_max_invalid_code_attempts" type="INT"/>
+            <column name="pickup_point_allow_authorized_person" type="BOOLEAN"/>
+            <column name="pickup_point_reminder_after_days" type="INT"/>
+            <column name="pickup_point_allow_storage_extension" type="BOOLEAN"/>
+            <column name="pickup_point_storage_extension_days" type="INT"/>
+            <column name="pickup_point_courier_compartment_hold_minutes" type="INT"/>
+            <column name="pickup_point_compartment_reservation_hours" type="INT"/>
+            <column name="pickup_point_oversized_shipment_policy" type="VARCHAR(32)"/>
+            <column name="pickup_point_suspend_after_compartment_failures" type="INT"/>
+            <column name="pickup_point_max_distance_km" type="INT"/>
+            <column name="pickup_point_preference" type="VARCHAR(32)"/>
+            <column name="pickup_point_alternative_count" type="INT"/>
+            <column name="pickup_point_full_point_policy" type="VARCHAR(32)"/>
+            <column name="pickup_point_same_department_only" type="BOOLEAN"/>
+            <column name="pickup_point_default_capacity" type="INT"/>
+            <column name="pickup_point_capacity_warning_threshold_percent" type="INT"/>
+            <column name="pickup_point_block_intake_when_full" type="BOOLEAN"/>
+            <column name="pickup_point_require_status_change_reason" type="BOOLEAN"/>
+            <column name="pickup_point_suspended_point_shipment_policy" type="VARCHAR(32)"/>
+            <column name="pickup_point_block_closing_with_pending_shipments" type="BOOLEAN"/>
+            <column name="pickup_point_auto_resume_suspended_after_days" type="INT"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

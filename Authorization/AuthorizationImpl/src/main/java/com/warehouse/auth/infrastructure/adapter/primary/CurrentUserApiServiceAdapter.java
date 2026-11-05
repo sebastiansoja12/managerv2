@@ -3,11 +3,11 @@ package com.warehouse.auth.infrastructure.adapter.primary;
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.port.primary.CurrentUserAuthenticationPort;
-import com.warehouse.auth.domain.service.UserService;
 import com.warehouse.auth.domain.vo.CurrentUserAuthentication;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.ResponseMapper;
 import com.warehouse.auth.infrastructure.dto.CurrentUserAuthenticationDto;
 import com.warehouse.auth.infrastructure.dto.UserDto;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 
@@ -17,14 +17,14 @@ public class CurrentUserApiServiceAdapter implements CurrentUserApiService {
 
     private final ResponseMapper responseMapper;
 
-    private final UserService userService;
+    private final ActingDepartmentHeader actingDepartmentHeader;
 
     public CurrentUserApiServiceAdapter(final CurrentUserAuthenticationPort currentUserAuthenticationPort,
                                         final ResponseMapper responseMapper,
-                                        final UserService userService) {
+                                        final ActingDepartmentHeader actingDepartmentHeader) {
         this.currentUserAuthenticationPort = currentUserAuthenticationPort;
         this.responseMapper = responseMapper;
-        this.userService = userService;
+        this.actingDepartmentHeader = actingDepartmentHeader;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class CurrentUserApiServiceAdapter implements CurrentUserApiService {
     @Override
     public UserDto getCurrentUser() {
         final OrganizationUser user = currentUserAuthenticationPort.getCurrentUser();
-        return responseMapper.map(user, userService.getDepartmentCode(user.getDepartmentId()));
+        return responseMapper.map(user, actingDepartmentCode(user));
     }
 
     @Override
@@ -43,9 +43,13 @@ public class CurrentUserApiServiceAdapter implements CurrentUserApiService {
         final CurrentUserAuthentication authentication = currentUserAuthenticationPort.getCurrentUserAuthentication();
         return new CurrentUserAuthenticationDto(
                 authentication.jwtToken(),
-                responseMapper.map(authentication.user(),
-                        userService.getDepartmentCode(authentication.user().getDepartmentId()))
+                responseMapper.map(authentication.user(), actingDepartmentCode(authentication.user()))
         );
+    }
+
+    private DepartmentCode actingDepartmentCode(final OrganizationUser user) {
+        return currentUserAuthenticationPort.getActingDepartmentCode(user,
+                actingDepartmentHeader.requestedDepartmentCode());
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.palletmanagement.domain.enumeration.PalletLoadBlockReason;
 import com.warehouse.palletmanagement.domain.enumeration.PalletStatus;
 import com.warehouse.palletmanagement.domain.vo.PalletDetails;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.PalletId;
 import com.warehouse.commonassets.identificator.PalletTrackingNumber;
 
@@ -25,6 +26,13 @@ public final class PalletFixture {
 
     public static PalletDetails loadedPallet(final Long... shipmentIds) {
         return pallet(PalletStatus.LOADED, false, null, shipmentIds);
+    }
+
+    public static PalletDetails inTransitPallet(final DepartmentId destinationDepartmentId, final Long... shipmentIds) {
+        final List<ShipmentId> ids = Arrays.stream(shipmentIds).map(ShipmentId::new).toList();
+        return new PalletDetails(PALLET_ID, TRACKING_NUMBER, PalletStatus.IN_TRANSIT, "UNLOCKED", ids, ids.isEmpty(),
+                false, null, null, null, null, destinationDepartmentId, null, Instant.parse("2026-10-17T10:00:00Z"),
+                Instant.parse("2026-10-17T10:00:00Z"), null, null);
     }
 
     public static PalletDetails blockedPallet(final PalletStatus status, final PalletLoadBlockReason reason,

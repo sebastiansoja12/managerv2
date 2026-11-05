@@ -10,8 +10,8 @@ import com.warehouse.returning.infrastructure.adapter.secondary.outbox.Returning
 import com.warehouse.returning.infrastructure.adapter.secondary.outbox.ReturningOutboxIntegrationEventPublisher;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import com.warehouse.returning.infrastructure.adapter.secondary.outbox.ReturningOutboxStore;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
+import org.springframework.boot.kafka.autoconfigure.KafkaAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;

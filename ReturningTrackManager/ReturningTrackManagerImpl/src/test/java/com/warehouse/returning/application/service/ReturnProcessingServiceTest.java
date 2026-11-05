@@ -1,5 +1,7 @@
 package com.warehouse.returning.application.service;
 
+import com.warehouse.returning.domain.enumeration.ReasonCode;
+import com.warehouse.returning.domain.event.ReturnPackageCompleted;
 import com.warehouse.returning.domain.event.ReturnPackageProcessingStarted;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.model.ReturnStatus;
@@ -32,7 +34,7 @@ class ReturnProcessingServiceTest {
         order.verify(repository).createOrUpdate(returning);
         final ArgumentCaptor<ReturnPackageProcessingStarted> event = ArgumentCaptor.forClass(ReturnPackageProcessingStarted.class);
         order.verify(events).publishEvent(event.capture());
-        verify(events, times(1)).publishEvent(any());
+        verify(events, times(1)).publishEvent(any(Object.class));
         verify(repository, times(1)).createOrUpdate(any());
         assertEquals(ReturnStatus.PROCESSING, event.getValue().getSnapshot().returnStatus());
         assertEquals(returning.getReturnPackageId(), event.getValue().getSnapshot().returnPackageId());
@@ -75,7 +77,7 @@ class ReturnProcessingServiceTest {
         final InOrder order = inOrder(repository, events);
         order.verify(repository).createOrUpdate(returning);
         order.verify(events).publishEvent(any(com.warehouse.returning.domain.event.ReturnPackageCanceled.class));
-        verify(events, times(1)).publishEvent(any());
+        verify(events, times(1)).publishEvent(any(Object.class));
         verify(repository, times(1)).createOrUpdate(any());
     }
 
@@ -99,5 +101,56 @@ class ReturnProcessingServiceTest {
         assertThrows(IllegalStateException.class, () -> service.cancel(returning.getReturnPackageId()));
 
         verifyNoInteractions(events);
+    }
+
+    @Test
+    void shouldPersistCompletionBeforePublishingEvent() {
+        final ReturnPackage returning = ReturnProcessingFixture.returning(ReturnStatus.PROCESSING);
+        when(repository.findForProcessing(returning.getReturnPackageId())).thenReturn(returning);
+
+        service.complete(returning.getReturnPackageId());
+
+        final InOrder order = inOrder(repository, events);
+        order.verify(repository).createOrUpdate(returning);
+        final ArgumentCaptor<ReturnPackageCompleted> event = ArgumentCaptor.forClass(ReturnPackageCompleted.class);
+        order.verify(events).publishEvent(event.capture());
+        assertEquals(ReturnStatus.COMPLETED, event.getValue().getSnapshot().returnStatus());
+        assertEquals(returning.getShipmentId(), event.getValue().getSnapshot().shipmentId());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ReturnStatus.class, names = {"CREATED", "COMPLETED", "CANCELLED"})
+    void shouldRejectCompletionWhenReturnIsNotProcessing(final ReturnStatus status) {
+        final ReturnPackage returning = ReturnProcessingFixture.returning(status);
+        when(repository.findForProcessing(returning.getReturnPackageId())).thenReturn(returning);
+
+        assertThrows(StatusChangeException.class, () -> service.complete(returning.getReturnPackageId()));
+
+        verify(repository, never()).createOrUpdate(any());
+        verifyNoInteractions(events);
+    }
+
+    @Test
+    void shouldPersistRegisteredReturnBeforePublishingCreatedEvent() {
+        final ReturnPackage returning = ReturnProcessingFixture.returning(ReturnStatus.CREATED);
+
+        service.register(returning);
+
+        final InOrder order = inOrder(repository, events);
+        order.verify(repository).createOrUpdate(returning);
+        order.verify(events).publishEvent(any(com.warehouse.returning.domain.event.ReturnPackageCreated.class));
+    }
+
+    @Test
+    void shouldPublishChangeWhenReasonCodeChanges() {
+        final ReturnPackage returning = ReturnProcessingFixture.returning(ReturnStatus.CREATED);
+        when(repository.findById(returning.getReturnPackageId())).thenReturn(returning);
+
+        service.changeReasonCode(returning.getReturnPackageId(), ReasonCode.WRONG_ITEM);
+
+        assertEquals(ReasonCode.WRONG_ITEM, returning.getReasonCode());
+        final InOrder order = inOrder(repository, events);
+        order.verify(repository).createOrUpdate(returning);
+        order.verify(events).publishEvent(any(com.warehouse.returning.domain.event.ReturnPackageChanged.class));
     }
 }

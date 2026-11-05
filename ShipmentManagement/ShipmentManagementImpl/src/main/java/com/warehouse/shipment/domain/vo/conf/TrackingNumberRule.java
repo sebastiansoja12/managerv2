@@ -53,7 +53,7 @@ public record TrackingNumberRule(
     }
 
     public TrackingNumberRule withDepartmentCode(final DepartmentCode departmentCode) {
-        if (prefixMode != TrackingNumberPrefixMode.DEPARTMENT_CODE) {
+        if (prefixMode != TrackingNumberPrefixMode.DEPARTMENT_CODE || departmentCode == null) {
             return this;
         } else {
             return new TrackingNumberRule(

@@ -21,8 +21,8 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.warehouse.tracking.domain.enumeration.TrackingEnvironment;
 import com.warehouse.tracking.domain.enumeration.TrackingProviderId;
 import com.warehouse.tracking.domain.exception.TrackingException;
@@ -112,7 +112,7 @@ class InPostTrackingClientTest {
                 .retryOnException(exception -> exception instanceof InPostRequestException
                         && ((InPostRequestException) exception).isRetryable())
                 .build();
-        final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        final ObjectMapper objectMapper = JsonMapper.builder().configureForJackson2().build();
         return new TestClient(new InPostTrackingClient(builder.build(), objectMapper, retryConfig), server);
     }
 

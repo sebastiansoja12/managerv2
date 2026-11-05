@@ -24,6 +24,7 @@ public class DeliveryReadModelResponseMapper {
                 item.originDepartmentId() == null ? null : String.valueOf(item.originDepartmentId().getValue()),
                 item.destinationDepartmentId() == null ? null
                         : String.valueOf(item.destinationDepartmentId().getValue()),
+                item.currentDepartmentId() == null ? null : String.valueOf(item.currentDepartmentId().getValue()),
                 item.method() == null ? null : item.method().name(),
                 item.stepCount(),
                 item.createdAt(),

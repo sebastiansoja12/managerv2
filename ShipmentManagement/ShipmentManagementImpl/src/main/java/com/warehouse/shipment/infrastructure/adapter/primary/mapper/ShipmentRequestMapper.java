@@ -3,6 +3,7 @@ package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 import java.util.List;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 import com.warehouse.commonassets.enumeration.Currency;
@@ -14,9 +15,9 @@ import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
+import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 import com.warehouse.shipment.application.port.primary.command.ShipmentCreateCommand;
 import com.warehouse.shipment.application.port.primary.command.ShipmentDeliveryCommand;
-import com.warehouse.shipment.application.port.primary.command.SignatureChangeRequest;
 import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.vo.Dimensions;
 import com.warehouse.shipment.domain.vo.LengthUnit;
@@ -31,11 +32,18 @@ import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ShipmentRequestMapper {
 
+    @Mapping(target = "source", ignore = true)
     ShipmentCreateCommand map(final ShipmentCreateRequestApi requestDto);
 
     default ShipmentCreateCommand mapCreateRequest(final ShipmentCreateRequestApi shipmentRequest) {
         final ShipmentCreateCommand command = map(shipmentRequest);
         command.setDeliveryPickupPointId(shipmentRequest.deliveryPickupPointId());
+        return command;
+    }
+
+    default ShipmentCreateCommand mapExternalCreateRequest(final ShipmentCreateRequestApi shipmentRequest) {
+        final ShipmentCreateCommand command = mapCreateRequest(shipmentRequest);
+        command.setSource(ShipmentSource.EXTERNAL);
         return command;
     }
 
@@ -85,12 +93,6 @@ public interface ShipmentRequestMapper {
                 ShipmentStatus.valueOf(shipmentStatusRequest.shipmentStatus().name()));
     }
 
-    default SignatureChangeRequest map(final SignatureChangeRequestApi signatureChangeRequest) {
-        final ShipmentId shipmentId = new ShipmentId(signatureChangeRequest.shipmentId().getValue());
-        return new SignatureChangeRequest(shipmentId, signatureChangeRequest.signature(), signatureChangeRequest.signerName(),
-                signatureChangeRequest.documentReference());
-    }
-
     default ShipmentDeliveryCommand map(final ShipmentDeliveryRequestApiDto deliveryRequest) {
         return new ShipmentDeliveryCommand(new ShipmentId(deliveryRequest.shipmentId().getValue()),
                 DeliveryMethod.valueOf(deliveryRequest.deliveryMethod()), new SupplierCode(deliveryRequest.supplierCode().value()),
@@ -101,7 +103,7 @@ public interface ShipmentRequestMapper {
         if (request == null) {
             return new ShipmentSearchCriteria(
                     null, null, List.of(), List.of(), null, null,
-                    null, null, null, null, null, null, null, null
+                    null, null, null, null, null, null, null, null, null
             );
         }
 
@@ -118,6 +120,7 @@ public interface ShipmentRequestMapper {
                 request.locked(),
                 request.createdFrom(),
                 request.createdTo(),
+                request.departmentId() == null ? null : request.departmentId().toDepartmentId(),
                 request.page(),
                 request.size()
         );

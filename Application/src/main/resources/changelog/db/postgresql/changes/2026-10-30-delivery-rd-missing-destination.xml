@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-30-delivery-rd-missing-destination" author="s-soja">
+        <sql>CREATE INDEX IF NOT EXISTS idx_delivery_rd_missing_destination
+             ON delivery_rd (operator_id, created)
+             WHERE target_type = 'SHIPMENT' AND destination_department_id IS NULL</sql>
+    </changeSet>
+</databaseChangeLog>
