@@ -45,16 +45,17 @@ class ReturnPackageControllerTest {
     @Test
     void shouldCreateUsingAuthenticatedUserAndDepartmentId() throws Exception {
         when(currentUser.getCurrentUserId()).thenReturn(new UserId(11L));
-        when(port.create(any())).thenReturn(List.of(new CreatedReturn(new ShipmentId(456L), new ReturnPackageId(123L), ReturnStatus.CREATED)));
+        when(port.create(any())).thenReturn(List.of(new CreatedReturn(new ShipmentId(456L), new ShipmentId(789L), new ReturnPackageId(123L), ReturnStatus.CREATED)));
 
         http.perform(post("/returns/packages").contentType(MediaType.APPLICATION_JSON).content("""
-                {"shipmentId":{"value":456},"departmentId":{"value":3},"reason":"Damaged parcel","reasonCode":"DAMAGED"}
+                {"trackingNumber":{"value":"TRK456"},"departmentId":{"value":3},"reason":"Damaged parcel","reasonCode":"DAMAGED"}
                 """)).andExpect(status().isCreated()).andExpect(jsonPath("$[0].returnId.value").value(123));
 
         final ArgumentCaptor<CreateReturnPackageCommand> command = ArgumentCaptor.forClass(CreateReturnPackageCommand.class);
         verify(port).create(command.capture());
         assertEquals(new DepartmentId(3L), command.getValue().getDepartmentId());
         assertEquals(new UserId(11L), command.getValue().getUserId());
+        assertEquals(new com.warehouse.commonassets.identificator.TrackingNumber("TRK456"), command.getValue().getTrackingNumber());
     }
 
     @Test
