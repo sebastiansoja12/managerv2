@@ -760,6 +760,25 @@ class ShipmentPortImplTest {
     }
 
     @Test
+    void shouldCreatePlannedReturnShipmentDraftAndPublishCreatedEvent() {
+        final Shipment shipment = DataTestCreator.shipment(null, false);
+        shipment.markAsDelivered();
+        final OperatorShipmentConfiguration configuration = permissiveConfiguration();
+        when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
+        when(this.shipmentConfigurationPort.getCurrentOperatorShipmentConfiguration()).thenReturn(configuration);
+        when(this.trackingNumberGenerationService.generate(eq(configuration.workflowSettings()),
+                eq(configuration.trackingNumberRule()), any(ShipmentId.class)))
+                .thenReturn(new TrackingNumber("MGR-RETURN-DRAFT"));
+
+        final ShipmentId draftShipmentId = this.shipmentPort.createReturnShipmentDraft(shipmentId());
+
+        final ShipmentCreated created = publishedEvent(ShipmentCreated.class);
+        assertEquals(draftShipmentId, created.getSnapshot().shipmentId());
+        assertEquals(ShipmentStatus.PLANNED, created.getSnapshot().shipmentStatus());
+        verify(this.shipmentRepository).createOrUpdate(shipment);
+    }
+
+    @Test
     void shouldFindSourceShipmentByRelatedShipmentId() {
         final ShipmentId returnedShipmentId = new ShipmentId(2L);
         final Shipment sourceShipment = DataTestCreator.shipment(returnedShipmentId, false);
@@ -821,7 +840,7 @@ class ShipmentPortImplTest {
 
     private ReturnDetailsDto returnDetails(final ReturnId returnId) {
         return new ReturnDetailsDto(new LongValueDto(returnId.getId()), new LongValueDto(shipmentId().getValue()),
-                "Damaged package", com.warehouse.commonassets.enumeration.ReturnStatus.CREATED,
+                null, null, null, "Damaged package", com.warehouse.commonassets.enumeration.ReturnStatus.CREATED,
                 new StringValueDto("TOKEN"), new DepartmentId(1L), new DepartmentId(1L),
                 new StringValueDto("KT1"), new StringValueDto("KT1"), new LongValueDto(1L), new LongValueDto(2L),
                 new StringValueDto("DAMAGED"), new OperatorId(77L), null, null);
