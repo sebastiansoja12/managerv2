@@ -111,7 +111,7 @@ public interface ShipmentResponseMapper {
     default ShipmentRouteLogResponseApi mapShipmentRouteLog(final ShipmentRouteLog shipmentRouteLog,
                                                             @Context final DepartmentServicePort departmentServicePort) {
         return new ShipmentRouteLogResponseApi(map(shipmentRouteLog.shipment()), shipmentRouteLog.routeLog(),
-                shipmentRouteLog.returnPackage());
+                shipmentRouteLog.returnPackage(), shipmentRouteLog.returnPackageUnavailable());
     }
 
     default List<String> map(String value) {
