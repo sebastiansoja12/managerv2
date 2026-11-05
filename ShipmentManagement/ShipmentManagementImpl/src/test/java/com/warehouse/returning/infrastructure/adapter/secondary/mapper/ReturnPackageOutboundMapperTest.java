@@ -15,11 +15,12 @@ class ReturnPackageOutboundMapperTest {
     @Test
     void sendsResolvedDepartmentIdToRtm() {
         final CreateReturnRequest createReturnRequest = new CreateReturnRequest(
-                new ShipmentId(123L), "Damaged parcel", new DepartmentId(31L),
+                new ShipmentId(123L), new ShipmentId(789L), "Damaged parcel", new DepartmentId(31L),
                 new UserId(41L), ReasonCode.DAMAGED);
 
         final ReturnRequestApi request = new ReturnPackageOutboundMapper().map(createReturnRequest);
 
         assertThat(request.requests().getFirst().departmentId().value()).isEqualTo(31L);
+        assertThat(request.requests().getFirst().returnShipmentId().getValue()).isEqualTo(789L);
     }
 }
