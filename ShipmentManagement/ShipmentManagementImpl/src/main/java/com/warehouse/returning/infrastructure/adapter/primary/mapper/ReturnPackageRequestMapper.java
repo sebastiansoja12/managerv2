@@ -13,7 +13,7 @@ public class ReturnPackageRequestMapper {
 
     public CreateReturnPackageCommand map(final CreateReturnPackageRequest request, final UserId userId) {
         return new CreateReturnPackageCommand(
-                request.shipmentId(),
+                request.trackingNumber(),
                 request.reason(),
                 request.departmentId(),
                 userId,
