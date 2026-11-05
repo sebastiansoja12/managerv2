@@ -22,6 +22,11 @@
             <artifactId>MailService</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>OrganisationStructureApi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
