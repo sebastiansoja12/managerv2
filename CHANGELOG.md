@@ -1,3 +1,51 @@
+## [2026.4] - Unreleased
+
+### Added
+- FleetTracking API and implementation modules with driver tracking sessions, batched GPS position ingestion from terminals, accuracy, sequence and plausible-speed filtering, last known vehicle positions, route history and `tracking_session`/`tracking_position` tables.
+- `/fleet-tracking/sessions` REST endpoints for starting, reporting positions to, finishing and listing active tracking sessions and reading a session route.
+- IncidentManagement API and implementation modules for reporting, assigning, commenting, resolving and reopening shipment incidents with statistics and operator-scoped persistence.
+- AuditLog module consuming audit entries from Kafka and exposing them through a paginated REST endpoint, with audit recording for shipments, deliveries, pallets, pickup points and the delivery network.
+- PalletManagement module with pallet lists, details, documents, carrier assignment, pallet transports and pallet unloading.
+- DepartmentMap module with department layouts, storage locations, directions and pallet placement, movement and reservation.
+- McpServer module exposing read-only and command tools for shipments, deliveries, departments, couriers, devices, processes and configuration with personal-data masking.
+- PlatformAdministration module for platform owners: operator users, departments, couriers, devices, API keys, sessions, access blocking, read-model rebuilds, data export and erasure, announcements, system status, maintenance mode and platform audit log.
+- Operator subscriptions, superadmin impersonation with operator consent and impersonation tokens.
+- User onboarding with required consents, consent versions and tutorial status.
+- Department lifecycle with status policies, daily capacity, configuration overrides, archiving of inactive departments and lifecycle participants in delivery network and logistics.
+- Department load endpoint, shipment acceptance and capacity-based destination department balancing in LogisticsOrchestrator.
+- Delivery model in LogisticsOrchestrator with routing data, delivery steps, step comments and comment codes, read model, change history, related deliveries and recipient signatures.
+- Delivery areas, postal codes with coordinates and delivery-department resolution from delivery areas.
+- Carriers, drivers and carrier vehicles in DriverHub, with courier vehicle and device assignment.
+- Device activation with one-time activation codes, hashed pair keys and operator sessions for terminals and phones.
+- Supplier configuration, supplier user accounts created through `SupplierCreatedEvent` and courier invitation e-mails.
+- Template-based mail service over SMTP driven by shipment Kafka events, including collected, reroute and external shipment templates.
+- Operator configuration for shipment policies, notifications, labels, tracking number prefixes, sorting, pickup points, fleet communication and regional settings.
+- `COLLECTED` shipment status, shipment content, parcel details, lifecycle timestamps, shipment source and party country codes.
+- Organization chat participants endpoint.
+- Common identifiers `IncidentId`, `TrackingSessionId` and `TrackingPositionId`.
+
+### Changed
+- Extracted deliveries from shipments into the hexagonal `logisticsdelivery` context; shipments now read routing data from deliveries.
+- Moved recipient signatures from shipments to deliveries.
+- Rebuilt AsyncJob and the legacy logistics package as hexagonal DDD modules.
+- Terminal requests use tracking numbers instead of shipment ids and are resolved in DeliveryOperation.
+- Moved QR code and CSV generators into DocumentStorage and build labels from shipment and delivery contracts.
+- Kafka outbox publishes on a dedicated executor with capped exponential backoff and validates operator headers in the record interceptor.
+- Log lines resolve operator and user from the security context.
+- Modeled organization users as a role-based account hierarchy with account levels and audiences.
+- Department code is carried explicitly instead of through the deprecated department ownership base class.
+- Restricted `/fleet-tracking/**` endpoints to authenticated users.
+
+### Fixed
+- Driver license and dangerous good certification invalidation job for suppliers.
+- Bean cycle when reading the platform owner username.
+- Unique current delivery target and missing delivery destination department resolution.
+- Operator context leaking between Kafka records.
+
+### Deprecated
+- Removed the PathFinder lookup from shipment management in favor of delivery areas.
+- Removed the standalone shipment dangerous good table and the deprecated software configuration service.
+
 ## [2026.3] - 2026-09-10
 
 ### Added
