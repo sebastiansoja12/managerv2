@@ -53,6 +53,8 @@
         <module>DepartmentMap</module>
         <module>McpServer</module>
         <module>AuditLog</module>
+        <module>IncidentManagement</module>
+        <module>FleetTracking</module>
     </modules>
 
 	<properties>
