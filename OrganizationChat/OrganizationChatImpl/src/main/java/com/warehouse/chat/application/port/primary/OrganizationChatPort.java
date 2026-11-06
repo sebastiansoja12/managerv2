@@ -5,6 +5,7 @@ import com.warehouse.chat.api.identificator.ChatMessageId;
 import com.warehouse.chat.application.port.primary.command.SendChatMessageCommand;
 import com.warehouse.chat.application.port.primary.result.OpenChatConversationResult;
 import com.warehouse.chat.domain.vo.ChatMessageSnapshot;
+import com.warehouse.chat.domain.vo.ChatParticipant;
 import com.warehouse.commonassets.identificator.UserId;
 
 import java.util.List;
@@ -21,4 +22,6 @@ public interface OrganizationChatPort {
                                          final ChatMessageId beforeMessageId, final int limit);
 
     ChatMessageSnapshot sendMessage(final ChatConversationId conversationId, final SendChatMessageCommand command);
+
+    List<ChatParticipant> findActiveParticipants();
 }

@@ -12,6 +12,7 @@ import com.warehouse.chat.domain.event.OrganizationChatMessageCreatedEvent;
 import com.warehouse.chat.domain.exception.ChatException;
 import com.warehouse.chat.domain.model.ChatConversation;
 import com.warehouse.chat.domain.vo.ChatMessageSnapshot;
+import com.warehouse.chat.domain.vo.ChatParticipant;
 import com.warehouse.chat.domain.vo.ChatPresence;
 import com.warehouse.chat.domain.vo.DirectChatParticipants;
 import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
@@ -66,6 +67,11 @@ public class OrganizationChatPortImpl implements OrganizationChatPort {
     private void notifyPresence(final OperatorId operatorId) {
         final List<UserId> onlineUsers = presenceRepository.findOnlineUsers(operatorId);
         presenceNotificationServicePort.notifyUsers(onlineUsers, onlineUsers);
+    }
+
+    @Override
+    public List<ChatParticipant> findActiveParticipants() {
+        return userServicePort.findActiveParticipants();
     }
 
     @Override
