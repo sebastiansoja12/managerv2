@@ -6,17 +6,21 @@ import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.organisationstructure.deliveryarea.application.port.primary.command.CreateDeliveryAreaCommand;
 import com.warehouse.organisationstructure.deliveryarea.application.port.primary.command.GenerateDeliveryAreasCommand;
 import com.warehouse.organisationstructure.deliveryarea.application.port.primary.command.ReplaceDepartmentDeliveryAreasCommand;
+import com.warehouse.organisationstructure.deliveryarea.application.port.primary.command.UpdateDeliveryAreaCommand;
 import com.warehouse.organisationstructure.deliveryarea.application.port.primary.result.DepartmentDeliveryAreas;
 import com.warehouse.organisationstructure.deliveryarea.application.port.secondary.DeliveryAreaDepartmentServicePort;
 import com.warehouse.organisationstructure.deliveryarea.application.port.secondary.DeliveryAreaRepository;
 import com.warehouse.organisationstructure.deliveryarea.domain.enumeration.DeliveryAreaSource;
 import com.warehouse.organisationstructure.deliveryarea.domain.exception.DeliveryAreaDepartmentNotFoundException;
 import com.warehouse.organisationstructure.deliveryarea.domain.exception.DeliveryAreaNotFoundException;
+import com.warehouse.organisationstructure.deliveryarea.domain.exception.ManualDeliveryAreaEditDisabledException;
 import com.warehouse.organisationstructure.deliveryarea.domain.model.DeliveryArea;
 import com.warehouse.organisationstructure.deliveryarea.domain.service.DeliveryAreaGenerator;
 import com.warehouse.organisationstructure.deliveryarea.domain.vo.DeliveryAreaBoundary;
 import com.warehouse.organisationstructure.deliveryarea.domain.vo.DeliveryAreaDepartment;
 import com.warehouse.organisationstructure.deliveryarea.domain.vo.DeliveryAreaDraft;
+import com.warehouse.organisationstructure.deliveryarea.domain.vo.DeliveryAreaPolicies;
+import com.warehouse.organisationstructure.deliveryarea.domain.vo.DeliveryAreaRules;
 import com.warehouse.commonassets.identificator.DeliveryAreaId;
 import com.warehouse.organisationstructure.deliveryarea.domain.vo.DeliveryAreaName;
 import com.warehouse.organisationstructure.deliveryarea.domain.vo.GeoPoint;
@@ -56,8 +60,13 @@ class DeliveryAreaPortImplTest {
 
     private boolean automaticAssignmentEnabled;
 
+    private boolean manualEditAllowed = true;
+
+    private boolean recalculationOnStatusChangeEnabled;
+
     private final DeliveryAreaPort port = new DeliveryAreaPortImpl(repository, departments,
-            () -> automaticAssignmentEnabled, new DeliveryAreaGenerator(COUNTRY),
+            () -> DeliveryAreaPolicies.uniform(new DeliveryAreaRules(automaticAssignmentEnabled, manualEditAllowed,
+                    recalculationOnStatusChangeEnabled, 0)), new DeliveryAreaGenerator(COUNTRY),
             Clock.fixed(Instant.parse("2026-10-28T10:00:00Z"), ZoneOffset.UTC));
 
     @Test
@@ -170,6 +179,73 @@ class DeliveryAreaPortImplTest {
         assertThat(port.findServingDepartment(new GeoPoint(54.0, 18.0))).isEmpty();
     }
 
+    @Test
+    void shouldRejectManualChangesWhenManualEditDisabled() {
+        final DeliveryArea area = port.create(new CreateDeliveryAreaCommand(WARSAW_ID,
+                new DeliveryAreaName("Centrum"), SQUARE));
+        manualEditAllowed = false;
+
+        assertThatThrownBy(() -> port.create(new CreateDeliveryAreaCommand(WARSAW_ID,
+                new DeliveryAreaName("Nowa"), SQUARE)))
+                .isInstanceOf(ManualDeliveryAreaEditDisabledException.class);
+        assertThatThrownBy(() -> port.update(new UpdateDeliveryAreaCommand(area.getDeliveryAreaId(),
+                new DeliveryAreaName("Zmiana"), TRIANGLE)))
+                .isInstanceOf(ManualDeliveryAreaEditDisabledException.class);
+        assertThatThrownBy(() -> port.delete(area.getDeliveryAreaId()))
+                .isInstanceOf(ManualDeliveryAreaEditDisabledException.class);
+        assertThatThrownBy(() -> port.replaceDepartmentAreas(new ReplaceDepartmentDeliveryAreasCommand(WARSAW_ID,
+                List.of())))
+                .isInstanceOf(ManualDeliveryAreaEditDisabledException.class);
+        assertThat(port.findAll()).containsExactly(area);
+    }
+
+    @Test
+    void shouldKeepAreasAfterStatusChangeWhenRecalculationDisabled() {
+        final DeliveryArea area = port.create(new CreateDeliveryAreaCommand(WARSAW_ID,
+                new DeliveryAreaName("Centrum"), SQUARE));
+        departments.byId.put(WARSAW_ID, inactive(WARSAW_ID, "WA1", 52.23, 21.01));
+
+        port.recalculateAfterDepartmentStatusChanged(WARSAW_ID);
+
+        assertThat(port.findAll()).containsExactly(area);
+    }
+
+    @Test
+    void shouldRemoveAreasOfInactiveDepartmentWhenRecalculationEnabled() {
+        recalculationOnStatusChangeEnabled = true;
+        port.create(new CreateDeliveryAreaCommand(WARSAW_ID, new DeliveryAreaName("Centrum"), SQUARE));
+        final DeliveryArea krakowArea = port.create(new CreateDeliveryAreaCommand(KRAKOW_ID,
+                new DeliveryAreaName("Manual"), TRIANGLE));
+        departments.byId.put(WARSAW_ID, inactive(WARSAW_ID, "WA1", 52.23, 21.01));
+
+        port.recalculateAfterDepartmentStatusChanged(WARSAW_ID);
+
+        assertThat(port.findAll()).containsExactly(krakowArea);
+    }
+
+    @Test
+    void shouldRedistributeAreasAfterStatusChangeWhenRecalculationAndAutomaticAssignmentEnabled() {
+        recalculationOnStatusChangeEnabled = true;
+        automaticAssignmentEnabled = true;
+        departments.listed = List.of(departments.byId.get(KRAKOW_ID), departments.byId.get(WARSAW_ID));
+        port.applyAutomatic(new GenerateDeliveryAreasCommand(List.of(WARSAW_ID, KRAKOW_ID)));
+        final double krakowAreaBefore = totalArea(KRAKOW_ID);
+        final DeliveryAreaDepartment suspendedWarsaw = inactive(WARSAW_ID, "WA1", 52.23, 21.01);
+        departments.byId.put(WARSAW_ID, suspendedWarsaw);
+        departments.listed = List.of(departments.byId.get(KRAKOW_ID), suspendedWarsaw);
+
+        port.recalculateAfterDepartmentStatusChanged(WARSAW_ID);
+
+        assertThat(repository.findByDepartmentId(WARSAW_ID)).isEmpty();
+        assertThat(totalArea(KRAKOW_ID)).isGreaterThan(krakowAreaBefore);
+    }
+
+    private static DeliveryAreaDepartment inactive(final DepartmentId departmentId, final String code,
+                                                   final double latitude, final double longitude) {
+        return new DeliveryAreaDepartment(departmentId, new DepartmentCode(code), false, CountryCode.PL,
+                new GeoPoint(latitude, longitude));
+    }
+
     private double totalArea(final DepartmentId departmentId) {
         return repository.findByDepartmentId(departmentId).stream()
                 .mapToDouble(area -> area.getBoundary().area())
@@ -189,7 +265,7 @@ class DeliveryAreaPortImplTest {
         private List<DeliveryAreaDepartment> listed = List.of();
 
         private InMemoryDepartments(final Map<DepartmentId, DeliveryAreaDepartment> byId) {
-            this.byId = byId;
+            this.byId = new LinkedHashMap<>(byId);
         }
 
         @Override
