@@ -13,5 +13,7 @@ public record DepartmentApi(Long departmentId,
                             String departmentType,
                             String status,
                             Instant createdAt,
-                            Instant updatedAt) {
+                            Instant updatedAt,
+                            String statusChangeReason,
+                            Instant statusChangedAt) {
 }
