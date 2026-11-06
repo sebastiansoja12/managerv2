@@ -78,6 +78,12 @@ public class DepartmentEntity extends BelongsToOperator {
     @AttributeOverride(name = "value", column = @Column(name = "last_modified_by"))
     private UserId lastModifiedBy;
 
+    @Column(name = "status_change_reason", length = 500)
+    private String statusChangeReason;
+
+    @Column(name = "status_changed_at")
+    private Instant statusChangedAt;
+
     public DepartmentEntity() {
     }
 
@@ -95,7 +101,9 @@ public class DepartmentEntity extends BelongsToOperator {
                             final Instant updatedAt,
                             final UserId adminUserId,
                             final UserId createdBy,
-                            final UserId lastModifiedBy) {
+                            final UserId lastModifiedBy,
+                            final String statusChangeReason,
+                            final Instant statusChangedAt) {
         this.departmentId = departmentId;
         this.departmentCode = departmentCode;
         this.departmentAddress = departmentAddress;
@@ -111,6 +119,16 @@ public class DepartmentEntity extends BelongsToOperator {
         this.adminUserId = adminUserId;
         this.createdBy = createdBy;
         this.lastModifiedBy = lastModifiedBy;
+        this.statusChangeReason = statusChangeReason;
+        this.statusChangedAt = statusChangedAt;
+    }
+
+    public String getStatusChangeReason() {
+        return statusChangeReason;
+    }
+
+    public Instant getStatusChangedAt() {
+        return statusChangedAt;
     }
 
     public DepartmentCode getDepartmentCode() {
