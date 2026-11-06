@@ -20,7 +20,8 @@ public abstract class DepartmentToEntityMapper {
 				DepartmentEntity.Status.valueOf(department.getStatus().name()),
 				map(department.getCoordinates()), department.getCreatedAt(),
 				department.getUpdatedAt(), department.getAdminUserId(), department.getCreatedBy(),
-				department.getLastModifiedBy());
+				department.getLastModifiedBy(), department.getStatusChangeReason(),
+				department.getStatusChangedAt());
 		entity.assignOperator(department.operatorId());
 		return entity;
 	}
