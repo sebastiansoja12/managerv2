@@ -2,6 +2,8 @@ package com.warehouse.process.configuration;
 
 import com.warehouse.auth.CurrentOperatorService;
 import com.warehouse.auth.CurrentUserApiService;
+import com.warehouse.auth.UserApiService;
+import com.warehouse.process.domain.port.secondary.UserServicePort;
 import com.warehouse.process.domain.port.secondary.CurrentUserServicePort;
 import com.warehouse.process.infrastructure.adapter.secondary.*;
 import org.springframework.context.ApplicationEventPublisher;
@@ -66,5 +68,10 @@ public class ProcessConfiguration {
     @Bean
     public CurrentUserServicePort currentUserServicePort(final CurrentUserApiService currentUserApiService) {
         return new CurrentUserServiceAdapter(currentUserApiService);
+    }
+
+    @Bean
+    public UserServicePort processUserServicePort(final UserApiService userApiService) {
+        return new UserServiceAdapter(userApiService);
     }
 }
