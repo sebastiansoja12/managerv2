@@ -107,6 +107,6 @@ class ReturnRequestApiValidatorTest {
     private ReturnPackageRequestApi getReturnPackageRequest(final ShipmentIdApi shipmentId, final String reason,
                                                             final DepartmentId departmentId,
                                                             final UserIdApi userId, final ReasonCodeApi reasonCode) {
-        return new ReturnPackageRequestApi(shipmentId, reason, departmentId, userId, reasonCode);
+        return new ReturnPackageRequestApi(shipmentId, null, reason, departmentId, userId, reasonCode);
     }
 }
