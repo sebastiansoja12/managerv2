@@ -22,6 +22,9 @@ public class ReturnPackageEntity {
     @AttributeOverride(name = "value", column = @Column(name = "shipment_id"))
     private ShipmentId shipmentId;
 
+    @AttributeOverride(name = "value", column = @Column(name = "return_shipment_id"))
+    private ShipmentId returnShipmentId;
+
     @Column(name = "reason", nullable = false)
     private String reason;
 
@@ -67,6 +70,7 @@ public class ReturnPackageEntity {
     public ReturnPackageEntity(
             final ReturnId returnId,
             final ShipmentId shipmentId,
+            final ShipmentId returnShipmentId,
             final String reason,
             final Status returnStatus,
             final ReturnToken returnToken,
@@ -81,6 +85,7 @@ public class ReturnPackageEntity {
     ) {
         this.returnId = returnId;
         this.shipmentId = shipmentId;
+        this.returnShipmentId = returnShipmentId;
         this.reason = reason;
         this.returnStatus = returnStatus;
         this.returnToken = returnToken;
@@ -140,6 +145,10 @@ public class ReturnPackageEntity {
 
     public ShipmentId getShipmentId() {
         return shipmentId;
+    }
+
+    public ShipmentId getReturnShipmentId() {
+        return returnShipmentId;
     }
 
     public Instant getUpdatedAt() {

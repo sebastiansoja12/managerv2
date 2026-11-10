@@ -15,6 +15,8 @@ public class ReturnPackageToModelMapper {
         return ReturnPackage.builder()
                 .returnPackageId(new ReturnPackageId(entity.getReturnId().getValue()))
                 .shipmentId(new ShipmentId(entity.getShipmentId().getValue()))
+                .returnShipmentId(entity.getReturnShipmentId() == null ? null
+                        : new ShipmentId(entity.getReturnShipmentId().getValue()))
                 .reason(entity.getReason())
                 .returnStatus(ReturnStatusMapper.toModelStatus(entity.getReturnStatus()))
                 .returnToken(entity.getReturnToken() != null ? new ReturnToken(entity.getReturnToken().getValue()) : null)
