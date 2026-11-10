@@ -11,7 +11,7 @@ final class ReturnLookupFixture {
     static ReturnPackage cancelledReturn() {
         final ReturnPackage returnPackage = new ReturnPackage(
                 new ReturnPackageId(9223372036854775001L), new ShipmentId(6805406359141427429L),
-                "Damaged parcel", new ReturnToken("RETURN-123"), new DepartmentId(1L),
+                null, "Damaged parcel", new ReturnToken("RETURN-123"), new DepartmentId(1L),
                 new DepartmentId(2L), new UserId(1L), new UserId(2L), ReasonCode.DAMAGED, new OperatorId(7L));
         returnPackage.markAsCanceled();
         return returnPackage;
