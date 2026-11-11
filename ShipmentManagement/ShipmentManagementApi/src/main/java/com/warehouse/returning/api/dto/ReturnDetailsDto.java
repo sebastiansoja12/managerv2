@@ -10,6 +10,9 @@ import com.warehouse.commonassets.enumeration.ReturnStatus;
 public record ReturnDetailsDto(
         LongValueDto returnPackageId,
         LongValueDto shipmentId,
+        StringValueDto trackingNumber,
+        LongValueDto returnShipmentId,
+        StringValueDto returnTrackingNumber,
         String reason,
         ReturnStatus returnStatus,
         StringValueDto returnToken,
