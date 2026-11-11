@@ -571,7 +571,7 @@ public class Shipment {
         }
         this.shipmentStatus = ShipmentStatus.DELIVERY;
         this.shipmentRelatedId = null;
-        this.locked = false;
+        this.locked = true;
         markAsModified();
     }
 
@@ -580,6 +580,17 @@ public class Shipment {
         if (!ShipmentStatus.SENT.equals(this.shipmentStatus)
                 && !ShipmentStatus.COLLECTED.equals(this.shipmentStatus)) {
             throw new ShipmentModificationException("Shipment cannot be accepted from status " + shipmentStatus);
+        }
+        this.shipmentStatus = ShipmentStatus.ACCEPTED;
+        this.acceptedAt = LocalDateTime.now();
+        markAsModified();
+    }
+
+    public void acceptInDepartment() {
+        ensureCanBeModified();
+        if (!departmentAcceptableStatuses().contains(this.shipmentStatus)) {
+            throw new ShipmentModificationException("Shipment cannot be accepted in department from status "
+                    + shipmentStatus);
         }
         this.shipmentStatus = ShipmentStatus.ACCEPTED;
         this.acceptedAt = LocalDateTime.now();
@@ -648,7 +659,7 @@ public class Shipment {
     }
 
     public void notifyShipmentCollected() {
-        if (ShipmentStatus.DELIVERY.equals(this.shipmentStatus) || ShipmentStatus.RETURN.equals(this.shipmentStatus)) {
+        if (!draftStatuses().contains(this.shipmentStatus)) {
             throw new ShipmentModificationException("Shipment cannot be collected from status " + shipmentStatus);
         }
         this.shipmentStatus = ShipmentStatus.COLLECTED;
@@ -708,7 +719,9 @@ public class Shipment {
     }
 
     public void notifyShipmentReturnCompleted() {
-        this.shipmentStatus = ShipmentStatus.DELIVERY;
+        if (!ShipmentStatus.RETURN.equals(this.shipmentStatus)) {
+            throw new ShipmentModificationException("Cannot complete return for not returned shipment");
+        }
         this.locked = true;
         markAsModified();
     }
@@ -759,6 +772,23 @@ public class Shipment {
                                    final ShipmentWorkflowSettings shipmentWorkflowSettings,
                                    final ExternalId<UUID> externalShipmentId) {
         ensureShipmentIsNotDelivered();
+        becomeReturnShipment(shipmentId, trackingNumber, shipmentWorkflowSettings.defaultStatus(),
+                shipmentWorkflowSettings.defaultShipmentPriority(), externalShipmentId);
+        return this;
+    }
+
+    public Shipment prepareReturnShipmentDraft(final ShipmentId shipmentId, final TrackingNumber trackingNumber,
+                                               final ShipmentWorkflowSettings shipmentWorkflowSettings,
+                                               final ExternalId<UUID> externalShipmentId) {
+        validateReturnRequest();
+        becomeReturnShipment(shipmentId, trackingNumber, ShipmentStatus.PLANNED,
+                shipmentWorkflowSettings.defaultShipmentPriority(), externalShipmentId);
+        return this;
+    }
+
+    private void becomeReturnShipment(final ShipmentId shipmentId, final TrackingNumber trackingNumber,
+                                      final ShipmentStatus shipmentStatus, final ShipmentPriority shipmentPriority,
+                                      final ExternalId<UUID> externalShipmentId) {
         this.shipmentId = shipmentId;
         this.shipmentType = ShipmentType.PARENT;
 
@@ -787,15 +817,16 @@ public class Shipment {
         this.sender = newSender;
         this.recipient = newRecipient;
 
-        this.shipmentStatus = shipmentWorkflowSettings.defaultStatus();
-        this.shipmentPriority = shipmentWorkflowSettings.defaultShipmentPriority();
+        this.shipmentStatus = shipmentStatus;
+        this.shipmentPriority = shipmentPriority;
         this.externalShipmentId = externalShipmentId;
         this.trackingNumber = trackingNumber;
         this.shipmentRelatedId = null;
+        this.locked = false;
+        this.createdAt = LocalDateTime.now();
+        this.acceptedAt = null;
 
         markAsModified();
-
-        return this;
     }
 
     private void ensureShipmentIsNotDelivered() {
@@ -853,6 +884,10 @@ public class Shipment {
 
     private List<ShipmentStatus> draftStatuses() {
         return List.of(ShipmentStatus.PLANNED, ShipmentStatus.CREATED, ShipmentStatus.PREPARED);
+    }
+
+    private List<ShipmentStatus> departmentAcceptableStatuses() {
+        return List.of(ShipmentStatus.CREATED, ShipmentStatus.PREPARED, ShipmentStatus.COLLECTED, ShipmentStatus.SENT);
     }
 
     private List<ShipmentStatus> reroutableStatuses() {
