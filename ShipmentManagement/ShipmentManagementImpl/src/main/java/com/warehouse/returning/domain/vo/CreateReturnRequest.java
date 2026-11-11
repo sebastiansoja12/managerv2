@@ -6,6 +6,7 @@ import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.returning.domain.enumeration.ReasonCode;
 
 public record CreateReturnRequest(ShipmentId shipmentId,
+                                  ShipmentId returnShipmentId,
                                   String reason,
                                   DepartmentId departmentId,
                                   UserId assignedTo,
