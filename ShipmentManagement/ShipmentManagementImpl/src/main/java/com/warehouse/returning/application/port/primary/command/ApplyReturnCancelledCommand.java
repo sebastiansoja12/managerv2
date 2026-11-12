@@ -9,7 +9,7 @@ import com.warehouse.returning.domain.vo.ReturnPackageId;
 import java.util.Objects;
 import java.util.UUID;
 
-public record ApplyReturnCancelledCommand(UUID eventId, ShipmentId shipmentId,
+public record ApplyReturnCancelledCommand(UUID eventId, ShipmentId shipmentId, ShipmentId returnShipmentId,
                                                   ReturnPackageId returnPackageId, DepartmentId departmentId,
                                                   OperatorId operatorId, UserId userId) {
 
