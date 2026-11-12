@@ -5,7 +5,9 @@ import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.application.port.secondary.DepartmentServicePort;
 import com.warehouse.shipment.application.port.secondary.ReturningServicePort;
+import com.warehouse.shipment.domain.exception.ReturnDetailsUnavailableException;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.vo.RouteLogRecord;
 import com.warehouse.returning.api.dto.ReturnDetailsDto;
 
 public class ShipmentResultFactory {
@@ -33,10 +35,13 @@ public class ShipmentResultFactory {
     }
 
     public ShipmentRouteLog createControlCenter(final Shipment shipment) {
-        final ReturnDetailsDto returnDetails = this.returningServicePort.findReturnByShipmentId(shipment.getShipmentId()).orElse(null);
-        return new ShipmentRouteLog(
-                create(shipment),
-                this.routeLogService.findByShipmentId(shipment.getShipmentId()).orElse(null),
-                returnDetails);
+        final RouteLogRecord routeLog = this.routeLogService.findByShipmentId(shipment.getShipmentId()).orElse(null);
+        try {
+            final ReturnDetailsDto returnDetails = this.returningServicePort
+                    .findReturnByShipmentId(shipment.getShipmentId()).orElse(null);
+            return new ShipmentRouteLog(create(shipment), routeLog, returnDetails, false);
+        } catch (final ReturnDetailsUnavailableException exception) {
+            return new ShipmentRouteLog(create(shipment), routeLog, null, true);
+        }
     }
 }
