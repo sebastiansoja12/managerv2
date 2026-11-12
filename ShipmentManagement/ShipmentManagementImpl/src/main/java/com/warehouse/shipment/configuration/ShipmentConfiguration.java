@@ -10,6 +10,7 @@ import org.springframework.cloud.openfeign.support.FeignHttpMessageConverters;
 import org.springframework.cloud.openfeign.support.HttpMessageConverterCustomizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Configuration;
 
 import tools.jackson.databind.ObjectMapper;
@@ -94,7 +95,7 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public ReturningServicePort returningServicePort(final ReturningApiService returningApiService) {
+	public ReturningServicePort returningServicePort(@Lazy final ReturningApiService returningApiService) {
 		return new ReturningServiceClient(returningApiService);
 	}
 

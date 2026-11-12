@@ -20,7 +20,9 @@ import com.warehouse.returning.infrastructure.adapter.secondary.mapper.ReturnPac
 import com.warehouse.returning.infrastructure.adapter.secondary.mapper.ReturnPackageResponseMapper;
 import com.warehouse.returning.infrastructure.adapter.secondary.mapper.ShipmentServiceMapper;
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.returning.application.port.secondary.CurrentUserServicePort;
 import com.warehouse.returning.application.port.secondary.DepartmentServicePort;
+import com.warehouse.returning.application.service.ReturnDepartmentAccessService;
 import com.warehouse.shipment.infrastructure.ShipmentApiService;
 import com.warehouse.tools.returning.ReturnProperties;
 import org.springframework.context.annotation.Bean;
@@ -50,10 +52,19 @@ public class ReturningConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
+    public ReturnDepartmentAccessService returnDepartmentAccessService(
+            final CurrentUserServicePort currentUserServicePort) {
+        return new ReturnDepartmentAccessService(currentUserServicePort);
+    }
+
+    @Bean
     public ReturnPort returnPort(final ReturningTrackManagerServicePort returningTrackManagerServicePort,
                                  final ShipmentServicePort shipmentServicePort,
-                                 final DepartmentServicePort departmentServicePort) {
-        return new ReturnPortImpl(returningTrackManagerServicePort, shipmentServicePort, departmentServicePort);
+                                 final DepartmentServicePort departmentServicePort,
+                                 final TransactionTemplate transactionTemplate,
+                                 final ReturnDepartmentAccessService returnDepartmentAccessService) {
+        return new ReturnPortImpl(returningTrackManagerServicePort, shipmentServicePort, departmentServicePort,
+                transactionTemplate, returnDepartmentAccessService);
     }
 
     @Bean
@@ -89,14 +100,15 @@ public class ReturningConfiguration implements WebMvcConfigurer {
             final CurrentUserApiService currentUserApiService,
             final ReturnPackageOutboundMapper returnPackageOutboundMapper,
             final ReturnPackageResponseMapper returnPackageResponseMapper,
-            final DepartmentServicePort departmentServicePort) {
+            final DepartmentServicePort departmentServicePort,
+            final ShipmentServicePort shipmentServicePort) {
         return new ReturningTrackManagerServiceClientAdapter(
                 restClientBuilder,
                 returnProperties,
                 currentUserApiService,
                 returnPackageOutboundMapper,
                 returnPackageResponseMapper,
-                new ReturnDetailsMapper(departmentServicePort)
+                new ReturnDetailsMapper(departmentServicePort, shipmentServicePort)
         );
     }
 }
