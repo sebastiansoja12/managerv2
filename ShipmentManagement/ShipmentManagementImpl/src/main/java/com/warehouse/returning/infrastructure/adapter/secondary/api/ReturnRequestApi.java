@@ -10,6 +10,7 @@ public record ReturnRequestApi(List<ReturnPackageRequestApi> requests) {
 
     public record ReturnPackageRequestApi(
             ShipmentId shipmentId,
+            ShipmentId returnShipmentId,
             String reason,
             DepartmentId departmentId,
             UserId userId,
