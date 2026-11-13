@@ -36,6 +36,11 @@ public class ShipmentApiServiceAdapter implements ShipmentApiService {
     }
 
     @Override
+    public ShipmentDetailsDto getShipment(final TrackingNumber trackingNumber) {
+        return mapper.map(shipmentPort.loadShipment(trackingNumber));
+    }
+
+    @Override
     public ShipmentDocumentDto getShipmentDocument(final ShipmentId shipmentId) {
         return mapper.mapDocument(shipmentPort.loadShipment(shipmentId));
     }
@@ -48,6 +53,11 @@ public class ShipmentApiServiceAdapter implements ShipmentApiService {
     @Override
     public ShipmentDetailsDto collectShipment(final TrackingNumber trackingNumber) {
         return mapper.map(shipmentPort.collectShipment(trackingNumber));
+    }
+
+    @Override
+    public ShipmentDetailsDto acceptShipmentInDepartment(final TrackingNumber trackingNumber) {
+        return mapper.map(shipmentPort.acceptShipmentInDepartment(trackingNumber));
     }
 
     @Override
@@ -132,6 +142,16 @@ public class ShipmentApiServiceAdapter implements ShipmentApiService {
     @Override
     public void markReturned(final ShipmentId shipmentId) {
         shipmentPort.markReturned(shipmentId);
+    }
+
+    @Override
+    public void markReturned(final ShipmentId shipmentId, final ShipmentId returnShipmentId) {
+        shipmentPort.markReturned(shipmentId, returnShipmentId);
+    }
+
+    @Override
+    public ShipmentId createReturnShipmentDraft(final ShipmentId shipmentId) {
+        return shipmentPort.createReturnShipmentDraft(shipmentId);
     }
 
     @Override
