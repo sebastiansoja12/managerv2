@@ -178,7 +178,7 @@ class ShipmentApiServiceAdapterTest {
                 routeEvent(1L, LocalDateTime.of(2026, 10, 20, 8, 0), ShipmentStatus.CREATED),
                 routeEvent(2L, LocalDateTime.of(2026, 10, 21, 9, 30), ShipmentStatus.SENT))), null, null);
         when(this.shipmentPort.loadShipmentWithRouteLog(trackingNumber))
-                .thenReturn(new ShipmentRouteLog(shipmentResult(null), routeLog, null));
+                .thenReturn(new ShipmentRouteLog(shipmentResult(null), routeLog, null, false));
 
         final ShipmentTrackingDto tracking = this.adapter.getShipmentTracking(trackingNumber);
 
@@ -193,7 +193,7 @@ class ShipmentApiServiceAdapterTest {
     void shouldReturnNoTrackingEventsWhenRouteLogIsUnavailable() {
         final TrackingNumber trackingNumber = new TrackingNumber("TRK-002");
         when(this.shipmentPort.loadShipmentWithRouteLog(trackingNumber))
-                .thenReturn(new ShipmentRouteLog(shipmentResult(null), null, null));
+                .thenReturn(new ShipmentRouteLog(shipmentResult(null), null, null, false));
 
         assertTrue(this.adapter.getShipmentTracking(trackingNumber).events().isEmpty());
     }
