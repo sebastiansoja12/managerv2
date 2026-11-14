@@ -14,6 +14,10 @@ import java.util.List;
 public interface SupplyPort {
     SupplierCreateResponse create(final SupplierCreateCommand supplierCreateCommand);
     List<Supplier> getAllByCurrentDepartment();
+
+    List<Supplier> getAllInCurrentUserDepartment();
+
+    SupplierCreateResponse createInCurrentUserDepartment(final SupplierCreateCommand supplierCreateCommand);
     Supplier getOneById(final SupplierId supplierId);
     Supplier getOneByCode(final SupplierCode supplierCode);
     Supplier getOneByUserId(final UserId userId);
@@ -29,6 +33,8 @@ public interface SupplyPort {
     DriverLicenseResponse updateDriverLicense(final DriverLicenseCommand request);
     CertificationUpdateResponse updateCertification(CertificationUpdateCommand request);
     DepartmentCode getDepartmentCode(final DepartmentId departmentId);
+    long countAssignedCouriers(final DepartmentId departmentId);
+    void transferCouriers(final DepartmentId sourceDepartmentId, final DepartmentId targetDepartmentId);
 
     int anonymizeAll();
 }
