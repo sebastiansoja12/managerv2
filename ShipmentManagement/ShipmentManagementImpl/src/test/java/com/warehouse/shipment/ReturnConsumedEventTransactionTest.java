@@ -69,11 +69,11 @@ class ReturnConsumedEventTransactionTest {
             return null;
         }).when(shipments).markReturned(new ShipmentId(1L));
         when(shipments.getShipment(new ShipmentId(1L))).thenAnswer(invocation -> new com.warehouse.returning.domain.model.ReturnableShipment(
-                new ShipmentId(1L), ShipmentStatus.valueOf(jdbc.queryForObject("SELECT status FROM test_shipment", String.class)), null));
+                new ShipmentId(1L), null, ShipmentStatus.valueOf(jdbc.queryForObject("SELECT status FROM test_shipment", String.class)), null));
         final ReturnProcessingPortImpl port = new ReturnProcessingPortImpl(
                 shipments, consumed, new OperatorContext(), transactions);
         final ApplyReturnProcessingStartedCommand command = new ApplyReturnProcessingStartedCommand(
-                UUID.randomUUID(), new ShipmentId(1L), new ReturnPackageId(123L), new DepartmentId(3L), new OperatorId(7L), null);
+                UUID.randomUUID(), new ShipmentId(1L), null, new ReturnPackageId(123L), new DepartmentId(3L), new OperatorId(7L), null);
 
         assertThrows(IllegalStateException.class, () -> port.applyProcessingStarted(command));
         assertEquals(0, jdbc.queryForObject("SELECT count(*) FROM return_consumed_event", Integer.class));
@@ -116,7 +116,7 @@ class ReturnConsumedEventTransactionTest {
                 mock(com.warehouse.returning.application.port.secondary.ShipmentServicePort.class);
         when(shipments.getShipment(new ShipmentId(1L))).thenReturn(
                 new com.warehouse.returning.domain.model.ReturnableShipment(
-                        new ShipmentId(1L), ShipmentStatus.RETURN, new ShipmentId(2L)));
+                        new ShipmentId(1L), null, ShipmentStatus.RETURN, new ShipmentId(2L)));
         doAnswer(invocation -> {
             jdbc.update("UPDATE test_shipment SET status = 'CANCELED' WHERE id = 2");
             return null;
@@ -132,7 +132,7 @@ class ReturnConsumedEventTransactionTest {
         final ReturnProcessingPortImpl port = new ReturnProcessingPortImpl(shipments, consumed, new OperatorContext(), transactions);
         final com.warehouse.returning.application.port.primary.command.ApplyReturnCancelledCommand cancelled =
                 new com.warehouse.returning.application.port.primary.command.ApplyReturnCancelledCommand(
-                        UUID.randomUUID(), new ShipmentId(1L), new ReturnPackageId(123L), new DepartmentId(3L), new OperatorId(7L), null);
+                        UUID.randomUUID(), new ShipmentId(1L), null, new ReturnPackageId(123L), new DepartmentId(3L), new OperatorId(7L), null);
 
         assertThrows(IllegalStateException.class, () -> port.applyCancelled(cancelled));
         assertEquals("RETURN", jdbc.queryForObject("SELECT status FROM test_shipment WHERE id = 1", String.class));
@@ -142,7 +142,7 @@ class ReturnConsumedEventTransactionTest {
         port.applyCancelled(cancelled);
         port.applyCancelled(cancelled);
         port.applyProcessingStarted(new ApplyReturnProcessingStartedCommand(UUID.randomUUID(), cancelled.shipmentId(),
-                cancelled.returnPackageId(), cancelled.departmentId(), cancelled.operatorId(), cancelled.userId()));
+                null, cancelled.returnPackageId(), cancelled.departmentId(), cancelled.operatorId(), cancelled.userId()));
 
         assertEquals("DELIVERY", jdbc.queryForObject("SELECT status FROM test_shipment WHERE id = 1", String.class));
         assertEquals("CANCELED", jdbc.queryForObject("SELECT status FROM test_shipment WHERE id = 2", String.class));
