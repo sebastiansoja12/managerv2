@@ -1,5 +1,6 @@
 package com.warehouse.supplier.infrastructure.adapter.secondary;
 
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.identificator.UserId;
@@ -43,6 +44,17 @@ public class SupplierRepositoryImpl implements SupplierRepository {
     public List<Supplier> findAllByCurrentDepartment() {
         final Criteria<SupplierEntity> criteria = this.supplierBaseRepository.createCriteria(SupplierEntity.class);
         return criteria
+                .list()
+                .stream()
+                .map(EntityToModelMapper::map)
+                .toList();
+    }
+
+    @Override
+    public List<Supplier> findAssignedToDepartment(final DepartmentId departmentId) {
+        return this.supplierBaseRepository.createCriteria(SupplierEntity.class)
+                .eq("departmentId.value", departmentId.getValue())
+                .ne("status", SupplierStatus.DELETED)
                 .list()
                 .stream()
                 .map(EntityToModelMapper::map)
