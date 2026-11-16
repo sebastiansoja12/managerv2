@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-04-department-lifecycle-capacity" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="department" columnName="status_change_reason"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="department">
+            <column name="status_change_reason" type="VARCHAR(500)"/>
+            <column name="status_changed_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="daily_capacity" type="INT"/>
+        </addColumn>
+        <addColumn tableName="department_aud">
+            <column name="status_change_reason" type="VARCHAR(500)"/>
+            <column name="status_changed_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="daily_capacity" type="INT"/>
+        </addColumn>
+        <addColumn tableName="department_rd">
+            <column name="status_change_reason" type="VARCHAR(500)"/>
+            <column name="status_changed_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="daily_capacity" type="INT"/>
+        </addColumn>
+        <addColumn tableName="department_rd_aud">
+            <column name="status_change_reason" type="VARCHAR(500)"/>
+            <column name="status_changed_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="daily_capacity" type="INT"/>
+        </addColumn>
+        <sql>UPDATE department SET status_changed_at = updated_at WHERE status &lt;&gt; 'ACTIVE'</sql>
+        <sql>UPDATE department_rd SET status_changed_at = updated_at WHERE status &lt;&gt; 'ACTIVE'</sql>
+    </changeSet>
+
+    <changeSet id="2026-11-04-delivery-network-connection-direction" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="delivery_network_connection" columnName="bidirectional"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="delivery_network_connection">
+            <column name="bidirectional" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>ALTER TABLE delivery_network_connection DROP CONSTRAINT IF EXISTS chk_delivery_network_connection_order</sql>
+        <sql>ALTER TABLE delivery_network_connection ADD CONSTRAINT chk_delivery_network_connection_order CHECK (bidirectional = FALSE OR first_department_id &lt; second_department_id)</sql>
+    </changeSet>
+
+    <changeSet id="2026-11-04-department-configuration-override" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="department_configuration_override"/>
+            </not>
+        </preConditions>
+        <createTable tableName="department_configuration_override">
+            <column name="department_id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="operator_id" type="BIGINT"/>
+            <column name="auto_assign_delivery_areas" type="BOOLEAN"/>
+            <column name="auto_connect_departments" type="BOOLEAN"/>
+            <column name="prevent_department_deletion" type="BOOLEAN"/>
+            <column name="prevent_department_archiving" type="BOOLEAN"/>
+            <column name="delivery_area_mode" type="VARCHAR(32)"/>
+            <column name="max_delivery_radius_km" type="INT"/>
+            <column name="allow_manual_delivery_area_edit" type="BOOLEAN"/>
+            <column name="recalculate_areas_on_status_change" type="BOOLEAN"/>
+            <column name="uncovered_postal_code_policy" type="VARCHAR(32)"/>
+            <column name="sorting_center_connection_count" type="INT"/>
+            <column name="max_auto_connection_distance_km" type="INT"/>
+            <column name="require_sorting_connection_for_activation" type="BOOLEAN"/>
+            <column name="bidirectional_connections_by_default" type="BOOLEAN"/>
+            <column name="require_status_change_reason" type="BOOLEAN"/>
+            <column name="block_deactivation_with_active_work" type="BOOLEAN"/>
+            <column name="work_transfer_on_deactivation" type="VARCHAR(32)"/>
+            <column name="auto_archive_inactive_after_days" type="INT"/>
+            <column name="daily_capacity" type="INT"/>
+            <column name="capacity_warning_threshold_percent" type="INT"/>
+            <column name="redirect_overflow_to_neighbour" type="BOOLEAN"/>
+            <column name="max_couriers_per_department" type="INT"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="department_configuration_override" baseColumnNames="department_id"
+                                 constraintName="fk_department_configuration_override_department"
+                                 referencedTableName="department" referencedColumnNames="department_id"
+                                 onDelete="CASCADE"/>
+        <createIndex tableName="department_configuration_override" indexName="idx_department_configuration_override_operator">
+            <column name="operator_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2026-11-05-department-daily-capacity-to-override" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="department" columnName="daily_capacity"/>
+        </preConditions>
+        <sql>INSERT INTO department_configuration_override (department_id, operator_id, daily_capacity)
+             SELECT department_id, operator_id, daily_capacity FROM department
+             WHERE daily_capacity IS NOT NULL
+             ON CONFLICT (department_id) DO UPDATE SET daily_capacity = EXCLUDED.daily_capacity</sql>
+        <dropColumn tableName="department" columnName="daily_capacity"/>
+        <dropColumn tableName="department_aud" columnName="daily_capacity"/>
+        <dropColumn tableName="department_rd" columnName="daily_capacity"/>
+        <dropColumn tableName="department_rd_aud" columnName="daily_capacity"/>
+    </changeSet>
+</databaseChangeLog>
