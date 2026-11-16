@@ -72,6 +72,12 @@ public class RerouteTokenPortImpl implements RerouteTokenPort {
             throw new MissingRerouteEmailException();
         }
         final Instant now = clock.instant();
+        final long issuedInWindow = rerouteTokenRepository.countIssuedSince(shipment.shipmentId(),
+                now.minus(rerouteTokenPolicy.issueWindow()));
+        if (!rerouteTokenPolicy.allowsIssuing(issuedInWindow)) {
+            log.warn("Reroute token request limit reached for shipment {}", shipment.shipmentId().getValue());
+            throw new RerouteTokenRequestsExceededException();
+        }
 
         rerouteTokenRepository.findActiveByShipmentId(shipment.shipmentId(), now)
                 .forEach(activeToken -> {
@@ -87,6 +93,11 @@ public class RerouteTokenPortImpl implements RerouteTokenPort {
     }
 
     @Override
+    @Transactional(noRollbackFor = {
+            InvalidRerouteTokenException.class,
+            RerouteTokenAttemptsExceededException.class,
+            RerouteTokenExpiredException.class
+    })
     public ReroutableShipmentDetails verifyToken(final VerifyRerouteTokenCommand command) {
         final ReroutableShipment shipment = loadReroutableShipment(command.trackingNumber());
         final RerouteToken rerouteToken = verifiedToken(shipment, command.token());
@@ -119,7 +130,7 @@ public class RerouteTokenPortImpl implements RerouteTokenPort {
 
     private RerouteToken verifiedToken(final ReroutableShipment shipment, final RerouteTokenValue providedToken) {
         final Instant now = clock.instant();
-        final RerouteToken rerouteToken = rerouteTokenRepository.findLatestByShipmentId(shipment.shipmentId())
+        final RerouteToken rerouteToken = rerouteTokenRepository.findLatestByShipmentIdForUpdate(shipment.shipmentId())
                 .orElseThrow(RerouteTokenExpiredException::new);
         final RerouteTokenVerification verification = rerouteToken.verify(providedToken, now, rerouteTokenPolicy);
         if (verification == RerouteTokenVerification.VALID) {

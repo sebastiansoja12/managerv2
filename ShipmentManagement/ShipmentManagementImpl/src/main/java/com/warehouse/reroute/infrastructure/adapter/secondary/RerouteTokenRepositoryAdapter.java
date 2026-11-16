@@ -27,7 +27,12 @@ public class RerouteTokenRepositoryAdapter implements RerouteTokenRepository {
     }
 
     @Override
-    public Optional<RerouteToken> findLatestByShipmentId(final ShipmentId shipmentId) {
+    public long countIssuedSince(final ShipmentId shipmentId, final Instant since) {
+        return repository.countByShipmentIdAndCreatedAtAfter(shipmentId.getValue(), since);
+    }
+
+    @Override
+    public Optional<RerouteToken> findLatestByShipmentIdForUpdate(final ShipmentId shipmentId) {
         return repository.findFirstByShipmentIdOrderByCreatedAtDescIdDesc(shipmentId.getValue())
                 .map(persistenceMapper::toDomain);
     }

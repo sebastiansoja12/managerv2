@@ -1,5 +1,11 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
+import java.time.Clock;
+import java.time.Duration;
+import org.springframework.beans.factory.annotation.Value;
+import com.warehouse.commonassets.security.AttemptLimiter;
+import com.warehouse.commonassets.security.InMemoryAttemptLimiter;
+import jakarta.servlet.http.HttpServletRequest;
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
@@ -37,22 +43,34 @@ public class ShipmentExternalController {
 
     private final OperatorContext operatorContext;
 
+    private final AttemptLimiter clientRequestLimiter;
+
     public ShipmentExternalController(final ShipmentPort shipmentPort,
                                       final ShipmentRequestValidator shipmentRequestValidator,
                                       final ShipmentRequestMapper requestMapper,
                                       final ShipmentConfigurationPort shipmentConfigurationServicePort,
-                                      final OperatorContext operatorContext) {
+                                      final OperatorContext operatorContext,
+                                      @Value("${shipment.external.max-requests-per-client:30}")
+                                      final int maxRequestsPerClient,
+                                      @Value("${shipment.external.rate-window:PT10M}") final Duration rateWindow) {
         this.shipmentPort = shipmentPort;
         this.shipmentRequestValidator = shipmentRequestValidator;
         this.requestMapper = requestMapper;
         this.shipmentConfigurationServicePort = shipmentConfigurationServicePort;
         this.operatorContext = operatorContext;
+        this.clientRequestLimiter = new InMemoryAttemptLimiter(maxRequestsPerClient, rateWindow, Clock.systemUTC());
     }
 
     @PostMapping
     @Counted(value = "controller.shipment.external.create")
     @Timed(value = "controller.shipment.external.create")
-    public ResponseEntity<?> create(@RequestBody final ExternalShipmentCreateRequestApi externalShipmentRequest) {
+    public ResponseEntity<?> create(@RequestBody final ExternalShipmentCreateRequestApi externalShipmentRequest,
+                                    final HttpServletRequest servletRequest) {
+        final String clientAddress = servletRequest.getRemoteAddr();
+        if (this.clientRequestLimiter.isBlocked(clientAddress)) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Too many requests. Try again later");
+        }
+        this.clientRequestLimiter.recordAttempt(clientAddress);
         if (externalShipmentRequest.operatorId() == null) {
             return ResponseEntity.badRequest().body("Operator must be selected");
         }
