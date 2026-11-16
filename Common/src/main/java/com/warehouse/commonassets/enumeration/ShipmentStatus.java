@@ -15,7 +15,11 @@ public enum ShipmentStatus {
 
     SENT,
 
+    HANDOVER,
+
     UNDELIVERABLE,
+
+    LOST,
 
     DELIVERY,
 

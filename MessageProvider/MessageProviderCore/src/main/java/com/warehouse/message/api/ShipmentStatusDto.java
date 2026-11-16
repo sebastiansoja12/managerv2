@@ -18,6 +18,8 @@ public enum ShipmentStatusDto {
 
     SENT,
 
+    HANDOVER,
+
     DELIVERY,
 
     RETURN,
@@ -34,6 +36,7 @@ public enum ShipmentStatusDto {
             case ACCEPTED -> ACCEPTED;
             case REROUTE -> REROUTE;
             case SENT -> SENT;
+            case HANDOVER -> HANDOVER;
             case DELIVERY -> DELIVERY;
             case RETURN -> RETURN;
             case REDIRECT -> REDIRECT;

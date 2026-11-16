@@ -8,8 +8,10 @@ public enum ShipmentStatus {
     COLLECTED,
     REROUTE,
     SENT,
+    HANDOVER,
     DELIVERY,
     RETURN,
     REDIRECT,
-    CANCELED
+    CANCELED,
+    LOST
 }
