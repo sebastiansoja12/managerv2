@@ -22,4 +22,21 @@ public interface RouteLogRecordReadRepository extends JpaRepository<RouteLogReco
     @Override
     @EntityGraph(attributePaths = "routeLogRecordDetails")
     List<RouteLogRecordEntity> findAll();
+
+    @EntityGraph(attributePaths = "routeLogRecordDetails")
+    @Query("""
+            SELECT r FROM RouteLogRecordEntity r
+            WHERE r.shipmentId = :shipmentId
+              AND EXISTS (SELECT d.id FROM RouteLogRecordDetailEntity d
+                          WHERE d.routeLogRecord = r AND d.operatorId.value = :operatorId)
+            """)
+    Optional<RouteLogRecordEntity> findByShipmentIdAndOperatorId(ShipmentId shipmentId, Long operatorId);
+
+    @EntityGraph(attributePaths = "routeLogRecordDetails")
+    @Query("""
+            SELECT r FROM RouteLogRecordEntity r
+            WHERE EXISTS (SELECT d.id FROM RouteLogRecordDetailEntity d
+                          WHERE d.routeLogRecord = r AND d.operatorId.value = :operatorId)
+            """)
+    List<RouteLogRecordEntity> findAllByOperatorId(Long operatorId);
 }

@@ -83,7 +83,8 @@ public interface RouteLogToEntityMapper {
     }
 
     default RouteLogRecordId map(final UUID routeLogRecordId) {
-        return new RouteLogRecordId(routeLogRecordId.toString());
+        // A record without an identifier gets one from the entity when it is first persisted.
+        return routeLogRecordId == null ? null : new RouteLogRecordId(routeLogRecordId.toString());
     }
 
 }

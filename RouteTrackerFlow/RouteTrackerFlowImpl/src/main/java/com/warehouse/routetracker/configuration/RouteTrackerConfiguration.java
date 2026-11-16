@@ -6,6 +6,7 @@ import org.springframework.kafka.annotation.EnableKafka;
 
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPortImpl;
+import com.warehouse.routetracker.domain.port.secondary.CurrentUserServicePort;
 import com.warehouse.routetracker.domain.port.secondary.RouteLogRepository;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.RouteLogRecordReadRepository;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.RouteLogRepositoryImpl;
@@ -20,7 +21,8 @@ public class RouteTrackerConfiguration {
 	}
 
 	@Bean
-	public RouteTrackerLogPort routeTrackerLogPort(RouteLogRepository repository) {
-		return new RouteTrackerLogPortImpl(repository);
+	public RouteTrackerLogPort routeTrackerLogPort(RouteLogRepository repository,
+			CurrentUserServicePort currentUserServicePort) {
+		return new RouteTrackerLogPortImpl(repository, currentUserServicePort);
 	}
 }
