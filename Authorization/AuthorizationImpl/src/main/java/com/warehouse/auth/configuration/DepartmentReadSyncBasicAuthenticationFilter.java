@@ -1,5 +1,6 @@
 package com.warehouse.auth.configuration;
 
+import com.warehouse.auth.domain.service.LoginThrottle;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -33,12 +34,17 @@ public class DepartmentReadSyncBasicAuthenticationFilter extends OncePerRequestF
     private static final String BASIC_PREFIX = "Basic ";
 
     private final UserReadRepository userReadRepository;
+    private static final String LOGIN_SCOPE = "user";
+
     private final PasswordEncoder passwordEncoder;
+    private final LoginThrottle loginThrottle;
 
     public DepartmentReadSyncBasicAuthenticationFilter(final UserReadRepository userReadRepository,
-                                                       final PasswordEncoder passwordEncoder) {
+                                                       final PasswordEncoder passwordEncoder,
+                                                       final LoginThrottle loginThrottle) {
         this.userReadRepository = userReadRepository;
         this.passwordEncoder = passwordEncoder;
+        this.loginThrottle = loginThrottle;
     }
 
     @Override
@@ -52,15 +58,22 @@ public class DepartmentReadSyncBasicAuthenticationFilter extends OncePerRequestF
         }
 
         final BasicCredentials credentials = decode(authorization);
+        final String clientAddress = request.getRemoteAddr();
+        if (loginThrottle.isBlocked(LOGIN_SCOPE, credentials.username(), clientAddress)) {
+            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+            return;
+        }
         final UserEntity user = userReadRepository.findByUsername(credentials.username())
                 .filter(foundUser -> passwordEncoder.matches(credentials.password(), foundUser.getPassword()))
                 .filter(this::hasRefreshPermission)
                 .orElse(null);
 
         if (user == null) {
+            loginThrottle.recordFailure(LOGIN_SCOPE, credentials.username(), clientAddress);
             unauthorized(response);
             return;
         }
+        loginThrottle.recordSuccess(LOGIN_SCOPE, credentials.username());
 
         final SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(new UsernameTenantPasswordAuthenticationToken(

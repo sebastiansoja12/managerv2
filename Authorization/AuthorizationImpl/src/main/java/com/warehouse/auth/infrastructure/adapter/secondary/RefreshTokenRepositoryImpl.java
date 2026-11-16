@@ -43,6 +43,11 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
     }
 
     @Override
+    public void deleteAllByUsername(final String username) {
+        repository.deleteAllByUsername(username);
+    }
+
+    @Override
     public void delete(final String refreshToken) {
         repository.deleteByToken(hash(refreshToken));
     }

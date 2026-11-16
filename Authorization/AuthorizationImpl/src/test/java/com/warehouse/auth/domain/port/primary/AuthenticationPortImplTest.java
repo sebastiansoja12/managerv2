@@ -334,6 +334,11 @@ class AuthenticationPortImplTest {
         }
 
         @Override
+        public void deleteAllByUsername(final String username) {
+            refreshTokens.values().removeIf(token -> username.equals(token.getUsername()));
+        }
+
+        @Override
         public void expireAt(final String refreshToken, final LocalDateTime expiryDate) {
             final RefreshToken token = refreshTokens.get(refreshToken);
             if (token != null && token.getExpiryDate().isAfter(expiryDate)) {

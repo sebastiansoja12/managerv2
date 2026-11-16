@@ -25,6 +25,11 @@ public interface RefreshTokenReadRepository extends JpaRepository<RefreshTokenEn
 
     @Modifying
     @Transactional
+    @Query("delete from RefreshTokenEntity t where t.username = :username")
+    void deleteAllByUsername(@Param("username") String username);
+
+    @Modifying
+    @Transactional
     @Query("update RefreshTokenEntity t set t.expiryDate = :expiryDate where t.token = :token and t.expiryDate > :expiryDate")
     void shortenExpiry(@Param("token") String token, @Param("expiryDate") LocalDateTime expiryDate);
 

@@ -91,6 +91,7 @@ public class UserPortImpl implements UserPort {
     @Override
     public void changePassword(final UserId userId, final String encodedPassword) {
         this.userService.changePassword(userId, encodedPassword);
+        this.authenticationService.revokeSessions(this.userService.findUserById(userId).getUsername());
     }
 
     @Override

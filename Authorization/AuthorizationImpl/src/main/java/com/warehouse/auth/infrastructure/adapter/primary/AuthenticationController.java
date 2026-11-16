@@ -1,5 +1,8 @@
 package com.warehouse.auth.infrastructure.adapter.primary;
 
+import com.warehouse.auth.domain.service.LoginThrottle;
+import com.warehouse.auth.AccessUserControl;
+import com.warehouse.commonassets.enumeration.UserPermission;
 import java.util.Map;
 
 import org.springframework.http.CacheControl;
@@ -32,6 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class AuthenticationController {
 
+    private static final String LOGIN_SCOPE = "user";
+
     private final AuthenticationPort authenticationPort;
 
     private final AuthenticationResponseMapper responseMapper;
@@ -39,8 +44,10 @@ public class AuthenticationController {
     private final AuthCookieService authCookieService;
 
     private final CookieCsrfTokenRepository csrfTokenRepository;
+    private final LoginThrottle loginThrottle;
 
     @PostMapping("/signup")
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_CREATE, UserPermission.ROLE_MANAGER_CREATE})
     public ResponseEntity<?> create(@RequestBody final RegisterRequestDto registerRequest) {
         final RegisterRequest request = RegisterRequest.from(registerRequest);
         final RegisterResponse registerResponse = this.authenticationPort.signup(request);
@@ -49,14 +56,22 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody final LoginRequestDto loginRequest,
+                                      final HttpServletRequest servletRequest,
                                       final HttpServletResponse servletResponse) {
+        final LoginRequest request = LoginRequest.from(loginRequest);
+        final String clientAddress = servletRequest.getRemoteAddr();
+        if (loginThrottle.isBlocked(LOGIN_SCOPE, request.username(), clientAddress)) {
+            log.warn("Login rejected: too many failed attempts");
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).cacheControl(CacheControl.noStore()).build();
+        }
         try {
-            final LoginRequest request = LoginRequest.from(loginRequest);
             final AuthenticationResponse authentication = authenticationPort.login(request);
+            loginThrottle.recordSuccess(LOGIN_SCOPE, request.username());
             authCookieService.addAuthenticationCookies(servletResponse,
                     authentication.accessToken(), authentication.refreshToken());
             return ResponseEntity.status(HttpStatus.NO_CONTENT).cacheControl(CacheControl.noStore()).build();
-        } catch (AuthenticationErrorException exception) {
+        } catch (AuthenticationErrorException | UserNotFoundException exception) {
+            loginThrottle.recordFailure(LOGIN_SCOPE, request.username(), clientAddress);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).cacheControl(CacheControl.noStore()).build();
         }
     }

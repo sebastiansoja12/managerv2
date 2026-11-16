@@ -1,5 +1,6 @@
 package com.warehouse.auth.infrastructure.adapter.primary;
 
+import com.warehouse.auth.domain.service.LoginThrottle;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,24 +38,37 @@ public class PlatformOwnerAuthenticationController {
 
     private final PlatformOwnerAuthenticationPort platformOwnerAuthenticationPort;
 
+    private static final String LOGIN_SCOPE = "platform-owner";
+
     private final AuthCookieService authCookieService;
 
+    private final LoginThrottle loginThrottle;
+
     public PlatformOwnerAuthenticationController(final PlatformOwnerAuthenticationPort platformOwnerAuthenticationPort,
-                                                 final AuthCookieService authCookieService) {
+                                                 final AuthCookieService authCookieService,
+                                                 final LoginThrottle loginThrottle) {
         this.platformOwnerAuthenticationPort = platformOwnerAuthenticationPort;
         this.authCookieService = authCookieService;
+        this.loginThrottle = loginThrottle;
     }
 
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody final LoginRequestDto loginRequest,
+                                      final HttpServletRequest servletRequest,
                                       final HttpServletResponse servletResponse) {
+        final LoginRequest request = LoginRequest.from(loginRequest);
+        final String clientAddress = servletRequest.getRemoteAddr();
+        if (loginThrottle.isBlocked(LOGIN_SCOPE, request.username(), clientAddress)) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).cacheControl(CacheControl.noStore()).build();
+        }
         try {
-            final PlatformOwnerAuthentication authentication =
-                    platformOwnerAuthenticationPort.login(LoginRequest.from(loginRequest));
+            final PlatformOwnerAuthentication authentication = platformOwnerAuthenticationPort.login(request);
+            loginThrottle.recordSuccess(LOGIN_SCOPE, request.username());
             authCookieService.addPlatformOwnerAuthenticationCookies(servletResponse, authentication.accessToken(),
                     authentication.refreshToken());
             return noContent();
         } catch (AuthenticationErrorException exception) {
+            loginThrottle.recordFailure(LOGIN_SCOPE, request.username(), clientAddress);
             return unauthorized();
         }
     }
