@@ -54,4 +54,36 @@ class TenantMdcFilterTest {
         assertEquals(401, response.getStatus());
         assertFalse(filterChainInvoked.get());
     }
+
+    @Test
+    void shouldRejectCookieAuthenticatedChangeWithoutCsrfToken() throws Exception {
+        final ApiKeyService apiKeyService = mock(ApiKeyService.class);
+        final TenantMdcFilter filter = new TenantMdcFilter(apiKeyService, "AUTH-TOKEN");
+        final MockHttpServletRequest request = new MockHttpServletRequest("POST", "/v1/api/returns");
+        request.setCookies(new Cookie("AUTH-TOKEN", "access-token"), new Cookie("XSRF-TOKEN", "csrf"));
+        final MockHttpServletResponse response = new MockHttpServletResponse();
+        final AtomicBoolean filterChainInvoked = new AtomicBoolean(false);
+
+        filter.doFilter(request, response, (servletRequest, servletResponse) -> filterChainInvoked.set(true));
+
+        assertEquals(403, response.getStatus());
+        assertFalse(filterChainInvoked.get());
+    }
+
+    @Test
+    void shouldAcceptCookieAuthenticatedChangeWithMatchingCsrfToken() throws Exception {
+        final ApiKeyService apiKeyService = mock(ApiKeyService.class);
+        final TenantMdcFilter filter = new TenantMdcFilter(apiKeyService, "AUTH-TOKEN");
+        final MockHttpServletRequest request = new MockHttpServletRequest("POST", "/v1/api/returns");
+        request.setCookies(new Cookie("AUTH-TOKEN", "access-token"), new Cookie("XSRF-TOKEN", "csrf"));
+        request.addHeader("X-XSRF-TOKEN", "csrf");
+        final MockHttpServletResponse response = new MockHttpServletResponse();
+        final AtomicBoolean filterChainInvoked = new AtomicBoolean(false);
+        when(apiKeyService.decodeJwt("access-token")).thenReturn(new DecodedApiOperator(
+                new UserId(11L), new DepartmentId(1L), new com.warehouse.returning.domain.vo.OperatorId(10001L), "operator"));
+
+        filter.doFilter(request, response, (servletRequest, servletResponse) -> filterChainInvoked.set(true));
+
+        assertTrue(filterChainInvoked.get());
+    }
 }

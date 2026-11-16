@@ -52,7 +52,8 @@ class McpServerArchitectureTest {
                         "com.warehouse.organisationstructure.operatorconfiguration..",
                         "com.warehouse.logisticsdelivery.domain..", "com.warehouse.logisticsdelivery.application..",
                         "com.warehouse.logisticsdelivery.infrastructure..",
-                        "com.warehouse.supplier.domain..", "com.warehouse.supplier.infrastructure..")
+                        "com.warehouse.supplier.domain..", "com.warehouse.supplier.application..",
+                        "com.warehouse.supplier.infrastructure..")
                 .check(MCP_CLASSES);
     }
 

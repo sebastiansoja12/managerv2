@@ -1,5 +1,7 @@
 package com.warehouse.process.infrastructure.adapter.primary;
 
+import com.warehouse.auth.AccessUserControl;
+import com.warehouse.commonassets.enumeration.AccountLevel;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -26,6 +28,7 @@ import com.warehouse.process.infrastructure.dto.ShipmentUpdateDto;
 
 import io.swagger.v3.oas.annotations.Operation;
 
+@AccessUserControl
 @RestController
 @RequestMapping("/process-logs")
 public class ProcessLogController {
@@ -64,6 +67,7 @@ public class ProcessLogController {
     }
 
     @PostMapping
+    @AccessUserControl(minimumLevel = AccountLevel.SUPERADMIN)
     @Operation(summary = "[TEST] Create process log", description = "⚠️ Test Endpoint")
     public ResponseEntity<?> create(@RequestBody final InitializeProcessRequestDto request) {
         final OperatorId operatorId = currentOperatorService.getCurrentOperatorId();
@@ -71,6 +75,7 @@ public class ProcessLogController {
     }
 
     @DeleteMapping("/{processStatus}/{processId}")
+    @AccessUserControl(minimumLevel = AccountLevel.SUPERADMIN)
     @Operation(summary = "[TEST] Finish process", description = "⚠️ Test Endpoint")
     public ResponseEntity<?> del(@PathVariable final ProcessStatus processStatus, @PathVariable final String processId) {
         final ProcessId id = new ProcessId(UUID.fromString(processId));
@@ -79,6 +84,7 @@ public class ProcessLogController {
     }
 
     @PutMapping("/{processId}")
+    @AccessUserControl(minimumLevel = AccountLevel.SUPERADMIN)
     @Operation(summary = "[TEST] Update shipment", description = "⚠️ Test Endpoint")
     public ResponseEntity<?> updateShipment(@PathVariable String processId, @RequestBody ShipmentUpdateDto shipmentUpdate) {
         final ProcessId prId = new ProcessId(UUID.fromString(processId));

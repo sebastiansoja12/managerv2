@@ -1,5 +1,6 @@
 package com.warehouse.csv.infrastructure.adapter.primary;
 
+import com.warehouse.auth.AccessUserControl;
 import com.itextpdf.text.DocumentException;
 import com.warehouse.csv.domain.port.primary.CsvPort;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@AccessUserControl
 @RestController
 @RequestMapping("/csv")
 @AllArgsConstructor
