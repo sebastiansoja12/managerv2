@@ -89,7 +89,7 @@ public class DeliveryNetworkConfiguration {
         return new AuditLogServiceAdapter(integrationEventPublisher);
     }
 
-    @Bean
+    @Bean("deliveryNetwork.shipmentDeliveryServicePort")
     public ShipmentDeliveryServicePort shipmentDeliveryServicePort(
             final ShipmentApiService shipmentApiService,
             final DeliveryApiService deliveryApiService) {
