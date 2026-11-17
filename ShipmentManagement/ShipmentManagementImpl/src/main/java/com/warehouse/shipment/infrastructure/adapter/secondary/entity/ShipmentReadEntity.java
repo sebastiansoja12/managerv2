@@ -153,10 +153,21 @@ public class ShipmentReadEntity extends BelongsToOperator {
     @AttributeOverride(name = "value", column = @Column(name = "destination_department_id"))
     private DepartmentId destinationDepartmentId;
 
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "current_department_id"))
+    private DepartmentId currentDepartmentId;
+
     @Column(name = "planned_delivery_at")
     private LocalDateTime plannedDeliveryAt;
 
     @Column(name = "delivered_at")
     private LocalDateTime deliveredAt;
+
+    @Column(name = "incident_reported", nullable = false)
+    private Boolean incidentReported;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "pallet_tracking_number"))
+    private PalletTrackingNumber palletTrackingNumber;
 
 }

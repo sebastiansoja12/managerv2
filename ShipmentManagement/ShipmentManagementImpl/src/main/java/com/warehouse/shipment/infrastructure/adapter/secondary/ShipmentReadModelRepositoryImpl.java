@@ -4,6 +4,7 @@ import com.warehouse.shipment.domain.vo.ShipmentDeliveryDetails;
 import java.util.Optional;
 
 import com.warehouse.commonassets.identificator.ExternalId;
+import com.warehouse.commonassets.identificator.PalletTrackingNumber;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
@@ -33,10 +34,7 @@ public class ShipmentReadModelRepositoryImpl implements ShipmentReadModelReposit
 
     @Override
     public void sync(final ShipmentSnapshot snapshot, final ShipmentDeliveryDetails deliveryDetails) {
-        final Optional<ShipmentReadEntity> currentEntity = currentEntity(snapshot);
-        save(snapshot, currentEntity, deliveryDetails.keepingOriginOf(currentEntity
-                .map(this.persistenceMapper::deliveryDetails)
-                .orElse(ShipmentDeliveryDetails.NONE)));
+        save(snapshot, currentEntity(snapshot), deliveryDetails);
     }
 
     private Optional<ShipmentReadEntity> currentEntity(final ShipmentSnapshot snapshot) {
@@ -47,13 +45,26 @@ public class ShipmentReadModelRepositoryImpl implements ShipmentReadModelReposit
 
     private void save(final ShipmentSnapshot snapshot, final Optional<ShipmentReadEntity> currentEntity,
                       final ShipmentDeliveryDetails deliveryDetails) {
-        final ShipmentReadEntity entity = this.persistenceMapper.withDeliveryDetails(
-                this.persistenceMapper.toReadEntity(snapshot), deliveryDetails);
+        final ShipmentReadEntity entity = this.persistenceMapper.withPalletTrackingNumber(
+                this.persistenceMapper.withIncidentReported(
+                        this.persistenceMapper.withDeliveryDetails(this.persistenceMapper.toReadEntity(snapshot),
+                                deliveryDetails),
+                        currentEntity.map(this.persistenceMapper::incidentReported).orElse(false)),
+                currentEntity.map(this.persistenceMapper::palletTrackingNumber).orElse(null));
         if (currentEntity.isPresent()) {
             this.repository.update(entity);
         } else {
             this.repository.create(entity);
         }
+    }
+
+    @Override
+    public void changeIncidentReported(final ShipmentId shipmentId, final boolean incidentReported) {
+        this.repository.createCriteria(ShipmentReadEntity.class)
+                .eq("shipmentId.value", shipmentId.getValue())
+                .one()
+                .ifPresent(entity -> this.repository.update(
+                        this.persistenceMapper.withIncidentReported(entity, incidentReported)));
     }
 
     @Override
@@ -65,6 +76,47 @@ public class ShipmentReadModelRepositoryImpl implements ShipmentReadModelReposit
                 .eq("shipmentId.value", shipmentId.getValue())
                 .one()
                 .map(this::toDomain);
+    }
+
+    @Override
+    public Optional<ShipmentDeliveryDetails> findDeliveryDetails(final ShipmentId shipmentId) {
+        if (shipmentId == null) {
+            return Optional.empty();
+        }
+        return this.repository.createCriteria(ShipmentReadEntity.class)
+                .eq("shipmentId.value", shipmentId.getValue())
+                .one()
+                .map(this.persistenceMapper::deliveryDetails);
+    }
+
+    @Override
+    public boolean isIncidentReported(final ShipmentId shipmentId) {
+        return shipmentId != null && this.repository.createCriteria(ShipmentReadEntity.class)
+                .eq("shipmentId.value", shipmentId.getValue())
+                .one()
+                .map(this.persistenceMapper::incidentReported)
+                .orElse(false);
+    }
+
+    @Override
+    public void changePalletTrackingNumber(final ShipmentId shipmentId,
+                                           final PalletTrackingNumber palletTrackingNumber) {
+        this.repository.createCriteria(ShipmentReadEntity.class)
+                .eq("shipmentId.value", shipmentId.getValue())
+                .one()
+                .ifPresent(entity -> this.repository.update(
+                        this.persistenceMapper.withPalletTrackingNumber(entity, palletTrackingNumber)));
+    }
+
+    @Override
+    public Optional<PalletTrackingNumber> findPalletTrackingNumber(final ShipmentId shipmentId) {
+        if (shipmentId == null) {
+            return Optional.empty();
+        }
+        return this.repository.createCriteria(ShipmentReadEntity.class)
+                .eq("shipmentId.value", shipmentId.getValue())
+                .one()
+                .map(this.persistenceMapper::palletTrackingNumber);
     }
 
     @Override

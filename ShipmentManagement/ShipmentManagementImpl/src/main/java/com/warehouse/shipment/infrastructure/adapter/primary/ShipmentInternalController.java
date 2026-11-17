@@ -1,5 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
+import com.warehouse.auth.AccessUserControl;
+import com.warehouse.commonassets.enumeration.UserPermission;
 import com.warehouse.shipment.application.port.secondary.DepartmentServicePort;
 import com.warehouse.shipment.application.port.primary.command.*;
 import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResponse;
@@ -30,6 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+@AccessUserControl
 @RestController
 @RequestMapping("/shipments")
 public class ShipmentInternalController {
@@ -85,6 +88,7 @@ public class ShipmentInternalController {
     }
 
     @PutMapping("/cancel/{id}")
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     @Counted(value = "controller.shipment.cancel")
     @Timed(value = "controller.shipment.cancel")
     public ResponseEntity<?> cancel(@PathVariable final Long id) {
@@ -157,6 +161,7 @@ public class ShipmentInternalController {
     }
 
     @PutMapping("/person")
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     @Counted(value = "controller.person.update")
     @Timed(value = "controller.person.update")
     public ResponseEntity<?> updatePerson(@RequestBody final PersonApi personRequest,
@@ -170,6 +175,7 @@ public class ShipmentInternalController {
     }
     
     @PutMapping("/shipment-type")
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     @Counted(value = "controller.shipment.type.update")
     @Timed(value = "controller.shipment.type.update")
 	public ResponseEntity<?> changeShipmentType(@RequestParam("shipmentType") final ShipmentType shipmentType,

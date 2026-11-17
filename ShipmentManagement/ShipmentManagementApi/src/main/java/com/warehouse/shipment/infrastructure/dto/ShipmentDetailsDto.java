@@ -1,6 +1,7 @@
 package com.warehouse.shipment.infrastructure.dto;
 
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 
 import java.math.BigDecimal;
@@ -13,12 +14,13 @@ public record ShipmentDetailsDto(ShipmentId shipmentId,
                                  String recipientCity,
                                  String recipientPostalCode,
                                  String recipientStreet,
-                                 String recipientCountryCode) {
+                                 String recipientCountryCode,
+                                 DepartmentId destinationDepartmentId) {
 
     public ShipmentDetailsDto(final ShipmentId shipmentId,
                               final ShipmentStatus status,
                               final ShipmentId relatedShipmentId,
                               final BigDecimal weightInKilograms) {
-        this(shipmentId, status, relatedShipmentId, weightInKilograms, null, null, null, null, null);
+        this(shipmentId, status, relatedShipmentId, weightInKilograms, null, null, null, null, null, null);
     }
 }

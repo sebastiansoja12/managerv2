@@ -1,5 +1,6 @@
 package com.warehouse.logisticsdelivery.infrastructure.adapter.primary;
 
+import com.warehouse.auth.AccessUserControl;
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -26,6 +27,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Function;
 
+@AccessUserControl
 @RestController
 @RequestMapping("/deliveries")
 public class DeliveryQueryController {

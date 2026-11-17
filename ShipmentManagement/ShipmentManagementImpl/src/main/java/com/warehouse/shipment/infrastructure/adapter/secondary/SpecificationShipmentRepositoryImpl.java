@@ -110,7 +110,8 @@ public class SpecificationShipmentRepositoryImpl
     }
 
     private ShipmentListEntry toListEntry(final ShipmentReadEntity entity) {
-        return new ShipmentListEntry(persistenceMapper.toDomain(entity), persistenceMapper.deliveryDetails(entity));
+        return new ShipmentListEntry(persistenceMapper.toDomain(entity), persistenceMapper.deliveryDetails(entity),
+                persistenceMapper.incidentReported(entity), persistenceMapper.palletTrackingNumber(entity));
     }
 
     private Predicate departmentMatches(final Criteria<ShipmentReadEntity> criteria, final DepartmentId departmentId) {

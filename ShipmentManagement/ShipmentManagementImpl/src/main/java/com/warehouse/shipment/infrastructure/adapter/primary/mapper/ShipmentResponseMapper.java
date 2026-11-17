@@ -61,21 +61,26 @@ public interface ShipmentResponseMapper {
 
     default ShipmentDto map(final ShipmentResult shipmentResult) {
         final ShipmentDto shipment = map(shipmentResult.snapshot());
-        if (shipment == null || shipmentResult.deliveryDetails() == null) {
-            return shipment;
+        if (shipment == null) {
+            return null;
         }
         return new ShipmentDto(shipment.getShipmentId(), shipment.getSender(), shipment.getRecipient(),
                 shipment.getShipmentStatus(), shipment.getShipmentRelatedId(), shipment.getShipmentPriority(),
                 shipment.getTrackingNumber(), shipment.getPrice(), shipment.getLocked(), shipment.getCreatedAt(),
                 shipment.getUpdatedAt(), shipment.getDimensions(), shipment.getWeight(),
                 shipment.getCustomerReference(), shipment.getContentDescription(), shipment.getDeclaredValue(),
-                shipment.getPackagingType(), shipment.getServiceLevel(), map(shipmentResult.deliveryDetails()));
+                shipment.getPackagingType(), shipment.getServiceLevel(),
+                shipmentResult.deliveryDetails() == null ? null : map(shipmentResult.deliveryDetails()),
+                shipmentResult.incidentReported(),
+                shipmentResult.palletTrackingNumber() == null ? null
+                        : new PalletTrackingNumberDto(shipmentResult.palletTrackingNumber().value()));
     }
 
     default ShipmentDeliveryApi map(final ShipmentDeliveryDetails deliveryDetails) {
         return new ShipmentDeliveryApi(
                 DepartmentIdDto.from(deliveryDetails.originDepartmentId()),
                 DepartmentIdDto.from(deliveryDetails.destinationDepartmentId()),
+                DepartmentIdDto.from(deliveryDetails.currentDepartmentId()),
                 deliveryDetails.plannedDeliveryAt(),
                 deliveryDetails.deliveredAt());
     }

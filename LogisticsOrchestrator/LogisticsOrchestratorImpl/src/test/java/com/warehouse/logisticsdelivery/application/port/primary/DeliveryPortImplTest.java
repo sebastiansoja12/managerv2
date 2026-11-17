@@ -19,6 +19,7 @@ import com.warehouse.logisticsdelivery.application.port.primary.command.Register
 import com.warehouse.logisticsdelivery.application.port.primary.command.CompleteDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDerivedDeliveryCommand;
+import com.warehouse.logisticsdelivery.application.port.primary.command.ChangePalletDeliveryRouteCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreatePalletDeliveryCommand;
 import com.warehouse.logisticsdelivery.domain.model.DeliveryStep;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryCommentCode;
@@ -385,7 +386,7 @@ class DeliveryPortImplTest {
     }
 
     @Test
-    void shouldCompletePalletDeliveryAndContinueShipmentDeliveriesFromUnloadDepartment() {
+    void shouldCompletePalletDeliveryAndContinueShipmentDeliveriesKeepingOrigin() {
         final DepartmentId unloadDepartmentId = new DepartmentId(8L);
         final Delivery palletDelivery = Delivery.forPallet(DeliveryTarget.pallet("pallet-1"), ORIGIN_DEPARTMENT_ID,
                 unloadDepartmentId, USER_ID);
@@ -406,10 +407,12 @@ class DeliveryPortImplTest {
         final Delivery continuation = saved.getAllValues().get(1);
         assertThat(palletDelivery.getStatus()).isEqualTo(DeliveryLifecycleStatus.COMPLETED);
         assertThat(continuation.isActive()).isTrue();
-        assertThat(continuation.getOriginDepartmentId()).isEqualTo(unloadDepartmentId);
+        assertThat(continuation.getOriginDepartmentId()).isEqualTo(ORIGIN_DEPARTMENT_ID);
         assertThat(continuation.getDestinationDepartmentId()).isEqualTo(DESTINATION_DEPARTMENT_ID);
         assertThat(continuation.getDeliverySteps().getLast().commentCode())
                 .isEqualTo(DeliveryCommentCode.UNLOADED_FROM_PALLET);
+        assertThat(continuation.getDeliverySteps().getLast().snapshot().departmentId())
+                .isEqualTo(unloadDepartmentId);
         assertThat(publishedEvent(DeliveryCompleted.class).getSnapshot().deliveryId())
                 .isEqualTo(palletDelivery.getDeliveryId());
         assertThat(publishedEvent(DeliveryCreated.class).getSnapshot().deliveryId())
@@ -461,6 +464,37 @@ class DeliveryPortImplTest {
 
         this.deliveryPort.unloadPalletDelivery(new UnloadPalletDeliveryCommand(new PalletId("pallet-1"),
                 List.of(new ShipmentId(10L)), DESTINATION_DEPARTMENT_ID, USER_ID));
+
+        verify(this.deliveryRepository, never()).createOrUpdate(any());
+        verifyNoInteractions(this.domainEventPublisher);
+    }
+
+    @Test
+    void shouldChangePalletDeliveryRouteWhenPalletDepartmentsAreChanged() {
+        final Delivery palletDelivery = Delivery.forPallet(DeliveryTarget.pallet("pallet-1"), ORIGIN_DEPARTMENT_ID,
+                DESTINATION_DEPARTMENT_ID, USER_ID);
+        when(this.deliveryRepository.findCurrentByTargetAndType(DeliveryTarget.pallet("pallet-1"), DeliveryType.OUTBOUND))
+                .thenReturn(Optional.of(palletDelivery));
+
+        this.deliveryPort.changePalletDeliveryRoute(new ChangePalletDeliveryRouteCommand(new PalletId("pallet-1"),
+                new DepartmentId(8L), new DepartmentId(9L)));
+
+        verify(this.deliveryRepository).createOrUpdate(palletDelivery);
+        assertThat(palletDelivery.getOriginDepartmentId()).isEqualTo(new DepartmentId(8L));
+        assertThat(palletDelivery.getDestinationDepartmentId()).isEqualTo(new DepartmentId(9L));
+        assertThat(publishedEvent(DeliveryModified.class).getSnapshot().deliveryId())
+                .isEqualTo(palletDelivery.getDeliveryId());
+    }
+
+    @Test
+    void shouldIgnoreRouteChangeWhenPalletDeliveryIsAlreadyCanceled() {
+        final Delivery palletDelivery = Delivery.forPallet(DeliveryTarget.pallet("pallet-1"), null, null, USER_ID);
+        palletDelivery.markAsCanceled();
+        when(this.deliveryRepository.findCurrentByTargetAndType(DeliveryTarget.pallet("pallet-1"), DeliveryType.OUTBOUND))
+                .thenReturn(Optional.of(palletDelivery));
+
+        this.deliveryPort.changePalletDeliveryRoute(new ChangePalletDeliveryRouteCommand(new PalletId("pallet-1"),
+                new DepartmentId(8L), new DepartmentId(9L)));
 
         verify(this.deliveryRepository, never()).createOrUpdate(any());
         verifyNoInteractions(this.domainEventPublisher);

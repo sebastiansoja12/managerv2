@@ -25,7 +25,6 @@ public class ShipmentDepartmentResolutionService {
             return resolvePickupPointDepartmentId(
                     command.getDeliveryPickupPointId(), ErrorCode.DESTINATION_DEPARTMENT_NOT_AVAILABLE);
         }
-        // the delivery department for an address is resolved by the delivery once the shipment is created
         return Result.success(null);
     }
 
@@ -34,7 +33,6 @@ public class ShipmentDepartmentResolutionService {
             return resolvePickupPointDepartmentId(command.getPickupPointId(), ErrorCode.ORIGIN_DEPARTMENT_NOT_AVAILABLE);
         }
         if (command.getSource() == ShipmentSource.EXTERNAL) {
-            // origin department of an external shipment is unknown until it is handed over to a department
             return Result.success(null);
         }
         return validateDepartmentId(operatorContextProvider.currentDepartmentId(),

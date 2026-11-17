@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public record ShipmentDeliveryReadModelData(ShipmentId shipmentId,
                                             DepartmentId originDepartmentId,
                                             DepartmentId destinationDepartmentId,
+                                            DepartmentId currentDepartmentId,
                                             LocalDateTime plannedDeliveryAt,
                                             LocalDateTime deliveredAt) {
 }

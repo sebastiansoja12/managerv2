@@ -1,6 +1,7 @@
 package com.warehouse.shipment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.RETURNS_SELF;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -12,8 +13,10 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.identificator.PalletTrackingNumber;
 import com.warehouse.commonassets.repository.Criteria;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
+import com.warehouse.shipment.domain.vo.ShipmentListEntry;
 import com.warehouse.shipment.domain.vo.ShipmentSearchCriteria;
 import com.warehouse.shipment.infrastructure.adapter.secondary.SpecificationShipmentRepositoryImpl;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentReadEntity;
@@ -50,6 +53,23 @@ class SpecificationShipmentRepositoryImplTest {
         verify(criteria).in("shipmentStatus", List.of(ShipmentStatus.CREATED));
         verify(criteria, never()).firstResult(40);
         verify(criteria, never()).maxResults(20);
+    }
+
+    @Test
+    void shouldReturnPalletTrackingNumberFromReadModelWhenListing() {
+        final ShipmentPersistenceMapper mapper = new ShipmentPersistenceMapper();
+        final PalletTrackingNumber palletTrackingNumber = new PalletTrackingNumber("PAL000000000001");
+        final ShipmentReadEntity onPallet = mapper.withPalletTrackingNumber(
+                mapper.toReadEntity(DataTestCreator.shipment().snapshot()), palletTrackingNumber);
+        final ShipmentReadEntity offPallet = mapper.toReadEntity(DataTestCreator.shipment().snapshot());
+        when(repository.createCriteria(ShipmentReadEntity.class)).thenReturn(criteria);
+        when(criteria.list()).thenReturn(List.of(onPallet, offPallet));
+
+        final List<ShipmentListEntry> entries = new SpecificationShipmentRepositoryImpl(repository, mapper)
+                .list(searchCriteria(0, 20));
+
+        assertEquals(palletTrackingNumber, entries.getFirst().palletTrackingNumber());
+        assertNull(entries.getLast().palletTrackingNumber());
     }
 
     private ShipmentSearchCriteria searchCriteria(final Integer page, final Integer size) {

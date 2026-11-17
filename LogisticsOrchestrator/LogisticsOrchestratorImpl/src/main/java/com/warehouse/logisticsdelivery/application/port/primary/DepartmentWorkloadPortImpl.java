@@ -50,11 +50,10 @@ public class DepartmentWorkloadPortImpl implements DepartmentWorkloadPort {
             final DepartmentId destinationDepartmentId = Objects.equals(delivery.getDestinationDepartmentId(),
                     sourceDepartmentId) ? targetDepartmentId : delivery.getDestinationDepartmentId();
             try {
-                if (delivery.changeRoute(originDepartmentId, destinationDepartmentId, delivery.getPickupMethod(),
-                        delivery.getPickupPointId(), delivery.getDeliveryPickupPointId())) {
-                    this.deliveryRepository.createOrUpdate(delivery);
-                    this.domainEventPublisher.publish(new DeliveryModified(delivery.snapshot(), Instant.now()));
-                }
+                delivery.changeRoute(originDepartmentId, destinationDepartmentId, delivery.getPickupMethod(),
+                        delivery.getPickupPointId(), delivery.getDeliveryPickupPointId());
+                this.deliveryRepository.createOrUpdate(delivery);
+                this.domainEventPublisher.publish(new DeliveryModified(delivery.snapshot(), Instant.now()));
             } catch (final DeliveryModificationException exception) {
                 log.warn("Delivery {} was not transferred from department {} to {}: {}",
                         delivery.getDeliveryId().getId(), sourceDepartmentId.getValue(),

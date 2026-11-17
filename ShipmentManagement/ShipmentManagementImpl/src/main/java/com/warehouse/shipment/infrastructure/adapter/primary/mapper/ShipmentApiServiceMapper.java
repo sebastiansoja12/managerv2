@@ -37,7 +37,8 @@ public class ShipmentApiServiceMapper {
                 shipment.snapshot().recipient() == null ? null : shipment.snapshot().recipient().getPostalCode(),
                 shipment.snapshot().recipient() == null ? null : shipment.snapshot().recipient().getStreet(),
                 shipment.snapshot().recipient() == null || shipment.snapshot().recipient().getCountryCode() == null
-                        ? null : shipment.snapshot().recipient().getCountryCode().name()
+                        ? null : shipment.snapshot().recipient().getCountryCode().name(),
+                shipment.deliveryDetails() == null ? null : shipment.deliveryDetails().destinationDepartmentId()
         );
     }
 

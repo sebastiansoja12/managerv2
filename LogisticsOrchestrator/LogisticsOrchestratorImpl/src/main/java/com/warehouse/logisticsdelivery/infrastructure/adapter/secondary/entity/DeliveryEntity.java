@@ -63,6 +63,10 @@ public class DeliveryEntity extends BelongsToOperator {
     @AttributeOverride(name = "value", column = @Column(name = "destination_department_id"))
     private DepartmentId destinationDepartmentId;
 
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "current_department_id"))
+    private DepartmentId currentDepartmentId;
+
     @Column(name = "pickup_method")
     @Enumerated(EnumType.STRING)
     private PickupMethod pickupMethod;
@@ -118,6 +122,7 @@ public class DeliveryEntity extends BelongsToOperator {
                            final DeliveryLifecycleStatus status,
                            final DepartmentId originDepartmentId,
                            final DepartmentId destinationDepartmentId,
+                           final DepartmentId currentDepartmentId,
                            final PickupMethod pickupMethod,
                            final DeliveryMethod method,
                            final PickupPointId pickupPointId,
@@ -141,6 +146,7 @@ public class DeliveryEntity extends BelongsToOperator {
         this.status = status;
         this.originDepartmentId = originDepartmentId;
         this.destinationDepartmentId = destinationDepartmentId;
+        this.currentDepartmentId = currentDepartmentId;
         this.pickupMethod = pickupMethod;
         this.method = method;
         this.pickupPointId = pickupPointId;
@@ -166,6 +172,7 @@ public class DeliveryEntity extends BelongsToOperator {
     public DeliveryLifecycleStatus getStatus() { return status; }
     public DepartmentId getOriginDepartmentId() { return originDepartmentId; }
     public DepartmentId getDestinationDepartmentId() { return destinationDepartmentId; }
+    public DepartmentId getCurrentDepartmentId() { return currentDepartmentId; }
     public PickupMethod getPickupMethod() { return pickupMethod; }
     public DeliveryMethod getMethod() { return method; }
     public PickupPointId getPickupPointId() { return pickupPointId; }

@@ -1,5 +1,6 @@
 package com.warehouse.logisticsdelivery.infrastructure.adapter.primary;
 
+import com.warehouse.auth.AccessUserControl;
 import com.warehouse.logisticsdelivery.application.port.primary.DepartmentWorkloadPort;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.api.DepartmentLoadApiResponse;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@AccessUserControl
 @RestController
 @RequestMapping("/deliveries/department-loads")
 public class DepartmentLoadController {

@@ -16,6 +16,7 @@ import com.warehouse.shipment.api.event.ShipmentCanceledIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentDestinationChangedIntegrationEvent;
+import com.warehouse.shipment.api.event.ShipmentPalletReadModelChanged;
 import com.warehouse.shipment.api.event.ShipmentReadModelChanged;
 import com.warehouse.shipment.api.event.ShipmentStatusChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.snapshot.ShipmentEventData;
@@ -273,6 +274,7 @@ class ShipmentArchitectureTest {
                 ShipmentDestinationChangedIntegrationEvent.class,
                 ShipmentStatusChangedIntegrationEvent.class,
                 ShipmentReadModelChanged.class,
+                ShipmentPalletReadModelChanged.class,
                 ShipmentCanceledIntegrationEvent.class
         );
 
@@ -288,6 +290,7 @@ class ShipmentArchitectureTest {
                 ShipmentDestinationChangedIntegrationEvent.class,
                 ShipmentStatusChangedIntegrationEvent.class,
                 ShipmentReadModelChanged.class,
+                ShipmentPalletReadModelChanged.class,
                 ShipmentCanceledIntegrationEvent.class
         );
 
@@ -347,6 +350,35 @@ class ShipmentArchitectureTest {
         assertThat(Path.of(
                 "../../Common/src/main/java/com/warehouse/commonassets/kafka/domain/model/KafkaEventKey.java"))
                 .doesNotExist();
+    }
+
+    @Test
+    void palletReadModelIntegrationEventShouldUseTransportNeutralContract() throws IOException {
+        final String eventSource = Files.readString(Path.of("../ShipmentManagementApi/src/main/java/com/warehouse/"
+                + "shipment/api/event/ShipmentPalletReadModelChanged.java"));
+        assertThat(eventSource)
+                .contains("ShipmentPalletReadModelData")
+                .contains("IntegrationEventKey")
+                .doesNotContain("palletmanagement")
+                .doesNotContain("commonassets.kafka");
+
+        final String dataSource = Files.readString(Path.of("../ShipmentManagementApi/src/main/java/com/warehouse/"
+                + "shipment/api/event/snapshot/ShipmentPalletReadModelData.java"));
+        assertThat(dataSource)
+                .contains("ShipmentId shipmentId")
+                .contains("PalletTrackingNumber palletTrackingNumber")
+                .doesNotContain("shipment.domain")
+                .doesNotContain("palletmanagement")
+                .doesNotContain("commonassets.kafka");
+
+        assertThat(Files.readString(Path.of("src/main/java/com/warehouse/shipment/infrastructure/adapter/primary/"
+                + "kafka/ShipmentIntegrationListener.java")))
+                .contains("ShipmentPalletReadModelChanged")
+                .contains("syncPalletTrackingNumber")
+                .doesNotContain("ShipmentReadModelRepository");
+
+        assertThat(Files.readString(Path.of("../../Application/src/main/resources/application.properties")))
+                .contains("manager.kafka.integration-events.routes.shipment.read-model.pallet-changed=");
     }
 
     @Test
