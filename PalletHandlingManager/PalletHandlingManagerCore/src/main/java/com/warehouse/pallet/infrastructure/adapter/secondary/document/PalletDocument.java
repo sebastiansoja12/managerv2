@@ -49,6 +49,7 @@ public class PalletDocument {
     private final SealNumber sealNumber;
     private final Boolean refrigerated;
     private final MaxPalletWeight maxPalletWeight;
+    private final Boolean mixedDestinationsAllowed;
 
 	public static PalletDocument from(final Pallet pallet) {
 		return new PalletDocument(pallet.getPalletId(), pallet.getTrackingNumber(), pallet.getOperatorId(),
@@ -57,7 +58,7 @@ public class PalletDocument {
 				pallet.getStorageStatus(), DriverDocument.from(pallet.getDriver()), pallet.getPalletWeight(),
 				pallet.getDimension(), pallet.getPalletHandlingPriority(),
 				PalletType.valueOf(pallet.getPalletType().name()), pallet.getSealNumber(), pallet.isRefrigerated(),
-				pallet.getMaxPalletWeight());
+				pallet.getMaxPalletWeight(), pallet.isMixedDestinationsAllowed());
 	}
 
 
@@ -79,7 +80,8 @@ public class PalletDocument {
                           final PalletType palletType,
                           final SealNumber sealNumber,
                           final Boolean refrigerated,
-                          final MaxPalletWeight maxPalletWeight) {
+                          final MaxPalletWeight maxPalletWeight,
+                          final Boolean mixedDestinationsAllowed) {
         this.palletId = palletId;
         this.trackingNumber = trackingNumber;
         this.operatorId = operatorId;
@@ -98,6 +100,7 @@ public class PalletDocument {
         this.sealNumber = sealNumber;
         this.refrigerated = refrigerated;
         this.maxPalletWeight = maxPalletWeight;
+        this.mixedDestinationsAllowed = mixedDestinationsAllowed;
     }
 
     public Instant getCreated() {
@@ -158,6 +161,10 @@ public class PalletDocument {
 
     public Boolean isRefrigerated() {
         return refrigerated;
+    }
+
+    public Boolean isMixedDestinationsAllowed() {
+        return mixedDestinationsAllowed;
     }
 
     public SealNumber getSealNumber() {

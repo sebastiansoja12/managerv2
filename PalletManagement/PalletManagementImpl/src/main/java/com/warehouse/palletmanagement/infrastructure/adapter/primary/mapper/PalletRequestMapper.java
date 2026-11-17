@@ -86,6 +86,7 @@ public class PalletRequestMapper {
             throw new IllegalArgumentException("All pallet dimensions are required");
         }
         return new PalletUpdate(trim(request.palletType()), trim(request.handlingPriority()), request.refrigerated(),
+                request.mixedDestinationsAllowed(),
                 anyDimension ? new PalletDimension(request.length(), request.width(), request.height()) : null,
                 trim(request.sealNumber()));
     }

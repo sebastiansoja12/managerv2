@@ -104,14 +104,15 @@ class PalletStorageServiceImplTest {
     }
 
     @Test
-    void shouldNotSaveWhenPalletAlreadyLoaded() {
+    void shouldKeepPalletLoadedWhenLoadedAgain() {
         final Pallet pallet = Pallet.withShipments(new PalletId("p1"), new TrackingNumber("PAL1"), OPERATOR_ID,
                 List.of(new ShipmentId(1L)));
         pallet.markLoaded();
         when(this.palletRepository.findById(new PalletId("p1"))).thenReturn(pallet);
 
-        assertThat(this.palletStorageService.markLoaded(new PalletId("p1"))).isFalse();
-        verify(this.palletRepository, never()).createOrUpdate(any());
+        final Pallet loaded = this.palletStorageService.markLoaded(new PalletId("p1"));
+
+        assertThat(loaded.getPalletStatus()).isEqualTo(PalletStatus.LOADED);
     }
 
     @Test

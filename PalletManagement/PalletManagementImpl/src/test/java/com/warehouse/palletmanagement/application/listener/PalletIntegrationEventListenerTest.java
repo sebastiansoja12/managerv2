@@ -3,13 +3,16 @@ package com.warehouse.palletmanagement.application.listener;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.palletmanagement.PalletFixture;
+import com.warehouse.palletmanagement.api.event.PalletDepartmentsChangedIntegrationEvent;
 import com.warehouse.palletmanagement.api.event.PalletLoadedIntegrationEvent;
 import com.warehouse.palletmanagement.api.event.PalletLoadingRevertedIntegrationEvent;
 import com.warehouse.palletmanagement.api.event.PalletUnloadedIntegrationEvent;
 import com.warehouse.palletmanagement.application.port.secondary.PalletIntegrationEventServicePort;
+import com.warehouse.palletmanagement.domain.event.PalletDepartmentsChanged;
 import com.warehouse.palletmanagement.domain.event.PalletLoaded;
 import com.warehouse.palletmanagement.domain.event.PalletLoadingReverted;
 import com.warehouse.palletmanagement.domain.event.PalletUnloaded;
+import com.warehouse.palletmanagement.domain.vo.PalletDepartmentsChangedSnapshot;
 import com.warehouse.palletmanagement.domain.vo.PalletLoadedSnapshot;
 import com.warehouse.palletmanagement.domain.vo.PalletLoadingRevertedSnapshot;
 import com.warehouse.palletmanagement.domain.vo.PalletUnloadedSnapshot;
@@ -58,6 +61,23 @@ class PalletIntegrationEventListenerTest {
         verify(servicePort).publishEvent(event.capture());
         assertThat(event.getValue().payload().palletId()).isEqualTo("pallet-1");
         assertThat(event.getValue().payload().shipmentIds()).containsExactly(1L);
+        assertThat(event.getValue().eventKey()).isEqualTo("pallet-1");
+    }
+
+    @Test
+    void shouldPublishPalletDepartmentsChangedIntegrationEvent() {
+        final PalletIntegrationEventServicePort servicePort = mock(PalletIntegrationEventServicePort.class);
+        final PalletIntegrationEventListener listener = new PalletIntegrationEventListener(servicePort);
+
+        listener.handle(new PalletDepartmentsChanged(new PalletDepartmentsChangedSnapshot(PalletFixture.PALLET_ID,
+                PalletFixture.TRACKING_NUMBER, new DepartmentId(5L), new DepartmentId(6L)), Instant.now()));
+
+        final ArgumentCaptor<PalletDepartmentsChangedIntegrationEvent> event =
+                ArgumentCaptor.forClass(PalletDepartmentsChangedIntegrationEvent.class);
+        verify(servicePort).publishEvent(event.capture());
+        assertThat(event.getValue().payload().palletId()).isEqualTo(PalletFixture.PALLET_ID);
+        assertThat(event.getValue().payload().originDepartmentId()).isEqualTo(new DepartmentId(5L));
+        assertThat(event.getValue().payload().destinationDepartmentId()).isEqualTo(new DepartmentId(6L));
         assertThat(event.getValue().eventKey()).isEqualTo("pallet-1");
     }
 

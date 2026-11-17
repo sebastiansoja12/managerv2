@@ -4,12 +4,15 @@ import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaEventListener;
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryPort;
+import com.warehouse.logisticsdelivery.application.port.primary.command.ChangePalletDeliveryRouteCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreatePalletDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.RevertPalletDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.UnloadPalletDeliveryCommand;
+import com.warehouse.palletmanagement.api.event.PalletDepartmentsChangedIntegrationEvent;
 import com.warehouse.palletmanagement.api.event.PalletLoadedIntegrationEvent;
 import com.warehouse.palletmanagement.api.event.PalletLoadingRevertedIntegrationEvent;
 import com.warehouse.palletmanagement.api.event.PalletUnloadedIntegrationEvent;
+import com.warehouse.palletmanagement.api.event.snapshot.PalletDepartmentsChangedEventData;
 import com.warehouse.palletmanagement.api.event.snapshot.PalletLoadedEventData;
 import com.warehouse.palletmanagement.api.event.snapshot.PalletLoadingRevertedEventData;
 import com.warehouse.palletmanagement.api.event.snapshot.PalletUnloadedEventData;
@@ -62,6 +65,18 @@ public class PalletDeliveryEventListener {
                 payload.unloadedShipmentIds(),
                 payload.unloadDepartmentId(),
                 event.userId()));
+    }
+
+    @KafkaEventListener(
+            topics = "${manager.kafka.topics.pallet-departments-changed:pallet.departments-changed}",
+            groupId = "${manager.kafka.consumer-groups.pallet-departments-changed-delivery:logistics-orchestrator-pallet-departments-changed}"
+    )
+    public void handle(final PalletDepartmentsChangedIntegrationEvent event) {
+        final PalletDepartmentsChangedEventData payload = event.payload();
+        deliveryPort.changePalletDeliveryRoute(new ChangePalletDeliveryRouteCommand(
+                payload.palletId(),
+                payload.originDepartmentId(),
+                payload.destinationDepartmentId()));
     }
 
     private static DepartmentId departmentId(final Long departmentId) {

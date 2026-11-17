@@ -2,16 +2,20 @@ package com.warehouse.palletmanagement.application.listener;
 
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.palletmanagement.api.event.PalletDepartmentsChangedIntegrationEvent;
 import com.warehouse.palletmanagement.api.event.PalletLoadedIntegrationEvent;
 import com.warehouse.palletmanagement.api.event.PalletLoadingRevertedIntegrationEvent;
 import com.warehouse.palletmanagement.api.event.PalletUnloadedIntegrationEvent;
+import com.warehouse.palletmanagement.api.event.snapshot.PalletDepartmentsChangedEventData;
 import com.warehouse.palletmanagement.api.event.snapshot.PalletLoadedEventData;
 import com.warehouse.palletmanagement.api.event.snapshot.PalletLoadingRevertedEventData;
 import com.warehouse.palletmanagement.api.event.snapshot.PalletUnloadedEventData;
 import com.warehouse.palletmanagement.application.port.secondary.PalletIntegrationEventServicePort;
+import com.warehouse.palletmanagement.domain.event.PalletDepartmentsChanged;
 import com.warehouse.palletmanagement.domain.event.PalletLoaded;
 import com.warehouse.palletmanagement.domain.event.PalletLoadingReverted;
 import com.warehouse.palletmanagement.domain.event.PalletUnloaded;
+import com.warehouse.palletmanagement.domain.vo.PalletDepartmentsChangedSnapshot;
 import com.warehouse.palletmanagement.domain.vo.PalletLoadedSnapshot;
 import com.warehouse.palletmanagement.domain.vo.PalletLoadingRevertedSnapshot;
 import com.warehouse.palletmanagement.domain.vo.PalletUnloadedSnapshot;
@@ -63,6 +67,17 @@ public class PalletIntegrationEventListener {
                 snapshot.missingShipmentIds(),
                 snapshot.unloadDepartmentId());
         this.palletIntegrationEventServicePort.publishEvent(new PalletUnloadedIntegrationEvent(eventData));
+    }
+
+    @EventListener
+    public void handle(final PalletDepartmentsChanged event) {
+        final PalletDepartmentsChangedSnapshot snapshot = event.getSnapshot();
+        final PalletDepartmentsChangedEventData eventData = new PalletDepartmentsChangedEventData(
+                snapshot.palletId(),
+                snapshot.trackingNumber(),
+                snapshot.originDepartmentId(),
+                snapshot.destinationDepartmentId());
+        this.palletIntegrationEventServicePort.publishEvent(new PalletDepartmentsChangedIntegrationEvent(eventData));
     }
 
     private static Long departmentValue(final DepartmentId departmentId) {

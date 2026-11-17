@@ -127,8 +127,9 @@ class PalletTest {
         final Pallet pallet = Pallet.withShipments(PALLET_ID, TRACKING_NUMBER, OPERATOR_ID,
                 List.of(new ShipmentId(1L)));
 
-        assertThat(pallet.markLoaded()).isTrue();
-        assertThat(pallet.markLoaded()).isFalse();
+        pallet.markLoaded();
+        pallet.markLoaded();
+
         assertThat(pallet.getPalletStatus()).isEqualTo(PalletStatus.LOADED);
     }
 
@@ -235,12 +236,13 @@ class PalletTest {
     void shouldUpdatePalletAttributes() {
         final Pallet pallet = Pallet.empty(PALLET_ID, TRACKING_NUMBER, OPERATOR_ID);
 
-        pallet.update(PalletType.CHILD, PalletHandlingPriority.HIGH, true, new Dimension(120, 80, 150),
+        pallet.update(PalletType.CHILD, PalletHandlingPriority.HIGH, true, true, new Dimension(120, 80, 150),
                 new SealNumber(" S-1 "));
 
         assertThat(pallet.getPalletType()).isEqualTo(PalletType.CHILD);
         assertThat(pallet.getPalletHandlingPriority()).isEqualTo(PalletHandlingPriority.HIGH);
         assertThat(pallet.isRefrigerated()).isTrue();
+        assertThat(pallet.isMixedDestinationsAllowed()).isTrue();
         assertThat(pallet.getDimension().getLength()).isEqualTo(120);
         assertThat(pallet.getSealNumber().value()).isEqualTo("S-1");
     }
@@ -252,7 +254,7 @@ class PalletTest {
         pallet.markLoaded();
         pallet.changeTransportStatus(PalletStatus.IN_TRANSIT);
 
-        assertThatThrownBy(() -> pallet.update(PalletType.CHILD, null, null, null, null))
+        assertThatThrownBy(() -> pallet.update(PalletType.CHILD, null, null, null, null, null))
                 .isInstanceOf(PalletModificationException.class);
     }
 
@@ -260,10 +262,10 @@ class PalletTest {
     void shouldRejectInvalidPalletUpdate() {
         final Pallet pallet = Pallet.empty(PALLET_ID, TRACKING_NUMBER, OPERATOR_ID);
 
-        assertThatThrownBy(() -> pallet.update(null, null, null, new Dimension(0, 80, 150), null))
+        assertThatThrownBy(() -> pallet.update(null, null, null, null, new Dimension(0, 80, 150), null))
                 .isInstanceOf(PalletModificationException.class);
         pallet.cancel();
-        assertThatThrownBy(() -> pallet.update(PalletType.CHILD, null, null, null, null))
+        assertThatThrownBy(() -> pallet.update(PalletType.CHILD, null, null, null, null, null))
                 .isInstanceOf(PalletModificationException.class);
     }
 
@@ -281,8 +283,10 @@ class PalletTest {
     void shouldCancelPalletIdempotently() {
         final Pallet pallet = Pallet.empty(PALLET_ID, TRACKING_NUMBER, OPERATOR_ID);
 
-        assertThat(pallet.cancel()).isTrue();
-        assertThat(pallet.cancel()).isFalse();
+        pallet.cancel();
+        pallet.cancel();
+
+        assertThat(pallet.getPalletStatus()).isEqualTo(PalletStatus.CANCELLED);
         assertThatThrownBy(() -> pallet.changePalletStatus(PalletStatus.READY))
                 .isInstanceOf(PalletStatusTransitionException.class);
     }

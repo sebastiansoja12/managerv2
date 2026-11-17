@@ -42,6 +42,7 @@ public class Pallet {
     private SealNumber sealNumber;
     private Boolean refrigerated;
     private MaxPalletWeight maxPalletWeight;
+    private Boolean mixedDestinationsAllowed;
 
 	public Pallet(final PalletId palletId,
                   final TrackingNumber trackingNumber,
@@ -79,6 +80,7 @@ public class Pallet {
         this.sealNumber = sealNumber;
         this.refrigerated = refrigerated;
         this.maxPalletWeight = maxPalletWeight;
+        this.mixedDestinationsAllowed = false;
     }
 
     public Pallet(final PalletId palletId,
@@ -98,7 +100,8 @@ public class Pallet {
                   final PalletType palletType,
                   final SealNumber sealNumber,
                   final Boolean refrigerated,
-                  final MaxPalletWeight maxPalletWeight) {
+                  final MaxPalletWeight maxPalletWeight,
+                  final Boolean mixedDestinationsAllowed) {
         Assert.notNull(palletId, "Pallet Id cannot be null");
         Assert.notNull(shipmentIds, "Shipment Ids cannot be null");
         Assert.notNull(created, "Created cannot be null");
@@ -127,6 +130,7 @@ public class Pallet {
         this.sealNumber = sealNumber;
         this.refrigerated = refrigerated;
         this.maxPalletWeight = maxPalletWeight;
+        this.mixedDestinationsAllowed = mixedDestinationsAllowed;
     }
 
     private Pallet(final PalletId palletId, final TrackingNumber trackingNumber, final OperatorId operatorId) {
@@ -150,6 +154,7 @@ public class Pallet {
         this.sealNumber = null;
         this.refrigerated = false;
         this.maxPalletWeight = null;
+        this.mixedDestinationsAllowed = false;
         this.palletType = PalletType.PARENT;
     }
 
@@ -163,7 +168,8 @@ public class Pallet {
                 pallet.getDriver() == null ? Driver.empty() : Driver.from(pallet.getDriver()),
                 pallet.getPalletWeight(), pallet.getDimension(), pallet.getPalletHandlingPriority(),
 				PalletType.valueOf(pallet.getPalletType().name()), pallet.getSealNumber(),
-                pallet.isRefrigerated() != null && pallet.isRefrigerated(), pallet.getMaxPalletWeight());
+                pallet.isRefrigerated() != null && pallet.isRefrigerated(), pallet.getMaxPalletWeight(),
+                Boolean.TRUE.equals(pallet.isMixedDestinationsAllowed()));
         result.resolveLegacyStatus();
         return result;
     }
@@ -257,6 +263,10 @@ public class Pallet {
         return maxPalletWeight;
     }
 
+    public Boolean isMixedDestinationsAllowed() {
+        return mixedDestinationsAllowed;
+    }
+
     public PalletType getPalletType() {
         return palletType;
     }
@@ -307,16 +317,19 @@ public class Pallet {
         return loadBlockReason().isEmpty();
     }
 
-    public boolean markLoaded() {
-        if (PalletStatus.LOADED.equals(this.palletStatus)) {
-            return false;
+    public boolean isLoaded() {
+        return PalletStatus.LOADED.equals(this.palletStatus);
+    }
+
+    public void markLoaded() {
+        if (isLoaded()) {
+            return;
         }
         final Optional<PalletLoadBlockReason> blockReason = loadBlockReason();
         if (blockReason.isPresent()) {
             throw new PalletModificationException("Pallet cannot be loaded: " + blockReason.get());
         }
         changePalletStatus(PalletStatus.LOADED);
-        return true;
     }
 
     public void revertLoading() {
@@ -342,12 +355,11 @@ public class Pallet {
         changePalletStatus(PalletStatus.DELIVERED);
     }
 
-    public boolean cancel() {
+    public void cancel() {
         if (PalletStatus.CANCELLED.equals(this.palletStatus)) {
-            return false;
+            return;
         }
         changePalletStatus(PalletStatus.CANCELLED);
-        return true;
     }
 
     public void changeOriginDepartmentId(final DepartmentId originDepartmentId) {
@@ -396,6 +408,7 @@ public class Pallet {
     public void update(final PalletType palletType,
                        final PalletHandlingPriority palletHandlingPriority,
                        final Boolean refrigerated,
+                       final Boolean mixedDestinationsAllowed,
                        final Dimension dimension,
                        final SealNumber sealNumber) {
         if (!this.palletStatus.isContentModifiable()) {
@@ -412,6 +425,9 @@ public class Pallet {
         }
         if (refrigerated != null) {
             this.refrigerated = refrigerated;
+        }
+        if (mixedDestinationsAllowed != null) {
+            this.mixedDestinationsAllowed = mixedDestinationsAllowed;
         }
         this.dimension = dimension;
         this.sealNumber = sealNumber == null || sealNumber.value() == null || sealNumber.value().isBlank()

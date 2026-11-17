@@ -25,5 +25,6 @@ public record PalletHandlingPalletApi(String palletId,
                                       String palletType,
                                       String handlingPriority,
                                       boolean refrigerated,
+                                      boolean mixedDestinationsAllowed,
                                       PalletHandlingDimensionApi dimension) {
 }
