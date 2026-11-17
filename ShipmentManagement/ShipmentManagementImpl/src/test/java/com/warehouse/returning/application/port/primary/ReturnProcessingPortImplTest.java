@@ -254,14 +254,32 @@ class ReturnProcessingPortImplTest {
     }
 
     @Test
-    void shouldNotCompleteShipmentThatIsNotReturned() {
+    void shouldApplyReturnWhenCompletionArrivesBeforeProcessingStarted() {
         when(transactions.getTransaction(any())).thenReturn(transaction);
         when(consumedEvents.tryConsume(command.eventId())).thenReturn(true);
         when(shipments.getShipment(command.shipmentId()))
-                .thenReturn(new ReturnableShipment(command.shipmentId(), null, ShipmentStatus.DELIVERY, null));
+                .thenReturn(new ReturnableShipment(command.shipmentId(), null, ShipmentStatus.DELIVERY, null))
+                .thenReturn(new ReturnableShipment(command.shipmentId(), null, ShipmentStatus.RETURN, returnShipmentId));
 
         port.applyCompleted(completion());
 
+        final org.mockito.InOrder order = inOrder(shipments, transactions);
+        order.verify(shipments).markReturned(command.shipmentId(), returnShipmentId);
+        order.verify(shipments).markDelivered(returnShipmentId);
+        order.verify(shipments).completeReturn(command.shipmentId());
+        order.verify(transactions).commit(transaction);
+    }
+
+    @Test
+    void shouldNotCompleteShipmentThatCannotBeReturned() {
+        when(transactions.getTransaction(any())).thenReturn(transaction);
+        when(consumedEvents.tryConsume(command.eventId())).thenReturn(true);
+        when(shipments.getShipment(command.shipmentId()))
+                .thenReturn(new ReturnableShipment(command.shipmentId(), null, ShipmentStatus.CANCELED, null));
+
+        port.applyCompleted(completion());
+
+        verify(shipments, never()).markReturned(any(), any());
         verify(shipments, never()).markDelivered(any());
         verify(shipments, never()).completeReturn(any());
     }

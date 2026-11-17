@@ -13,6 +13,8 @@ public interface ShipmentContentRepository {
 
     void saveNote(final ShipmentNote note);
 
+    void saveIncidentNote(final ShipmentNote note);
+
     List<ShipmentNote> listNotes(final ShipmentId shipmentId);
 
     void saveDocument(final ShipmentDocumentFile documentFile);

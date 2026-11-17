@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-06-shipment-note-incident-source" author="s-soja">
+        <dropNotNullConstraint tableName="shipment_note" columnName="body" columnDataType="VARCHAR(4000)"/>
+        <addColumn tableName="shipment_note">
+            <column name="incident_id" type="BIGINT"/>
+            <column name="incident_note_type" type="VARCHAR(20)"/>
+            <column name="incident_reason" type="VARCHAR(40)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
