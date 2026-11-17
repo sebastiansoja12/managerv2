@@ -3,11 +3,13 @@ package com.warehouse.incident.application.port.secondary;
 import com.warehouse.commonassets.identificator.IncidentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.incident.application.port.primary.command.FindIncidentsCommand;
+import com.warehouse.incident.application.port.primary.result.DepartmentIncidentStatistics;
 import com.warehouse.incident.application.port.primary.result.IncidentPage;
 import com.warehouse.incident.application.port.primary.result.IncidentStatistics;
 import com.warehouse.incident.domain.model.Incident;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 public interface IncidentRepository {
@@ -23,4 +25,6 @@ public interface IncidentRepository {
     IncidentPage find(final FindIncidentsCommand command);
 
     IncidentStatistics statistics(final Instant overdueBefore, final Instant resolvedSince);
+
+    List<DepartmentIncidentStatistics> departmentStatistics(final Instant rangeStart, final Instant rangeEnd);
 }

@@ -6,6 +6,7 @@ import com.warehouse.incident.application.port.primary.command.FindIncidentsComm
 import com.warehouse.incident.application.port.primary.command.ReopenIncidentCommand;
 import com.warehouse.incident.application.port.primary.command.ReportIncidentCommand;
 import com.warehouse.incident.application.port.primary.command.ResolveIncidentCommand;
+import com.warehouse.incident.application.port.primary.result.DepartmentIncidentStatistics;
 import com.warehouse.incident.application.port.primary.result.IncidentPage;
 import com.warehouse.incident.application.port.primary.result.IncidentStatistics;
 import com.warehouse.incident.application.port.secondary.IncidentActorServicePort;
@@ -21,6 +22,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.function.BiConsumer;
 
 public class IncidentPortImpl implements IncidentPort {
@@ -60,6 +62,7 @@ public class IncidentPortImpl implements IncidentPort {
                 this.incidentActorServicePort.currentDepartmentCode().orElse(null), command.category(),
                 command.severity(), command.description(), actor, this.clock.instant());
         this.incidentRepository.create(incident);
+        this.incidentShipmentServicePort.notifyReported(incident);
         return incident.incidentId();
     }
 
@@ -72,22 +75,25 @@ public class IncidentPortImpl implements IncidentPort {
     @Override
     @Transactional
     public void comment(final CommentIncidentCommand command) {
-        change(command.incidentId(), (incident, actor) ->
-                incident.comment(actor, command.text(), this.clock.instant()));
+        final Incident incident = change(command.incidentId(), (changedIncident, actor) ->
+                changedIncident.comment(actor, command.text(), this.clock.instant()));
+        this.incidentShipmentServicePort.notifyCommented(incident);
     }
 
     @Override
     @Transactional
     public void resolve(final ResolveIncidentCommand command) {
-        change(command.incidentId(), (incident, actor) ->
-                incident.resolve(actor, command.resolution(), command.note(), this.clock.instant()));
+        final Incident incident = change(command.incidentId(), (changedIncident, actor) ->
+                changedIncident.resolve(actor, command.resolution(), command.note(), this.clock.instant()));
+        this.incidentShipmentServicePort.notifyResolved(incident, command.repackaging());
     }
 
     @Override
     @Transactional
     public void reopen(final ReopenIncidentCommand command) {
-        change(command.incidentId(), (incident, actor) ->
-                incident.reopen(actor, command.reason(), this.clock.instant()));
+        final Incident incident = change(command.incidentId(), (changedIncident, actor) ->
+                changedIncident.reopen(actor, command.reason(), this.clock.instant()));
+        this.incidentShipmentServicePort.notifyReopened(incident);
     }
 
     @Override
@@ -111,11 +117,17 @@ public class IncidentPortImpl implements IncidentPort {
         return this.incidentRepository.statistics(now.minus(OVERDUE_AFTER), startOfDay);
     }
 
-    private void change(final IncidentId incidentId, final BiConsumer<Incident, IncidentActor> change) {
+    @Override
+    public List<DepartmentIncidentStatistics> departmentStatistics(final Instant rangeStart, final Instant rangeEnd) {
+        return this.incidentRepository.departmentStatistics(rangeStart, rangeEnd);
+    }
+
+    private Incident change(final IncidentId incidentId, final BiConsumer<Incident, IncidentActor> change) {
         final IncidentActor actor = currentActor();
         final Incident incident = get(incidentId);
         change.accept(incident, actor);
         this.incidentRepository.update(incident);
+        return incident;
     }
 
     private IncidentActor currentActor() {

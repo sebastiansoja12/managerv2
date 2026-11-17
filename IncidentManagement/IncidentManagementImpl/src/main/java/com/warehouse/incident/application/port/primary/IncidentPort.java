@@ -6,9 +6,13 @@ import com.warehouse.incident.application.port.primary.command.FindIncidentsComm
 import com.warehouse.incident.application.port.primary.command.ReopenIncidentCommand;
 import com.warehouse.incident.application.port.primary.command.ReportIncidentCommand;
 import com.warehouse.incident.application.port.primary.command.ResolveIncidentCommand;
+import com.warehouse.incident.application.port.primary.result.DepartmentIncidentStatistics;
 import com.warehouse.incident.application.port.primary.result.IncidentPage;
 import com.warehouse.incident.application.port.primary.result.IncidentStatistics;
 import com.warehouse.incident.domain.model.Incident;
+
+import java.time.Instant;
+import java.util.List;
 
 public interface IncidentPort {
 
@@ -27,4 +31,6 @@ public interface IncidentPort {
     IncidentPage find(final FindIncidentsCommand command);
 
     IncidentStatistics statistics();
+
+    List<DepartmentIncidentStatistics> departmentStatistics(final Instant rangeStart, final Instant rangeEnd);
 }

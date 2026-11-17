@@ -1,5 +1,6 @@
 package com.warehouse.incident.infrastructure.adapter.primary;
 
+import com.warehouse.auth.AccessUserControl;
 import com.warehouse.commonassets.identificator.IncidentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.incident.application.port.primary.IncidentPort;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@AccessUserControl
 @RestController
 @RequestMapping("/incidents")
 public class IncidentController {

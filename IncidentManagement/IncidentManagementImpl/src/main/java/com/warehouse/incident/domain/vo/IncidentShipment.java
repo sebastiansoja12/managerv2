@@ -5,9 +5,13 @@ import com.warehouse.commonassets.identificator.TrackingNumber;
 
 import java.util.Objects;
 
-public record IncidentShipment(ShipmentId shipmentId, TrackingNumber trackingNumber) {
+public record IncidentShipment(ShipmentId shipmentId, TrackingNumber trackingNumber, boolean lost) {
 
     public IncidentShipment {
         Objects.requireNonNull(shipmentId, "Incident shipment ID cannot be null");
+    }
+
+    public IncidentShipment(final ShipmentId shipmentId, final TrackingNumber trackingNumber) {
+        this(shipmentId, trackingNumber, false);
     }
 }
