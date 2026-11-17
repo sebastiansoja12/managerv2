@@ -8,6 +8,8 @@ import com.warehouse.pickuppoint.application.port.secondary.PickupPointRepositor
 import com.warehouse.pickuppoint.domain.model.PickupPoint;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 
 public class PickupPointReadModelSyncServiceImpl implements PickupPointReadModelSyncPort {
@@ -32,8 +34,10 @@ public class PickupPointReadModelSyncServiceImpl implements PickupPointReadModel
 
     @Override
     @Transactional
-    public int syncReadModels() {
-        final List<PickupPoint> pickupPoints = this.pickupPointRepository.findAll();
+    public int syncReadModels(final LocalDate dateFrom, final LocalDate dateTo) {
+        final List<PickupPoint> pickupPoints = this.pickupPointRepository.findAllCreatedBetween(
+                dateFrom.atStartOfDay(ZoneOffset.UTC).toInstant(),
+                dateTo.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant());
         pickupPoints.stream()
                 .map(PickupPoint::snapshot)
                 .forEach(this.pickupPointReadModelRepository::sync);

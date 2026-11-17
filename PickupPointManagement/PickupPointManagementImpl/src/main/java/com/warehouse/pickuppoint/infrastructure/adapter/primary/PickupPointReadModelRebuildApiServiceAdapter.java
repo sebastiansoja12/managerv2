@@ -20,6 +20,7 @@ public class PickupPointReadModelRebuildApiServiceAdapter implements PickupPoint
 
     @Override
     public int rebuildReadModels(final OperatorId operatorId, final LocalDate dateFrom, final LocalDate dateTo) {
-        return this.operatorContext.runAs(operatorId, this.pickupPointReadModelSyncPort::syncReadModels);
+        return this.operatorContext.runAs(operatorId,
+                () -> this.pickupPointReadModelSyncPort.syncReadModels(dateFrom, dateTo));
     }
 }

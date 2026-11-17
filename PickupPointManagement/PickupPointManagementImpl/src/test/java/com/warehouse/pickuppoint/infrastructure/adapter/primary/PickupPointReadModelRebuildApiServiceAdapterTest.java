@@ -19,12 +19,13 @@ class PickupPointReadModelRebuildApiServiceAdapterTest {
         final PickupPointReadModelSyncPort pickupPointReadModelSyncPort = mock(PickupPointReadModelSyncPort.class);
         final PickupPointReadModelRebuildApiServiceAdapter adapter =
                 new PickupPointReadModelRebuildApiServiceAdapter(pickupPointReadModelSyncPort, new OperatorContext());
-        when(pickupPointReadModelSyncPort.syncReadModels()).thenReturn(4);
+        final LocalDate dateFrom = LocalDate.of(2026, 10, 1);
+        final LocalDate dateTo = LocalDate.of(2026, 10, 20);
+        when(pickupPointReadModelSyncPort.syncReadModels(dateFrom, dateTo)).thenReturn(4);
 
-        final int rebuilt = adapter.rebuildReadModels(OperatorId.of(7L), LocalDate.of(2026, 10, 1),
-                LocalDate.of(2026, 10, 20));
+        final int rebuilt = adapter.rebuildReadModels(OperatorId.of(7L), dateFrom, dateTo);
 
         assertThat(rebuilt).isEqualTo(4);
-        verify(pickupPointReadModelSyncPort).syncReadModels();
+        verify(pickupPointReadModelSyncPort).syncReadModels(dateFrom, dateTo);
     }
 }

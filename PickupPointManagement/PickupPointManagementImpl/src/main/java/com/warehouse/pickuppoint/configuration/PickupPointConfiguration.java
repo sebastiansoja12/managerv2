@@ -18,7 +18,12 @@ import com.warehouse.pickuppoint.application.port.secondary.PickupPointCoordinat
 import com.warehouse.pickuppoint.application.port.secondary.PickupPointReadModelRepository;
 import com.warehouse.pickuppoint.application.port.secondary.PickupPointRepository;
 import com.warehouse.pickuppoint.application.port.secondary.PickupPointSearchRepository;
+import com.warehouse.pickuppoint.application.service.PickupPointConfigurationService;
+import com.warehouse.pickuppoint.application.service.PickupPointDepartmentService;
 import com.warehouse.pickuppoint.application.service.PickupPointReadModelSyncServiceImpl;
+import com.warehouse.pickuppoint.application.service.PickupPointResultFactory;
+import com.warehouse.pickuppoint.application.service.PickupPointSearchService;
+import com.warehouse.pickuppoint.application.service.PickupPointStatusService;
 import com.warehouse.pickuppoint.infrastructure.adapter.primary.PickupPointApiServiceAdapter;
 import com.warehouse.pickuppoint.infrastructure.adapter.primary.PickupPointReadModelRebuildApiServiceAdapter;
 import com.warehouse.pickuppoint.infrastructure.adapter.primary.mapper.PickupPointApiMapper;
@@ -123,18 +128,53 @@ public class PickupPointConfiguration {
     }
 
     @Bean
+    public PickupPointDepartmentService pickupPointDepartmentService(
+            @Qualifier("pickupPointDepartmentDirectoryServicePort")
+            final DepartmentDirectoryServicePort departmentDirectoryServicePort) {
+        return new PickupPointDepartmentService(departmentDirectoryServicePort);
+    }
+
+    @Bean
+    public PickupPointConfigurationService pickupPointConfigurationService(
+            final PickupPointCoordinatesServicePort pickupPointCoordinatesServicePort) {
+        return new PickupPointConfigurationService(pickupPointCoordinatesServicePort);
+    }
+
+    @Bean
+    public PickupPointStatusService pickupPointStatusService(
+            final PickupPointDepartmentService pickupPointDepartmentService) {
+        return new PickupPointStatusService(pickupPointDepartmentService);
+    }
+
+    @Bean
+    public PickupPointSearchService pickupPointSearchService(
+            final PickupPointSearchRepository pickupPointSearchRepository,
+            final PickupPointDepartmentService pickupPointDepartmentService) {
+        return new PickupPointSearchService(pickupPointSearchRepository, pickupPointDepartmentService);
+    }
+
+    @Bean
+    public PickupPointResultFactory pickupPointResultFactory(
+            final PickupPointDepartmentService pickupPointDepartmentService) {
+        return new PickupPointResultFactory(pickupPointDepartmentService);
+    }
+
+    @Bean
     public PickupPointPort pickupPointPort(
             final PickupPointRepository pickupPointRepository,
-            final PickupPointSearchRepository pickupPointSearchRepository,
-            @Qualifier("pickupPointDepartmentDirectoryServicePort")
-            final DepartmentDirectoryServicePort departmentDirectoryServicePort,
-            final PickupPointCoordinatesServicePort pickupPointCoordinatesServicePort,
+            final PickupPointDepartmentService pickupPointDepartmentService,
+            final PickupPointConfigurationService pickupPointConfigurationService,
+            final PickupPointStatusService pickupPointStatusService,
+            final PickupPointSearchService pickupPointSearchService,
+            final PickupPointResultFactory pickupPointResultFactory,
             final DomainEventPublisher domainEventPublisher) {
         return new PickupPointPortImpl(
                 pickupPointRepository,
-                pickupPointSearchRepository,
-                departmentDirectoryServicePort,
-                pickupPointCoordinatesServicePort,
+                pickupPointDepartmentService,
+                pickupPointConfigurationService,
+                pickupPointStatusService,
+                pickupPointSearchService,
+                pickupPointResultFactory,
                 domainEventPublisher,
                 Clock.systemUTC());
     }

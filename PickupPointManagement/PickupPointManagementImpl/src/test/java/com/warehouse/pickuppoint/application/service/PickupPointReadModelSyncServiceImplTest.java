@@ -18,6 +18,7 @@ import com.warehouse.pickuppoint.domain.vo.PickupPointServicePolicy;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
@@ -32,6 +33,10 @@ import static org.mockito.Mockito.when;
 class PickupPointReadModelSyncServiceImplTest {
 
     private static final Instant CREATED_AT = Instant.parse("2026-09-09T08:00:00Z");
+    private static final LocalDate DATE_FROM = LocalDate.of(2026, 10, 1);
+    private static final LocalDate DATE_TO = LocalDate.of(2026, 10, 20);
+    private static final Instant CREATED_FROM = Instant.parse("2026-10-01T00:00:00Z");
+    private static final Instant CREATED_TO = Instant.parse("2026-10-21T00:00:00Z");
 
     private final PickupPointRepository pickupPointRepository = mock(PickupPointRepository.class);
     private final PickupPointReadModelRepository pickupPointReadModelRepository =
@@ -40,12 +45,13 @@ class PickupPointReadModelSyncServiceImplTest {
             new PickupPointReadModelSyncServiceImpl(pickupPointRepository, pickupPointReadModelRepository);
 
     @Test
-    void shouldSyncAllPickupPointsIntoReadModel() {
+    void shouldSyncPickupPointsCreatedInDateRangeIntoReadModel() {
         final PickupPoint first = pickupPoint("9a7f3b38-73d0-4e9b-91b7-dadfeab4882f", "WAW-PP-001");
         final PickupPoint second = pickupPoint("1c2f8e0a-5b7d-4b8e-9f1a-3d6c2b9e4a10", "WAW-PP-002");
-        when(pickupPointRepository.findAll()).thenReturn(List.of(first, second));
+        when(pickupPointRepository.findAllCreatedBetween(CREATED_FROM, CREATED_TO))
+                .thenReturn(List.of(first, second));
 
-        final int synced = service.syncReadModels();
+        final int synced = service.syncReadModels(DATE_FROM, DATE_TO);
 
         assertThat(synced).isEqualTo(2);
         verify(pickupPointReadModelRepository).sync(first.snapshot());
@@ -53,10 +59,10 @@ class PickupPointReadModelSyncServiceImplTest {
     }
 
     @Test
-    void shouldReturnZeroWhenThereAreNoPickupPoints() {
-        when(pickupPointRepository.findAll()).thenReturn(List.of());
+    void shouldReturnZeroWhenThereAreNoPickupPointsInDateRange() {
+        when(pickupPointRepository.findAllCreatedBetween(CREATED_FROM, CREATED_TO)).thenReturn(List.of());
 
-        final int synced = service.syncReadModels();
+        final int synced = service.syncReadModels(DATE_FROM, DATE_TO);
 
         assertThat(synced).isZero();
         verifyNoInteractions(pickupPointReadModelRepository);
