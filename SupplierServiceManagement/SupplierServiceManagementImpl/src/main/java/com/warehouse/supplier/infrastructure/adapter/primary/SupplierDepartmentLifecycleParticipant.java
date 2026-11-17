@@ -2,7 +2,7 @@ package com.warehouse.supplier.infrastructure.adapter.primary;
 
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.organisationstructure.department.api.DepartmentLifecycleParticipant;
-import com.warehouse.supplier.domain.port.primary.SupplyPort;
+import com.warehouse.supplier.application.port.primary.SupplyPort;
 
 import java.util.Optional;
 

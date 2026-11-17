@@ -46,12 +46,12 @@ public class ModelToEntityMapper {
                 certification.expiryDate(), certification.authority(), certification.valid());
     }
 
-    public static DeliveryArea map(final com.warehouse.supplier.domain.model.DeliveryArea deliveryArea) {
+    public static DeliveryArea map(final com.warehouse.supplier.domain.vo.DeliveryArea deliveryArea) {
         if (deliveryArea == null) {
             return null;
         }
-        return new DeliveryArea(deliveryArea.getAreaName(), deliveryArea.getCity(), deliveryArea.getDistrict(),
-                deliveryArea.getMunicipality(), deliveryArea.getRegion(), deliveryArea.getCountry(), deliveryArea.getPostalCodes());
+        return new DeliveryArea(deliveryArea.areaName(), deliveryArea.city(), deliveryArea.district(),
+                deliveryArea.municipality(), deliveryArea.region(), deliveryArea.country(), deliveryArea.postalCodes());
     }
 
     public static DriverLicense map(final com.warehouse.supplier.domain.vo.DriverLicense driverLicense) {

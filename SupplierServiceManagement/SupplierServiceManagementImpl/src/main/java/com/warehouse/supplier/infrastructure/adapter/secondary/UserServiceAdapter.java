@@ -3,8 +3,9 @@ package com.warehouse.supplier.infrastructure.adapter.secondary;
 import com.warehouse.auth.SupplierUserEventPublisher;
 import com.warehouse.auth.event.SupplierCreatedEvent;
 import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.supplier.domain.port.secondary.UserServicePort;
+import com.warehouse.supplier.application.port.secondary.UserServicePort;
 import com.warehouse.supplier.domain.vo.SupplierSnapshot;
+import com.warehouse.supplier.infrastructure.adapter.secondary.mapper.OutputRequestMapper;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -19,14 +20,8 @@ public class UserServiceAdapter implements UserServicePort {
     @Override
     public UserId createUserForSupplier(final SupplierSnapshot snapshot) {
         final AtomicReference<UserId> userCreatedId = new AtomicReference<>();
-        this.supplierUserEventPublisher.sendEvent(new SupplierCreatedEvent(
-                snapshot.supplierId(),
-                snapshot.supplierCode(),
-                snapshot.firstName(),
-                snapshot.lastName(),
-                snapshot.email(),
-                snapshot.departmentId(),
-                userCreatedId::set));
+        final SupplierCreatedEvent event = OutputRequestMapper.map(snapshot, userCreatedId::set);
+        this.supplierUserEventPublisher.sendEvent(event);
         final UserId userId = userCreatedId.get();
         if (userId == null) {
             throw new IllegalStateException("Supplier user was not created");

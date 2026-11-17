@@ -12,5 +12,6 @@ public record SupplierProfileDto(
         String lastName,
         DepartmentId departmentId,
         String status,
+        boolean active,
         VehicleId vehicleId) {
 }

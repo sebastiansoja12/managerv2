@@ -1,17 +1,18 @@
 package com.warehouse.supplier.domain.model;
 
-import com.google.common.collect.Sets;
 import com.warehouse.commonassets.enumeration.PackageType;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.supplier.domain.enumeration.SupplierStatus;
 import com.warehouse.supplier.domain.enumeration.UserStatus;
 import com.warehouse.supplier.domain.vo.DangerousGoodCertification;
+import com.warehouse.supplier.domain.vo.DeliveryArea;
 import com.warehouse.supplier.domain.vo.DriverLicense;
-import com.warehouse.supplier.domain.vo.SupplierDto;
+import com.warehouse.supplier.domain.vo.SupplierActivationData;
 import com.warehouse.supplier.domain.vo.SupplierSnapshot;
 import org.apache.commons.lang3.Validate;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -59,9 +60,6 @@ public class Supplier {
     private Instant updatedAt;
 
     private UserId createdUserId;
-
-    public Supplier() {
-    }
 
     public Supplier(
             final SupplierId supplierId,
@@ -147,7 +145,7 @@ public class Supplier {
         this.dangerousGoodCertification = null;
         this.driverLicense = null;
         this.deliveryArea = null;
-        this.supportedPackageTypes = Sets.newHashSet();
+        this.supportedPackageTypes = new HashSet<>();
         this.apiKey = null;
         this.termsAccepted = false;
         this.createdUserId = null;
@@ -277,33 +275,33 @@ public class Supplier {
         markAsModified();
     }
 
-    public void updateData(final SupplierDto supp) {
-        if (supp.departmentId() != null) {
-            changeDepartment(supp.departmentId());
+    public void updateData(final SupplierActivationData activationData) {
+        if (activationData.departmentId() != null) {
+            changeDepartment(activationData.departmentId());
         }
 
-        if (supp.deviceId() != null) {
-            changeDeviceId(supp.deviceId());
+        if (activationData.deviceId() != null) {
+            changeDeviceId(activationData.deviceId());
         }
 
-        if (supp.driverLicense() != null) {
-            changeDriverLicense(supp.driverLicense());
+        if (activationData.driverLicense() != null) {
+            changeDriverLicense(activationData.driverLicense());
         }
 
-        if (supp.deliveryArea() != null) {
-            changeDeliveryArea(supp.deliveryArea());
+        if (activationData.deliveryArea() != null) {
+            changeDeliveryArea(activationData.deliveryArea());
         }
 
-        if (supp.supportedPackageTypes() != null) {
-            changeSupportedPackageTypes(supp.supportedPackageTypes());
+        if (activationData.supportedPackageTypes() != null) {
+            changeSupportedPackageTypes(activationData.supportedPackageTypes());
         }
 
-        if (supp.dangerousGoodCertification() != null) {
-            changeDangerousGoodCertification(supp.dangerousGoodCertification());
+        if (activationData.dangerousGoodCertification() != null) {
+            changeDangerousGoodCertification(activationData.dangerousGoodCertification());
         }
 
-        if (supp.vehicleId() != null) {
-            assignVehicle(supp.vehicleId());
+        if (activationData.vehicleId() != null) {
+            assignVehicle(activationData.vehicleId());
         }
 
         acceptTerms();
@@ -420,7 +418,7 @@ public class Supplier {
 
     public Set<PackageType> getSupportedPackageTypes() {
         if (supportedPackageTypes == null) {
-            supportedPackageTypes = Sets.newHashSet();
+            supportedPackageTypes = new HashSet<>();
         }
         return supportedPackageTypes;
     }

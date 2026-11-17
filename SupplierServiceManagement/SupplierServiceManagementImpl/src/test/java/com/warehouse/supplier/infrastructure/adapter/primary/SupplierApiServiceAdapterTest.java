@@ -7,10 +7,11 @@ import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.supplier.api.dto.CreateSupplierApiRequest;
 import com.warehouse.supplier.api.dto.SupplierCodeDto;
 import com.warehouse.supplier.api.dto.SupplierDetailsDto;
+import com.warehouse.supplier.application.port.primary.result.SupplierResult;
 import com.warehouse.supplier.domain.model.Supplier;
-import com.warehouse.supplier.domain.port.primary.SupplyPort;
-import com.warehouse.supplier.domain.vo.SupplierCreateCommand;
-import com.warehouse.supplier.domain.vo.SupplierCreateResponse;
+import com.warehouse.supplier.application.port.primary.SupplyPort;
+import com.warehouse.supplier.application.port.primary.command.SupplierCreateCommand;
+import com.warehouse.supplier.application.port.primary.result.SupplierCreateResponse;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -33,8 +34,8 @@ class SupplierApiServiceAdapterTest {
         final Supplier supplier = new Supplier(new SupplierId(9L), new SupplierCode("abcdef"), "Adam", "Nowak",
                 "+48111222333");
         supplier.changeDepartment(new DepartmentId(10L));
-        when(supplyPort.getAllByCurrentDepartment()).thenReturn(List.of(supplier));
-        when(supplyPort.getDepartmentCode(new DepartmentId(10L))).thenReturn(new DepartmentCode("KT1"));
+        when(supplyPort.getAllByCurrentDepartment())
+                .thenReturn(List.of(new SupplierResult(supplier.snapshot(), new DepartmentCode("KT1"))));
 
         final List<SupplierDetailsDto> suppliers = adapter.findAll();
 

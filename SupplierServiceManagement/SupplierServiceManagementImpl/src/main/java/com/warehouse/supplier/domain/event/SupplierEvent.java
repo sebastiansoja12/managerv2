@@ -1,4 +1,9 @@
 package com.warehouse.supplier.domain.event;
 
-public interface SupplierEvent {
+import com.warehouse.commonassets.event.domain.model.DomainEvent;
+import com.warehouse.supplier.domain.vo.SupplierSnapshot;
+
+public interface SupplierEvent extends DomainEvent {
+
+    SupplierSnapshot getSnapshot();
 }
