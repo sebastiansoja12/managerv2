@@ -8,6 +8,10 @@ import com.warehouse.supplier.api.SupplierApiService;
 import com.warehouse.supplier.api.SupplierConfigurationApiService;
 import com.warehouse.supplierconfiguration.application.port.primary.SupplierConfigurationPort;
 import com.warehouse.supplierconfiguration.application.port.primary.SupplierConfigurationPortImpl;
+import com.warehouse.supplierconfiguration.application.service.SubstituteSupplierService;
+import com.warehouse.supplierconfiguration.application.service.SupplierConfigurationResultFactory;
+import com.warehouse.supplierconfiguration.application.service.SupplierConfigurationService;
+import com.warehouse.supplierconfiguration.application.service.SupplierResolutionService;
 import com.warehouse.supplierconfiguration.application.port.secondary.CurrentUserServicePort;
 import com.warehouse.supplierconfiguration.application.port.secondary.SupplierConfigurationHistoryRepository;
 import com.warehouse.supplierconfiguration.application.port.secondary.SupplierConfigurationPolicyRepository;
@@ -96,18 +100,51 @@ public class SupplierConfigurationContextConfiguration {
     }
 
     @Bean
-    public SupplierConfigurationPort supplierConfigurationPort(
+    public SupplierConfigurationService supplierConfigurationService(
             final SupplierConfigurationRepository supplierConfigurationRepository,
             final SupplierConfigurationPolicyRepository supplierConfigurationPolicyRepository,
-            final SupplierConfigurationHistoryRepository supplierConfigurationHistoryRepository,
+            final SupplierConfigurationHistoryRepository supplierConfigurationHistoryRepository) {
+        return new SupplierConfigurationService(supplierConfigurationRepository,
+                supplierConfigurationPolicyRepository, supplierConfigurationHistoryRepository);
+    }
+
+    @Bean
+    public SupplierResolutionService supplierResolutionService(
+            @Qualifier("supplierConfiguration.supplierDirectoryServicePort")
+            final SupplierDirectoryServicePort supplierDirectoryServicePort,
+            @Qualifier("supplierConfiguration.currentUserServicePort")
+            final CurrentUserServicePort currentUserServicePort) {
+        return new SupplierResolutionService(supplierDirectoryServicePort, currentUserServicePort);
+    }
+
+    @Bean
+    public SubstituteSupplierService substituteSupplierService(
+            @Qualifier("supplierConfiguration.supplierDirectoryServicePort")
+            final SupplierDirectoryServicePort supplierDirectoryServicePort) {
+        return new SubstituteSupplierService(supplierDirectoryServicePort);
+    }
+
+    @Bean
+    public SupplierConfigurationResultFactory supplierConfigurationResultFactory(
+            final SubstituteSupplierService substituteSupplierService) {
+        return new SupplierConfigurationResultFactory(substituteSupplierService);
+    }
+
+    @Bean
+    public SupplierConfigurationPort supplierConfigurationPort(
+            final SupplierConfigurationService supplierConfigurationService,
+            final SupplierResolutionService supplierResolutionService,
+            final SubstituteSupplierService substituteSupplierService,
+            final SupplierConfigurationResultFactory supplierConfigurationResultFactory,
             @Qualifier("supplierConfiguration.supplierDirectoryServicePort")
             final SupplierDirectoryServicePort supplierDirectoryServicePort,
             @Qualifier("supplierConfiguration.currentUserServicePort")
             final CurrentUserServicePort currentUserServicePort) {
         return new SupplierConfigurationPortImpl(
-                supplierConfigurationRepository,
-                supplierConfigurationPolicyRepository,
-                supplierConfigurationHistoryRepository,
+                supplierConfigurationService,
+                supplierResolutionService,
+                substituteSupplierService,
+                supplierConfigurationResultFactory,
                 supplierDirectoryServicePort,
                 currentUserServicePort,
                 Clock.systemUTC());

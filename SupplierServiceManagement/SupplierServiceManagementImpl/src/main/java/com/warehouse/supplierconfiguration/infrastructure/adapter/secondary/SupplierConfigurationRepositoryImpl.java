@@ -8,6 +8,7 @@ import com.warehouse.supplierconfiguration.infrastructure.adapter.secondary.enti
 import com.warehouse.supplierconfiguration.infrastructure.adapter.secondary.mapper.SupplierConfigurationPersistenceMapper;
 import jakarta.persistence.EntityManager;
 
+import java.util.List;
 import java.util.Optional;
 
 public class SupplierConfigurationRepositoryImpl implements SupplierConfigurationRepository {
@@ -42,6 +43,21 @@ public class SupplierConfigurationRepositoryImpl implements SupplierConfiguratio
         return findEntity(supplierConfiguration.getSupplierId())
                 .map(this.persistenceMapper::toModel)
                 .orElseThrow();
+    }
+
+    @Override
+    public List<SupplierConfiguration> findBySubstituteSupplierId(final SupplierId substituteSupplierId) {
+        return this.repository.createCriteria(SupplierConfigurationEntity.class)
+                .eq("substituteSupplierId.value", substituteSupplierId.value())
+                .list()
+                .stream()
+                .map(this.persistenceMapper::toModel)
+                .toList();
+    }
+
+    @Override
+    public void deleteBySupplierId(final SupplierId supplierId) {
+        findEntity(supplierId).ifPresent(this.repository::delete);
     }
 
     private Optional<SupplierConfigurationEntity> findEntity(final SupplierId supplierId) {
