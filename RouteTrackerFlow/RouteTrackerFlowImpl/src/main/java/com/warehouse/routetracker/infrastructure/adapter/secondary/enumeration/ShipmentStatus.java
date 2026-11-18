@@ -15,11 +15,14 @@ public enum ShipmentStatus {
 
     SENT,
 
+    HANDOVER,
+
     DELIVERY,
 
     RETURN,
 
     REDIRECT,
 
-    CANCELED
+    CANCELED,
+    LOST
 }

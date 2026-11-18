@@ -13,6 +13,8 @@ public enum ShipmentStatusDto {
 
     SENT,
 
+    HANDOVER,
+
     DELIVERY,
 
     RETURN,

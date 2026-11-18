@@ -15,7 +15,10 @@ public enum ShipmentStatusDto {
 
     SENT,
 
+    HANDOVER,
+
     UNDELIVERABLE,
+    LOST,
 
     DELIVERY,
 

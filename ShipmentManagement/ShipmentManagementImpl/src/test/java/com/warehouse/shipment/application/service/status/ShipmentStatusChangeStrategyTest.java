@@ -38,6 +38,9 @@ class ShipmentStatusChangeStrategyTest {
 
     private final ShipmentSentStatusChangeStrategy sentStrategy = new ShipmentSentStatusChangeStrategy();
 
+    private final ShipmentHandedOverStatusChangeStrategy handedOverStrategy =
+            new ShipmentHandedOverStatusChangeStrategy();
+
     private final ShipmentDeliveredStatusChangeStrategy deliveredStrategy =
             new ShipmentDeliveredStatusChangeStrategy();
 
@@ -57,6 +60,7 @@ class ShipmentStatusChangeStrategyTest {
             redirectedStrategy,
             reroutedStrategy,
             sentStrategy,
+            handedOverStrategy,
             deliveredStrategy,
             returnedStrategy,
             preparedStrategy,
@@ -71,6 +75,7 @@ class ShipmentStatusChangeStrategyTest {
                 Map.entry(ShipmentStatus.ACCEPTED, ShipmentAcceptedStatusChangeStrategy.class),
                 Map.entry(ShipmentStatus.REROUTE, ShipmentReroutedStatusChangeStrategy.class),
                 Map.entry(ShipmentStatus.SENT, ShipmentSentStatusChangeStrategy.class),
+                Map.entry(ShipmentStatus.HANDOVER, ShipmentHandedOverStatusChangeStrategy.class),
                 Map.entry(ShipmentStatus.DELIVERY, ShipmentDeliveredStatusChangeStrategy.class),
                 Map.entry(ShipmentStatus.RETURN, ShipmentReturnedStatusChangeStrategy.class),
                 Map.entry(ShipmentStatus.REDIRECT, ShipmentRedirectedStatusChangeStrategy.class),
@@ -105,6 +110,15 @@ class ShipmentStatusChangeStrategyTest {
         assertInstanceOf(ShipmentSent.class, sentStrategy.process(shipment));
 
         verify(shipment).notifyShipmentSent();
+    }
+
+    @Test
+    void shouldApplyHandedOverStrategy() {
+        final Shipment shipment = mock(Shipment.class);
+
+        assertInstanceOf(ShipmentStatusChanged.class, handedOverStrategy.process(shipment));
+
+        verify(shipment).handOver();
     }
 
     @Test
