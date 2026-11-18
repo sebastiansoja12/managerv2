@@ -47,13 +47,12 @@ class OperatorDirectoryServiceMapperTest {
     @Test
     void shouldMapCreateUserCommandToAuthorizationRequest() {
         final CreateOperatorUserCommand command = new CreateOperatorUserCommand("Jan", "Kowalski", "jkowalski",
-                "secret", "jan@test.pl", "ADMIN", new DepartmentCode("KT1"), "pl");
+                "jan@test.pl", "ADMIN", new DepartmentCode("KT1"), "pl");
 
         final CreateOperatorUserApiRequest request = OperatorDirectoryServiceMapper.toCreateOperatorUserApiRequest(command);
 
         assertThat(request.departmentCode()).isEqualTo("KT1");
         assertThat(request.role()).isEqualTo("ADMIN");
-        assertThat(request.password()).isEqualTo("secret");
     }
 
     @Test

@@ -8,9 +8,9 @@ import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatusCode;
@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.qrcode.domain.port.secondary.DeliveryServicePort;
+import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import com.warehouse.shipment.infrastructure.ShipmentApiService;
 import com.warehouse.shipment.infrastructure.dto.ShipmentDocumentDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentPartyDto;
@@ -41,11 +41,11 @@ public class QrCodeGeneratorControllerIntegrationTest {
     @Autowired
     private RestClient restClient;
 
-    @MockBean
+    @MockitoBean
     private ShipmentApiService shipmentApiService;
 
-    @MockBean
-    private DeliveryServicePort deliveryServicePort;
+    @MockitoBean
+    private OperatorConfigurationApiService operatorConfigurationApiService;
 
     @Test
     void shouldGenerateQrCodeForParcel() {
@@ -54,7 +54,7 @@ public class QrCodeGeneratorControllerIntegrationTest {
         final ShipmentPartyDto party = new ShipmentPartyDto("Jan", "Kowalski", "jan@test.pl", "123456789",
                 "Katowice", "40-000", "Mariacka 1", "PL");
         when(shipmentApiService.getShipmentDocument(any())).thenReturn(new ShipmentDocumentDto(
-                new ShipmentId(parcelId), null, null, "INP000000001", null, party, party));
+                new ShipmentId(parcelId), null, null, "INP000000001", null, party, party, null, null, null));
         // when
         final ResponseEntity<Void> qrCode = restClient.get()
                 .uri("/v1/api/qrcodes/{id}", parcelId)

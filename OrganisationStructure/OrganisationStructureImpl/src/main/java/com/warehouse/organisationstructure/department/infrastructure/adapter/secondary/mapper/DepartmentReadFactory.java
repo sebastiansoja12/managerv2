@@ -28,7 +28,9 @@ public class DepartmentReadFactory {
                 snapshot.updatedAt(),
                 snapshot.adminUserId(),
                 snapshot.createdBy(),
-                snapshot.lastModifiedBy()
+                snapshot.lastModifiedBy(),
+                snapshot.statusChangeReason(),
+                snapshot.statusChangedAt()
         );
         readEntity.assignOperator(snapshot.operatorId());
         return readEntity;

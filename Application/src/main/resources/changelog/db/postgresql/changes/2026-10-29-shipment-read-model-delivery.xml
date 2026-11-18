@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-29-shipment-read-model-delivery" author="s-soja">
+        <addColumn tableName="shipment_rd">
+            <column name="origin_department_id" type="BIGINT"/>
+            <column name="destination_department_id" type="BIGINT"/>
+            <column name="planned_delivery_at" type="TIMESTAMP"/>
+            <column name="delivered_at" type="TIMESTAMP"/>
+        </addColumn>
+        <createIndex tableName="shipment_rd" indexName="idx_shipment_rd_origin_department_id">
+            <column name="origin_department_id"/>
+        </createIndex>
+        <createIndex tableName="shipment_rd" indexName="idx_shipment_rd_destination_department_id">
+            <column name="destination_department_id"/>
+        </createIndex>
+        <sql>
+            UPDATE shipment_rd rd
+            SET origin_department_id = first_delivery.origin_department_id
+            FROM (SELECT DISTINCT ON (target_id) target_id, origin_department_id
+                  FROM delivery
+                  WHERE target_type = 'SHIPMENT' AND delivery_type = 'OUTBOUND'
+                  ORDER BY target_id, created) first_delivery
+            WHERE CAST(rd.shipment_id AS VARCHAR(255)) = first_delivery.target_id
+        </sql>
+        <sql>
+            UPDATE shipment_rd rd
+            SET destination_department_id = current_delivery.destination_department_id,
+                planned_delivery_at = current_delivery.planned_delivery_at,
+                delivered_at = current_delivery.delivered_at
+            FROM (SELECT DISTINCT ON (target_id) target_id, destination_department_id, planned_delivery_at,
+                         delivered_at
+                  FROM delivery
+                  WHERE target_type = 'SHIPMENT' AND delivery_type = 'OUTBOUND' AND status &lt;&gt; 'CANCELED'
+                  ORDER BY target_id, created DESC) current_delivery
+            WHERE CAST(rd.shipment_id AS VARCHAR(255)) = current_delivery.target_id
+        </sql>
+    </changeSet>
+</databaseChangeLog>

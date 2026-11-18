@@ -6,6 +6,7 @@ import com.warehouse.logisticsdelivery.api.dto.DeliveryAttemptResultDto;
 import com.warehouse.logisticsdelivery.api.dto.ShipmentDeliveryCompletionRequestDto;
 import com.warehouse.logisticsdelivery.api.dto.ShipmentDeliveryCompletionResultDto;
 import com.warehouse.logisticsdelivery.api.dto.ShipmentDeliveryDto;
+import com.warehouse.logisticsdelivery.api.dto.ShipmentDeliverySupplierAssignmentRequestDto;
 
 public interface DeliveryApiService {
 
@@ -15,4 +16,6 @@ public interface DeliveryApiService {
 
     ShipmentDeliveryCompletionResultDto completeShipmentDelivery(
             final ShipmentDeliveryCompletionRequestDto shipmentDeliveryCompletionRequest);
+
+    void assignShipmentSupplier(final ShipmentDeliverySupplierAssignmentRequestDto supplierAssignmentRequest);
 }

@@ -36,7 +36,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(classes = ReturnPersistenceTestConfiguration.class, properties = {
         "spring.liquibase.enabled=false", "spring.sql.init.mode=never",
         "manager.kafka.integration-events.routes.return.processing.started=return.processing.started",
-        "manager.kafka.integration-events.routes.return.cancelled=return.cancelled"
+        "manager.kafka.integration-events.routes.return.cancelled=return.cancelled",
+        "manager.kafka.integration-events.routes.return.completed=return.completed",
+        "manager.kafka.integration-events.routes.return.read-model.changed=return.read-model.sync"
 })
 @Transactional
 class ReturnIntegrationTest {
@@ -94,7 +96,8 @@ class ReturnIntegrationTest {
         final UserId issuerUserId = new UserId(1L);
         final List<ReturnPackageRequest> requests = buildReturnPackageRequest(issuerDepartmentId, issuerUserId,
                 new ShipmentId(1L), "Zwrot", ReasonCode.NO_LONGER_NEEDED);
-        final ReturnRequest request = new ReturnRequest(issuerDepartmentId, issuerUserId, requests);
+        final ReturnRequest request = new ReturnRequest(issuerDepartmentId, issuerUserId, new OperatorId(77L),
+                requests);
 
         final ReturnResponse response = this.returnPort.process(request);
 
@@ -317,7 +320,7 @@ class ReturnIntegrationTest {
 
 	private List<ReturnPackageRequest> buildReturnPackageRequest(final DepartmentId departmentId,
 			final UserId userId, final ShipmentId shipmentId, final String reason, final ReasonCode reasonCode) {
-		final ReturnPackageRequest request = new ReturnPackageRequest(departmentId, reason, shipmentId, userId,
+		final ReturnPackageRequest request = new ReturnPackageRequest(departmentId, reason, shipmentId, null, userId,
 				reasonCode);
 		return List.of(request);
 	}
@@ -349,6 +352,7 @@ class ReturnIntegrationTest {
         final ReturnPackageEntity entity = new ReturnPackageEntity(
                 new ReturnId(returnId),
                 new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId(shipmentId),
+                null,
                 reason,
                 status,
                 new ReturnToken(returnToken),

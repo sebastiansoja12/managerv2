@@ -16,9 +16,8 @@ public interface KafkaOutboxPort {
 
     void markPublished(UUID eventId, String workerId);
 
-    void markFailed(UUID eventId,
-                    String workerId,
-                    Throwable exception,
-                    Instant nextAttemptAt,
-                    int maxAttempts);
+    void markFailed(final UUID eventId,
+                    final String workerId,
+                    final Throwable exception,
+                    final Instant nextAttemptAt);
 }

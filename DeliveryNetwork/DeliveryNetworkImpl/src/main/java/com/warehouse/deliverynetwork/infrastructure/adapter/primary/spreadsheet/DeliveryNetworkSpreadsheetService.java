@@ -53,6 +53,12 @@ public class DeliveryNetworkSpreadsheetService {
 
     private static final String SECOND_DEPARTMENT_HEADER = "Department B";
 
+    private static final String BIDIRECTIONAL_HEADER = "Bidirectional";
+
+    private static final String BIDIRECTIONAL_VALUE = "YES";
+
+    private static final String ONE_WAY_VALUE = "NO";
+
     private static final int MAX_DATA_ROWS = 10_000;
 
     public byte[] exportWorkbook(final DeliveryNetworkExportResult deliveryNetwork) {
@@ -66,7 +72,7 @@ public class DeliveryNetworkSpreadsheetService {
             final Sheet relationsSheet = workbook.createSheet(RELATIONS_SHEET_NAME);
             createRelationsHeader(workbook, relationsSheet);
             createConnectionRows(relationsSheet, deliveryNetwork.connections());
-            formatSheet(relationsSheet, deliveryNetwork.connections().size(), 1, 28, 28);
+            formatSheet(relationsSheet, deliveryNetwork.connections().size(), 2, 28, 28, 16);
             workbook.write(outputStream);
             return outputStream.toByteArray();
         } catch (final IOException exception) {
@@ -119,6 +125,7 @@ public class DeliveryNetworkSpreadsheetService {
         final CellStyle style = headerStyle(workbook);
         createHeaderCell(header, 0, FIRST_DEPARTMENT_HEADER, style);
         createHeaderCell(header, 1, SECOND_DEPARTMENT_HEADER, style);
+        createHeaderCell(header, 2, BIDIRECTIONAL_HEADER, style);
     }
 
     private CellStyle headerStyle(final XSSFWorkbook workbook) {
@@ -162,6 +169,7 @@ public class DeliveryNetworkSpreadsheetService {
             final Row row = sheet.createRow(index + 1);
             row.createCell(0).setCellValue(connection.firstDepartmentCode().getValue());
             row.createCell(1).setCellValue(connection.secondDepartmentCode().getValue());
+            row.createCell(2).setCellValue(connection.bidirectional() ? BIDIRECTIONAL_VALUE : ONE_WAY_VALUE);
         }
     }
 
@@ -287,9 +295,24 @@ public class DeliveryNetworkSpreadsheetService {
             }
             connections.add(new DepartmentConnectionCodeCommand(
                     new DepartmentCode(firstDepartmentCode),
-                    new DepartmentCode(secondDepartmentCode)));
+                    new DepartmentCode(secondDepartmentCode),
+                    bidirectional(cellValue(row, 2, dataFormatter), rowIndex)));
         }
         return connections;
+    }
+
+    private Boolean bidirectional(final String value, final int rowIndex) {
+        if (value.isBlank()) {
+            return null;
+        }
+        if (BIDIRECTIONAL_VALUE.equalsIgnoreCase(value.trim())) {
+            return true;
+        }
+        if (ONE_WAY_VALUE.equalsIgnoreCase(value.trim())) {
+            return false;
+        }
+        throw invalid("Unknown direction in row " + (rowIndex + 1) + ": " + value + ". Use "
+                + BIDIRECTIONAL_VALUE + " or " + ONE_WAY_VALUE);
     }
 
     private boolean rowIsEmpty(

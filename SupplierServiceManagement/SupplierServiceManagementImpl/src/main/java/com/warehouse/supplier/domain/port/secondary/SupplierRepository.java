@@ -1,10 +1,13 @@
 package com.warehouse.supplier.domain.port.secondary;
 
+import com.warehouse.commonassets.identificator.DepartmentId;
+
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.supplier.domain.model.Supplier;
 
+import java.time.Instant;
 import java.util.List;
 
 public interface SupplierRepository {
@@ -14,4 +17,8 @@ public interface SupplierRepository {
     Supplier findById(final SupplierId supplierId);
     Supplier findByCode(final SupplierCode supplierCode);
     Supplier findByUserId(final UserId userId);
+    List<Supplier> findAll();
+    List<Supplier> findAssignedToDepartment(final DepartmentId departmentId);
+    List<Supplier> findAllWithInvalidDriverLicense(final Instant now);
+    List<Supplier> findAllWithExpiredDangerousGoodCertification(final Instant now);
 }

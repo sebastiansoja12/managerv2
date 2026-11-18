@@ -16,7 +16,6 @@ class OperatorUserRequestMapperTest {
                 "Sebastian",
                 "Soja",
                 "s-soja",
-                "secret",
                 "sebastian@test.pl",
                 "ADMIN",
                 "TST",
@@ -29,7 +28,6 @@ class OperatorUserRequestMapperTest {
         assertThat(command.firstName()).isEqualTo("Sebastian");
         assertThat(command.lastName()).isEqualTo("Soja");
         assertThat(command.username()).isEqualTo("s-soja");
-        assertThat(command.password()).isEqualTo("secret");
         assertThat(command.email()).isEqualTo("sebastian@test.pl");
         assertThat(command.role()).isEqualTo("ADMIN");
         assertThat(command.departmentCode().getValue()).isEqualTo("TST");

@@ -6,6 +6,7 @@ import com.warehouse.commonassets.helper.Result;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.supplier.domain.exception.DomainException;
+import com.warehouse.supplier.domain.exception.SupplierDepartmentAccessDeniedException;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.port.primary.SupplyPort;
 import com.warehouse.supplier.domain.vo.*;
@@ -37,13 +38,13 @@ public class SupplierController {
             return ResponseEntity.badRequest().body("Email is required to create supplier user account");
         }
         final SupplierCreateCommand command = RequestMapper.map(supplierCreateApiRequest);
-        final SupplierCreateResponse response = this.supplyPort.create(command);
+        final SupplierCreateResponse response = this.supplyPort.createInCurrentUserDepartment(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseMapper.map(response));
     }
 
     @GetMapping
     public ResponseEntity<?> getAllByCurrentDepartment() {
-        final List<SupplierApi> suppliers = this.supplyPort.getAllByCurrentDepartment()
+        final List<SupplierApi> suppliers = this.supplyPort.getAllInCurrentUserDepartment()
                 .stream()
                 .map(this::map)
                 .toList();
@@ -174,6 +175,11 @@ public class SupplierController {
                 supplyPort.getDepartmentCode(supplier.getDepartmentId()));
     }
 
+
+    @ExceptionHandler(SupplierDepartmentAccessDeniedException.class)
+    public ResponseEntity<?> handleException(final SupplierDepartmentAccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+    }
 
     @ExceptionHandler(DomainException.class)
     public ResponseEntity<?> handleException(final DomainException ex) {

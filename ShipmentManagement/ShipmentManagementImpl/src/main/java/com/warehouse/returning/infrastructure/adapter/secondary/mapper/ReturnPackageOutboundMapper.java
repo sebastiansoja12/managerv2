@@ -11,6 +11,7 @@ public class ReturnPackageOutboundMapper {
         final ReturnRequestApi.ReturnPackageRequestApi packageRequest =
                 new ReturnRequestApi.ReturnPackageRequestApi(
                         request.shipmentId(),
+                        request.returnShipmentId(),
                         request.reason(),
                         request.departmentId(),
                         request.assignedTo(),

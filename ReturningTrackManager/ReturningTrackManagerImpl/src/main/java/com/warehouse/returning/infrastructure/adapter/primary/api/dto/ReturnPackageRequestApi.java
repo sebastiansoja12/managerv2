@@ -7,6 +7,7 @@ import lombok.NonNull;
 @Builder
 public record ReturnPackageRequestApi(
         ShipmentIdApi shipmentId,
+        ShipmentIdApi returnShipmentId,
         String reason,
         DepartmentId departmentId,
         UserIdApi userId,
@@ -17,6 +18,7 @@ public record ReturnPackageRequestApi(
     public String toString() {
         return "ReturnPackageRequestApi{" +
                 "shipmentId=" + shipmentId +
+                ", returnShipmentId=" + returnShipmentId +
                 ", reason='" + reason + '\'' +
                 ", departmentId=" + departmentId +
                 ", userId=" + userId +

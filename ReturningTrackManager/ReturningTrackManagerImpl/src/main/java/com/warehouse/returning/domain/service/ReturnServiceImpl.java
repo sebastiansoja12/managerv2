@@ -2,16 +2,12 @@ package com.warehouse.returning.domain.service;
 
 import com.warehouse.returning.domain.vo.DepartmentId;
 import com.warehouse.returning.domain.vo.OperatorId;
-import com.warehouse.returning.domain.enumeration.ReasonCode;
-import com.warehouse.returning.domain.event.ReturnPackageCompleted;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
-import com.warehouse.returning.domain.registry.DomainRegistry;
 import com.warehouse.returning.domain.vo.ReturnPackageId;
 import com.warehouse.returning.domain.vo.ReturnPage;
 import com.warehouse.returning.domain.vo.ShipmentId;
 
-import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -46,13 +42,6 @@ public class ReturnServiceImpl implements ReturnService {
     }
 
     @Override
-    public void changeReasonCode(final ReturnPackageId returnPackageId, final ReasonCode reasonCode) {
-        final ReturnPackage returnPackage = this.returnRepository.findById(returnPackageId);
-        returnPackage.changeReasonCode(reasonCode);
-        this.saveOrUpdate(returnPackage);
-    }
-
-    @Override
     public ReturnPackageId nextReturnPackageId() {
         return new ReturnPackageId(Math.abs(UUID.randomUUID().getLeastSignificantBits()));
     }
@@ -60,14 +49,6 @@ public class ReturnServiceImpl implements ReturnService {
     @Override
     public void saveOrUpdate(final ReturnPackage returnPackage) {
         this.returnRepository.createOrUpdate(returnPackage);
-    }
-
-    @Override
-    public void completeReturn(final ReturnPackageId returnPackageId) {
-        final ReturnPackage returnPackage = this.returnRepository.findDetailsById(returnPackageId);
-        returnPackage.markAsCompleted();
-        this.saveOrUpdate(returnPackage);
-        DomainRegistry.publish(new ReturnPackageCompleted(returnPackage.toSnapshot(), Instant.now()));
     }
 
     @Override

@@ -4,10 +4,15 @@ import com.warehouse.auth.configuration.ApiExposureProperties;
 import com.warehouse.auth.configuration.AuthCookieService;
 import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.port.primary.PlatformOwnerAuthenticationPort;
+import com.warehouse.auth.domain.service.DepartmentService;
 import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.domain.service.OperatorAccessPolicy;
 import com.warehouse.auth.domain.service.UserService;
 import com.warehouse.auth.domain.vo.Impersonation;
+import com.warehouse.auth.infrastructure.adapter.primary.ActingDepartmentHeader;
+import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import io.jsonwebtoken.JwtException;
 import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,6 +20,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -25,11 +31,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     public static final String IMPERSONATION_ATTRIBUTE = JwtAuthenticationFilter.class.getName() + ".impersonation";
+
+    public static final String USERNAME_ATTRIBUTE = JwtAuthenticationFilter.class.getName() + ".username";
 
     private static final List<String> DEVICE_ENDPOINTS = List.of(
             "/v1/api/ws"
@@ -46,6 +55,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final OperatorAccessPolicy operatorAccessPolicy;
 
     private final ApiExposureProperties apiExposureProperties;
+
+    private final DepartmentService departmentService;
+
+    private final ActingDepartmentHeader actingDepartmentHeader = new ActingDepartmentHeader();
 
 	@Override
 	protected void doFilterInternal(@NonNull final HttpServletRequest request,
@@ -72,6 +85,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         && operatorAccessPolicy.allowsAccess(user.operatorId(),
                         jwtService.extractIssuedAt(jwt).orElse(null), impersonation.isPresent())) {
                     impersonation.ifPresent(value -> request.setAttribute(IMPERSONATION_ATTRIBUTE, value));
+                    request.setAttribute(USERNAME_ATTRIBUTE, username);
                     final SecurityContext context = SecurityContextHolder.createEmptyContext();
                     final UsernameTenantPasswordAuthenticationToken authToken = new UsernameTenantPasswordAuthenticationToken(
                             user.getUserId(), user.operatorId(), this.jwtService.extractDepartmentId(jwt).orElse(null),
@@ -79,17 +93,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     context.setAuthentication(authToken);
                     SecurityContextHolder.setContext(context);
+                    departmentService.findActingDepartmentId(user,
+                                    actingDepartmentHeader.fromValue(request.getHeader(ActingDepartmentHeader.NAME)))
+                            .ifPresent(departmentId -> context.setAuthentication(
+                                    actingDepartmentToken(authToken, user, departmentId, jwt)));
                 }
             }
-        } catch (RuntimeException exception) {
+        } catch (JwtException | IllegalArgumentException | UserNotFoundException exception) {
             SecurityContextHolder.clearContext();
+        } catch (RuntimeException exception) {
+            // Infrastructure failure (database, operator status lookup): a 401 would make clients drop the session.
+            SecurityContextHolder.clearContext();
+            log.warn("Access token verification failed", exception);
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return;
         }
 		filterChain.doFilter(request, response);
 	}
 
+    private UsernameTenantPasswordAuthenticationToken actingDepartmentToken(
+            final UsernameTenantPasswordAuthenticationToken authToken,
+            final OrganizationUser user,
+            final DepartmentId departmentId,
+            final String jwt) {
+        final UsernameTenantPasswordAuthenticationToken actingToken = new UsernameTenantPasswordAuthenticationToken(
+                user.getUserId(), user.operatorId(), departmentId, jwt, user.getAuthorities());
+        actingToken.setDetails(authToken.getDetails());
+        return actingToken;
+    }
+
     @Override
     protected boolean shouldNotFilter(@NonNull final HttpServletRequest request) {
         final String uri = request.getRequestURI();
-        return DEVICE_ENDPOINTS.stream().anyMatch(uri::startsWith) || apiExposureProperties.isMcpPath(request);
+        return DEVICE_ENDPOINTS.stream().anyMatch(uri::startsWith) || apiExposureProperties.isMcpPath(request)
+                || apiExposureProperties.isExternalPath(request);
     }
 }

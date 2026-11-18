@@ -12,7 +12,7 @@ import com.warehouse.commonassets.kafka.domain.model.KafkaOutboxRecord;
 import com.warehouse.commonassets.kafka.domain.model.KafkaOutboxStatus;
 import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.JdbcKafkaOutboxAdapter;
 import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.OutboxIntegrationEventPublisher;
-import com.warehouse.shipment.api.event.ShipmentCanceledMessage;
+import com.warehouse.shipment.api.event.ShipmentCanceledIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentDestinationChangedIntegrationEvent;
@@ -28,7 +28,6 @@ import com.warehouse.shipment.application.port.primary.command.ShipmentStatusReq
 import com.warehouse.shipment.application.service.ShipmentReadModelSyncServiceImpl;
 import com.warehouse.shipment.infrastructure.adapter.primary.kafka.ShipmentIntegrationListener;
 import com.warehouse.shipment.domain.event.ShipmentChanged;
-import com.warehouse.shipment.domain.event.SignatureChangedEvent;
 import com.warehouse.shipment.domain.model.Shipment;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -225,7 +224,7 @@ class ShipmentArchitectureTest {
                 "src/main/java/com/warehouse/shipment/application/listener/ShipmentDomainEventListener.java"));
         assertThat(domainListenerSource)
                 .contains("ShipmentPort")
-                .contains("PathFinderServicePort")
+                .doesNotContain("PathFinderServicePort")
                 .doesNotContain("IntegrationEventPublisher")
                 .doesNotContain("IntegrationEvent");
 
@@ -274,7 +273,7 @@ class ShipmentArchitectureTest {
                 ShipmentDestinationChangedIntegrationEvent.class,
                 ShipmentStatusChangedIntegrationEvent.class,
                 ShipmentReadModelChanged.class,
-                ShipmentCanceledMessage.class
+                ShipmentCanceledIntegrationEvent.class
         );
 
         integrationEvents.forEach(eventType ->
@@ -289,7 +288,7 @@ class ShipmentArchitectureTest {
                 ShipmentDestinationChangedIntegrationEvent.class,
                 ShipmentStatusChangedIntegrationEvent.class,
                 ShipmentReadModelChanged.class,
-                ShipmentCanceledMessage.class
+                ShipmentCanceledIntegrationEvent.class
         );
 
         integrationEvents.forEach(eventType ->
@@ -376,7 +375,6 @@ class ShipmentArchitectureTest {
     void domainEventsShouldNotCarryOperatorContextOrDependOnKafka() throws IOException {
         assertThat(OperatorAwareEvent.class.isAssignableFrom(DomainEvent.class)).isFalse();
         assertThat(OperatorAwareContext.class.isAssignableFrom(ShipmentChanged.class)).isFalse();
-        assertThat(OperatorAwareContext.class.isAssignableFrom(SignatureChangedEvent.class)).isFalse();
 
         final Path domainEventsRoot = Path.of("src/main/java/com/warehouse/shipment/domain/event");
         try (java.util.stream.Stream<Path> sourceFiles = Files.walk(domainEventsRoot)) {
@@ -498,8 +496,7 @@ class ShipmentArchitectureTest {
                 java.util.UUID.class,
                 String.class,
                 Throwable.class,
-                java.time.Instant.class,
-                int.class))
+                java.time.Instant.class))
                 .isEqualTo(Propagation.REQUIRES_NEW);
     }
 
@@ -521,8 +518,7 @@ class ShipmentArchitectureTest {
                 "CountryDetermineService",
                 "DepartmentCountryAvailabilityService",
                 "PriceService",
-                "RouteLogService",
-                "SignatureService"
+                "RouteLogService"
         );
 
         applicationServices.forEach(service -> {

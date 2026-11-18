@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-03-operator-department-policies" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="operator_configurations"/>
+                <not>
+                    <columnExists tableName="operator_configurations" columnName="department_delivery_area_mode"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="operator_configurations">
+            <column name="department_delivery_area_mode" type="VARCHAR(32)" defaultValue="COUNTRY_PARTITION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_max_delivery_radius_km" type="INT" defaultValueNumeric="50">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_allow_manual_delivery_area_edit" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_recalculate_areas_on_status_change" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_uncovered_postal_code_policy" type="VARCHAR(32)" defaultValue="WARN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_sorting_center_connection_count" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_max_auto_connection_distance_km" type="INT" defaultValueNumeric="300">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_require_sorting_connection_for_activation" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_bidirectional_connections_by_default" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_require_status_change_reason" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_block_deactivation_with_active_work" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_work_transfer_on_deactivation" type="VARCHAR(32)" defaultValue="MANUAL">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_auto_archive_inactive_after_days" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_default_daily_capacity" type="INT" defaultValueNumeric="1000">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_capacity_warning_threshold_percent" type="INT" defaultValueNumeric="85">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_redirect_overflow_to_neighbour" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_max_couriers_per_department" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2026-11-03-operator-department-policies-aud" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="operator_configurations_aud"/>
+                <not>
+                    <columnExists tableName="operator_configurations_aud" columnName="department_delivery_area_mode"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="operator_configurations_aud">
+            <column name="department_delivery_area_mode" type="VARCHAR(32)"/>
+            <column name="department_max_delivery_radius_km" type="INT"/>
+            <column name="department_allow_manual_delivery_area_edit" type="BOOLEAN"/>
+            <column name="department_recalculate_areas_on_status_change" type="BOOLEAN"/>
+            <column name="department_uncovered_postal_code_policy" type="VARCHAR(32)"/>
+            <column name="department_sorting_center_connection_count" type="INT"/>
+            <column name="department_max_auto_connection_distance_km" type="INT"/>
+            <column name="department_require_sorting_connection_for_activation" type="BOOLEAN"/>
+            <column name="department_bidirectional_connections_by_default" type="BOOLEAN"/>
+            <column name="department_require_status_change_reason" type="BOOLEAN"/>
+            <column name="department_block_deactivation_with_active_work" type="BOOLEAN"/>
+            <column name="department_work_transfer_on_deactivation" type="VARCHAR(32)"/>
+            <column name="department_auto_archive_inactive_after_days" type="INT"/>
+            <column name="department_default_daily_capacity" type="INT"/>
+            <column name="department_capacity_warning_threshold_percent" type="INT"/>
+            <column name="department_redirect_overflow_to_neighbour" type="BOOLEAN"/>
+            <column name="department_max_couriers_per_department" type="INT"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

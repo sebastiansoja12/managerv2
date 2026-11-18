@@ -1,5 +1,7 @@
 package com.warehouse.palletmanagement.domain.service;
 
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.palletmanagement.domain.enumeration.PalletStatus;
 import com.warehouse.palletmanagement.domain.exception.PalletRequestRejectedException;
 import com.warehouse.palletmanagement.domain.vo.PalletCarrier;
@@ -8,6 +10,8 @@ import com.warehouse.palletmanagement.domain.vo.PalletDetails;
 import com.warehouse.palletmanagement.domain.vo.TransportCarrier;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -19,6 +23,9 @@ public final class PalletTransportPolicy {
     private static final String CARRIER_DRIVER_UNAVAILABLE = "CARRIER_DRIVER_UNAVAILABLE";
     private static final String CARRIER_VEHICLE_UNAVAILABLE = "CARRIER_VEHICLE_UNAVAILABLE";
     private static final String PALLET_VEHICLE_REQUIRED = "PALLET_VEHICLE_REQUIRED";
+    private static final String PALLET_INVALID_STATUS = "PALLET_INVALID_STATUS";
+    private static final String PALLET_UNLOAD_DEPARTMENT_MISMATCH = "PALLET_UNLOAD_DEPARTMENT_MISMATCH";
+    private static final String PALLET_SHIPMENT_NOT_ON_PALLET = "PALLET_SHIPMENT_NOT_ON_PALLET";
 
     private PalletTransportPolicy() {
     }
@@ -61,13 +68,29 @@ public final class PalletTransportPolicy {
     }
 
     public static void ensureManualStatusChange(final PalletStatus targetStatus, final boolean carrierAssigned) {
-        if (targetStatus != PalletStatus.IN_TRANSIT && targetStatus != PalletStatus.DELIVERED) {
+        if (targetStatus != PalletStatus.IN_TRANSIT) {
             throw new PalletRequestRejectedException(400, PALLET_STATUS_NOT_MANUAL,
                     "Pallet status " + targetStatus + " cannot be set manually");
         }
-        if (targetStatus == PalletStatus.IN_TRANSIT && !carrierAssigned) {
+        if (!carrierAssigned) {
             throw new PalletRequestRejectedException(409, PALLET_CARRIER_REQUIRED,
                     "Carrier must be assigned before the pallet departs");
+        }
+    }
+
+    public static void ensureUnloadable(final PalletDetails pallet, final DepartmentId unloadDepartmentId,
+                                        final List<ShipmentId> missingShipmentIds) {
+        if (pallet.palletStatus() != PalletStatus.IN_TRANSIT) {
+            throw new PalletRequestRejectedException(409, PALLET_INVALID_STATUS,
+                    "Pallet cannot be unloaded in status " + pallet.palletStatus());
+        }
+        if (pallet.destinationDepartmentId() != null && !pallet.destinationDepartmentId().equals(unloadDepartmentId)) {
+            throw new PalletRequestRejectedException(409, PALLET_UNLOAD_DEPARTMENT_MISMATCH,
+                    "Pallet must be unloaded in its destination department");
+        }
+        if (!new HashSet<>(pallet.shipmentIds()).containsAll(missingShipmentIds)) {
+            throw new PalletRequestRejectedException(400, PALLET_SHIPMENT_NOT_ON_PALLET,
+                    "Missing shipments must belong to the pallet");
         }
     }
 

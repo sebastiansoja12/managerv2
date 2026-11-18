@@ -1,8 +1,8 @@
 package com.warehouse.returning.infrastructure.adapter.secondary.outbox;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 import com.warehouse.returning.application.port.secondary.ReturnEventPublisherServicePort;
 import com.warehouse.returning.api.event.ReturnLifecycleIntegrationEvent;
 import org.springframework.core.env.Environment;
@@ -50,7 +50,7 @@ public class ReturningOutboxIntegrationEventPublisher implements ReturnEventPubl
             repository.saveAndFlush(new ReturningOutboxEntity(event.eventId(), event.returnPackageId(),
                     event.eventType(), topic, event.eventKey(), objectMapper.writeValueAsString(payload),
                     objectMapper.writeValueAsString(headers), event.occurredAt()));
-        } catch (final JsonProcessingException exception) {
+        } catch (final JacksonException exception) {
             throw new IllegalStateException("Cannot serialize return event", exception);
         }
     }

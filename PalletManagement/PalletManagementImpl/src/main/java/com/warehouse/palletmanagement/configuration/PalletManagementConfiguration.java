@@ -1,11 +1,14 @@
 package com.warehouse.palletmanagement.configuration;
 
+import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
 import org.springframework.beans.factory.annotation.Qualifier;
 import com.warehouse.palletmanagement.application.service.PalletDocumentService;
 import com.warehouse.palletmanagement.application.service.PalletGrossWeightService;
 import com.warehouse.palletmanagement.application.service.PalletTransportService;
+import com.warehouse.palletmanagement.application.port.secondary.AuditLogServicePort;
 import com.warehouse.palletmanagement.application.port.secondary.CarrierServicePort;
 import com.warehouse.palletmanagement.application.port.secondary.PalletTransportRepository;
+import com.warehouse.palletmanagement.infrastructure.adapter.secondary.AuditLogServiceAdapter;
 import com.warehouse.palletmanagement.infrastructure.adapter.secondary.DriverHubCarrierServiceAdapter;
 import com.warehouse.palletmanagement.infrastructure.adapter.secondary.PalletTransportRepositoryImpl;
 import com.warehouse.palletmanagement.infrastructure.adapter.secondary.entity.PalletTransportEntity;
@@ -20,7 +23,7 @@ import com.warehouse.palletmanagement.infrastructure.adapter.secondary.document.
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import org.springframework.beans.factory.annotation.Value;
 import java.time.ZoneId;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.commonassets.resilience.CircuitBreakerExecutor;
@@ -43,6 +46,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -88,6 +92,15 @@ public class PalletManagementConfiguration {
         return new DriverHubCarrierServiceAdapter(carrierApiService);
     }
 
+    @Bean("palletAuditLogServicePort")
+    @ConditionalOnProperty(
+            name = {"manager.kafka.integration-events.enabled", "manager.kafka.outbox.enabled"},
+            havingValue = "true")
+    public AuditLogServicePort palletAuditLogServicePort(
+            final IntegrationEventPublisher integrationEventPublisher) {
+        return new AuditLogServiceAdapter(integrationEventPublisher);
+    }
+
     @Bean
     public BaseRepository<PalletTransportEntity> palletTransportEntityRepository(
             final EntityManager entityManager,
@@ -117,9 +130,11 @@ public class PalletManagementConfiguration {
     @Bean("palletManagement.palletScanPort")
     public PalletScanPort palletScanPort(final PalletHandlingManagerServicePort palletHandlingManagerServicePort,
                                          final ShipmentServicePort palletShipmentServicePort,
-                                         final DomainEventPublisher domainEventPublisher) {
+                                         final PalletTransportService palletTransportService,
+                                         final DomainEventPublisher domainEventPublisher,
+                                         final OperatorContextProvider operatorContextProvider) {
         return new PalletScanPortImpl(palletHandlingManagerServicePort, palletShipmentServicePort,
-                domainEventPublisher);
+                palletTransportService, domainEventPublisher, operatorContextProvider);
     }
 
     @Bean

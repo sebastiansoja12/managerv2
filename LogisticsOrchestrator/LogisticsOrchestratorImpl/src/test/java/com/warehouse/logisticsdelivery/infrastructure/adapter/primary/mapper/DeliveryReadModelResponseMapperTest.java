@@ -27,7 +27,7 @@ class DeliveryReadModelResponseMapperTest {
         final LocalDateTime createdAt = LocalDateTime.of(2026, 10, 20, 9, 0);
         final DeliveryReadPage page = new DeliveryReadPage(List.of(new DeliveryReadItem(new DeliveryId("delivery-1"),
                 new ShipmentId(10L), DeliveryTargetType.SHIPMENT, "10", DeliveryType.OUTBOUND, DeliveryStatus.DEPOT,
-                DeliveryLifecycleStatus.CREATED, ORIGIN_DEPARTMENT_ID, DESTINATION_DEPARTMENT_ID,
+                DeliveryLifecycleStatus.CREATED, ORIGIN_DEPARTMENT_ID, DESTINATION_DEPARTMENT_ID, ORIGIN_DEPARTMENT_ID,
                 DeliveryMethod.COURIER, 1, createdAt, null)), 2, 25, true);
 
         final DeliveryReadPageResponseDto response = new DeliveryReadModelResponseMapper().map(page);
@@ -43,6 +43,7 @@ class DeliveryReadModelResponseMapperTest {
         assertThat(item.lifecycleStatus()).isEqualTo("CREATED");
         assertThat(item.originDepartmentId()).isEqualTo("3");
         assertThat(item.destinationDepartmentId()).isEqualTo("5");
+        assertThat(item.currentDepartmentId()).isEqualTo("3");
         assertThat(item.method()).isEqualTo("COURIER");
         assertThat(item.stepCount()).isEqualTo(1);
         assertThat(item.createdAt()).isEqualTo(createdAt);

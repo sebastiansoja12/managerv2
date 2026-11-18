@@ -5,14 +5,15 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.organisationstructure.department.domain.model.Department;
-import com.warehouse.organisationstructure.department.domain.port.secondary.DepartmentReadRepository;
-import com.warehouse.organisationstructure.department.domain.port.secondary.DepartmentRepository;
+import com.warehouse.organisationstructure.department.application.port.secondary.DepartmentReadRepository;
+import com.warehouse.organisationstructure.department.application.port.secondary.DepartmentRepository;
 import com.warehouse.organisationstructure.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
 import com.warehouse.organisationstructure.department.infrastructure.adapter.secondary.entity.readmodel.DepartmentReadEntity;
 import com.warehouse.organisationstructure.department.infrastructure.adapter.secondary.mapper.DepartmentToEntityMapper;
 import com.warehouse.organisationstructure.department.infrastructure.adapter.secondary.mapper.DepartmentToModelMapper;
 
 import java.util.List;
+import java.util.Optional;
 
 public class DepartmentRepositoryImpl implements DepartmentRepository {
 
@@ -59,6 +60,15 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
                 .one()
                 .map(DepartmentToModelMapper::map)
                 .orElse(null);
+    }
+
+    @Override
+    public Optional<DepartmentCode> findDepartmentCode(final DepartmentId departmentId) {
+        return repository.createCriteria(DepartmentEntity.class)
+                .eq("departmentId.value", departmentId.getValue())
+                .one()
+                .map(DepartmentToModelMapper::map)
+                .map(Department::getDepartmentCode);
     }
 
     @Override

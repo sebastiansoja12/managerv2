@@ -16,8 +16,7 @@ import com.warehouse.platformadministration.domain.vo.OperatorShipmentSettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
@@ -52,7 +51,7 @@ class OperatorOperationsControllerTest {
     void setUp() {
         mockMvc = standaloneSetup(new OperatorOperationsController(operatorOnboardingPort, operatorDevicePort,
                 operatorDataPort))
-                .setMessageConverters(new MappingJackson2HttpMessageConverter(Jackson2ObjectMapperBuilder.json().build()))
+                .setMessageConverters(new JacksonJsonHttpMessageConverter())
                 .build();
     }
 

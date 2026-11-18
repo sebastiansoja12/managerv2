@@ -3,10 +3,11 @@ package com.warehouse.shipment.infrastructure.adapter.secondary;
 import java.util.Collection;
 import java.util.List;
 
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.repository.Criteria;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
-import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.vo.ShipmentListEntry;
 import com.warehouse.shipment.domain.vo.ShipmentSearchCriteria;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentReadEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentPersistenceMapper;
@@ -16,7 +17,7 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
 public class SpecificationShipmentRepositoryImpl
-        implements SpecificationRepository<ShipmentSearchCriteria, Shipment> {
+        implements SpecificationRepository<ShipmentSearchCriteria, ShipmentListEntry> {
 
     private final OperatorFilteredRepository<ShipmentReadEntity> repository;
     private final ShipmentPersistenceMapper persistenceMapper;
@@ -28,7 +29,23 @@ public class SpecificationShipmentRepositoryImpl
     }
 
     @Override
-    public List<Shipment> list(final ShipmentSearchCriteria criteria) {
+    public List<ShipmentListEntry> list(final ShipmentSearchCriteria criteria) {
+        return filteredCriteria(criteria)
+                .desc("createdAt")
+                .firstResult(criteria.pageNumber() * criteria.pageSize())
+                .maxResults(criteria.pageSize())
+                .list()
+                .stream()
+                .map(this::toListEntry)
+                .toList();
+    }
+
+    @Override
+    public long count(final ShipmentSearchCriteria criteria) {
+        return filteredCriteria(criteria).count();
+    }
+
+    private Criteria<ShipmentReadEntity> filteredCriteria(final ShipmentSearchCriteria criteria) {
         final Criteria<ShipmentReadEntity> shipmentCriteria = repository.createCriteria(ShipmentReadEntity.class);
 
         if (criteria.shipmentId() != null) {
@@ -85,18 +102,24 @@ public class SpecificationShipmentRepositoryImpl
             shipmentCriteria.le("createdAt", criteria.createdTo());
         }
 
-        return shipmentCriteria
-                .desc("createdAt")
-                .firstResult(criteria.pageNumber() * criteria.pageSize())
-                .maxResults(criteria.pageSize())
-                .list()
-                .stream()
-                .map(this::toDomain)
-                .toList();
+        if (criteria.departmentId() != null) {
+            shipmentCriteria.and(departmentMatches(shipmentCriteria, criteria.departmentId()));
+        }
+
+        return shipmentCriteria;
     }
 
-    private Shipment toDomain(final ShipmentReadEntity entity) {
-        return persistenceMapper.toDomain(entity);
+    private ShipmentListEntry toListEntry(final ShipmentReadEntity entity) {
+        return new ShipmentListEntry(persistenceMapper.toDomain(entity), persistenceMapper.deliveryDetails(entity));
+    }
+
+    private Predicate departmentMatches(final Criteria<ShipmentReadEntity> criteria, final DepartmentId departmentId) {
+        final CriteriaBuilder cb = criteria.getCriteriaBuilder();
+        final Root<ShipmentReadEntity> root = criteria.getRoot();
+        return cb.or(
+                cb.equal(root.get("originDepartmentId").get("value"), departmentId.value()),
+                cb.equal(root.get("destinationDepartmentId").get("value"), departmentId.value())
+        );
     }
 
     private Predicate nameLike(

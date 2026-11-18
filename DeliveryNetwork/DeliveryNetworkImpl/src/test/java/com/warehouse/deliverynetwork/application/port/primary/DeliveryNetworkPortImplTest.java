@@ -3,8 +3,12 @@ package com.warehouse.deliverynetwork.application.port.primary;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
+import com.warehouse.deliverynetwork.application.exception.ShipmentDestinationDepartmentNotAssignedException;
+import com.warehouse.deliverynetwork.application.exception.ShipmentOriginDepartmentNotAssignedException;
 import com.warehouse.deliverynetwork.application.port.primary.command.DepartmentConnectionCommand;
 import com.warehouse.deliverynetwork.application.port.primary.command.DepartmentConnectionCodeCommand;
 import com.warehouse.deliverynetwork.application.port.primary.command.DepartmentImportCommand;
@@ -12,16 +16,24 @@ import com.warehouse.deliverynetwork.application.port.primary.command.ReplaceDel
 import com.warehouse.deliverynetwork.application.port.primary.command.ReplaceDeliveryNetworkCommand;
 import com.warehouse.deliverynetwork.application.port.primary.result.DeliveryNetworkExportResult;
 import com.warehouse.deliverynetwork.application.port.primary.result.DeliveryNetworkResult;
+import com.warehouse.deliverynetwork.application.port.primary.result.ShipmentDeliveryRouteResult;
 import com.warehouse.deliverynetwork.application.port.secondary.DeliveryNetworkRepository;
 import com.warehouse.deliverynetwork.application.port.secondary.DepartmentDirectoryServicePort;
+import com.warehouse.deliverynetwork.application.port.secondary.ShipmentDeliveryServicePort;
+import com.warehouse.deliverynetwork.application.service.ShipmentRouteDocumentService;
 import com.warehouse.deliverynetwork.domain.enumeration.DepartmentStatus;
 import com.warehouse.deliverynetwork.domain.enumeration.DepartmentType;
 import com.warehouse.deliverynetwork.domain.model.DeliveryNetwork;
 import com.warehouse.deliverynetwork.domain.event.DeliveryNetworkChanged;
+import com.warehouse.deliverynetwork.application.service.ShipmentDeliveryRouteFactory;
 import com.warehouse.deliverynetwork.domain.service.DeliveryPathFinder;
 import com.warehouse.deliverynetwork.domain.vo.DeliveryPath;
 import com.warehouse.deliverynetwork.domain.vo.DepartmentConnection;
+import com.warehouse.deliverynetwork.domain.vo.DepartmentConnectionPolicies;
+import com.warehouse.deliverynetwork.domain.vo.DepartmentConnectionRules;
+import com.warehouse.deliverynetwork.domain.vo.DepartmentLocation;
 import com.warehouse.deliverynetwork.domain.vo.DepartmentNode;
+import com.warehouse.deliverynetwork.domain.vo.ShipmentDepartments;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +46,10 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -55,7 +70,15 @@ class DeliveryNetworkPortImplTest {
     @Mock
     private DomainEventPublisher domainEventPublisher;
 
+    @Mock
+    private ShipmentDeliveryServicePort shipmentDeliveryServicePort;
+
+    @Mock
+    private ShipmentRouteDocumentService shipmentRouteDocumentService;
+
     private DeliveryNetworkPort deliveryNetworkPort;
+
+    private DepartmentConnectionRules connectionRules = DepartmentConnectionRules.defaultRules();
 
     @BeforeEach
     void setUp() {
@@ -64,7 +87,11 @@ class DeliveryNetworkPortImplTest {
                 this.departmentDirectoryServicePort,
                 this.operatorContextProvider,
                 new DeliveryPathFinder(),
-                this.domainEventPublisher);
+                this.domainEventPublisher,
+                this.shipmentDeliveryServicePort,
+                this.shipmentRouteDocumentService,
+                new ShipmentDeliveryRouteFactory(new DeliveryPathFinder()),
+                () -> DepartmentConnectionPolicies.uniform(this.connectionRules));
     }
 
     @Test
@@ -155,11 +182,58 @@ class DeliveryNetworkPortImplTest {
         when(this.operatorContextProvider.currentOperatorId()).thenReturn(OPERATOR_ID);
         when(this.deliveryNetworkRepository.find())
                 .thenReturn(Optional.of(deliveryNetwork));
+        when(this.departmentDirectoryServicePort.getCurrentOperatorDepartments()).thenReturn(List.of(
+                branch(1L, "KT1"),
+                sortingFacility(2L, "NCS"),
+                branch(3L, "WA1")));
 
         final DeliveryPath deliveryPath = this.deliveryNetworkPort.findDeliveryPath(
                 departmentId(1L), departmentId(3L));
 
         assertEquals(List.of(departmentId(1L), departmentId(2L), departmentId(3L)), deliveryPath.departmentIds());
+    }
+
+    @Test
+    void shouldFindShipmentDeliveryRouteThroughSortingFacility() {
+        final TrackingNumber trackingNumber = new TrackingNumber("TN-1");
+        final DeliveryNetwork deliveryNetwork = new DeliveryNetwork(OPERATOR_ID, Set.of(
+                connection(1L, 2L),
+                connection(2L, 3L)));
+        when(this.shipmentDeliveryServicePort.getShipmentDepartments(trackingNumber)).thenReturn(
+                new ShipmentDepartments(new ShipmentId(100L), trackingNumber, departmentId(1L), departmentId(3L)));
+        when(this.operatorContextProvider.currentOperatorId()).thenReturn(OPERATOR_ID);
+        when(this.deliveryNetworkRepository.find()).thenReturn(Optional.of(deliveryNetwork));
+        when(this.departmentDirectoryServicePort.getCurrentOperatorDepartments()).thenReturn(List.of(
+                branch(1L, "KT1"),
+                sortingFacility(2L, "NCS"),
+                branch(3L, "WA1")));
+
+        final ShipmentDeliveryRouteResult result = this.deliveryNetworkPort.findShipmentDeliveryRoute(trackingNumber);
+
+        assertEquals(List.of("KT1", "NCS", "WA1"), result.departments().stream()
+                .map(department -> department.departmentCode().getValue())
+                .toList());
+        assertEquals(new ShipmentId(100L), result.shipmentId());
+    }
+
+    @Test
+    void shouldRejectShipmentDeliveryRouteWithoutOriginDepartment() {
+        final TrackingNumber trackingNumber = new TrackingNumber("TN-1");
+        when(this.shipmentDeliveryServicePort.getShipmentDepartments(trackingNumber)).thenReturn(
+                new ShipmentDepartments(new ShipmentId(100L), trackingNumber, null, departmentId(3L)));
+
+        assertThrows(ShipmentOriginDepartmentNotAssignedException.class,
+                () -> this.deliveryNetworkPort.findShipmentDeliveryRoute(trackingNumber));
+    }
+
+    @Test
+    void shouldRejectShipmentDeliveryRouteWithoutDestinationDepartment() {
+        final TrackingNumber trackingNumber = new TrackingNumber("TN-1");
+        when(this.shipmentDeliveryServicePort.getShipmentDepartments(trackingNumber)).thenReturn(
+                new ShipmentDepartments(new ShipmentId(100L), trackingNumber, departmentId(1L), null));
+
+        assertThrows(ShipmentDestinationDepartmentNotAssignedException.class,
+                () -> this.deliveryNetworkPort.findShipmentDeliveryRoute(trackingNumber));
     }
 
     @Test
@@ -177,6 +251,120 @@ class DeliveryNetworkPortImplTest {
         verify(this.deliveryNetworkRepository).save(networkCaptor.capture());
         verify(this.domainEventPublisher).publish(org.mockito.ArgumentMatchers.any(DeliveryNetworkChanged.class));
         assertEquals(Set.of(connection(3L, 4L)), networkCaptor.getValue().connections());
+    }
+
+    @Test
+    void shouldUseOneWayConnectionsWhenConfiguredAsDefault() {
+        this.connectionRules = new DepartmentConnectionRules(false, 1, 300, false, false);
+        when(this.operatorContextProvider.currentOperatorId()).thenReturn(OPERATOR_ID);
+        when(this.deliveryNetworkRepository.find()).thenReturn(Optional.empty());
+        when(this.departmentDirectoryServicePort.getCurrentOperatorDepartments()).thenReturn(List.of(
+                branch(1L, "KT1"),
+                sortingFacility(2L, "NCS"),
+                branch(3L, "KT2")));
+
+        final DeliveryNetworkResult result = this.deliveryNetworkPort.replaceCurrentNetwork(
+                new ReplaceDeliveryNetworkCommand(List.of(
+                        new DepartmentConnectionCommand(departmentId(2L), departmentId(1L)),
+                        new DepartmentConnectionCommand(departmentId(3L), departmentId(2L), true))));
+
+        assertEquals(Set.of(DepartmentConnection.oneWay(departmentId(2L), departmentId(1L)), connection(2L, 3L)),
+                result.connections());
+    }
+
+    @Test
+    void shouldConnectNewDepartmentToNearestSortingFacilitiesWithinDistance() {
+        this.connectionRules = new DepartmentConnectionRules(true, 1, 100, false, true);
+        when(this.operatorContextProvider.currentOperatorId()).thenReturn(OPERATOR_ID);
+        when(this.deliveryNetworkRepository.find()).thenReturn(Optional.empty());
+        when(this.departmentDirectoryServicePort.getCurrentOperatorDepartments()).thenReturn(List.of(
+                located(1L, "KT1", DepartmentType.BRANCH, 50.26, 19.02),
+                located(2L, "NCS", DepartmentType.SORTING_FACILITY, 50.30, 18.95),
+                located(3L, "WAW", DepartmentType.SORTING_FACILITY, 52.23, 21.01)));
+
+        this.deliveryNetworkPort.connectDepartmentToSortingFacilities(departmentId(1L));
+
+        final ArgumentCaptor<DeliveryNetwork> networkCaptor = ArgumentCaptor.forClass(DeliveryNetwork.class);
+        verify(this.deliveryNetworkRepository).save(networkCaptor.capture());
+        assertEquals(Set.of(connection(1L, 2L)), networkCaptor.getValue().connections());
+    }
+
+    @Test
+    void shouldCreateTwoOneWayConnectionsWhenAutoConnectingWithoutBidirectionalDefault() {
+        this.connectionRules = new DepartmentConnectionRules(true, 1, 0, false, false);
+        when(this.operatorContextProvider.currentOperatorId()).thenReturn(OPERATOR_ID);
+        when(this.deliveryNetworkRepository.find()).thenReturn(Optional.empty());
+        when(this.departmentDirectoryServicePort.getCurrentOperatorDepartments()).thenReturn(List.of(
+                located(1L, "KT1", DepartmentType.BRANCH, 50.26, 19.02),
+                located(3L, "WAW", DepartmentType.SORTING_FACILITY, 52.23, 21.01)));
+
+        this.deliveryNetworkPort.connectDepartmentToSortingFacilities(departmentId(1L));
+
+        final ArgumentCaptor<DeliveryNetwork> networkCaptor = ArgumentCaptor.forClass(DeliveryNetwork.class);
+        verify(this.deliveryNetworkRepository).save(networkCaptor.capture());
+        assertEquals(Set.of(DepartmentConnection.oneWay(departmentId(1L), departmentId(3L)),
+                DepartmentConnection.oneWay(departmentId(3L), departmentId(1L))),
+                networkCaptor.getValue().connections());
+    }
+
+    @Test
+    void shouldSkipAutoConnectWhenDisabledOrNothingInRange() {
+        this.deliveryNetworkPort.connectDepartmentToSortingFacilities(departmentId(1L));
+
+        this.connectionRules = new DepartmentConnectionRules(true, 1, 10, false, true);
+        when(this.operatorContextProvider.currentOperatorId()).thenReturn(OPERATOR_ID);
+        when(this.deliveryNetworkRepository.find()).thenReturn(Optional.empty());
+        when(this.departmentDirectoryServicePort.getCurrentOperatorDepartments()).thenReturn(List.of(
+                located(1L, "KT1", DepartmentType.BRANCH, 50.26, 19.02),
+                located(3L, "WAW", DepartmentType.SORTING_FACILITY, 52.23, 21.01)));
+
+        this.deliveryNetworkPort.connectDepartmentToSortingFacilities(departmentId(1L));
+
+        verify(this.deliveryNetworkRepository, never()).save(org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    void shouldRequireSortingConnectionForActivationOnlyWhenConfigured() {
+        when(this.departmentDirectoryServicePort.getCurrentOperatorDepartments()).thenReturn(List.of(
+                branch(1L, "KT1"),
+                sortingFacility(2L, "NCS")));
+        assertTrue(this.deliveryNetworkPort.canActivateDepartment(departmentId(1L)));
+
+        this.connectionRules = new DepartmentConnectionRules(false, 1, 300, true, true);
+        when(this.operatorContextProvider.currentOperatorId()).thenReturn(OPERATOR_ID);
+        when(this.deliveryNetworkRepository.find()).thenReturn(Optional.empty());
+
+        assertFalse(this.deliveryNetworkPort.canActivateDepartment(departmentId(1L)));
+        assertTrue(this.deliveryNetworkPort.canActivateDepartment(departmentId(2L)));
+
+        when(this.deliveryNetworkRepository.find()).thenReturn(Optional.of(
+                new DeliveryNetwork(OPERATOR_ID, Set.of(connection(1L, 2L)))));
+
+        assertTrue(this.deliveryNetworkPort.canActivateDepartment(departmentId(1L)));
+    }
+
+    @Test
+    void shouldUseRulesOfTheConnectedDepartment() {
+        this.deliveryNetworkPort = new DeliveryNetworkPortImpl(
+                this.deliveryNetworkRepository,
+                this.departmentDirectoryServicePort,
+                this.operatorContextProvider,
+                new DeliveryPathFinder(),
+                this.domainEventPublisher,
+                this.shipmentDeliveryServicePort,
+                this.shipmentRouteDocumentService,
+                new ShipmentDeliveryRouteFactory(new DeliveryPathFinder()),
+                () -> new DepartmentConnectionPolicies(DepartmentConnectionRules.defaultRules(), java.util.Map.of(
+                        departmentId(1L), new DepartmentConnectionRules(false, 1, 300, true, true))));
+        when(this.departmentDirectoryServicePort.getCurrentOperatorDepartments()).thenReturn(List.of(
+                branch(1L, "KT1"),
+                branch(3L, "KT2"),
+                sortingFacility(2L, "NCS")));
+        when(this.operatorContextProvider.currentOperatorId()).thenReturn(OPERATOR_ID);
+        when(this.deliveryNetworkRepository.find()).thenReturn(Optional.empty());
+
+        assertFalse(this.deliveryNetworkPort.canActivateDepartment(departmentId(1L)));
+        assertTrue(this.deliveryNetworkPort.canActivateDepartment(departmentId(3L)));
     }
 
     @Test
@@ -204,6 +392,13 @@ class DeliveryNetworkPortImplTest {
                 new DepartmentCode(departmentCode),
                 departmentType,
                 DepartmentStatus.ACTIVE);
+    }
+
+    private static DepartmentNode located(final Long departmentId, final String departmentCode,
+                                          final DepartmentType departmentType, final double latitude,
+                                          final double longitude) {
+        return new DepartmentNode(new DepartmentId(departmentId), new DepartmentCode(departmentCode), departmentType,
+                DepartmentStatus.ACTIVE, new DepartmentLocation(latitude, longitude));
     }
 
     private static DepartmentConnection connection(final Long firstDepartmentId, final Long secondDepartmentId) {

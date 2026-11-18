@@ -3,6 +3,7 @@ package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 import com.warehouse.shipment.application.port.primary.result.ShipmentRerouteResult;
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
+import com.warehouse.shipment.domain.vo.Dimensions;
 import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.vo.RouteLogRecord;
 import com.warehouse.shipment.domain.vo.RouteLogRecordDetail;
@@ -10,6 +11,7 @@ import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 import com.warehouse.shipment.domain.vo.Weight;
 import com.warehouse.shipment.domain.vo.WeightUnit;
 import com.warehouse.shipment.infrastructure.dto.ShipmentDetailsDto;
+import com.warehouse.shipment.infrastructure.dto.ShipmentDimensionsDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentDocumentDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentPartyDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRerouteDetailsDto;
@@ -32,7 +34,10 @@ public class ShipmentApiServiceMapper {
                 weightInKilograms(shipment.snapshot().weight()),
                 shipment.snapshot().trackingNumber() == null ? null : shipment.snapshot().trackingNumber().value(),
                 shipment.snapshot().recipient() == null ? null : shipment.snapshot().recipient().getCity(),
-                shipment.snapshot().recipient() == null ? null : shipment.snapshot().recipient().getPostalCode()
+                shipment.snapshot().recipient() == null ? null : shipment.snapshot().recipient().getPostalCode(),
+                shipment.snapshot().recipient() == null ? null : shipment.snapshot().recipient().getStreet(),
+                shipment.snapshot().recipient() == null || shipment.snapshot().recipient().getCountryCode() == null
+                        ? null : shipment.snapshot().recipient().getCountryCode().name()
         );
     }
 
@@ -45,7 +50,10 @@ public class ShipmentApiServiceMapper {
                 snapshot.trackingNumber() == null ? null : snapshot.trackingNumber().value(),
                 weightInKilograms(snapshot.weight()),
                 snapshot.sender() == null ? null : map(snapshot.sender()),
-                snapshot.recipient() == null ? null : map(snapshot.recipient())
+                snapshot.recipient() == null ? null : map(snapshot.recipient()),
+                snapshot.shipmentPriority(),
+                snapshot.serviceLevel() == null ? null : snapshot.serviceLevel().name(),
+                snapshot.dimensions() == null ? null : map(snapshot.dimensions())
         );
     }
 
@@ -98,6 +106,15 @@ public class ShipmentApiServiceMapper {
                 shipmentRerouteResult.reroutable(),
                 map(snapshot.sender()),
                 map(snapshot.recipient())
+        );
+    }
+
+    private ShipmentDimensionsDto map(final Dimensions dimensions) {
+        return new ShipmentDimensionsDto(
+                dimensions.length(),
+                dimensions.width(),
+                dimensions.height(),
+                dimensions.unit().name()
         );
     }
 

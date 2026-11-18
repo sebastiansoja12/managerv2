@@ -7,5 +7,4 @@ public interface ShipmentRequestValidator {
     void validateRequest(final ShipmentCreateRequestApi shipmentRequest, final ShipmentValidationRules validationRules);
     void validateBody(final ShipmentIdDto parcelId);
     void validateBody(final ShipmentStatusRequestApi shipmentStatusRequest);
-    void validateBody(final SignatureChangeRequestApi signatureChangeRequest);
 }

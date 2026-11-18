@@ -11,8 +11,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -74,6 +74,19 @@ public class RefreshTokenReadRepositoryTest {
         repository.deleteByToken("0");
         // then
         assertFalse(repository.findByToken(token).isEmpty());
+    }
+
+    @Test
+    void shouldShortenExpiryOnly() {
+        // given
+        final String token = "12345";
+        final LocalDateTime shortenedExpiry = LocalDateTime.now().plusSeconds(60);
+        // when
+        repository.shortenExpiry(token, shortenedExpiry);
+        repository.shortenExpiry(token, shortenedExpiry.plusDays(1));
+        // then
+        assertThat(repository.findByToken(token).orElseThrow().getExpiryDate())
+                .isEqualToIgnoringNanos(shortenedExpiry);
     }
 
     @Test

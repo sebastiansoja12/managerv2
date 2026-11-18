@@ -7,6 +7,8 @@ import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 
+import java.util.Optional;
+
 
 public class DepartmentServiceAdapter implements DepartmentServicePort {
 
@@ -38,6 +40,8 @@ public class DepartmentServiceAdapter implements DepartmentServicePort {
 
     @Override
     public DepartmentCode getDepartmentCode(final DepartmentId departmentId) {
-        return new DepartmentCode(departmentApiService.getDepartmentById(departmentId).departmentCode());
+        return Optional.ofNullable(departmentId)
+                .flatMap(departmentApiService::findDepartmentCode)
+                .orElse(null);
     }
 }

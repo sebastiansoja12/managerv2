@@ -35,6 +35,7 @@ public class CollectMapper {
         final CollectResponse collectResponse = new CollectResponse();
         collectResponse.setProcessId(processId.value().toString());
         collectResponse.setSuccess(result.allCollected());
+        collectResponse.setErrorMessage(result.failureDescription());
         collectResponse.setCollectResponseDetails(details);
         return collectResponse;
     }

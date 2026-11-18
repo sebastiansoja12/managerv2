@@ -4,8 +4,12 @@ import com.warehouse.auth.CurrentOperatorService;
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.auth.UserApiService;
 import com.warehouse.auth.infrastructure.dto.OperatorIdDto;
+import com.warehouse.chat.domain.vo.ChatParticipant;
 import com.warehouse.chat.domain.vo.ChatRecipient;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static com.warehouse.chat.ChatFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,5 +49,15 @@ class ChatUserServiceAdapterTest {
         when(users.findById(PARTICIPANT_USER_ID)).thenReturn(ChatUserFixture.recipient(true, null));
 
         assertThat(adapter.findRecipient(PARTICIPANT_USER_ID)).contains(new ChatRecipient(null, false));
+    }
+
+    @Test
+    void shouldListActiveParticipantsOfWholeOrganization() {
+        when(users.findAll()).thenReturn(List.of(
+                ChatUserFixture.recipient(false, new OperatorIdDto(OPERATOR_ID.value())),
+                ChatUserFixture.recipient(true, new OperatorIdDto(OPERATOR_ID.value()))));
+
+        assertThat(adapter.findActiveParticipants()).containsExactly(new ChatParticipant(PARTICIPANT_USER_ID,
+                "chat.user", "Chat", "User", new DepartmentCode("WAW-01"), "USER", OPERATOR_ID));
     }
 }

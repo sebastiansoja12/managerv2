@@ -8,10 +8,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -34,7 +34,7 @@ public class CsvControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private ShipmentApiService shipmentApiService;
 
     @Test
@@ -44,7 +44,7 @@ public class CsvControllerIntegrationTest {
         final ShipmentPartyDto party = new ShipmentPartyDto("Jan", "Kowalski", "jan@test.pl", "123456789",
                 "Katowice", "40-000", "Mariacka 1", "PL");
         when(shipmentApiService.getShipmentDocument(any())).thenReturn(new ShipmentDocumentDto(
-                new ShipmentId(parcelId), null, null, null, null, party, party));
+                new ShipmentId(parcelId), null, null, null, null, party, party, null, null, null));
         // when
         mockMvc.perform(get("/v1/api/csv/{id}", parcelId).contextPath("/v1/api"))
         // then

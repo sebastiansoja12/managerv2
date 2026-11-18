@@ -233,10 +233,23 @@ public class PickupPoint {
         if (this.status == PickupPointStatus.CLOSED) {
             return false;
         }
+        if (this.status == PickupPointStatus.DELETED) {
+            throw new InvalidPickupPointStatusTransitionException(this.status, PickupPointStatus.CLOSED);
+        }
         this.status = PickupPointStatus.CLOSED;
         this.statusReason = validReason(reason);
         touch(requiredTimestamp);
         return true;
+    }
+
+    public void delete(final Instant timestamp) {
+        final Instant requiredTimestamp = requiredTimestamp(timestamp);
+        if (this.status == PickupPointStatus.DELETED) {
+            return;
+        }
+        this.status = PickupPointStatus.DELETED;
+        this.statusReason = null;
+        touch(requiredTimestamp);
     }
 
     public void validateSelection(final PickupPointSelectionCriteria criteria, final boolean departmentActive) {
@@ -288,6 +301,9 @@ public class PickupPoint {
     private void ensureMutable() {
         if (this.status == PickupPointStatus.CLOSED) {
             throw new InvalidPickupPointConfigurationException("Closed pickup point cannot be changed");
+        }
+        if (this.status == PickupPointStatus.DELETED) {
+            throw new InvalidPickupPointConfigurationException("Deleted pickup point cannot be changed");
         }
     }
 

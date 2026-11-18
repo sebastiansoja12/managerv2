@@ -7,7 +7,7 @@ public class DuplicateDepartmentConnectionException extends RuntimeException {
     public DuplicateDepartmentConnectionException(final DepartmentConnection connection) {
         super("Duplicate department connection: "
                 + connection.firstDepartmentId().getValue()
-                + " <-> "
+                + (connection.bidirectional() ? " <-> " : " -> ")
                 + connection.secondDepartmentId().getValue());
     }
 }

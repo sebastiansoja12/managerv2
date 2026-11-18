@@ -1,7 +1,7 @@
 package com.warehouse.logisticsdelivery.infrastructure.adapter.secondary;
 
 import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
-import com.warehouse.logisticsdelivery.api.event.DeliveryChangedIntegrationEvent;
+import com.warehouse.commonassets.event.integration.model.IntegrationEvent;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryIntegrationEventServicePort;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ public class DeliveryIntegrationEventServiceAdapter implements DeliveryIntegrati
     }
 
     @Override
-    public void publishEvent(final DeliveryChangedIntegrationEvent event) {
+    public void publishEvent(final IntegrationEvent event) {
         this.integrationEventPublisher.publish(event);
     }
 }

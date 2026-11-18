@@ -30,6 +30,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -156,6 +157,13 @@ public class PickupPointController {
         final PickupPointResult result = this.pickupPointPort.changeStatus(
                 this.pickupPointWebMapper.toCommand(new PickupPointId(pickupPointId), request));
         return ResponseEntity.ok(this.pickupPointWebMapper.toResponse(result));
+    }
+
+    @DeleteMapping("/{pickupPointId}")
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_DELETE, UserPermission.ROLE_MANAGER_DELETE})
+    public ResponseEntity<Void> delete(@PathVariable final UUID pickupPointId) {
+        this.pickupPointPort.delete(new PickupPointId(pickupPointId));
+        return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler(PickupPointNotFoundException.class)

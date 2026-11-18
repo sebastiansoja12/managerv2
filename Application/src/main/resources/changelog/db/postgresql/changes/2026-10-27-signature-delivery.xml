@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-27-signature-delivery" author="s-soja">
+        <dropForeignKeyConstraint baseTableName="signature" constraintName="fk_signature_shipment"/>
+        <dropPrimaryKey tableName="signature"/>
+        <dropUniqueConstraint tableName="signature" constraintName="uk_signature_signature_id"/>
+        <addPrimaryKey tableName="signature" columnNames="signature_id" constraintName="pk_signature"/>
+        <dropNotNullConstraint tableName="signature" columnName="shipment_id" columnDataType="BIGINT"/>
+        <dropNotNullConstraint tableName="signature" columnName="document_reference" columnDataType="VARCHAR(255)"/>
+        <dropColumn tableName="shipment_rd" columnName="signature_id"/>
+    </changeSet>
+</databaseChangeLog>

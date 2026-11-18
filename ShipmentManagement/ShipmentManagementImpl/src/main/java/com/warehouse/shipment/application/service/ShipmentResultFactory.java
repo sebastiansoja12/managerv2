@@ -1,11 +1,13 @@
 package com.warehouse.shipment.application.service;
 
+import com.warehouse.shipment.domain.vo.ShipmentListEntry;
 import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.application.port.secondary.DepartmentServicePort;
-import com.warehouse.shipment.application.port.secondary.SignatureRepository;
 import com.warehouse.shipment.application.port.secondary.ReturningServicePort;
+import com.warehouse.shipment.domain.exception.ReturnDetailsUnavailableException;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.vo.RouteLogRecord;
 import com.warehouse.returning.api.dto.ReturnDetailsDto;
 
 public class ShipmentResultFactory {
@@ -15,35 +17,31 @@ public class ShipmentResultFactory {
     private final RouteLogService routeLogService;
 
     private final ReturningServicePort returningServicePort;
-    private final SignatureRepository signatureRepository;
-
-    public ShipmentResultFactory(final DepartmentServicePort departmentServicePort,
-                                 final RouteLogService routeLogService,
-                                 final ReturningServicePort returningServicePort,
-                                 final SignatureRepository signatureRepository) {
-        this.departmentServicePort = departmentServicePort;
-        this.routeLogService = routeLogService;
-        this.returningServicePort = returningServicePort;
-        this.signatureRepository = signatureRepository;
-    }
 
     public ShipmentResultFactory(final DepartmentServicePort departmentServicePort,
                                  final RouteLogService routeLogService,
                                  final ReturningServicePort returningServicePort) {
-        this(departmentServicePort, routeLogService, returningServicePort, null);
+        this.departmentServicePort = departmentServicePort;
+        this.routeLogService = routeLogService;
+        this.returningServicePort = returningServicePort;
     }
 
     public ShipmentResult create(final Shipment shipment) {
-        return new ShipmentResult(
-                shipment.snapshot(),
-                signatureRepository == null ? null : signatureRepository.get(shipment.getShipmentId()));
+        return new ShipmentResult(shipment.snapshot());
+    }
+
+    public ShipmentResult create(final ShipmentListEntry entry) {
+        return new ShipmentResult(entry.shipment().snapshot(), entry.deliveryDetails());
     }
 
     public ShipmentRouteLog createControlCenter(final Shipment shipment) {
-        final ReturnDetailsDto returnDetails = this.returningServicePort.findReturnByShipmentId(shipment.getShipmentId()).orElse(null);
-        return new ShipmentRouteLog(
-                create(shipment),
-                this.routeLogService.findByShipmentId(shipment.getShipmentId()).orElse(null),
-                returnDetails);
+        final RouteLogRecord routeLog = this.routeLogService.findByShipmentId(shipment.getShipmentId()).orElse(null);
+        try {
+            final ReturnDetailsDto returnDetails = this.returningServicePort
+                    .findReturnByShipmentId(shipment.getShipmentId()).orElse(null);
+            return new ShipmentRouteLog(create(shipment), routeLog, returnDetails, false);
+        } catch (final ReturnDetailsUnavailableException exception) {
+            return new ShipmentRouteLog(create(shipment), routeLog, null, true);
+        }
     }
 }

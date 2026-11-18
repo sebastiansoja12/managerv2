@@ -1,5 +1,6 @@
 package com.warehouse.shipment.application.port.secondary;
 
+import com.warehouse.shipment.domain.vo.ShipmentDeliveryDetails;
 import java.util.Optional;
 
 import com.warehouse.commonassets.identificator.ExternalId;
@@ -11,6 +12,8 @@ import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 public interface ShipmentReadModelRepository {
 
     void sync(final ShipmentSnapshot snapshot);
+
+    void sync(final ShipmentSnapshot snapshot, final ShipmentDeliveryDetails deliveryDetails);
 
     Optional<Shipment> findById(final ShipmentId shipmentId);
 

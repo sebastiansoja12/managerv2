@@ -36,6 +36,7 @@ import com.warehouse.auth.domain.port.secondary.PlatformOwnerRepository;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.provider.JwtProvider;
+import com.warehouse.auth.domain.provider.RefreshTokenProvider;
 import com.warehouse.auth.domain.service.*;
 import com.warehouse.auth.infrastructure.adapter.primary.CurrentOperatorServiceAdapter;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapper;
@@ -112,8 +113,10 @@ public class AuthConfiguration  {
     @Bean
     public AuthenticationService authenticationService(final RefreshTokenRepository refreshTokenRepository,
                                                        final RefreshTokenGenerator refreshTokenGenerator,
-                                                       final UserRepository userRepository) {
-        return new AuthenticationServiceImpl(refreshTokenRepository, refreshTokenGenerator, userRepository);
+                                                       final UserRepository userRepository,
+                                                       final RefreshTokenProvider refreshTokenProvider) {
+        return new AuthenticationServiceImpl(refreshTokenRepository, refreshTokenGenerator, userRepository,
+                refreshTokenProvider.getRotationGracePeriod());
     }
 
     @Bean
@@ -123,8 +126,7 @@ public class AuthConfiguration  {
     
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        final DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService());
+        final DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }

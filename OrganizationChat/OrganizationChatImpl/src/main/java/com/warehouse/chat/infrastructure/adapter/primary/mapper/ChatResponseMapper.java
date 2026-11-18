@@ -3,8 +3,10 @@ package com.warehouse.chat.infrastructure.adapter.primary.mapper;
 import com.warehouse.chat.application.port.primary.result.OpenChatConversationResult;
 import com.warehouse.chat.domain.model.ChatConversation;
 import com.warehouse.chat.domain.vo.ChatMessageSnapshot;
+import com.warehouse.chat.domain.vo.ChatParticipant;
 import com.warehouse.chat.infrastructure.adapter.primary.api.ChatConversationDto;
 import com.warehouse.chat.infrastructure.adapter.primary.api.ChatMessageDto;
+import com.warehouse.chat.infrastructure.adapter.primary.api.ChatParticipantDto;
 
 public class ChatResponseMapper {
 
@@ -17,6 +19,13 @@ public class ChatResponseMapper {
     public ChatMessageDto toResponse(final ChatMessageSnapshot message) {
         return new ChatMessageDto(message.id(), message.conversationId(), message.senderUserId(),
                 message.clientMessageId(), message.body(), message.sentAt());
+    }
+
+    public ChatParticipantDto toResponse(final ChatParticipant participant) {
+        return new ChatParticipantDto(participant.userId(), participant.username(), participant.firstName(),
+                participant.lastName(),
+                participant.departmentCode() == null ? null : participant.departmentCode().value(),
+                participant.role(), participant.operatorId());
     }
 
     public com.warehouse.chat.api.ChatConversationDto toApi(final OpenChatConversationResult result) {

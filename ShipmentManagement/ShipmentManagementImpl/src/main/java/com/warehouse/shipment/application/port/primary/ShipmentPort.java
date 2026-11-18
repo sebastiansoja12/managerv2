@@ -8,7 +8,6 @@ import com.warehouse.shipment.application.port.primary.result.ShipmentRerouteRes
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
 import com.warehouse.shipment.domain.enumeration.PersonType;
-import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.vo.Party;
@@ -29,8 +28,6 @@ public interface ShipmentPort {
 
     void markDelivered(final ShipmentId shipmentId);
 
-    void changeShipmentSignatureTo(final SignatureChangeRequest request, final SignatureMethod signatureMethod);
-
     ShipmentResult loadShipment(final ShipmentId shipmentId);
 
     ShipmentResult loadShipment(final TrackingNumber trackingNumber);
@@ -41,9 +38,15 @@ public interface ShipmentPort {
 
     ShipmentResult collectShipment(final TrackingNumber trackingNumber);
 
+    ShipmentResult acceptShipmentInDepartment(final TrackingNumber trackingNumber);
+
     ShipmentResult handOverShipment(final ShipmentHandoverCommand command);
 
     ShipmentResult loadShipmentOnPallet(final ShipmentId shipmentId);
+
+    ShipmentResult revertShipmentLoadingFromPallet(final ShipmentId shipmentId);
+
+    ShipmentResult unloadShipmentFromPallet(final ShipmentId shipmentId);
 
     Optional<OperatorId> findOperator(final TrackingNumber trackingNumber);
 
@@ -67,9 +70,11 @@ public interface ShipmentPort {
 
     void redirectShipmentToSender(final ShipmentId shipmentId);
 
-    void changeDestination(final ShipmentId shipmentId, final DepartmentCode destination);
-
     void markReturned(final ShipmentId shipmentId);
+
+    void markReturned(final ShipmentId shipmentId, final ShipmentId returnShipmentId);
+
+    ShipmentId createReturnShipmentDraft(final ShipmentId shipmentId);
 
     void restoreAfterReturnCancellation(final ShipmentId shipmentId);
 
@@ -80,6 +85,8 @@ public interface ShipmentPort {
     void returnToSender(final ShipmentId shipmentId);
 
     boolean hasAnyShipment();
+
+    boolean isOperatorActive(final OperatorId operatorId);
 
     ShipmentOwnerContext findContext(final TrackingNumber trackingNumber);
 }

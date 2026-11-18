@@ -50,8 +50,26 @@ public class UserPortImpl implements UserPort {
     }
 
     @Override
+    public OrganizationUser findUserInCurrentDepartment(final String username) {
+        final OrganizationUser user = userService.findUser(username);
+        if (user != null && !currentUser().canAccessDepartment(user.getDepartmentId())) {
+            throw new UserAccessDeniedException("User belongs to another department");
+        }
+        return user;
+    }
+
+    @Override
     public List<OrganizationUser> findAll() {
         return userService.findAll();
+    }
+
+    @Override
+    public List<OrganizationUser> findAllInCurrentDepartment() {
+        final OrganizationUser currentUser = currentUser();
+        return userService.findAll()
+                .stream()
+                .filter(user -> currentUser.canAccessDepartment(user.getDepartmentId()))
+                .toList();
     }
 
     @Override
@@ -172,6 +190,16 @@ public class UserPortImpl implements UserPort {
     @Override
     public void changeFullName(final FullNameChangeCommand fullNameChangeCommand) {
         this.userService.changeFullName(fullNameChangeCommand);
+    }
+
+    @Override
+    public void delete(final UserId userId) {
+        final OrganizationUser currentUser = currentUser();
+        if (currentUser.getUserId().equals(userId)) {
+            throw new UserAccessDeniedException("You cannot delete yourself");
+        }
+        requireManageable(currentUser, userService.findUserById(userId));
+        this.userService.deleteDataForUser(userId);
     }
 
     private OrganizationUser currentUser() {

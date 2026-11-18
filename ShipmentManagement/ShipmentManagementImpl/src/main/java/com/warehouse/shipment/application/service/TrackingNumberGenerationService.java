@@ -31,9 +31,13 @@ public class TrackingNumberGenerationService {
                                    final TrackingNumberRule rule, final ShipmentId shipmentId) {
 
         if (!shipmentWorkflowSettings.generateTrackingNumber()) {
-            return new TrackingNumber(UUID.randomUUID().toString());
+            return temporary();
         } else {
             return generate(rule, shipmentId);
         }
+    }
+
+    public TrackingNumber temporary() {
+        return new TrackingNumber(UUID.randomUUID().toString());
     }
 }

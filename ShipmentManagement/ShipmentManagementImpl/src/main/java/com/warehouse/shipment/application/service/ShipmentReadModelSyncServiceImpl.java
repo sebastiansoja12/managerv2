@@ -1,5 +1,6 @@
 package com.warehouse.shipment.application.service;
 
+import com.warehouse.shipment.domain.vo.ShipmentDeliveryDetails;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.application.port.primary.ShipmentReadModelSyncPort;
 import com.warehouse.shipment.application.port.secondary.ShipmentReadModelRepository;
@@ -36,6 +37,13 @@ public class ShipmentReadModelSyncServiceImpl implements ShipmentReadModelSyncPo
                 dateFrom.atStartOfDay(),
                 dateTo.plusDays(1).atStartOfDay());
         return syncReadModels(shipments);
+    }
+
+    @Transactional
+    @Override
+    public void syncReadModel(final ShipmentId shipmentId, final ShipmentDeliveryDetails deliveryDetails) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        this.readModelRepository.sync(shipment.snapshot(), deliveryDetails);
     }
 
     private int syncReadModels(final List<Shipment> shipments) {

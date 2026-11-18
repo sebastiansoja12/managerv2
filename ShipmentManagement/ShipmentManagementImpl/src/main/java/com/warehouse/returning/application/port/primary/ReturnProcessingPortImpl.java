@@ -5,6 +5,7 @@ import com.warehouse.commonassets.enumeration.ReturnStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.returning.application.port.primary.command.ApplyReturnProcessingStartedCommand;
 import com.warehouse.returning.application.port.primary.command.ApplyReturnCancelledCommand;
+import com.warehouse.returning.application.port.primary.command.ApplyReturnCompletedCommand;
 import com.warehouse.returning.domain.model.ReturnableShipment;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.returning.application.port.secondary.ReturnConsumedEventServicePort;
@@ -33,10 +34,17 @@ public class ReturnProcessingPortImpl implements ReturnProcessingPort {
     public void applyProcessingStarted(final ApplyReturnProcessingStartedCommand command) {
         operatorContext.runAs(command.operatorId(), command.userId(), command.departmentId(),
                 () -> transactionTemplate.executeWithoutResult(status -> {
-                    if (!returnConsumedEventServicePort.lockAndCheckCancelled(command.returnPackageId())
-                            && returnConsumedEventServicePort.tryConsume(command.eventId())
-                            && !alreadyReturned(command.shipmentId())) {
+                    if (returnConsumedEventServicePort.lockAndCheckCancelled(command.returnPackageId())
+                            || !returnConsumedEventServicePort.tryConsume(command.eventId())) {
+                        return;
+                    }
+                    if (alreadyReturned(command.shipmentId())) {
+                        return;
+                    }
+                    if (command.returnShipmentId() == null) {
                         shipmentServicePort.markReturned(command.shipmentId());
+                    } else {
+                        shipmentServicePort.markReturned(command.shipmentId(), command.returnShipmentId());
                     }
                 }));
     }
@@ -49,8 +57,20 @@ public class ReturnProcessingPortImpl implements ReturnProcessingPort {
                             || !returnConsumedEventServicePort.tryConsume(command.eventId())) {
                         return;
                     }
-                    cancelShipmentReturn(command.shipmentId());
+                    cancelShipmentReturn(command.shipmentId(), command.returnShipmentId());
                     returnConsumedEventServicePort.markCancelled(command.returnPackageId());
+                }));
+    }
+
+    @Override
+    public void applyCompleted(final ApplyReturnCompletedCommand command) {
+        operatorContext.runAs(command.operatorId(), command.userId(), command.departmentId(),
+                () -> transactionTemplate.executeWithoutResult(status -> {
+                    if (returnConsumedEventServicePort.lockAndCheckCancelled(command.returnPackageId())
+                            || !returnConsumedEventServicePort.tryConsume(command.eventId())) {
+                        return;
+                    }
+                    completeShipmentReturn(command.shipmentId(), command.returnShipmentId());
                 }));
     }
 
@@ -58,24 +78,43 @@ public class ReturnProcessingPortImpl implements ReturnProcessingPort {
     @Transactional
     public void applyStatusChanged(final ShipmentId shipmentId, final ReturnStatus status) {
         switch (status) {
-            case CANCELLED -> cancelShipmentReturn(shipmentId);
-            case COMPLETED -> shipmentServicePort.completeReturn(shipmentId);
+            case CANCELLED -> cancelShipmentReturn(shipmentId, null);
+            case COMPLETED -> completeShipmentReturn(shipmentId, null);
             case CREATED, PROCESSING -> { }
         }
     }
-    // A courier may already have returned the shipment from the terminal, which created the return shipment.
+
     private boolean alreadyReturned(final ShipmentId shipmentId) {
         return shipmentServicePort.getShipment(shipmentId).status() == ShipmentStatus.RETURN;
     }
 
-    private void cancelShipmentReturn(final ShipmentId shipmentId) {
+    private void completeShipmentReturn(final ShipmentId shipmentId, final ShipmentId returnShipmentId) {
         final ReturnableShipment shipment = shipmentServicePort.getShipment(shipmentId);
+        if (shipment.status() != ShipmentStatus.RETURN) {
+            return;
+        }
+        final ShipmentId deliveredShipmentId = resolveReturnShipmentId(shipment, returnShipmentId);
+        if (deliveredShipmentId != null) {
+            shipmentServicePort.markDelivered(deliveredShipmentId);
+        }
+        shipmentServicePort.completeReturn(shipmentId);
+    }
+
+    private void cancelShipmentReturn(final ShipmentId shipmentId, final ShipmentId returnShipmentId) {
+        final ReturnableShipment shipment = shipmentServicePort.getShipment(shipmentId);
+        final ShipmentId cancelledShipmentId = resolveReturnShipmentId(shipment, returnShipmentId);
+        if (cancelledShipmentId != null) {
+            shipmentServicePort.cancelReturnShipment(cancelledShipmentId);
+        }
         if (shipment.status() == ShipmentStatus.RETURN) {
-            if (shipment.relatedShipmentId() != null) {
-                shipmentServicePort.cancelReturnShipment(shipment.relatedShipmentId());
-            }
             shipmentServicePort.restoreAfterReturnCancellation(shipmentId);
         }
     }
 
+    private ShipmentId resolveReturnShipmentId(final ReturnableShipment shipment, final ShipmentId returnShipmentId) {
+        if (returnShipmentId != null) {
+            return returnShipmentId;
+        }
+        return shipment.status() == ShipmentStatus.RETURN ? shipment.relatedShipmentId() : null;
+    }
 }

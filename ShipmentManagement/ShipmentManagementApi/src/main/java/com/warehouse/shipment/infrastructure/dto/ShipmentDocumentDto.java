@@ -1,5 +1,6 @@
 package com.warehouse.shipment.infrastructure.dto;
 
+import com.warehouse.commonassets.enumeration.ShipmentPriority;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
 
@@ -11,5 +12,8 @@ public record ShipmentDocumentDto(ShipmentId shipmentId,
                                   String trackingNumber,
                                   BigDecimal weightInKilograms,
                                   ShipmentPartyDto sender,
-                                  ShipmentPartyDto recipient) {
+                                  ShipmentPartyDto recipient,
+                                  ShipmentPriority priority,
+                                  String serviceLevel,
+                                  ShipmentDimensionsDto dimensions) {
 }

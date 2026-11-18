@@ -1,5 +1,6 @@
 package com.warehouse.departmentmap.infrastructure.adapter.secondary.entity;
 
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentMapId;
 import com.warehouse.commonassets.identificator.MapElementId;
 import com.warehouse.departmentmap.domain.enumeration.MapElementType;
@@ -56,6 +57,10 @@ public class MapElementEntity {
     @Column(name = "capacity")
     private Integer capacity;
 
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "destination_department_code", length = 40))
+    private DepartmentCode destinationDepartmentCode;
+
     @Column(name = "sort_order", nullable = false)
     private int sortOrder;
 
@@ -74,6 +79,7 @@ public class MapElementEntity {
                             final String color,
                             final String locationCode,
                             final Integer capacity,
+                            final DepartmentCode destinationDepartmentCode,
                             final int sortOrder) {
         this.elementId = elementId;
         this.departmentMapId = departmentMapId;
@@ -87,6 +93,7 @@ public class MapElementEntity {
         this.color = color;
         this.locationCode = locationCode;
         this.capacity = capacity;
+        this.destinationDepartmentCode = destinationDepartmentCode;
         this.sortOrder = sortOrder;
     }
 
@@ -136,6 +143,10 @@ public class MapElementEntity {
 
     public Integer getCapacity() {
         return capacity;
+    }
+
+    public DepartmentCode getDestinationDepartmentCode() {
+        return destinationDepartmentCode;
     }
 
     public int getSortOrder() {

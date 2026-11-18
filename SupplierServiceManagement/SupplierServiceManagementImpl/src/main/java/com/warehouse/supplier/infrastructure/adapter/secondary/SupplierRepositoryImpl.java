@@ -1,16 +1,23 @@
 package com.warehouse.supplier.infrastructure.adapter.secondary;
 
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.repository.BaseRepository;
 import com.warehouse.commonassets.repository.Criteria;
+import com.warehouse.supplier.domain.enumeration.SupplierStatus;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
 import com.warehouse.supplier.infrastructure.adapter.secondary.entity.SupplierEntity;
 import com.warehouse.supplier.infrastructure.adapter.secondary.mapper.EntityToModelMapper;
 import com.warehouse.supplier.infrastructure.adapter.secondary.mapper.ModelToEntityMapper;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Root;
+
+import java.time.Instant;
 import java.util.List;
 
 public class SupplierRepositoryImpl implements SupplierRepository {
@@ -44,6 +51,17 @@ public class SupplierRepositoryImpl implements SupplierRepository {
     }
 
     @Override
+    public List<Supplier> findAssignedToDepartment(final DepartmentId departmentId) {
+        return this.supplierBaseRepository.createCriteria(SupplierEntity.class)
+                .eq("departmentId.value", departmentId.getValue())
+                .ne("status", SupplierStatus.DELETED)
+                .list()
+                .stream()
+                .map(EntityToModelMapper::map)
+                .toList();
+    }
+
+    @Override
     public Supplier findById(final SupplierId supplierId) {
         return this.supplierBaseRepository.createCriteria(SupplierEntity.class)
                 .eq("supplierId.value", supplierId)
@@ -68,5 +86,49 @@ public class SupplierRepositoryImpl implements SupplierRepository {
                 .one()
                 .map(EntityToModelMapper::map)
                 .orElse(null);
+    }
+
+    @Override
+    public List<Supplier> findAll() {
+        final Criteria<SupplierEntity> criteria = this.supplierBaseRepository.createCriteria(SupplierEntity.class);
+        return criteria
+                .list()
+                .stream()
+                .map(EntityToModelMapper::map)
+                .toList();
+    }
+
+    @Override
+    public List<Supplier> findAllWithInvalidDriverLicense(final Instant now) {
+        final Criteria<SupplierEntity> criteria = this.supplierBaseRepository.createCriteria(SupplierEntity.class)
+                .ne("status", SupplierStatus.DELETED)
+                .isNotNull("driverLicense.number");
+        final CriteriaBuilder cb = criteria.getCriteriaBuilder();
+        final Root<SupplierEntity> root = criteria.getRoot();
+        final Path<String> number = root.get("driverLicense").get("number");
+        final Path<Instant> acquiredDate = root.get("driverLicense").get("acquiredDate");
+        final Path<Instant> expiryDate = root.get("driverLicense").get("drivingLicenseExpiryDate");
+        return criteria
+                .and(cb.or(
+                        cb.lessThan(expiryDate, now),
+                        cb.greaterThan(acquiredDate, expiryDate),
+                        cb.lessThan(cb.length(number), 14)
+                ))
+                .list()
+                .stream()
+                .map(EntityToModelMapper::map)
+                .toList();
+    }
+
+    @Override
+    public List<Supplier> findAllWithExpiredDangerousGoodCertification(final Instant now) {
+        return this.supplierBaseRepository.createCriteria(SupplierEntity.class)
+                .ne("status", SupplierStatus.DELETED)
+                .isNotNull("dangerousGoodCertification.certificateNumber")
+                .lt("dangerousGoodCertification.expiryDate", now)
+                .list()
+                .stream()
+                .map(EntityToModelMapper::map)
+                .toList();
     }
 }

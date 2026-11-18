@@ -8,6 +8,8 @@ import com.warehouse.pickuppoint.application.port.secondary.PickupPointRepositor
 import com.warehouse.pickuppoint.domain.model.PickupPoint;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 public class PickupPointReadModelSyncServiceImpl implements PickupPointReadModelSyncPort {
 
     private final PickupPointRepository pickupPointRepository;
@@ -26,5 +28,15 @@ public class PickupPointReadModelSyncServiceImpl implements PickupPointReadModel
         final PickupPoint pickupPoint = this.pickupPointRepository.findById(pickupPointId)
                 .orElseThrow(() -> new PickupPointNotFoundException(pickupPointId));
         this.pickupPointReadModelRepository.sync(pickupPoint.snapshot());
+    }
+
+    @Override
+    @Transactional
+    public int syncReadModels() {
+        final List<PickupPoint> pickupPoints = this.pickupPointRepository.findAll();
+        pickupPoints.stream()
+                .map(PickupPoint::snapshot)
+                .forEach(this.pickupPointReadModelRepository::sync);
+        return pickupPoints.size();
     }
 }

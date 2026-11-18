@@ -18,11 +18,17 @@ import com.warehouse.palletmanagement.domain.vo.PalletDepartmentsChange;
 import com.warehouse.commonassets.identificator.PalletId;
 import com.warehouse.palletmanagement.infrastructure.adapter.primary.dto.PalletDepartmentsRequestApi;
 import com.warehouse.palletmanagement.infrastructure.adapter.primary.dto.PalletShipmentsRequestApi;
+import com.warehouse.palletmanagement.infrastructure.adapter.primary.dto.PalletUnloadRequestApi;
 import com.warehouse.palletmanagement.api.dto.PalletScanRequestDto;
+import com.warehouse.palletmanagement.api.dto.PalletUnloadRequestDto;
 import com.warehouse.palletmanagement.application.port.primary.command.CreatePalletCommand;
 import com.warehouse.palletmanagement.application.port.primary.command.PalletScanCommand;
+import com.warehouse.palletmanagement.application.port.primary.command.PalletUnloadScanCommand;
+import com.warehouse.palletmanagement.application.port.primary.command.UnloadPalletCommand;
 import com.warehouse.commonassets.identificator.PalletTrackingNumber;
 import com.warehouse.palletmanagement.infrastructure.adapter.primary.dto.CreatePalletRequestApi;
+
+import java.util.List;
 
 public class PalletRequestMapper {
 
@@ -40,6 +46,13 @@ public class PalletRequestMapper {
         return new AddPalletShipmentsCommand(palletId, request.shipmentIds().stream().map(ShipmentId::new).toList());
     }
 
+    public UnloadPalletCommand map(final PalletId palletId, final PalletUnloadRequestApi request) {
+        if (request == null || request.missingShipmentIds() == null) {
+            return new UnloadPalletCommand(palletId, List.of());
+        }
+        return new UnloadPalletCommand(palletId, request.missingShipmentIds().stream().map(ShipmentId::new).toList());
+    }
+
     public PalletDepartmentsChange map(final PalletDepartmentsRequestApi request) {
         return new PalletDepartmentsChange(
                 request.originDepartmentId() == null ? null : new DepartmentId(request.originDepartmentId()),
@@ -48,6 +61,10 @@ public class PalletRequestMapper {
 
     public PalletScanCommand map(final PalletScanRequestDto request) {
         return new PalletScanCommand(new PalletTrackingNumber(request.trackingNumber()));
+    }
+
+    public PalletUnloadScanCommand map(final PalletUnloadRequestDto request) {
+        return new PalletUnloadScanCommand(request.trackingNumber());
     }
 
     public PalletCarrierAssignment map(final PalletCarrierRequestApi request) {

@@ -108,10 +108,10 @@ class CollectE2ETest extends AbstractE2ETest {
     }
 
     @Test
-    void shouldMarkCollectedShipmentsAsSent() {
-        assertThat(shipmentStatus(CREATED_SHIPMENT_ID)).isEqualTo("SENT");
-        assertThat(shipmentStatus(PREPARED_SHIPMENT_ID)).isEqualTo("SENT");
-        assertThat(shipmentStatus(PARTIALLY_COLLECTED_SHIPMENT_ID)).isEqualTo("SENT");
+    void shouldMarkShipmentsAsCollected() {
+        assertThat(shipmentStatus(CREATED_SHIPMENT_ID)).isEqualTo("COLLECTED");
+        assertThat(shipmentStatus(PREPARED_SHIPMENT_ID)).isEqualTo("COLLECTED");
+        assertThat(shipmentStatus(PARTIALLY_COLLECTED_SHIPMENT_ID)).isEqualTo("COLLECTED");
     }
 
     @Test
@@ -214,7 +214,7 @@ class CollectE2ETest extends AbstractE2ETest {
                     .query(String.class)
                     .list();
 
-            assertThat(statuses).containsExactly("SENT", "SENT", "SENT");
+            assertThat(statuses).containsExactly("COLLECTED", "COLLECTED", "COLLECTED");
         });
     }
 

@@ -27,8 +27,6 @@ public class ShipmentDto {
 
     private final Boolean locked;
 
-    private final SignatureDto signature;
-
     private final LocalDateTime createdAt;
 
     private final LocalDateTime updatedAt;
@@ -43,17 +41,34 @@ public class ShipmentDto {
 
     private final MoneyApi declaredValue;
 
+    private final ShipmentDeliveryApi delivery;
+
 	public ShipmentDto(final ShipmentIdDto shipmentId, final PersonApi sender, final PersonApi recipient,
                        final ShipmentStatusDto shipmentStatus,
                        final ShipmentIdDto shipmentRelatedId, final ShipmentPriorityDto shipmentPriority,
                        final TrackingNumberDto trackingNumber,
                        final MoneyApi price, final Boolean locked,
-                       final SignatureDto signature,
                        final LocalDateTime createdAt, final LocalDateTime updatedAt,
                        final DimensionsApi dimensions, final WeightApi weight,
                        final String customerReference, final String contentDescription,
                        final MoneyApi declaredValue, final PackagingTypeDto packagingType,
                        final ShipmentServiceLevelDto serviceLevel) {
+        this(shipmentId, sender, recipient, shipmentStatus, shipmentRelatedId, shipmentPriority, trackingNumber, price,
+                locked, createdAt, updatedAt, dimensions, weight, customerReference, contentDescription, declaredValue,
+                packagingType, serviceLevel, null);
+    }
+
+    public ShipmentDto(final ShipmentIdDto shipmentId, final PersonApi sender, final PersonApi recipient,
+                       final ShipmentStatusDto shipmentStatus,
+                       final ShipmentIdDto shipmentRelatedId, final ShipmentPriorityDto shipmentPriority,
+                       final TrackingNumberDto trackingNumber,
+                       final MoneyApi price, final Boolean locked,
+                       final LocalDateTime createdAt, final LocalDateTime updatedAt,
+                       final DimensionsApi dimensions, final WeightApi weight,
+                       final String customerReference, final String contentDescription,
+                       final MoneyApi declaredValue, final PackagingTypeDto packagingType,
+                       final ShipmentServiceLevelDto serviceLevel, final ShipmentDeliveryApi delivery) {
+        this.delivery = delivery;
         this.shipmentId = shipmentId;
         this.sender = sender;
 		this.recipient = recipient;
@@ -65,7 +80,6 @@ public class ShipmentDto {
         this.trackingNumber = trackingNumber;
         this.price = price;
         this.locked = locked;
-        this.signature = signature;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.dimensions = dimensions;
@@ -115,10 +129,6 @@ public class ShipmentDto {
 
     public ShipmentServiceLevelDto getServiceLevel() { return serviceLevel; }
 
-    public SignatureDto getSignature() {
-        return signature;
-    }
-
     public TrackingNumberDto getTrackingNumber() {
         return trackingNumber;
     }
@@ -149,5 +159,9 @@ public class ShipmentDto {
 
     public MoneyApi getDeclaredValue() {
         return declaredValue;
+    }
+
+    public ShipmentDeliveryApi getDelivery() {
+        return delivery;
     }
 }

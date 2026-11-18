@@ -7,12 +7,16 @@ import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.model.PlatformOwner;
 import com.warehouse.auth.domain.port.primary.PlatformOwnerAuthenticationPort;
 import com.warehouse.auth.domain.provider.JwtProvider;
+import com.warehouse.auth.domain.port.secondary.DepartmentServicePort;
+import com.warehouse.auth.domain.service.DepartmentService;
 import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.domain.service.JwtServiceImpl;
 import com.warehouse.auth.domain.service.OperatorAccessPolicy;
 import com.warehouse.auth.domain.service.UserService;
 import com.warehouse.auth.domain.vo.Impersonation;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.PlatformOwnerId;
 import com.warehouse.commonassets.identificator.UserId;
@@ -37,6 +41,8 @@ class JwtAuthenticationFilterImpersonationTest {
 
     private final UserService userService = mock(UserService.class);
 
+    private final DepartmentServicePort departmentServicePort = mock(DepartmentServicePort.class);
+
     private final PlatformOwnerAuthenticationPort platformOwnerAuthenticationPort = mock(PlatformOwnerAuthenticationPort.class);
 
     private final OperatorAccessPolicy operatorAccessPolicy = mock(OperatorAccessPolicy.class);
@@ -53,7 +59,7 @@ class JwtAuthenticationFilterImpersonationTest {
         jwtService = new JwtServiceImpl(jwtProvider);
         filter = new JwtAuthenticationFilter(jwtService, userService,
                 new AuthCookieService(new AuthProperties(), jwtProvider), platformOwnerAuthenticationPort,
-                operatorAccessPolicy, new ApiExposureProperties());
+                operatorAccessPolicy, new ApiExposureProperties(), new DepartmentService(departmentServicePort));
         superadmin = OrganizationUser.of(new UserId(5L), "superadmin", "password", "Super", "Admin",
                 "superadmin@test.pl", OrganizationUser.Role.SUPERADMIN, new DepartmentId(10L), "api-key");
         superadmin.assignOperator(OperatorId.of(20L));
@@ -80,6 +86,17 @@ class JwtAuthenticationFilterImpersonationTest {
         assertThat(authentication.getPrincipal()).isEqualTo(new UserId(5L));
         assertThat(request.getAttribute(JwtAuthenticationFilter.IMPERSONATION_ATTRIBUTE))
                 .isEqualTo(new Impersonation(PLATFORM_OWNER_ID, "owner", 77L));
+    }
+
+    @Test
+    void shouldNotAuthenticateExternalShipmentRequest() throws Exception {
+        final MockHttpServletRequest request = request(impersonationToken());
+        request.setMethod("POST");
+        request.setRequestURI("/v1/api/external/shipments");
+
+        final Authentication authentication = filter(request);
+
+        assertThat(authentication).isNull();
     }
 
     @Test
@@ -126,6 +143,36 @@ class JwtAuthenticationFilterImpersonationTest {
         final PlatformOwner platformOwner = PlatformOwner.create(PLATFORM_OWNER_ID, "owner", "encoded", "Platform",
                 "Owner", "owner@test.pl");
         return jwtService.generateImpersonationToken(superadmin, platformOwner, 77L, java.time.Instant.now().plusSeconds(3600));
+    }
+
+    @Test
+    void shouldPutActingDepartmentIntoContextOfSuperadmin() throws Exception {
+        when(departmentServicePort.departmentExists(new DepartmentCode("WAW"))).thenReturn(true);
+        when(departmentServicePort.getDepartmentId(new DepartmentCode("WAW"))).thenReturn(new DepartmentId(30L));
+        final MockHttpServletRequest request = request(jwtService.generateToken(superadmin));
+        request.addHeader("X-Acting-Department", "WAW");
+
+        final Authentication authentication = filter(request);
+
+        assertThat(((UsernameTenantPasswordAuthenticationToken) authentication).getDepartmentId())
+                .isEqualTo(new DepartmentId(30L));
+    }
+
+    @Test
+    void shouldIgnoreActingDepartmentOfAdmin() throws Exception {
+        final OrganizationUser admin = OrganizationUser.of(new UserId(6L), "admin", "password", "Ad", "Min",
+                "admin@test.pl", OrganizationUser.Role.ADMIN, new DepartmentId(10L), "api-key");
+        admin.assignOperator(OperatorId.of(20L));
+        admin.setDeleted(false);
+        when(userService.findUser("admin")).thenReturn(admin);
+        when(departmentServicePort.departmentExists(new DepartmentCode("WAW"))).thenReturn(true);
+        final MockHttpServletRequest request = request(jwtService.generateToken(admin));
+        request.addHeader("X-Acting-Department", "WAW");
+
+        final Authentication authentication = filter(request);
+
+        assertThat(((UsernameTenantPasswordAuthenticationToken) authentication).getDepartmentId())
+                .isNotEqualTo(new DepartmentId(30L));
     }
 
     private Authentication filter(final MockHttpServletRequest request) throws Exception {

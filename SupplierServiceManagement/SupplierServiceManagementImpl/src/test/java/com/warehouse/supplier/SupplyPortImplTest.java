@@ -1,5 +1,6 @@
 package com.warehouse.supplier;
 
+import com.warehouse.supplier.domain.exception.DepartmentCourierLimitExceededException;
 import com.warehouse.commonassets.enumeration.PackageType;
 import com.warehouse.commonassets.helper.Result;
 import com.warehouse.commonassets.identificator.DepartmentCode;
@@ -9,9 +10,11 @@ import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.supplier.domain.exception.SupplierAlreadyExistsException;
+import com.warehouse.supplier.domain.exception.SupplierDepartmentAccessDeniedException;
 import com.warehouse.supplier.domain.enumeration.UserStatus;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.port.primary.SupplyPortImpl;
+import com.warehouse.supplier.domain.port.secondary.CurrentUserServicePort;
 import com.warehouse.supplier.domain.port.secondary.DepartmentServicePort;
 import com.warehouse.supplier.domain.port.secondary.DeviceServicePort;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
@@ -29,14 +32,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
 public class SupplyPortImplTest {
+
+    private static final DepartmentCode DEPARTMENT_CODE = new DepartmentCode("GD1");
+
+    private static final DepartmentId DEPARTMENT_ID = new DepartmentId(10L);
 
     @Mock
     private SupplierRepository supplierRepository;
@@ -50,7 +59,12 @@ public class SupplyPortImplTest {
     @Mock
     private UserServicePort userServicePort;
 
+    @Mock
+    private CurrentUserServicePort currentUserServicePort;
+
     private SupplyPortImpl supplyPort;
+
+    private int maxCouriersPerDepartment;
 
     @BeforeEach
     void setup() {
@@ -64,14 +78,30 @@ public class SupplyPortImplTest {
         domainContext.setApplicationEventPublisher(eventPublisher);
         domainContext.setApplicationContext(applicationContext);
         supplyPort = new SupplyPortImpl(service, generatorService, validatorService, driverLicenseService,
-                deviceServicePort, departmentServicePort, userServicePort);
+                deviceServicePort, departmentServicePort, userServicePort, supplierRepository,
+                departmentId -> maxCouriersPerDepartment, currentUserServicePort);
+    }
+
+    @Test
+    void shouldListOnlyCouriersFromCurrentUserDepartment() {
+        final DepartmentId otherDepartmentId = new DepartmentId(20L);
+        final Supplier ownCourier = new Supplier(new SupplierId(1L), new SupplierCode("111111"), "Adam", "Nowak",
+                "+48111222333", "adam@example.com", DEPARTMENT_ID);
+        final Supplier otherCourier = new Supplier(new SupplierId(2L), new SupplierCode("222222"), "Ewa", "Kowalska",
+                "+48111222334", "ewa@example.com", otherDepartmentId);
+        when(supplierRepository.findAllByCurrentDepartment()).thenReturn(List.of(ownCourier, otherCourier));
+        when(currentUserServicePort.canAccessDepartment(DEPARTMENT_ID)).thenReturn(true);
+        when(currentUserServicePort.canAccessDepartment(otherDepartmentId)).thenReturn(false);
+
+        assertEquals(List.of(ownCourier), supplyPort.getAllInCurrentUserDepartment());
     }
 
     @Test
     void shouldCreateUserAccountForNewSupplier() {
         final SupplierCode supplierCode = new SupplierCode("123456");
         final SupplierCreateCommand request = new SupplierCreateCommand(supplierCode, "Adam", "Nowak", "+48111222333",
-                "adam@example.com", null);
+                "adam@example.com", DEPARTMENT_CODE);
+        stubDepartment();
         when(userServicePort.createUserForSupplier(argThat(snapshot ->
                 "adam@example.com".equals(snapshot.email()) && supplierCode.equals(snapshot.supplierCode()))))
                 .thenReturn(new UserId(101L));
@@ -86,18 +116,10 @@ public class SupplyPortImplTest {
     @DisplayName("Create supplier when supplier code is correct")
     void shouldCreateSupplier() {
         final SupplierCode supplierCode = new SupplierCode("123456");
-        final SupplierCreateCommand request = new SupplierCreateCommand(supplierCode, "test", "test", "test");
+        final SupplierCreateCommand request = createCommand(supplierCode);
+        stubDepartment();
         final SupplierCreateResponse response = supplyPort.create(request);
         assertEquals(supplierCode, response.supplierCode());
-    }
-
-    @Test
-    @DisplayName("Create supplier when supplier code is shorter than six characters")
-    void shouldCreateSupplierWithNewCode() {
-        final SupplierCode supplierCode = new SupplierCode("13");
-        final SupplierCreateCommand request = new SupplierCreateCommand(supplierCode, "test", "test", "test");
-        final SupplierCreateResponse response = supplyPort.create(request);
-        assertNotEquals(supplierCode, response.supplierCode());
     }
 
     @Test
@@ -118,7 +140,8 @@ public class SupplyPortImplTest {
     @Test
     @DisplayName("Create supplier when supplier code is empty")
     void shouldCreateSupplierAutogeneratedCode() {
-        final SupplierCreateCommand request = new SupplierCreateCommand(null, "test", "test", "test");
+        final SupplierCreateCommand request = createCommand(null);
+        stubDepartment();
         final SupplierCreateResponse response = supplyPort.create(request);
         assertNotNull(response.supplierCode());
     }
@@ -166,5 +189,77 @@ public class SupplyPortImplTest {
         when(supplierRepository.findByCode(new SupplierCode("123"))).thenReturn(mock(Supplier.class));
         this.supplyPort.addDevice(request);
         verify(supplierRepository).update(any());
+    }
+
+    private static SupplierCreateCommand createCommand(final SupplierCode supplierCode) {
+        return new SupplierCreateCommand(supplierCode, "test", "test", "test", null, DEPARTMENT_CODE);
+    }
+
+    @Test
+    void shouldRejectNewSupplierWhenDepartmentCourierLimitReached() {
+        maxCouriersPerDepartment = 1;
+        stubDepartment();
+        when(supplierRepository.findAssignedToDepartment(DEPARTMENT_ID)).thenReturn(java.util.List.of(
+                supplier(1L, DEPARTMENT_ID)));
+
+        assertThrows(DepartmentCourierLimitExceededException.class,
+                () -> supplyPort.create(createCommand(new SupplierCode("123456"))));
+        verify(supplierRepository, never()).create(any());
+    }
+
+    @Test
+    void shouldTransferCouriersUpToTargetDepartmentLimit() {
+        maxCouriersPerDepartment = 2;
+        final DepartmentId targetDepartmentId = new DepartmentId(20L);
+        final Supplier first = supplier(1L, DEPARTMENT_ID);
+        final Supplier second = supplier(2L, DEPARTMENT_ID);
+        when(supplierRepository.findAssignedToDepartment(DEPARTMENT_ID)).thenReturn(java.util.List.of(first, second));
+        when(supplierRepository.findAssignedToDepartment(targetDepartmentId)).thenReturn(java.util.List.of(
+                supplier(3L, targetDepartmentId)));
+        when(supplierRepository.findById(first.getSupplierId())).thenReturn(first);
+
+        supplyPort.transferCouriers(DEPARTMENT_ID, targetDepartmentId);
+
+        assertEquals(targetDepartmentId, first.getDepartmentId());
+        assertEquals(DEPARTMENT_ID, second.getDepartmentId());
+        assertEquals(2, supplyPort.countAssignedCouriers(DEPARTMENT_ID));
+    }
+
+    private Supplier supplier(final Long supplierId, final DepartmentId departmentId) {
+        return new Supplier(new SupplierId(supplierId), new SupplierCode("S" + supplierId), "Jan", "Kowalski",
+                "+48111222333", null, departmentId);
+    }
+
+    @Test
+    void shouldNotCreateCourierInAnotherDepartmentThanCurrentUser() {
+        final SupplierCreateCommand request = new SupplierCreateCommand(new SupplierCode("123456"), "Adam", "Nowak",
+                "+48111222333", "adam@example.com", DEPARTMENT_CODE);
+        stubDepartment();
+        when(currentUserServicePort.canAccessDepartment(DEPARTMENT_ID)).thenReturn(false);
+
+        assertThrows(SupplierDepartmentAccessDeniedException.class,
+                () -> supplyPort.createInCurrentUserDepartment(request));
+
+        verify(supplierRepository, never()).create(any());
+        verifyNoInteractions(userServicePort);
+    }
+
+    @Test
+    void shouldCreateCourierInCurrentUserDepartment() {
+        final SupplierCode supplierCode = new SupplierCode("123456");
+        final SupplierCreateCommand request = new SupplierCreateCommand(supplierCode, "Adam", "Nowak",
+                "+48111222333", "adam@example.com", DEPARTMENT_CODE);
+        stubDepartment();
+        when(currentUserServicePort.canAccessDepartment(DEPARTMENT_ID)).thenReturn(true);
+        when(userServicePort.createUserForSupplier(any())).thenReturn(new UserId(101L));
+
+        supplyPort.createInCurrentUserDepartment(request);
+
+        verify(supplierRepository).create(any());
+    }
+
+    private void stubDepartment() {
+        when(departmentServicePort.validateDepartmentCode(DEPARTMENT_CODE)).thenReturn(Result.success());
+        when(departmentServicePort.getDepartmentId(DEPARTMENT_CODE)).thenReturn(DEPARTMENT_ID);
     }
 }

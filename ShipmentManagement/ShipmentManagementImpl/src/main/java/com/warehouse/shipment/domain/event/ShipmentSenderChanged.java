@@ -10,4 +10,10 @@ public class ShipmentSenderChanged extends ShipmentChanged implements ShipmentEv
     public ShipmentSenderChanged(final ShipmentSnapshot snapshot, final Instant timestamp) {
         super(snapshot, timestamp);
     }
+
+    public ShipmentSenderChanged(final ShipmentSnapshot previousSnapshot,
+                                 final ShipmentSnapshot snapshot,
+                                 final Instant timestamp) {
+        super(previousSnapshot, snapshot, timestamp);
+    }
 }

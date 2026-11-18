@@ -14,7 +14,6 @@ public abstract class OperatorUserRequestMapper {
                 request.firstName(),
                 request.lastName(),
                 request.username(),
-                request.password(),
                 request.email(),
                 request.role(),
                 new DepartmentCode(request.departmentCode()),

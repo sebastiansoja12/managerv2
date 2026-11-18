@@ -1,4 +1,6 @@
 package com.warehouse.terminal.domain.vo;
 
-public record DeviceHeartbeatResult(boolean updateRequired) {
+import java.time.Instant;
+
+public record DeviceHeartbeatResult(boolean updateRequired, Instant operatorSessionExpiresAt) {
 }

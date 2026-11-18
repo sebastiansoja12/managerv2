@@ -20,6 +20,8 @@ public interface PickupPointPort {
 
     PickupPointResult changeStatus(final ChangePickupPointStatusCommand command);
 
+    void delete(final PickupPointId pickupPointId);
+
     Optional<PickupPointResult> get(final PickupPointId pickupPointId);
 
     List<PickupPointResult> get(final List<PickupPointId> pickupPointIds);

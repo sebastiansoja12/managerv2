@@ -15,9 +15,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.kafka.domain.model.KafkaOutboxRecord;
 import com.warehouse.commonassets.kafka.domain.model.KafkaOutboxStatus;
@@ -80,17 +80,18 @@ public class JdbcKafkaOutboxAdapter implements KafkaOutboxPort {
         final List<UUID> candidates = this.jdbcTemplate.query("""
                         SELECT event_id
                           FROM kafka_event_outbox
-                         WHERE (status = ? AND (next_attempt_at IS NULL OR next_attempt_at <= ?))
+                         WHERE (status IN (?, ?) AND (next_attempt_at IS NULL OR next_attempt_at <= ?))
                             OR (status = ? AND locked_until <= ?)
                          ORDER BY created_at
                          LIMIT ?
                         """,
                 ps -> {
                     ps.setString(1, KafkaOutboxStatus.PENDING.name());
-                    ps.setTimestamp(2, Timestamp.from(now));
-                    ps.setString(3, KafkaOutboxStatus.PROCESSING.name());
-                    ps.setTimestamp(4, Timestamp.from(now));
-                    ps.setInt(5, limit);
+                    ps.setString(2, KafkaOutboxStatus.DEAD.name());
+                    ps.setTimestamp(3, Timestamp.from(now));
+                    ps.setString(4, KafkaOutboxStatus.PROCESSING.name());
+                    ps.setTimestamp(5, Timestamp.from(now));
+                    ps.setInt(6, limit);
                 },
                 (rs, rowNum) -> UUID.fromString(rs.getString("event_id")));
 
@@ -115,7 +116,7 @@ public class JdbcKafkaOutboxAdapter implements KafkaOutboxPort {
                                locked_by = ?,
                                locked_until = ?
                          WHERE event_id = ?
-                           AND ((status = ? AND (next_attempt_at IS NULL OR next_attempt_at <= ?))
+                           AND ((status IN (?, ?) AND (next_attempt_at IS NULL OR next_attempt_at <= ?))
                              OR (status = ? AND locked_until <= ?))
                         """,
                 KafkaOutboxStatus.PROCESSING.name(),
@@ -123,6 +124,7 @@ public class JdbcKafkaOutboxAdapter implements KafkaOutboxPort {
                 Timestamp.from(lockedUntil),
                 eventId.toString(),
                 KafkaOutboxStatus.PENDING.name(),
+                KafkaOutboxStatus.DEAD.name(),
                 Timestamp.from(now),
                 KafkaOutboxStatus.PROCESSING.name(),
                 Timestamp.from(now)) == 1;
@@ -155,32 +157,12 @@ public class JdbcKafkaOutboxAdapter implements KafkaOutboxPort {
     public void markFailed(final UUID eventId,
                            final String workerId,
                            final Throwable exception,
-                           final Instant nextAttemptAt,
-                           final int maxAttempts) {
-        final List<Integer> attempts = this.jdbcTemplate.query("""
-                        SELECT attempt_count
-                          FROM kafka_event_outbox
-                         WHERE event_id = ?
-                           AND status = ?
-                           AND locked_by = ?
-                        """,
-                ps -> {
-                    ps.setString(1, eventId.toString());
-                    ps.setString(2, KafkaOutboxStatus.PROCESSING.name());
-                    ps.setString(3, workerId);
-                },
-                (rs, rowNum) -> rs.getInt("attempt_count"));
-        if (attempts.isEmpty()) {
-            return;
-        }
-
-        final int nextAttemptCount = attempts.getFirst() + 1;
-        final boolean exhausted = nextAttemptCount >= maxAttempts;
+                           final Instant nextAttemptAt) {
         this.jdbcTemplate.update("""
                         UPDATE kafka_event_outbox
                            SET status = ?,
                                next_attempt_at = ?,
-                               attempt_count = ?,
+                               attempt_count = attempt_count + 1,
                                last_error = ?,
                                locked_by = NULL,
                                locked_until = NULL
@@ -188,9 +170,8 @@ public class JdbcKafkaOutboxAdapter implements KafkaOutboxPort {
                            AND status = ?
                            AND locked_by = ?
                         """,
-                exhausted ? KafkaOutboxStatus.DEAD.name() : KafkaOutboxStatus.PENDING.name(),
-                exhausted ? null : Timestamp.from(nextAttemptAt),
-                nextAttemptCount,
+                KafkaOutboxStatus.PENDING.name(),
+                Timestamp.from(nextAttemptAt),
                 errorMessage(exception),
                 eventId.toString(),
                 KafkaOutboxStatus.PROCESSING.name(),
@@ -247,7 +228,7 @@ public class JdbcKafkaOutboxAdapter implements KafkaOutboxPort {
     private String serializeHeaders(final Map<String, String> headers) {
         try {
             return this.objectMapper.writeValueAsString(headers);
-        } catch (final JsonProcessingException exception) {
+        } catch (final JacksonException exception) {
             throw new IllegalStateException("Cannot serialize Kafka event headers", exception);
         }
     }
@@ -255,7 +236,7 @@ public class JdbcKafkaOutboxAdapter implements KafkaOutboxPort {
     private Map<String, String> deserializeHeaders(final String headers) {
         try {
             return this.objectMapper.readValue(headers, HEADERS_TYPE);
-        } catch (final JsonProcessingException exception) {
+        } catch (final JacksonException exception) {
             throw new IllegalStateException("Cannot deserialize Kafka event headers", exception);
         }
     }

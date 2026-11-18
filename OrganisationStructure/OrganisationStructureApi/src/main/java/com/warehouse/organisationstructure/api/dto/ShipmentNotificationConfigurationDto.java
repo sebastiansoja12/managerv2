@@ -7,4 +7,9 @@ public record ShipmentNotificationConfigurationDto(
         boolean notifySenderOnException,
         ShipmentNotificationChannelDto notificationChannel
 ) {
+
+    public boolean shouldSendEmailToRecipient(final boolean shouldSendEmailOnAction) {
+        return shouldSendEmailOnAction && (
+                notificationChannel == ShipmentNotificationChannelDto.BOTH || notificationChannel == ShipmentNotificationChannelDto.EMAIL);
+    }
 }

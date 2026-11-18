@@ -7,9 +7,14 @@ import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.supplier.domain.exception.DepartmentCourierLimitExceededException;
 import com.warehouse.supplier.domain.exception.SupplierAlreadyExistsException;
+import com.warehouse.supplier.domain.exception.SupplierDepartmentAccessDeniedException;
 import com.warehouse.supplier.domain.model.Supplier;
+import com.warehouse.supplier.domain.port.secondary.CourierLimitServicePort;
+import com.warehouse.supplier.domain.port.secondary.CurrentUserServicePort;
 import com.warehouse.supplier.domain.port.secondary.DeviceServicePort;
+import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
 import com.warehouse.supplier.domain.port.secondary.DepartmentServicePort;
 import com.warehouse.supplier.domain.port.secondary.UserServicePort;
 import com.warehouse.supplier.domain.service.DriverLicenseService;
@@ -39,13 +44,22 @@ public class SupplyPortImpl implements SupplyPort {
 
     private final UserServicePort userServicePort;
 
+    private final SupplierRepository supplierRepository;
+
+    private final CourierLimitServicePort courierLimitServicePort;
+
+    private final CurrentUserServicePort currentUserServicePort;
+
     public SupplyPortImpl(final SupplierService supplierService,
                           final SupplierCodeGeneratorService generatorService,
                           final SupplierValidatorService validatorService,
                           final DriverLicenseService driverLicenseService,
                           final DeviceServicePort deviceServicePort,
                           final DepartmentServicePort departmentServicePort,
-                          final UserServicePort userServicePort) {
+                          final UserServicePort userServicePort,
+                          final SupplierRepository supplierRepository,
+                          final CourierLimitServicePort courierLimitServicePort,
+                          final CurrentUserServicePort currentUserServicePort) {
         this.supplierService = supplierService;
         this.generatorService = generatorService;
         this.validatorService = validatorService;
@@ -53,6 +67,9 @@ public class SupplyPortImpl implements SupplyPort {
         this.deviceServicePort = deviceServicePort;
         this.departmentServicePort = departmentServicePort;
         this.userServicePort = userServicePort;
+        this.supplierRepository = supplierRepository;
+        this.courierLimitServicePort = courierLimitServicePort;
+        this.currentUserServicePort = currentUserServicePort;
     }
 
     @Override
@@ -70,6 +87,7 @@ public class SupplyPortImpl implements SupplyPort {
         }
         final SupplierId supplierId = this.supplierService.nextSupplierId();
         final DepartmentId departmentId = departmentServicePort.getDepartmentId(departmentCode);
+        ensureCourierLimitNotReached(departmentId);
         final Supplier supplier = new Supplier(supplierId, supplierCode, firstName, lastName, telephoneNumber, email,
                 departmentId);
         supplier.markUserCreated(this.userServicePort.createUserForSupplier(supplier.snapshot()));
@@ -80,8 +98,27 @@ public class SupplyPortImpl implements SupplyPort {
     }
 
     @Override
+    @Transactional
+    public SupplierCreateResponse createInCurrentUserDepartment(final SupplierCreateCommand supplierCreateCommand) {
+        final DepartmentCode departmentCode = supplierCreateCommand.departmentCode();
+        if (validatorService.validateDepartmentExistsByDepartmentCode(departmentCode)
+                && !currentUserServicePort.canAccessDepartment(departmentServicePort.getDepartmentId(departmentCode))) {
+            throw new SupplierDepartmentAccessDeniedException("Courier cannot be created in another department");
+        }
+        return create(supplierCreateCommand);
+    }
+
+    @Override
     public List<Supplier> getAllByCurrentDepartment() {
         return supplierService.findAllByCurrentDepartment();
+    }
+
+    @Override
+    public List<Supplier> getAllInCurrentUserDepartment() {
+        return supplierService.findAllByCurrentDepartment()
+                .stream()
+                .filter(supplier -> currentUserServicePort.canAccessDepartment(supplier.getDepartmentId()))
+                .toList();
     }
 
     @Override
@@ -163,7 +200,37 @@ public class SupplyPortImpl implements SupplyPort {
         }
 
         final DepartmentId departmentId = departmentServicePort.getDepartmentId(departmentCode);
+        if (!departmentId.equals(supplierService.findByCode(supplierCode).getDepartmentId())) {
+            ensureCourierLimitNotReached(departmentId);
+        }
         this.supplierService.changeDepartment(supplierCode, departmentId);
+    }
+
+    @Override
+    public long countAssignedCouriers(final DepartmentId departmentId) {
+        return this.supplierRepository.findAssignedToDepartment(departmentId).size();
+    }
+
+    @Override
+    @Transactional
+    public void transferCouriers(final DepartmentId sourceDepartmentId, final DepartmentId targetDepartmentId) {
+        final int maxCouriers = this.courierLimitServicePort.maxCouriersPerDepartment(targetDepartmentId);
+        int targetCouriers = this.supplierRepository.findAssignedToDepartment(targetDepartmentId).size();
+        for (final Supplier supplier : this.supplierRepository.findAssignedToDepartment(sourceDepartmentId)) {
+            if (maxCouriers > 0 && targetCouriers >= maxCouriers) {
+                return;
+            }
+            this.supplierService.changeDepartment(supplier.getSupplierId(), targetDepartmentId);
+            targetCouriers++;
+        }
+    }
+
+    private void ensureCourierLimitNotReached(final DepartmentId departmentId) {
+        final int maxCouriers = this.courierLimitServicePort.maxCouriersPerDepartment(departmentId);
+        if (maxCouriers > 0 && this.supplierRepository.findAssignedToDepartment(departmentId).size() >= maxCouriers) {
+            throw new DepartmentCourierLimitExceededException("Department " + departmentId.getValue()
+                    + " already has the maximum number of couriers (" + maxCouriers + ")");
+        }
     }
 
     @Override

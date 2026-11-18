@@ -16,6 +16,8 @@ import com.warehouse.organisationstructure.api.dto.TrackingNumberSourceDto;
 import com.warehouse.shipment.application.port.secondary.CurrentDepartmentCodePort;
 import com.warehouse.shipment.domain.vo.conf.OperatorShipmentConfiguration;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.OperatorShipmentConfigurationMapper;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -81,7 +83,7 @@ class ShipmentConfigurationServiceAdapterTest {
                         ),
                         null
                 ));
-        when(currentDepartmentCodePort.currentDepartmentCode()).thenReturn(new DepartmentCode("PO1"));
+        when(currentDepartmentCodePort.currentDepartmentCode()).thenReturn(Optional.of(new DepartmentCode("PO1")));
         final ShipmentConfigurationServiceAdapter adapter = new ShipmentConfigurationServiceAdapter(
                 operatorConfigurationApiService,
                 new OperatorShipmentConfigurationMapper(),

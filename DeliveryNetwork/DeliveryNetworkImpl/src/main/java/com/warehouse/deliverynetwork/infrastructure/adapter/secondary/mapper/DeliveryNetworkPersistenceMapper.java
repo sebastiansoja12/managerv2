@@ -44,12 +44,14 @@ public class DeliveryNetworkPersistenceMapper {
         return new DeliveryNetworkConnectionEntity(
                 deliveryNetworkId,
                 connection.firstDepartmentId(),
-                connection.secondDepartmentId());
+                connection.secondDepartmentId(),
+                connection.bidirectional());
     }
 
     private DepartmentConnection toModel(final DeliveryNetworkConnectionEntity entity) {
         return new DepartmentConnection(
                 entity.getFirstDepartmentId(),
-                entity.getSecondDepartmentId());
+                entity.getSecondDepartmentId(),
+                entity.isBidirectional());
     }
 }

@@ -12,9 +12,7 @@ import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.ProcessHubEventPublisher;
 import com.warehouse.process.infrastructure.dto.ProcessStatusDto;
 import com.warehouse.process.infrastructure.event.ProcessFinishEvent;
-import com.warehouse.terminal.jaxb.CollectResponse;
-import com.warehouse.terminal.jaxb.HandoverResponse;
-import com.warehouse.terminal.jaxb.PalletScanResponse;
+import com.warehouse.terminal.jaxb.ProcessResponseType;
 import com.warehouse.terminal.response.TerminalResponse;
 
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LogisticsProcessFinishAspect {
 
-    private static final String HANDOVER_FAILED = "Handover failed for at least one shipment";
+    private static final String PROCESS_FAILED = "Process failed without error message";
 
     private final ProcessHubEventPublisher processHubEventPublisher;
 
@@ -39,15 +37,8 @@ public class LogisticsProcessFinishAspect {
             if (response instanceof TerminalResponse terminalResponse) {
                 publishProcessFinishEvent(terminalResponse.getProcessId(), resolveFaultDescription(terminalResponse));
             }
-            if (response instanceof CollectResponse collectResponse) {
-                publishProcessFinishEvent(collectResponse.getProcessId(), null);
-            }
-            if (response instanceof HandoverResponse handoverResponse) {
-                publishProcessFinishEvent(handoverResponse.getProcessId(), resolveFaultDescription(handoverResponse));
-            }
-            if (response instanceof PalletScanResponse palletScanResponse) {
-                publishProcessFinishEvent(palletScanResponse.getProcessId(),
-                        palletScanResponse.isSuccess() ? null : palletScanResponse.getErrorMessage());
+            if (response instanceof ProcessResponseType processResponse) {
+                publishProcessFinishEvent(processResponse.getProcessId(), resolveFaultDescription(processResponse));
             }
         } finally {
             LogisticsProcessContext.clear();
@@ -66,21 +57,12 @@ public class LogisticsProcessFinishAspect {
                 faultDescription));
     }
 
-    private String resolveFaultDescription(final HandoverResponse handoverResponse) {
-        if (handoverResponse.isSuccess()) {
+    private String resolveFaultDescription(final ProcessResponseType processResponse) {
+        if (processResponse.isSuccess()) {
             return null;
         }
-        if (handoverResponse.getHandoverResponseDetails() == null) {
-            return HANDOVER_FAILED;
-        }
-        return handoverResponse.getHandoverResponseDetails()
-                .getHandoverResponseDetail()
-                .stream()
-                .filter(detail -> !detail.isSuccess())
-                .map(detail -> detail.getErrorMessage())
-                .filter(message -> message != null && !message.isBlank())
-                .findFirst()
-                .orElse(HANDOVER_FAILED);
+        final String errorMessage = processResponse.getErrorMessage();
+        return errorMessage != null && !errorMessage.isBlank() ? errorMessage : PROCESS_FAILED;
     }
 
     private String resolveFaultDescription(final TerminalResponse terminalResponse) {

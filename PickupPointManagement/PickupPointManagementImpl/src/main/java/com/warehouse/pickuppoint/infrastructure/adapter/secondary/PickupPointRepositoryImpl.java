@@ -58,6 +58,15 @@ public class PickupPointRepositoryImpl implements PickupPointRepository {
     }
 
     @Override
+    public List<PickupPoint> findAll() {
+        return this.repository.createCriteria(PickupPointEntity.class)
+                .list()
+                .stream()
+                .map(this.persistenceMapper::toModel)
+                .toList();
+    }
+
+    @Override
     public boolean existsByCode(final PickupPointCode code) {
         return this.repository.createCriteria(PickupPointEntity.class)
                 .eq("code", code.value())

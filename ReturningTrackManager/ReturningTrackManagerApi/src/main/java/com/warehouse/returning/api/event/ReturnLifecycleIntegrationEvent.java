@@ -12,6 +12,7 @@ import java.util.UUID;
 public interface ReturnLifecycleIntegrationEvent {
     UUID eventId();
     ShipmentId shipmentId();
+    ShipmentId returnShipmentId();
     ReturnPackageId returnPackageId();
     DepartmentId departmentId();
     OperatorId operatorId();

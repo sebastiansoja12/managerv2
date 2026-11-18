@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-04-postgresql-table-incident" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="incident"/>
+            </not>
+        </preConditions>
+        <createTable tableName="incident">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="shipment_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="tracking_number" type="VARCHAR(100)" />
+            <column name="department_code" type="VARCHAR(40)" />
+            <column name="category" type="VARCHAR(40)">
+                <constraints nullable="false" />
+            </column>
+            <column name="severity" type="VARCHAR(20)">
+                <constraints nullable="false" />
+            </column>
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="VARCHAR(2000)" />
+            <column name="reporter_user_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="reporter_username" type="VARCHAR(255)" />
+            <column name="assignee_user_id" type="BIGINT" />
+            <column name="assignee_username" type="VARCHAR(255)" />
+            <column name="resolution" type="VARCHAR(30)" />
+            <column name="reported_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false" />
+            </column>
+            <column name="resolved_at" type="TIMESTAMP WITH TIME ZONE" />
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <createIndex tableName="incident" indexName="idx_incident_operator_status_reported_at">
+            <column name="operator_id"/>
+            <column name="status"/>
+            <column name="reported_at"/>
+        </createIndex>
+        <createIndex tableName="incident" indexName="idx_incident_operator_shipment">
+            <column name="operator_id"/>
+            <column name="shipment_id"/>
+        </createIndex>
+        <createIndex tableName="incident" indexName="idx_incident_operator_assignee">
+            <column name="operator_id"/>
+            <column name="assignee_user_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2026-11-04-postgresql-table-incident-entry" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="incident_entry"/>
+            </not>
+        </preConditions>
+        <createTable tableName="incident_entry">
+            <column name="incident_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_incident_entry_incident"
+                             references="incident(id)" deleteCascade="true" />
+            </column>
+            <column name="position" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="type" type="VARCHAR(30)">
+                <constraints nullable="false" />
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="username" type="VARCHAR(255)" />
+            <column name="text" type="VARCHAR(2000)" />
+            <column name="occurred_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="incident_entry" columnNames="incident_id, position"
+                       constraintName="pk_incident_entry" />
+    </changeSet>
+</databaseChangeLog>

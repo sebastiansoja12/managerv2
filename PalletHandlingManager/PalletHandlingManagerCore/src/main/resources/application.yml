@@ -2,6 +2,8 @@ server:
   port: 8071
 
 spring:
+  jackson:
+    use-jackson2-defaults: true
   application:
     name: pallet-handling-manager
 
@@ -26,11 +28,6 @@ spring:
     consumer:
       group-id: ${SPRING_KAFKA_CONSUMER_GROUP_ID:pallet-handling-manager}
       auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 jwt:
   secret-key: ${JWT_SECRET_KEY:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
@@ -55,3 +52,9 @@ eureka:
       enabled: true
   instance:
     prefer-ip-address: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:true}
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

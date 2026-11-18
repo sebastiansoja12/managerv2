@@ -26,7 +26,7 @@ class ShipmentMailRequestMapperTest {
     @Test
     void shouldCreateRequestsForSenderAndRecipientInTheirLanguages() {
         final List<MailRequest> requests = mapper.mapCreated(shipment(ShipmentStatus.CREATED,
-                party("Jan", "jan@example.com", "PL"), party("Hans", "hans@example.de", "DE")));
+                party("Jan", "jan@example.com", "PL"), party("Hans", "hans@example.de", "DE")), true);
 
         assertEquals(2, requests.size());
         assertEquals("shipment.created.sender", requests.get(0).templateKey());
@@ -46,7 +46,7 @@ class ShipmentMailRequestMapperTest {
     @Test
     void shouldUseUnmappedCountryLocaleForForeignRecipient() {
         final List<MailRequest> requests = mapper.mapDelivered(shipment(ShipmentStatus.DELIVERY,
-                party("Jan", null, "PL"), party("Marie", "marie@example.fr", "FR")));
+                party("Jan", null, "PL"), party("Marie", "marie@example.fr", "FR")), true);
 
         assertEquals(1, requests.size());
         assertEquals("shipment.delivered.recipient", requests.get(0).templateKey());
@@ -73,9 +73,27 @@ class ShipmentMailRequestMapperTest {
     }
 
     @Test
+    void shouldUseExternalTemplatesForShipmentCreatedByExternalIntegration() {
+        final List<MailRequest> requests = mapper.mapCreated(shipment(ShipmentStatus.CREATED,
+                party("Jan", "jan@example.com", "PL"), party("Anna", "anna@example.com", "PL"), null, "EXTERNAL"), true);
+
+        assertEquals(2, requests.size());
+        assertEquals("shipment.created.external.sender", requests.get(0).templateKey());
+        assertEquals("shipment.created.external.recipient", requests.get(1).templateKey());
+    }
+
+    @Test
+    void shouldSkipRecipientWhenOperatorDoesNotNotifyRecipient() {
+        final List<MailRequest> requests = mapper.mapDelivered(shipment(ShipmentStatus.DELIVERY,
+                party("Jan", "jan@example.com", "PL"), party("Anna", "anna@example.com", "PL")), false);
+
+        assertEquals(List.of("shipment.delivered.sender"), requests.stream().map(MailRequest::templateKey).toList());
+    }
+
+    @Test
     void shouldNotNotifyAboutCreatedReturnShipment() {
         final List<MailRequest> requests = mapper.mapCreated(shipment(ShipmentStatus.CREATED,
-                party("Jan", "jan@example.com", "PL"), party("Anna", "anna@example.com", "PL"), new ShipmentId(7L)));
+                party("Jan", "jan@example.com", "PL"), party("Anna", "anna@example.com", "PL"), new ShipmentId(7L)), true);
 
         assertTrue(requests.isEmpty());
     }

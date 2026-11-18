@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ContextConfiguration;
@@ -24,10 +24,8 @@ import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
 import com.warehouse.shipment.application.listener.ShipmentDomainEventListener;
-import com.warehouse.shipment.application.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.application.port.secondary.PriceRepository;
 import com.warehouse.shipment.application.port.secondary.RouteLogServicePort;
-import com.warehouse.shipment.application.port.secondary.SignatureRepository;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentInternalController;
 import com.warehouse.returning.api.ReturningApiService;
 import com.warehouse.shipment.infrastructure.adapter.secondary.PriceReadRepository;
@@ -72,16 +70,6 @@ public class ShipmentReadRepositoryTest {
         @Bean
         public ShipmentInternalController shipmentController() {
             return Mockito.mock(ShipmentInternalController.class);
-        }
-
-        @Bean
-        public PathFinderServicePort pathFinderServicePort() {
-            return Mockito.mock(PathFinderServicePort.class);
-        }
-
-        @Bean
-        public SignatureRepository signatureRepository() {
-            return Mockito.mock(SignatureRepository.class);
         }
 
         @Bean

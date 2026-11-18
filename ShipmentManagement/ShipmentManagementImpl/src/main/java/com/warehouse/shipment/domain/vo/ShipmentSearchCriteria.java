@@ -7,6 +7,7 @@ import java.util.List;
 import com.warehouse.commonassets.enumeration.Currency;
 import com.warehouse.commonassets.enumeration.ShipmentPriority;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.searchobject.SearchCriteria;
 
 public class ShipmentSearchCriteria extends SearchCriteria {
@@ -27,6 +28,7 @@ public class ShipmentSearchCriteria extends SearchCriteria {
     private final Boolean locked;
     private final LocalDateTime createdFrom;
     private final LocalDateTime createdTo;
+    private final DepartmentId departmentId;
     private final Integer page;
     private final Integer size;
 
@@ -43,6 +45,7 @@ public class ShipmentSearchCriteria extends SearchCriteria {
             final Boolean locked,
             final LocalDateTime createdFrom,
             final LocalDateTime createdTo,
+            final DepartmentId departmentId,
             final Integer page,
             final Integer size
     ) {
@@ -58,6 +61,7 @@ public class ShipmentSearchCriteria extends SearchCriteria {
         this.locked = locked;
         this.createdFrom = createdFrom;
         this.createdTo = createdTo;
+        this.departmentId = departmentId;
         this.page = page;
         this.size = size;
     }
@@ -119,6 +123,10 @@ public class ShipmentSearchCriteria extends SearchCriteria {
 
     public LocalDateTime createdTo() {
         return createdTo;
+    }
+
+    public DepartmentId departmentId() {
+        return departmentId;
     }
 
     public Integer page() {

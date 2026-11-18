@@ -110,6 +110,7 @@ public interface TerminalResponseMapper {
     }
 
     default DeviceHeartbeatResponseDto map(final DeviceHeartbeatResult heartbeatResult) {
-        return new DeviceHeartbeatResponseDto(heartbeatResult.updateRequired());
+        return new DeviceHeartbeatResponseDto(heartbeatResult.updateRequired(),
+                heartbeatResult.operatorSessionExpiresAt());
     }
 }

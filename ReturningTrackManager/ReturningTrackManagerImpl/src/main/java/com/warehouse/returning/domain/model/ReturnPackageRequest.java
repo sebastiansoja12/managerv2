@@ -7,6 +7,7 @@ import com.warehouse.returning.domain.vo.UserId;
 
 public class ReturnPackageRequest {
     private ShipmentId shipmentId;
+    private ShipmentId returnShipmentId;
     private String reason;
     private DepartmentId departmentId;
     private UserId userId;
@@ -15,11 +16,13 @@ public class ReturnPackageRequest {
 	public ReturnPackageRequest(final DepartmentId departmentId,
                                 final String reason,
                                 final ShipmentId shipmentId,
+                                final ShipmentId returnShipmentId,
                                 final UserId userId,
                                 final ReasonCode reasonCode) {
         this.departmentId = departmentId;
         this.reason = reason;
         this.shipmentId = shipmentId;
+        this.returnShipmentId = returnShipmentId;
         this.userId = userId;
         this.reasonCode = reasonCode;
     }
@@ -46,6 +49,10 @@ public class ReturnPackageRequest {
 
     public void setShipmentId(final ShipmentId shipmentId) {
         this.shipmentId = shipmentId;
+    }
+
+    public ShipmentId getReturnShipmentId() {
+        return returnShipmentId;
     }
 
     public UserId getUserId() {

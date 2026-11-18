@@ -4,19 +4,24 @@ import com.warehouse.mail.application.port.primary.MailPort;
 import com.warehouse.mail.application.port.primary.MailPortImpl;
 import com.warehouse.mail.application.port.secondary.MailSenderServicePort;
 import com.warehouse.mail.application.port.secondary.MailTemplateRepository;
+import com.warehouse.mail.application.port.secondary.ShipmentNotificationPolicyPort;
 import com.warehouse.mail.domain.service.MailTemplateRenderer;
 import com.warehouse.mail.infrastructure.adapter.primary.MailListener;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
 import com.warehouse.mail.infrastructure.adapter.primary.kafka.MailKafkaListener;
+import com.warehouse.mail.infrastructure.adapter.primary.kafka.SupplierMailKafkaListener;
 import com.warehouse.mail.infrastructure.adapter.primary.kafka.UserInvitationMailKafkaListener;
 import com.warehouse.mail.infrastructure.adapter.primary.mapper.MailLocaleResolver;
 import com.warehouse.mail.infrastructure.adapter.primary.mapper.ShipmentMailRequestMapper;
+import com.warehouse.mail.infrastructure.adapter.primary.mapper.SupplierMailRequestMapper;
 import com.warehouse.mail.infrastructure.adapter.primary.mapper.UserInvitationMailRequestMapper;
 import com.warehouse.mail.infrastructure.adapter.secondary.DisabledMailServiceAdapter;
 import com.warehouse.mail.infrastructure.adapter.secondary.MailTemplateReadRepository;
 import com.warehouse.mail.infrastructure.adapter.secondary.MailTemplateRepositoryImpl;
 import com.warehouse.mail.infrastructure.adapter.secondary.NotificationEventPublisherImpl;
+import com.warehouse.mail.infrastructure.adapter.secondary.OperatorShipmentNotificationPolicyAdapter;
 import com.warehouse.mail.infrastructure.adapter.secondary.SmtpMailServiceAdapter;
+import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
@@ -84,15 +89,28 @@ public class MailConfiguration {
     }
 
     @Bean
+    public ShipmentNotificationPolicyPort shipmentNotificationPolicyPort(
+            final OperatorConfigurationApiService operatorConfigurationApiService) {
+        return new OperatorShipmentNotificationPolicyAdapter(operatorConfigurationApiService);
+    }
+
+    @Bean
     public MailKafkaListener mailKafkaListener(final MailPort mailPort,
-                                               final ShipmentMailRequestMapper shipmentMailRequestMapper) {
-        return new MailKafkaListener(mailPort, shipmentMailRequestMapper);
+                                               final ShipmentMailRequestMapper shipmentMailRequestMapper,
+                                               final ShipmentNotificationPolicyPort shipmentNotificationPolicyPort) {
+        return new MailKafkaListener(mailPort, shipmentMailRequestMapper, shipmentNotificationPolicyPort);
     }
 
     @Bean
     public UserInvitationMailKafkaListener userInvitationMailKafkaListener(final MailPort mailPort,
                                                                            final MailLocaleResolver mailLocaleResolver) {
         return new UserInvitationMailKafkaListener(mailPort, new UserInvitationMailRequestMapper(mailLocaleResolver));
+    }
+
+    @Bean
+    public SupplierMailKafkaListener supplierMailKafkaListener(final MailPort mailPort,
+                                                               final MailLocaleResolver mailLocaleResolver) {
+        return new SupplierMailKafkaListener(mailPort, new SupplierMailRequestMapper(mailLocaleResolver));
     }
 
     @Bean

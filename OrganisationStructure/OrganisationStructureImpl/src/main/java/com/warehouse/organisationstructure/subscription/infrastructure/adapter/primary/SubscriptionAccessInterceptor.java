@@ -1,6 +1,6 @@
 package com.warehouse.organisationstructure.subscription.infrastructure.adapter.primary;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.warehouse.organisationstructure.subscription.application.port.primary.OperatorSubscriptionPort;
 import com.warehouse.organisationstructure.subscription.infrastructure.adapter.primary.api.CurrentSubscriptionApiResponse;
 import com.warehouse.organisationstructure.subscription.infrastructure.adapter.primary.mapper.OperatorSubscriptionApiMapper;

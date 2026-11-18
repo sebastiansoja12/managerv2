@@ -2,6 +2,8 @@ package com.warehouse.account.configuration;
 
 import com.warehouse.account.application.port.primary.SupplierAccountPort;
 import com.warehouse.account.application.port.primary.SupplierAccountPortImpl;
+import com.warehouse.account.application.port.primary.UserInvitationPort;
+import com.warehouse.account.application.port.primary.UserInvitationPortImpl;
 import com.warehouse.account.application.port.secondary.UserAccountServicePort;
 import com.warehouse.account.application.port.secondary.UserInvitationRepository;
 import com.warehouse.account.infrastructure.adapter.secondary.UserAccountServiceAdapter;
@@ -54,5 +56,15 @@ public class SupplierAccountConfiguration {
             @Value("${manager.auth.invitation.language:pl}") final String language) {
         return new SupplierAccountPortImpl(userAccountServicePort, userInvitationRepository, integrationEventPublisher,
                 Clock.systemUTC(), invitationValidity, invitationUrl, language);
+    }
+
+    @Bean
+    public UserInvitationPort userInvitationPort(
+            final UserInvitationRepository userInvitationRepository,
+            final IntegrationEventPublisher integrationEventPublisher,
+            @Value("${manager.auth.invitation.validity:PT72H}") final Duration invitationValidity,
+            @Value("${manager.auth.invitation.url:http://localhost:3000/set-password}") final String invitationUrl) {
+        return new UserInvitationPortImpl(userInvitationRepository, integrationEventPublisher, Clock.systemUTC(),
+                invitationValidity, invitationUrl);
     }
 }

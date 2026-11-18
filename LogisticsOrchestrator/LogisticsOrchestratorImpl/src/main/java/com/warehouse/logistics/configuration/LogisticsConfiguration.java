@@ -12,6 +12,8 @@ import com.warehouse.logistics.application.port.primary.PalletScanPort;
 import com.warehouse.logistics.application.port.primary.PalletScanPortImpl;
 import com.warehouse.logistics.application.port.primary.ProcessInitializerPort;
 import com.warehouse.logistics.application.port.primary.ProcessInitializerPortImpl;
+import com.warehouse.logistics.application.port.primary.ShipmentAcceptPort;
+import com.warehouse.logistics.application.port.primary.ShipmentAcceptPortImpl;
 import com.warehouse.logistics.application.port.primary.ShipmentCollectPort;
 import com.warehouse.logistics.application.port.primary.ShipmentCollectPortImpl;
 import com.warehouse.logistics.application.port.primary.ShipmentHandoverPort;
@@ -21,6 +23,7 @@ import com.warehouse.logistics.application.port.primary.ShipmentIdentificationPo
 import com.warehouse.logistics.application.port.primary.SupplierValidatorPort;
 import com.warehouse.logistics.application.port.primary.SupplierValidatorPortImpl;
 import com.warehouse.logistics.application.port.secondary.DeliveryCollectServicePort;
+import com.warehouse.logistics.application.port.secondary.ShipmentAcceptServicePort;
 import com.warehouse.logistics.application.port.secondary.DeliveryHandoverServicePort;
 import com.warehouse.logistics.application.port.secondary.DeliveryServicePort;
 import com.warehouse.logistics.application.port.secondary.DepartmentServicePort;
@@ -29,6 +32,7 @@ import com.warehouse.logistics.application.port.secondary.PalletScanServicePort;
 import com.warehouse.logistics.application.port.secondary.ProcessHubServicePort;
 import com.warehouse.logistics.application.port.secondary.ShipmentIdentificationServicePort;
 import com.warehouse.logistics.application.port.secondary.SupplierRepository;
+import com.warehouse.logistics.application.port.secondary.SupplierServicePort;
 import com.warehouse.logistics.application.service.LogisticsService;
 import com.warehouse.logistics.application.service.LogisticsServiceImpl;
 import com.warehouse.logistics.infrastructure.adapter.primary.DeviceAccessValidatorAspect;
@@ -36,12 +40,14 @@ import com.warehouse.logistics.infrastructure.adapter.primary.DeviceContextAuthe
 import com.warehouse.logistics.infrastructure.adapter.primary.DeviceTypeResolver;
 import com.warehouse.logistics.infrastructure.adapter.primary.LoggingSoapEndpointExceptionResolver;
 import com.warehouse.logistics.infrastructure.adapter.primary.LogisticsProcessFinishAspect;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.AcceptMapper;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.CollectMapper;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.HandoverMapper;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRequestMapper;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.PalletScanMapper;
 import com.warehouse.logistics.infrastructure.adapter.secondary.DeliveryCollectServiceAdapter;
+import com.warehouse.logistics.infrastructure.adapter.secondary.ShipmentAcceptServiceAdapter;
 import com.warehouse.logistics.infrastructure.adapter.secondary.DeliveryHandoverServiceAdapter;
 import com.warehouse.logistics.infrastructure.adapter.secondary.DeliveryServiceAdapter;
 import com.warehouse.logistics.infrastructure.adapter.secondary.DepartmentServiceAdapter;
@@ -51,6 +57,7 @@ import com.warehouse.logistics.infrastructure.adapter.secondary.ProcessHubServic
 import com.warehouse.logistics.infrastructure.adapter.secondary.ShipmentIdentificationServiceAdapter;
 import com.warehouse.logistics.infrastructure.adapter.secondary.SupplierReadRepository;
 import com.warehouse.logistics.infrastructure.adapter.secondary.SupplierRepositoryImpl;
+import com.warehouse.logistics.infrastructure.adapter.secondary.SupplierServiceAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -61,6 +68,7 @@ import com.warehouse.logisticsdelivery.api.DeliveryApiService;
 import com.warehouse.palletmanagement.api.PalletApiService;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
+import com.warehouse.supplier.api.SupplierApiService;
 import com.warehouse.process.ProcessHubApiService;
 import com.warehouse.process.ProcessHubEventPublisher;
 import com.warehouse.shipment.infrastructure.ShipmentApiService;
@@ -202,13 +210,37 @@ public class LogisticsConfiguration {
     }
 
     @Bean
-    public ShipmentCollectPort shipmentCollectPort(final DeliveryCollectServicePort deliveryCollectServicePort) {
-        return new ShipmentCollectPortImpl(deliveryCollectServicePort);
+    public ShipmentCollectPort shipmentCollectPort(final DeliveryCollectServicePort deliveryCollectServicePort,
+                                                   final DeliveryServicePort deliveryServicePort,
+                                                   final SupplierServicePort supplierServicePort) {
+        return new ShipmentCollectPortImpl(deliveryCollectServicePort, deliveryServicePort, supplierServicePort);
+    }
+
+    @Bean
+    public SupplierServicePort supplierServicePort(final SupplierApiService supplierApiService,
+                                                   final OperatorContextProvider operatorContextProvider) {
+        return new SupplierServiceAdapter(supplierApiService, operatorContextProvider);
     }
 
     @Bean
     public DeliveryCollectServicePort deliveryCollectServicePort(final DeliveryCollectApiService deliveryCollectApiService) {
         return new DeliveryCollectServiceAdapter(deliveryCollectApiService);
+    }
+
+    @Bean
+    public AcceptMapper acceptMapper() {
+        return new AcceptMapper();
+    }
+
+    @Bean
+    public ShipmentAcceptPort shipmentAcceptPort(final ShipmentAcceptServicePort shipmentAcceptServicePort,
+                                                 final ProcessHubServicePort processHubServicePort) {
+        return new ShipmentAcceptPortImpl(shipmentAcceptServicePort, processHubServicePort);
+    }
+
+    @Bean
+    public ShipmentAcceptServicePort shipmentAcceptServicePort(final ShipmentApiService shipmentApiService) {
+        return new ShipmentAcceptServiceAdapter(shipmentApiService);
     }
 
     @Bean

@@ -8,4 +8,10 @@ public class ShipmentRerouted extends ShipmentStatusChanged implements ShipmentE
     public ShipmentRerouted(final ShipmentSnapshot snapshot, final Instant timestamp) {
         super(snapshot, timestamp);
     }
+
+    public ShipmentRerouted(final ShipmentSnapshot previousSnapshot,
+                            final ShipmentSnapshot snapshot,
+                            final Instant timestamp) {
+        super(previousSnapshot, snapshot, timestamp);
+    }
 }

@@ -34,6 +34,10 @@ public interface PalletPort {
     Pallet getPalletByTrackingNumber(final TrackingNumber trackingNumber, final OperatorId operatorId);
     PalletPage findPallets(final PalletSearchCriteria criteria);
     Pallet cancelPallet(final PalletId palletId, final OperatorId operatorId);
+
+    Pallet revertLoading(final PalletId palletId, final OperatorId operatorId);
+
+    Pallet unload(final PalletId palletId, final OperatorId operatorId);
     List<PalletHistoryEntry> getHistory(final PalletId palletId, final OperatorId operatorId);
     void handlePalletLoaded(final PalletLoadedRequest palletLoadedRequest);
     void determinePalletHandlingPriority(final PalletId palletId);

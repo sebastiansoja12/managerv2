@@ -28,7 +28,9 @@ class McpServerArchitectureTest {
                 .should().dependOnClassesThat().resideInAnyPackage(
                         "com.warehouse.mcp.infrastructure..", "com.warehouse.mcp.configuration..",
                         "org.springframework..", "com.warehouse.auth..", "com.warehouse.shipment..",
-                        "com.warehouse.process..", "com.warehouse.terminal..")
+                        "com.warehouse.process..", "com.warehouse.terminal..",
+                        "com.warehouse.organisationstructure..", "com.warehouse.deliverynetwork..",
+                        "com.warehouse.logisticsdelivery..", "com.warehouse.supplier..")
                 .check(MCP_CLASSES);
     }
 
@@ -41,7 +43,16 @@ class McpServerArchitectureTest {
                         "com.warehouse.process.domain..", "com.warehouse.process.infrastructure.adapter..",
                         "com.warehouse.terminal.domain..", "com.warehouse.terminal.infrastructure..",
                         "com.warehouse.auth.domain..", "com.warehouse.auth.configuration..",
-                        "com.warehouse.auth.infrastructure.adapter..")
+                        "com.warehouse.auth.infrastructure.adapter..",
+                        "com.warehouse.organisationstructure.department.domain..",
+                        "com.warehouse.organisationstructure.department.application..",
+                        "com.warehouse.organisationstructure.department.infrastructure..",
+                        "com.warehouse.deliverynetwork.domain..", "com.warehouse.deliverynetwork.application..",
+                        "com.warehouse.deliverynetwork.infrastructure..",
+                        "com.warehouse.organisationstructure.operatorconfiguration..",
+                        "com.warehouse.logisticsdelivery.domain..", "com.warehouse.logisticsdelivery.application..",
+                        "com.warehouse.logisticsdelivery.infrastructure..",
+                        "com.warehouse.supplier.domain..", "com.warehouse.supplier.infrastructure..")
                 .check(MCP_CLASSES);
     }
 

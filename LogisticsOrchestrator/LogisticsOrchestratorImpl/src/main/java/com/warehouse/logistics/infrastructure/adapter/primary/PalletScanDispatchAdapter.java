@@ -6,6 +6,7 @@ import com.warehouse.logistics.application.port.primary.PalletScanPort;
 import com.warehouse.logistics.application.port.primary.ProcessInitializerPort;
 import com.warehouse.logistics.application.port.primary.ShipmentIdentificationPort;
 import com.warehouse.logistics.application.port.primary.result.PalletScanOutcome;
+import com.warehouse.logistics.application.port.primary.result.PalletUnloadOutcome;
 import com.warehouse.logistics.configuration.LogisticsSoapWebServiceConfiguration;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.JaxbDeviceInformationMapper;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.PalletScanMapper;
@@ -27,6 +28,8 @@ import com.warehouse.process.infrastructure.event.ProcessResponseChangedEvent;
 import com.warehouse.terminal.DeviceInformation;
 import com.warehouse.terminal.jaxb.PalletScanRequest;
 import com.warehouse.terminal.jaxb.PalletScanResponse;
+import com.warehouse.terminal.jaxb.PalletUnloadRequest;
+import com.warehouse.terminal.jaxb.PalletUnloadResponse;
 import com.warehouse.xmlconverter.XmlToStringService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -94,6 +97,35 @@ public class PalletScanDispatchAdapter {
         final PalletScanResponse palletScanResponse = palletScanMapper.map(processId, outcome, this::findTrackingNumber);
         publishResponseChangedEvent(processId, palletScanResponse);
         return palletScanResponse;
+    }
+
+    @DeviceAccessValidator
+    @PayloadRoot(namespace = LogisticsSoapWebServiceConfiguration.TERMINAL_NAMESPACE, localPart = "PalletUnloadRequest")
+    @ResponsePayload
+    public PalletUnloadResponse processPalletUnloadRequest(@RequestPayload final PalletUnloadRequest palletUnloadRequest) {
+        final DeviceInformation deviceInformation =
+                JaxbDeviceInformationMapper.map(palletUnloadRequest.getDeviceInformation());
+
+        log.info("Detected pallet unload request from device: ID - {}, Version - {}, Responsible User - {}, Department - {}",
+                deviceInformation.getDeviceId().value(), deviceInformation.getVersion(),
+                deviceInformation.getUsername(), deviceInformation.getDepartmentCode().value());
+
+        final ProcessId processId = processInitializerPort.initializeProcess(deviceInformation,
+                xmlToStringService.convertToString(palletUnloadRequest));
+        LogisticsProcessContext.setProcessId(processId);
+        log.info("Pallet unload process initialized in orchestrator flow: {}", processId.value());
+
+        deviceValidatorPort.validateDevice(processId, ProcessType.PALLET_UNLOAD, deviceInformation);
+
+        deviceAgentPort.updateDeviceIfNeed(deviceInformation);
+
+        final PalletUnloadOutcome outcome = palletScanPort.unload(palletScanMapper.map(processId, palletUnloadRequest));
+
+        final PalletUnloadResponse palletUnloadResponse = palletScanMapper.map(processId, outcome,
+                this::findTrackingNumber);
+        processHubEventPublisher.publish(new ProcessResponseChangedEvent(processId, ServiceType.LOGISTICS_ORCHESTRATOR,
+                LocalDateTime.now(), xmlToStringService.convertToString(palletUnloadResponse)));
+        return palletUnloadResponse;
     }
 
     private String findTrackingNumber(final ShipmentId shipmentId) {

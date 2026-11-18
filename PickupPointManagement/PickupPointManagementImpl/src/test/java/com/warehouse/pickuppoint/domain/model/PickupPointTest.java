@@ -9,6 +9,7 @@ import com.warehouse.pickuppoint.domain.enumeration.PickupPointShipmentSize;
 import com.warehouse.pickuppoint.domain.enumeration.PickupPointStatus;
 import com.warehouse.pickuppoint.domain.enumeration.PickupPointType;
 import com.warehouse.pickuppoint.domain.exception.InvalidPickupPointConfigurationException;
+import com.warehouse.pickuppoint.domain.exception.InvalidPickupPointStatusTransitionException;
 import com.warehouse.pickuppoint.domain.exception.PickupPointUnavailableException;
 import com.warehouse.pickuppoint.domain.vo.GeoCoordinates;
 import com.warehouse.pickuppoint.domain.vo.OpeningSchedule;
@@ -119,6 +120,44 @@ class PickupPointTest {
         assertThrows(
                 InvalidPickupPointConfigurationException.class,
                 () -> pickupPoint.changeCapabilities(Set.of(PickupPointCapability.COLLECTION), UPDATED_AT));
+    }
+
+    @Test
+    void shouldDeletePickupPointAndBlockFurtherChanges() {
+        final PickupPoint pickupPoint = activePickupPoint();
+
+        pickupPoint.delete(UPDATED_AT);
+
+        assertEquals(PickupPointStatus.DELETED, pickupPoint.snapshot().status());
+        assertEquals(UPDATED_AT, pickupPoint.snapshot().updatedAt());
+        assertThrows(
+                InvalidPickupPointConfigurationException.class,
+                () -> pickupPoint.changeCapabilities(Set.of(PickupPointCapability.COLLECTION), UPDATED_AT));
+        assertThrows(InvalidPickupPointStatusTransitionException.class, () -> pickupPoint.resume(true, UPDATED_AT));
+        assertThrows(
+                InvalidPickupPointStatusTransitionException.class,
+                () -> pickupPoint.close("Location closed", UPDATED_AT));
+    }
+
+    @Test
+    void shouldIgnoreRepeatedDelete() {
+        final PickupPoint pickupPoint = activePickupPoint();
+        pickupPoint.delete(UPDATED_AT);
+
+        pickupPoint.delete(Instant.parse("2026-09-10T09:00:00Z"));
+
+        assertEquals(UPDATED_AT, pickupPoint.snapshot().updatedAt());
+    }
+
+    @Test
+    void shouldDeleteClosedPickupPoint() {
+        final PickupPoint pickupPoint = activePickupPoint();
+        pickupPoint.close("Location closed", UPDATED_AT);
+
+        pickupPoint.delete(UPDATED_AT);
+
+        assertEquals(PickupPointStatus.DELETED, pickupPoint.snapshot().status());
+        assertNull(pickupPoint.snapshot().statusReason());
     }
 
     @Test

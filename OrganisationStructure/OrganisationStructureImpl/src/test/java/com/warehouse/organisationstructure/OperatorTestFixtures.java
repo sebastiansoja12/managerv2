@@ -14,7 +14,14 @@ import com.warehouse.organisationstructure.api.dto.FirstDepartmentDto;
 import com.warehouse.organisationstructure.api.dto.OperatorConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.OperatorGeocodingConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.OperatorStatusDto;
+import com.warehouse.organisationstructure.api.dto.CashOnDeliveryPaymentMethodDto;
+import com.warehouse.organisationstructure.api.dto.ProofOfDeliveryModeDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentDataRetentionConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentDeliveryConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentPaymentConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentReturnConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentSlaConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentLabelConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentLabelFormatDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentLimitsDto;
@@ -415,7 +422,12 @@ public final class OperatorTestFixtures {
                         true,
                         true,
                         ShipmentNotificationChannelDto.SMS
-                )
+                ),
+                new ShipmentDeliveryConfigurationDto(false, ProofOfDeliveryModeDto.SIGNATURE, 2, false, false, true),
+                new ShipmentReturnConfigurationDto(true, 14, true, 7, false),
+                new ShipmentPaymentConfigurationDto(true, 5000.0, CashOnDeliveryPaymentMethodDto.BOTH, 0.0),
+                new ShipmentSlaConfigurationDto(96, 48, 24, 24, true, false),
+                new ShipmentDataRetentionConfigurationDto(365, 90, 180)
         );
     }
 

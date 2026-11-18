@@ -17,6 +17,7 @@ public class DeliveryReadModelMapper {
                 .status(delivery.status())
                 .originDepartmentId(delivery.originDepartmentId())
                 .destinationDepartmentId(delivery.destinationDepartmentId())
+                .currentDepartmentId(delivery.currentDepartmentId())
                 .method(delivery.method())
                 .stepCount(delivery.deliverySteps().size())
                 .created(delivery.createdAt())
@@ -27,7 +28,8 @@ public class DeliveryReadModelMapper {
     public DeliveryReadItem toItem(final DeliveryReadEntity entity) {
         return new DeliveryReadItem(entity.getId(), entity.getShipmentId(), entity.getTargetType(),
                 entity.getTargetId(), entity.getType(), entity.getDeliveryStatus(), entity.getStatus(),
-                entity.getOriginDepartmentId(), entity.getDestinationDepartmentId(), entity.getMethod(),
+                entity.getOriginDepartmentId(), entity.getDestinationDepartmentId(), entity.getCurrentDepartmentId(),
+                entity.getMethod(),
                 entity.getStepCount(), entity.getCreated(), entity.getDeliveredAt());
     }
 }

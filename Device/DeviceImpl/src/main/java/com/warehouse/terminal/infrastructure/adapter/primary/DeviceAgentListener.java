@@ -1,21 +1,18 @@
 package com.warehouse.terminal.infrastructure.adapter.primary;
 
 import com.warehouse.terminal.domain.model.command.DeviceSettingsRequest;
-import com.warehouse.terminal.domain.vo.DeviceValidationRequest;
-import com.warehouse.terminal.domain.vo.DeviceVersionRequest;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
-
 import com.warehouse.terminal.domain.port.primary.DevicePort;
 import com.warehouse.terminal.domain.service.DeviceValidatorService;
+import com.warehouse.terminal.domain.vo.DeviceValidationRequest;
 import com.warehouse.terminal.dto.DeviceSettingsRequestDto;
 import com.warehouse.terminal.dto.DeviceUpdateRequestDto;
 import com.warehouse.terminal.event.DeviceEvent;
 import com.warehouse.terminal.event.DeviceSettingsEvent;
 import com.warehouse.terminal.event.DeviceUpdateEvent;
 import com.warehouse.terminal.event.DeviceValidationEvent;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
@@ -42,7 +39,7 @@ public class DeviceAgentListener {
     public void handle(final DeviceUpdateEvent event) {
         logEvent(event);
         final DeviceUpdateRequestDto deviceUpdateRequest = event.getDeviceUpdateRequest();
-        devicePort.changeVersionTo(DeviceVersionRequest.from(deviceUpdateRequest));
+        //devicePort.changeVersionTo(DeviceVersionRequest.from(deviceUpdateRequest));
     }
 
     @EventListener

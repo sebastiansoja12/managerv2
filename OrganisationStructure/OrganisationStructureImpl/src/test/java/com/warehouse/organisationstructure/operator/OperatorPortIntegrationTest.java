@@ -1,5 +1,6 @@
 package com.warehouse.organisationstructure.operator;
 
+import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.cache.NoOpOperatorConfigurationCache;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -163,7 +164,7 @@ class OperatorPortIntegrationTest {
         @Bean
         OperatorConfigurationRepository operatorConfigurationRepository(
                 final OperatorConfigurationReadRepository readRepository) {
-            return new OperatorConfigurationRepositoryImpl(readRepository);
+            return new OperatorConfigurationRepositoryImpl(readRepository, new NoOpOperatorConfigurationCache());
         }
 
         @Bean

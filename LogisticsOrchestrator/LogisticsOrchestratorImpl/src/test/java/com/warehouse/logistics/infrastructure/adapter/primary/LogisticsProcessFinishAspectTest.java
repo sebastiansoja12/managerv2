@@ -10,9 +10,12 @@ import org.mockito.ArgumentCaptor;
 import com.warehouse.process.ProcessHubEventPublisher;
 import com.warehouse.process.infrastructure.dto.ProcessStatusDto;
 import com.warehouse.process.infrastructure.event.ProcessFinishEvent;
+import com.warehouse.terminal.jaxb.AcceptResponse;
+import com.warehouse.terminal.jaxb.CollectResponse;
 import com.warehouse.terminal.jaxb.HandoverResponse;
 import com.warehouse.terminal.jaxb.HandoverResponseDetailType;
 import com.warehouse.terminal.jaxb.HandoverResponseDetailsType;
+import com.warehouse.terminal.jaxb.PalletUnloadResponse;
 
 class LogisticsProcessFinishAspectTest {
 
@@ -40,6 +43,46 @@ class LogisticsProcessFinishAspectTest {
         assertThat(event.getFaultDescription()).isEqualTo("Recipient signature is required for this delivery");
     }
 
+    @Test
+    void shouldFinishFailedPalletUnloadProcessWithErrorMessage() {
+        final PalletUnloadResponse response = new PalletUnloadResponse();
+        response.setProcessId(PROCESS_ID);
+        response.setSuccess(false);
+        response.setErrorMessage("Pallet must be unloaded in its destination department");
+
+        aspect.publishProcessFinishEvent(response);
+
+        final ProcessFinishEvent event = publishedEvent();
+        assertThat(event.getProcessStatus()).isEqualTo(ProcessStatusDto.FAILURE);
+        assertThat(event.getFaultDescription()).isEqualTo("Pallet must be unloaded in its destination department");
+    }
+
+    @Test
+    void shouldFinishFailedCollectProcessWithDefaultFaultWhenNoErrorMessage() {
+        final CollectResponse response = new CollectResponse();
+        response.setProcessId(PROCESS_ID);
+        response.setSuccess(false);
+
+        aspect.publishProcessFinishEvent(response);
+
+        final ProcessFinishEvent event = publishedEvent();
+        assertThat(event.getProcessStatus()).isEqualTo(ProcessStatusDto.FAILURE);
+        assertThat(event.getFaultDescription()).isEqualTo("Process failed without error message");
+    }
+
+    @Test
+    void shouldFinishSuccessfulAcceptProcess() {
+        final AcceptResponse response = new AcceptResponse();
+        response.setProcessId(PROCESS_ID);
+        response.setSuccess(true);
+
+        aspect.publishProcessFinishEvent(response);
+
+        final ProcessFinishEvent event = publishedEvent();
+        assertThat(event.getProcessStatus()).isEqualTo(ProcessStatusDto.SUCCESS);
+        assertThat(event.getFaultDescription()).isNull();
+    }
+
     private ProcessFinishEvent publishedEvent() {
         final ArgumentCaptor<ProcessFinishEvent> event = ArgumentCaptor.forClass(ProcessFinishEvent.class);
         verify(processHubEventPublisher).publish(event.capture());
@@ -57,6 +100,7 @@ class LogisticsProcessFinishAspectTest {
         final HandoverResponse response = new HandoverResponse();
         response.setProcessId(PROCESS_ID);
         response.setSuccess(success);
+        response.setErrorMessage(errorMessage);
         response.setHandoverResponseDetails(details);
         return response;
     }

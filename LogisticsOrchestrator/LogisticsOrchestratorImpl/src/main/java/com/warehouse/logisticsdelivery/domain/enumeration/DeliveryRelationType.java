@@ -4,5 +4,7 @@ public enum DeliveryRelationType {
     SOURCE,
     DERIVED,
     REPLACED_BY,
-    REPLACES
+    REPLACES,
+    CONTINUES,
+    CONTINUED_BY
 }

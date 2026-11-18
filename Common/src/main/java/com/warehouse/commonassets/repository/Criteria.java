@@ -1,6 +1,7 @@
 package com.warehouse.commonassets.repository;
 
 import com.warehouse.commonassets.identificator.ObjectValue;
+import org.hibernate.query.criteria.JpaCriteriaQuery;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
@@ -162,6 +163,10 @@ public class Criteria<T> {
 
     public List<T> getResultList() {
         return list();
+    }
+
+    public long count() {
+        return em.createQuery(((JpaCriteriaQuery<T>) cq).createCountQuery()).getSingleResult();
     }
 
     public CriteriaQuery<T> build() {

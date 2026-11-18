@@ -19,11 +19,14 @@ import com.warehouse.auth.domain.vo.RegisterResponse;
 import com.warehouse.auth.infrastructure.dto.LoginRequestDto;
 import com.warehouse.auth.infrastructure.dto.RegisterRequestDto;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapper;
+import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 @AllArgsConstructor
@@ -72,9 +75,12 @@ public class AuthenticationController {
             authCookieService.addAuthenticationCookies(response,
                     authentication.accessToken(), authentication.refreshToken());
             return ResponseEntity.status(HttpStatus.NO_CONTENT).cacheControl(CacheControl.noStore()).build();
-        } catch (RuntimeException exception) {
-            authCookieService.clearAuthenticationCookies(response);
+        } catch (AuthenticationErrorException | UserNotFoundException exception) {
+            log.info("Session refresh rejected: {}", exception.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).cacheControl(CacheControl.noStore()).build();
+        } catch (RuntimeException exception) {
+            log.warn("Session refresh failed", exception);
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).cacheControl(CacheControl.noStore()).build();
         }
     }
 

@@ -34,7 +34,7 @@ class DepartmentMapPortImplTest {
     @BeforeEach
     void setUp() {
         this.store = new InMemoryDepartmentMapStore(Set.of(DEPARTMENT_ID), OPERATOR_ID, USER_ID);
-        this.departmentMapPort = new DepartmentMapPortImpl(store, store, store, store,
+        this.departmentMapPort = new DepartmentMapPortImpl(store, store, store, store, store,
                 new StorageLocationSynchronizer());
         this.palletLocationPort = new PalletLocationPortImpl(store, store, store, store);
     }

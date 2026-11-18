@@ -44,6 +44,41 @@ class DevicePairOperatorSessionTest {
     }
 
     @Test
+    void shouldExtendActiveOperatorSession() {
+        final Instant now = Instant.now();
+        final Instant extendedExpiry = now.plus(Duration.ofHours(12));
+        final DevicePair devicePair = DeviceAccessFixture.devicePairWithOperator(DeviceAccessFixture.OWNER_ID,
+                now.plus(Duration.ofHours(1)));
+
+        devicePair.extendOperatorSession(now, extendedExpiry);
+
+        assertEquals(extendedExpiry, devicePair.getOperatorSessionExpiresAt());
+    }
+
+    @Test
+    void shouldNotShortenOperatorSession() {
+        final Instant now = Instant.now();
+        final Instant expiresAt = now.plus(Duration.ofHours(12));
+        final DevicePair devicePair = DeviceAccessFixture.devicePairWithOperator(DeviceAccessFixture.OWNER_ID, expiresAt);
+
+        devicePair.extendOperatorSession(now, now.plus(Duration.ofHours(1)));
+
+        assertEquals(expiresAt, devicePair.getOperatorSessionExpiresAt());
+    }
+
+    @Test
+    void shouldNotRevivePastOperatorSession() {
+        final Instant now = Instant.now();
+        final Instant expiredAt = now.minus(Duration.ofMinutes(1));
+        final DevicePair devicePair = DeviceAccessFixture.devicePairWithOperator(DeviceAccessFixture.OWNER_ID, expiredAt);
+
+        devicePair.extendOperatorSession(now, now.plus(Duration.ofHours(12)));
+
+        assertEquals(expiredAt, devicePair.getOperatorSessionExpiresAt());
+        assertTrue(devicePair.activeOperator(now).isEmpty());
+    }
+
+    @Test
     void shouldRecognizeSessionOwner() {
         final DevicePair devicePair = DeviceAccessFixture.devicePairWithOperator(DeviceAccessFixture.OWNER_ID,
                 Instant.now().plus(Duration.ofHours(1)));

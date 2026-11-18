@@ -1,6 +1,6 @@
 package com.warehouse.returning.infrastructure.adapter.secondary.outbox;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.warehouse.returning.domain.vo.ReturnPackageId;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ class ReturningOutboxPublisherTest {
     @SuppressWarnings("unchecked")
     private final KafkaTemplate<String, String> kafka = mock(KafkaTemplate.class);
     private final ReturningOutboxPublisher publisher = new ReturningOutboxPublisher(
-            store, kafka, new ObjectMapper(), 1, 60000, 20, 5000, 10);
+            store, kafka, JsonMapper.builder().configureForJackson2().build(), 1, 60000, 20, 5000, 10);
 
     @Test
     @SuppressWarnings({"unchecked", "rawtypes"})

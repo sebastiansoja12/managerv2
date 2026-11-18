@@ -319,6 +319,29 @@ public class Pallet {
         return true;
     }
 
+    public void revertLoading() {
+        if (!PalletStatus.LOADED.equals(this.palletStatus)) {
+            throw new PalletStatusTransitionException(
+                    "Pallet loading cannot be reverted in status " + this.palletStatus);
+        }
+        changePalletStatus(PalletStatus.READY);
+        evaluateReadiness();
+    }
+
+    public boolean isUnloaded() {
+        return PalletStatus.DELIVERED.equals(this.palletStatus);
+    }
+
+    public void unload() {
+        if (isUnloaded()) {
+            return;
+        }
+        if (!PalletStatus.IN_TRANSIT.equals(this.palletStatus)) {
+            throw new PalletStatusTransitionException("Pallet cannot be unloaded in status " + this.palletStatus);
+        }
+        changePalletStatus(PalletStatus.DELIVERED);
+    }
+
     public boolean cancel() {
         if (PalletStatus.CANCELLED.equals(this.palletStatus)) {
             return false;
@@ -375,7 +398,7 @@ public class Pallet {
                        final Boolean refrigerated,
                        final Dimension dimension,
                        final SealNumber sealNumber) {
-        if (this.palletStatus.isFinished()) {
+        if (!this.palletStatus.isContentModifiable()) {
             throw new PalletModificationException("Pallet cannot be changed in status " + this.palletStatus);
         }
         if (dimension != null && (dimension.getLength() <= 0 || dimension.getWidth() <= 0 || dimension.getHeight() <= 0)) {

@@ -6,7 +6,13 @@ import java.util.Objects;
 
 public record DepartmentConnectionCodeResult(
         DepartmentCode firstDepartmentCode,
-        DepartmentCode secondDepartmentCode) {
+        DepartmentCode secondDepartmentCode,
+        boolean bidirectional) {
+
+    public DepartmentConnectionCodeResult(final DepartmentCode firstDepartmentCode,
+                                          final DepartmentCode secondDepartmentCode) {
+        this(firstDepartmentCode, secondDepartmentCode, true);
+    }
 
     public DepartmentConnectionCodeResult {
         Objects.requireNonNull(firstDepartmentCode, "First department code cannot be null");
@@ -14,7 +20,7 @@ public record DepartmentConnectionCodeResult(
         Objects.requireNonNull(firstDepartmentCode.getValue(), "First department code value cannot be null");
         Objects.requireNonNull(secondDepartmentCode.getValue(), "Second department code value cannot be null");
 
-        if (firstDepartmentCode.getValue().compareTo(secondDepartmentCode.getValue()) > 0) {
+        if (bidirectional && firstDepartmentCode.getValue().compareTo(secondDepartmentCode.getValue()) > 0) {
             final DepartmentCode originalFirstDepartmentCode = firstDepartmentCode;
             firstDepartmentCode = secondDepartmentCode;
             secondDepartmentCode = originalFirstDepartmentCode;

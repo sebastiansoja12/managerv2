@@ -24,7 +24,7 @@ public class ResponseMapper {
         final String lastName = user.getLastName();
         final String email = user.getEmail();
         final String role = user.getRole().name();
-        final String departmentCodeValue = departmentCode.getValue();
+        final String departmentCodeValue = departmentCode == null ? null : departmentCode.getValue();
         final String language = user.getLanguage();
         final Boolean deleted = user.isDeleted();
         final Instant createdAt = user.createdAt();
@@ -38,7 +38,9 @@ public class ResponseMapper {
                 operatorId, createdAt, updatedAt);
     }
 
-    public CurrentUserProfileDto mapCurrentUser(final OrganizationUser user, final DepartmentCode departmentCode) {
+    public CurrentUserProfileDto mapCurrentUser(final OrganizationUser user,
+                                                final DepartmentCode departmentCode,
+                                                final DepartmentCode homeDepartmentCode) {
         final UserDto userDto = map(user, departmentCode);
         if (userDto == null) {
             return null;
@@ -52,8 +54,9 @@ public class ResponseMapper {
                 userDto.email(),
                 userDto.role(),
                 userDto.departmentCode(),
+                homeDepartmentCode == null ? null : homeDepartmentCode.getValue(),
                 userDto.language(),
-                user.getApiKey(),
+                user.canAuthenticateWithApiKey(),
                 userDto.rolePermissions(),
                 userDto.deleted(),
                 userDto.operatorId(),

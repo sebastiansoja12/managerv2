@@ -2,5 +2,5 @@ package com.warehouse.organisationstructure.department.domain.vo;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
 
-public record ChangeDepartmentStatusCommand(DepartmentCode departmentCode, String status) {
+public record ChangeDepartmentStatusCommand(DepartmentCode departmentCode, String status, String reason) {
 }

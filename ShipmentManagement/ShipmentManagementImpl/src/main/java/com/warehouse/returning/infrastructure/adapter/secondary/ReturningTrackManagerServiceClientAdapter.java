@@ -183,7 +183,7 @@ public class ReturningTrackManagerServiceClientAdapter implements ReturningTrack
 
     @Override
     public ReturnPageDto getReturns(final DepartmentId departmentId, final int page, final int size) {
-        final URI uri = UriComponentsBuilder.fromUriString(baseUrl())
+        final URI uri = UriComponentsBuilder.fromUriString(baseUrl() + "/read-model")
                 .queryParam("departmentId", departmentId.value()).queryParam("page", page)
                 .queryParam("size", size).build().encode().toUri();
         final ReturnPageApi response = restClient.get().uri(uri).header("Authorization", authorization())

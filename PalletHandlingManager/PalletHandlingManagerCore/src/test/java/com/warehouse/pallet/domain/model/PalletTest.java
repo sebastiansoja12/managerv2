@@ -144,6 +144,27 @@ class PalletTest {
     }
 
     @Test
+    void shouldRevertLoadedPalletToReadyAndAllowContentChanges() {
+        final Pallet pallet = Pallet.withShipments(PALLET_ID, TRACKING_NUMBER, OPERATOR_ID,
+                List.of(new ShipmentId(1L)));
+        pallet.markLoaded();
+
+        pallet.revertLoading();
+        pallet.addShipment(new ShipmentId(2L));
+
+        assertThat(pallet.getPalletStatus()).isEqualTo(PalletStatus.READY);
+        assertThat(pallet.getShipmentIds()).containsExactlyInAnyOrder(new ShipmentId(1L), new ShipmentId(2L));
+    }
+
+    @Test
+    void shouldRejectLoadingRevertOfPalletThatIsNotLoaded() {
+        final Pallet pallet = Pallet.withShipments(PALLET_ID, TRACKING_NUMBER, OPERATOR_ID,
+                List.of(new ShipmentId(1L)));
+
+        assertThatThrownBy(pallet::revertLoading).isInstanceOf(PalletStatusTransitionException.class);
+    }
+
+    @Test
     void shouldNotChangeContentOfLoadedPallet() {
         final Pallet pallet = Pallet.withShipments(PALLET_ID, TRACKING_NUMBER, OPERATOR_ID,
                 List.of(new ShipmentId(1L)));
@@ -172,7 +193,31 @@ class PalletTest {
         pallet.markLoaded();
 
         assertThat(pallet.changeTransportStatus(PalletStatus.IN_TRANSIT)).isEqualTo(PalletStatus.LOADED);
-        assertThat(pallet.changeTransportStatus(PalletStatus.DELIVERED)).isEqualTo(PalletStatus.IN_TRANSIT);
+        assertThatThrownBy(() -> pallet.changeTransportStatus(PalletStatus.DELIVERED))
+                .isInstanceOf(PalletStatusTransitionException.class);
+    }
+
+    @Test
+    void shouldUnloadPalletInTransitOnlyOnce() {
+        final Pallet pallet = Pallet.withShipments(PALLET_ID, TRACKING_NUMBER, OPERATOR_ID,
+                List.of(new ShipmentId(1L)));
+        pallet.markLoaded();
+        pallet.changeTransportStatus(PalletStatus.IN_TRANSIT);
+
+        pallet.unload();
+        pallet.unload();
+
+        assertThat(pallet.isUnloaded()).isTrue();
+        assertThat(pallet.getPalletStatus()).isEqualTo(PalletStatus.DELIVERED);
+    }
+
+    @Test
+    void shouldRejectUnloadingPalletThatHasNotDeparted() {
+        final Pallet pallet = Pallet.withShipments(PALLET_ID, TRACKING_NUMBER, OPERATOR_ID,
+                List.of(new ShipmentId(1L)));
+        pallet.markLoaded();
+
+        assertThatThrownBy(pallet::unload).isInstanceOf(PalletStatusTransitionException.class);
     }
 
     @Test
@@ -198,6 +243,17 @@ class PalletTest {
         assertThat(pallet.isRefrigerated()).isTrue();
         assertThat(pallet.getDimension().getLength()).isEqualTo(120);
         assertThat(pallet.getSealNumber().value()).isEqualTo("S-1");
+    }
+
+    @Test
+    void shouldRejectPalletUpdateAfterLoading() {
+        final Pallet pallet = Pallet.withShipments(PALLET_ID, TRACKING_NUMBER, OPERATOR_ID,
+                List.of(new ShipmentId(1L)));
+        pallet.markLoaded();
+        pallet.changeTransportStatus(PalletStatus.IN_TRANSIT);
+
+        assertThatThrownBy(() -> pallet.update(PalletType.CHILD, null, null, null, null))
+                .isInstanceOf(PalletModificationException.class);
     }
 
     @Test

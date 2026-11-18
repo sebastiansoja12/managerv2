@@ -52,7 +52,54 @@ public class DeliveryNetwork {
     }
 
     public boolean directlyConnects(final DepartmentId firstDepartmentId, final DepartmentId secondDepartmentId) {
-        return this.connections.contains(new DepartmentConnection(firstDepartmentId, secondDepartmentId));
+        return this.connections.stream()
+                .anyMatch(connection -> connection.allowsTravel(firstDepartmentId, secondDepartmentId));
+    }
+
+    public boolean hasSortingFacilityConnection(final DepartmentId departmentId,
+                                                final Collection<DepartmentNode> departments) {
+        final Set<DepartmentId> sortingFacilityIds = sortingFacilityIds(departments);
+        return hasSortingFacilityConnection(departmentId, this.connections, sortingFacilityIds);
+    }
+
+    public void connectToNearestSortingFacilities(final DepartmentId departmentId,
+                                                     final Collection<DepartmentNode> departments,
+                                                     final int sortingFacilityCount,
+                                                     final int maxDistanceInKilometers,
+                                                     final boolean bidirectional) {
+        Objects.requireNonNull(departmentId, "Department ID cannot be null");
+        final DepartmentNode department = indexDepartments(departments).get(departmentId);
+        if (department == null) {
+            throw new UnknownDepartmentException(departmentId);
+        }
+        if (sortingFacilityCount <= 0 || department.isSortingFacility()
+                || !department.participatesInDeliveryNetwork() || department.location() == null) {
+            return;
+        }
+        final List<DepartmentNode> nearestSortingFacilities = departments.stream()
+                .filter(DepartmentNode::participatesInDeliveryNetwork)
+                .filter(DepartmentNode::isSortingFacility)
+                .filter(sortingFacility -> sortingFacility.location() != null)
+                .filter(sortingFacility -> maxDistanceInKilometers <= 0
+                        || department.distanceInKilometersTo(sortingFacility) <= maxDistanceInKilometers)
+                .filter(sortingFacility -> !directlyConnects(departmentId, sortingFacility.departmentId())
+                        && !directlyConnects(sortingFacility.departmentId(), departmentId))
+                .sorted(Comparator.comparingDouble(department::distanceInKilometersTo))
+                .limit(sortingFacilityCount)
+                .toList();
+        if (nearestSortingFacilities.isEmpty()) {
+            return;
+        }
+        final Set<DepartmentConnection> extendedConnections = new HashSet<>(this.connections);
+        for (final DepartmentNode sortingFacility : nearestSortingFacilities) {
+            if (bidirectional) {
+                extendedConnections.add(new DepartmentConnection(departmentId, sortingFacility.departmentId()));
+            } else {
+                extendedConnections.add(DepartmentConnection.oneWay(departmentId, sortingFacility.departmentId()));
+                extendedConnections.add(DepartmentConnection.oneWay(sortingFacility.departmentId(), departmentId));
+            }
+        }
+        this.connections = Set.copyOf(extendedConnections);
     }
 
     public boolean removeConnectionsFor(final DepartmentId departmentId) {
@@ -94,9 +141,14 @@ public class DeliveryNetwork {
     private Set<DepartmentConnection> uniqueConnections(
             final Collection<DepartmentConnection> proposedConnections) {
         final Set<DepartmentConnection> uniqueConnections = new HashSet<>();
+        final Set<List<DepartmentId>> directions = new HashSet<>();
         for (final DepartmentConnection connection : proposedConnections) {
             Objects.requireNonNull(connection, "Department connection cannot be null");
-            if (!uniqueConnections.add(connection)) {
+            final boolean forwardAdded = directions.add(
+                    List.of(connection.firstDepartmentId(), connection.secondDepartmentId()));
+            final boolean backwardAdded = !connection.bidirectional() || directions.add(
+                    List.of(connection.secondDepartmentId(), connection.firstDepartmentId()));
+            if (!forwardAdded || !backwardAdded || !uniqueConnections.add(connection)) {
                 throw new DuplicateDepartmentConnectionException(connection);
             }
         }
@@ -127,12 +179,7 @@ public class DeliveryNetwork {
     private void validateSortingFacilityConnections(
             final Set<DepartmentConnection> proposedConnections,
             final Collection<DepartmentNode> departments) {
-        final Set<DepartmentId> sortingFacilityIds = new HashSet<>();
-        for (final DepartmentNode department : departments) {
-            if (department.participatesInDeliveryNetwork() && department.isSortingFacility()) {
-                sortingFacilityIds.add(department.departmentId());
-            }
-        }
+        final Set<DepartmentId> sortingFacilityIds = sortingFacilityIds(departments);
 
         final List<DepartmentCode> missingDepartmentCodes = departments.stream()
                 .filter(DepartmentNode::participatesInDeliveryNetwork)
@@ -146,6 +193,16 @@ public class DeliveryNetwork {
         if (!missingDepartmentCodes.isEmpty()) {
             throw new MissingSortingFacilityConnectionException(missingDepartmentCodes);
         }
+    }
+
+    private Set<DepartmentId> sortingFacilityIds(final Collection<DepartmentNode> departments) {
+        final Set<DepartmentId> sortingFacilityIds = new HashSet<>();
+        for (final DepartmentNode department : departments) {
+            if (department.participatesInDeliveryNetwork() && department.isSortingFacility()) {
+                sortingFacilityIds.add(department.departmentId());
+            }
+        }
+        return sortingFacilityIds;
     }
 
     private boolean hasSortingFacilityConnection(
