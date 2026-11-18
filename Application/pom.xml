@@ -171,6 +171,16 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>IncidentManagementImpl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>FleetTrackingImpl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
         </dependency>
