@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-05-postgresql-table-tracking-session" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="tracking_session"/>
+            </not>
+        </preConditions>
+        <createTable tableName="tracking_session">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="driver_user_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="driver_username" type="VARCHAR(255)" />
+            <column name="device_id" type="VARCHAR(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="vehicle_id" type="BIGINT" />
+            <column name="department_code" type="VARCHAR(40)" />
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false" />
+            </column>
+            <column name="started_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false" />
+            </column>
+            <column name="finished_at" type="TIMESTAMP WITH TIME ZONE" />
+            <column name="last_sequence" type="BIGINT" />
+            <column name="last_latitude" type="DOUBLE PRECISION" />
+            <column name="last_longitude" type="DOUBLE PRECISION" />
+            <column name="last_accuracy_meters" type="DOUBLE PRECISION" />
+            <column name="last_speed_meters_per_second" type="DOUBLE PRECISION" />
+            <column name="last_heading_degrees" type="DOUBLE PRECISION" />
+            <column name="last_recorded_at" type="TIMESTAMP WITH TIME ZONE" />
+        </createTable>
+        <createIndex tableName="tracking_session" indexName="idx_tracking_session_operator_status">
+            <column name="operator_id"/>
+            <column name="status"/>
+        </createIndex>
+        <createIndex tableName="tracking_session" indexName="idx_tracking_session_operator_driver_status">
+            <column name="operator_id"/>
+            <column name="driver_user_id"/>
+            <column name="status"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2026-11-05-postgresql-table-tracking-position" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="tracking_position"/>
+            </not>
+        </preConditions>
+        <createTable tableName="tracking_position">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="tracking_session_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="sequence" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="latitude" type="DOUBLE PRECISION">
+                <constraints nullable="false" />
+            </column>
+            <column name="longitude" type="DOUBLE PRECISION">
+                <constraints nullable="false" />
+            </column>
+            <column name="accuracy_meters" type="DOUBLE PRECISION" />
+            <column name="speed_meters_per_second" type="DOUBLE PRECISION" />
+            <column name="heading_degrees" type="DOUBLE PRECISION" />
+            <column name="recorded_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="tracking_position" columnNames="tracking_session_id, sequence"
+                             constraintName="uk_tracking_position_session_sequence"/>
+        <addForeignKeyConstraint baseTableName="tracking_position" baseColumnNames="tracking_session_id"
+                                 constraintName="fk_tracking_position_session"
+                                 referencedTableName="tracking_session" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>
