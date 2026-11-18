@@ -113,6 +113,11 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
         validateDepartmentCode(departmentCode);
         final DepartmentId departmentId = departmentService.getDepartmentId(departmentCode);
+        final OrganizationUser currentUser = userService.findUserById(authenticationService.currentUserId());
+        if (!currentUser.canAssignRole(role) || !currentUser.canAccessDepartment(departmentId)) {
+            throw new UserAccessDeniedException("Current user cannot create user with role " + role
+                    + " in department " + departmentCode.getValue());
+        }
 
         final OrganizationUser user = OrganizationUser.createWithRole(
                 userId, username, password, firstName, lastName, email, role, departmentId,

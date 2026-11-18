@@ -1,7 +1,6 @@
 package com.warehouse.auth.configuration;
 
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,6 +22,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.warehouse.auth.infrastructure.adapter.secondary.filter.JwtAuthenticationFilter;
 import com.warehouse.auth.infrastructure.adapter.secondary.filter.PlatformOwnerAuthenticationFilter;
 
+import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -44,7 +44,6 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(final HttpSecurity http,
-                                                   @Value("${server.servlet.contextPath:}") final String contextPath,
                                                    final CookieCsrfTokenRepository csrfTokenRepository) throws Exception {
 
         http
@@ -54,21 +53,20 @@ public class SecurityConfiguration {
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                         .ignoringRequestMatchers(
                                 "/departments/read-sync/**",
-                                "/internal/shipments/read-sync/**",
-                                "/admin/async-jobs/**")
+                                "/internal/shipments/read-sync/**")
                         .ignoringRequestMatchers(apiExposureProperties.mcpSecurityMatchers())
                         .ignoringRequestMatchers(apiExposureProperties.externalSecurityMatchers()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
+                        .dispatcherTypeMatchers(DispatcherType.ERROR, DispatcherType.FORWARD).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(apiExposureProperties.externalSecurityMatchers()).permitAll()
                         .requestMatchers("/auth/login", "/auth/refresh", "/auth/logout", "/auth/csrf").permitAll()
                         .requestMatchers("/platform/auth/login", "/platform/auth/refresh", "/platform/auth/logout").permitAll()
-                        .requestMatchers("/platform/**", "/operators", "/operators/**")
+                        .requestMatchers("/platform/**", "/operators", "/operators/**", "/admin/async-jobs/**")
                         .hasAuthority(PlatformOwnerAuthenticationFilter.PLATFORM_OWNER_AUTHORITY)
                         .requestMatchers(
-                                "/v1/api/shipments/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
@@ -77,15 +75,9 @@ public class SecurityConfiguration {
                                 "/webjars/**"
                         )
                         .permitAll()
-                        .requestMatchers("/returns/packages", "/returns/packages/**").authenticated()
-                        .requestMatchers("/incidents", "/incidents/**").authenticated()
-                        .requestMatchers("/pallets", "/pallets/**").authenticated()
-                        .requestMatchers("/carriers", "/carriers/**").authenticated()
-                        .requestMatchers("/drivers", "/drivers/**").authenticated()
-                        .requestMatchers("/fleet-tracking/**").authenticated()
-                        .requestMatchers("/v1/api/returns").authenticated()
-                        .requestMatchers(apiExposureProperties.pairKeySecurityMatchers(contextPath)).permitAll()
-                        .anyRequest().permitAll()
+                        .requestMatchers("/maintenance", "/maintenance/**", "/reroutes/**", "/ws", "/ws/**").permitAll()
+                        .requestMatchers(apiExposureProperties::isPublicEndpoint).permitAll()
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(platformOwnerAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);

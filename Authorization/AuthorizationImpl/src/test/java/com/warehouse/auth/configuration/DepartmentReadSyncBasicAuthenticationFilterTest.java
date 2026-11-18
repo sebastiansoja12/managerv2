@@ -1,5 +1,9 @@
 package com.warehouse.auth.configuration;
 
+import java.time.Clock;
+import java.time.Duration;
+import com.warehouse.auth.domain.service.LoginThrottle;
+import com.warehouse.commonassets.security.InMemoryAttemptLimiter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
@@ -33,7 +37,9 @@ class DepartmentReadSyncBasicAuthenticationFilterTest {
     private final UserReadRepository userReadRepository = mock(UserReadRepository.class);
     private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
     private final DepartmentReadSyncBasicAuthenticationFilter filter =
-            new DepartmentReadSyncBasicAuthenticationFilter(userReadRepository, passwordEncoder);
+            new DepartmentReadSyncBasicAuthenticationFilter(userReadRepository, passwordEncoder, new LoginThrottle(
+                    new InMemoryAttemptLimiter(2, Duration.ofMinutes(15), Clock.systemUTC()),
+                    new InMemoryAttemptLimiter(100, Duration.ofMinutes(15), Clock.systemUTC())));
 
     @AfterEach
     void tearDown() {

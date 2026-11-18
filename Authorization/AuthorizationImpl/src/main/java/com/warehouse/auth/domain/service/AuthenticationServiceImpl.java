@@ -97,6 +97,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    @Transactional
+    public void revokeSessions(final String username) {
+        this.refreshTokenRepository.deleteAllByUsername(username);
+    }
+
+    @Override
     public UserId currentUserId() {
         return (UserId) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }

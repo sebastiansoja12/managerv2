@@ -1,5 +1,8 @@
 package com.warehouse.auth.configuration;
 
+import java.time.Clock;
+import com.warehouse.auth.domain.service.LoginThrottle;
+import com.warehouse.commonassets.security.InMemoryAttemptLimiter;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -117,6 +120,15 @@ public class AuthConfiguration  {
                                                        final RefreshTokenProvider refreshTokenProvider) {
         return new AuthenticationServiceImpl(refreshTokenRepository, refreshTokenGenerator, userRepository,
                 refreshTokenProvider.getRotationGracePeriod());
+    }
+
+    @Bean
+    public LoginThrottle loginThrottle(final AuthProperties authProperties) {
+        final AuthProperties.Login login = authProperties.getLogin();
+        return new LoginThrottle(
+                new InMemoryAttemptLimiter(login.getMaxFailedAttempts(), login.getLockDuration(), Clock.systemUTC()),
+                new InMemoryAttemptLimiter(login.getMaxFailedAttemptsPerClient(), login.getLockDuration(),
+                        Clock.systemUTC()));
     }
 
     @Bean
