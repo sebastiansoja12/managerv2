@@ -55,6 +55,7 @@
         <module>AuditLog</module>
         <module>IncidentManagement</module>
         <module>FleetTracking</module>
+        <module>OrganizationAnalytics</module>
     </modules>
 
 	<properties>
