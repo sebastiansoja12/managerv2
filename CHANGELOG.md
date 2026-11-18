@@ -21,6 +21,7 @@
 - Template-based mail service over SMTP driven by shipment Kafka events, including collected, reroute and external shipment templates.
 - Operator configuration for shipment policies, notifications, labels, tracking number prefixes, sorting, pickup points, fleet communication and regional settings.
 - `COLLECTED` shipment status, shipment content, parcel details, lifecycle timestamps, shipment source and party country codes.
+- `HANDOVER` shipment status set when a shipment is handed over for delivery, with a `ShipmentStatusChanged` event published after the shipment is saved.
 - Organization chat participants endpoint.
 - Common identifiers `IncidentId`, `TrackingSessionId` and `TrackingPositionId`.
 
