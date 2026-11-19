@@ -50,8 +50,10 @@ public class RerouteConfiguration {
     @Bean
     public RerouteTokenPolicy rerouteTokenPolicy(
             @Value("${reroute.token-validity:PT30M}") final Duration tokenValidity,
-            @Value("${reroute.max-failed-attempts:5}") final int maxFailedAttempts) {
-        return new RerouteTokenPolicy(tokenValidity, maxFailedAttempts);
+            @Value("${reroute.max-failed-attempts:5}") final int maxFailedAttempts,
+            @Value("${reroute.max-issued-tokens:3}") final int maxIssuedTokens,
+            @Value("${reroute.issue-window:PT30M}") final Duration issueWindow) {
+        return new RerouteTokenPolicy(tokenValidity, maxFailedAttempts, maxIssuedTokens, issueWindow);
     }
 
     @Bean

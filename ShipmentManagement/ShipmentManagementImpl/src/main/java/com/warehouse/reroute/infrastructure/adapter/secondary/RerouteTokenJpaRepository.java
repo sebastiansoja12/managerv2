@@ -1,5 +1,7 @@
 package com.warehouse.reroute.infrastructure.adapter.secondary;
 
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -14,10 +16,13 @@ import com.warehouse.reroute.infrastructure.adapter.secondary.entity.RerouteToke
 
 public interface RerouteTokenJpaRepository extends JpaRepository<RerouteTokenEntity, Long> {
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<RerouteTokenEntity> findFirstByShipmentIdOrderByCreatedAtDescIdDesc(final Long shipmentId);
 
     List<RerouteTokenEntity> findAllByShipmentIdAndUsedAtIsNullAndExpiresAtAfter(final Long shipmentId,
                                                                                  final Instant now);
+
+    long countByShipmentIdAndCreatedAtAfter(final Long shipmentId, final Instant createdAfter);
 
     @Modifying
     @Transactional

@@ -35,6 +35,7 @@ import com.warehouse.reroute.application.port.secondary.RerouteNotificationServi
 import com.warehouse.reroute.application.port.secondary.RerouteTokenRepository;
 import com.warehouse.reroute.application.port.secondary.ShipmentRerouteServicePort;
 import com.warehouse.reroute.domain.exception.InvalidRerouteTokenException;
+import com.warehouse.reroute.domain.exception.RerouteTokenRequestsExceededException;
 import com.warehouse.reroute.domain.exception.ShipmentNotReroutableException;
 import com.warehouse.reroute.domain.model.RerouteToken;
 import com.warehouse.reroute.domain.service.RerouteTokenValueGenerator;
@@ -49,7 +50,7 @@ class RerouteTokenPortImplTest {
 
     private static final Instant NOW = Instant.parse("2026-10-17T10:00:00Z");
 
-    private static final RerouteTokenPolicy POLICY = new RerouteTokenPolicy(Duration.ofMinutes(30), 5);
+    private static final RerouteTokenPolicy POLICY = new RerouteTokenPolicy(Duration.ofMinutes(30), 5, 3, Duration.ofMinutes(30));
 
     private static final TrackingNumber TRACKING_NUMBER = new TrackingNumber("TRK-001");
 
@@ -101,6 +102,17 @@ class RerouteTokenPortImplTest {
     }
 
     @Test
+    void shouldNotIssueTokenWhenTooManyTokensWereRequestedRecently() {
+        when(shipmentRerouteServicePort.findShipment(TRACKING_NUMBER)).thenReturn(Optional.of(shipment(true)));
+        when(rerouteTokenRepository.countIssuedSince(SHIPMENT_ID, NOW.minus(Duration.ofMinutes(30)))).thenReturn(3L);
+
+        assertThrows(RerouteTokenRequestsExceededException.class,
+                () -> rerouteTokenPort.requestToken(TRACKING_NUMBER));
+        verify(rerouteTokenRepository, never()).save(any());
+        verify(rerouteNotificationServicePort, never()).sendRerouteToken(any(), any());
+    }
+
+    @Test
     void shouldNotIssueTokenWhenShipmentCannotBeChangedAnymore() {
         when(shipmentRerouteServicePort.findShipment(TRACKING_NUMBER)).thenReturn(Optional.of(shipment(false)));
 
@@ -112,7 +124,7 @@ class RerouteTokenPortImplTest {
     void shouldPersistFailedAttemptWhenTokenIsInvalid() {
         final RerouteToken token = activeToken(123456);
         when(shipmentRerouteServicePort.findShipment(TRACKING_NUMBER)).thenReturn(Optional.of(shipment(true)));
-        when(rerouteTokenRepository.findLatestByShipmentId(SHIPMENT_ID)).thenReturn(Optional.of(token));
+        when(rerouteTokenRepository.findLatestByShipmentIdForUpdate(SHIPMENT_ID)).thenReturn(Optional.of(token));
 
         assertThrows(InvalidRerouteTokenException.class, () -> rerouteTokenPort.verifyToken(
                 new VerifyRerouteTokenCommand(TRACKING_NUMBER, new RerouteTokenValue(654321))));
@@ -128,7 +140,7 @@ class RerouteTokenPortImplTest {
         final RerouteParty recipient = party("recipient@example.com");
         final ReroutableShipment shipment = shipment(true);
         when(shipmentRerouteServicePort.findShipment(TRACKING_NUMBER)).thenReturn(Optional.of(shipment));
-        when(rerouteTokenRepository.findLatestByShipmentId(SHIPMENT_ID)).thenReturn(Optional.of(token));
+        when(rerouteTokenRepository.findLatestByShipmentIdForUpdate(SHIPMENT_ID)).thenReturn(Optional.of(token));
 
         final RerouteRequestAccepted accepted = rerouteTokenPort.reroute(new RerouteShipmentCommand(
                 TRACKING_NUMBER, new RerouteTokenValue(123456), sender, recipient));
@@ -147,7 +159,7 @@ class RerouteTokenPortImplTest {
         final RerouteParty sender = party("new-sender@example.com");
         final RerouteParty recipient = party("recipient@example.com");
         when(shipmentRerouteServicePort.findShipment(TRACKING_NUMBER)).thenReturn(Optional.of(shipment(true)));
-        when(rerouteTokenRepository.findLatestByShipmentId(SHIPMENT_ID)).thenReturn(Optional.of(token));
+        when(rerouteTokenRepository.findLatestByShipmentIdForUpdate(SHIPMENT_ID)).thenReturn(Optional.of(token));
 
         assertThrows(InvalidRerouteTokenException.class, () -> rerouteTokenPort.reroute(new RerouteShipmentCommand(
                 TRACKING_NUMBER, new RerouteTokenValue(654321), sender, recipient)));
