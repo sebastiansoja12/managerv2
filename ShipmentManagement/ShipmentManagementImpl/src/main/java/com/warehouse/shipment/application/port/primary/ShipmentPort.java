@@ -1,5 +1,11 @@
 package com.warehouse.shipment.application.port.primary;
 
+import com.warehouse.shipment.domain.vo.Dimensions;
+
+import com.warehouse.shipment.domain.vo.Weight;
+
+import com.warehouse.shipment.domain.enumeration.PackagingType;
+
 import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.shipment.application.port.primary.command.*;
@@ -61,6 +67,15 @@ public interface ShipmentPort {
     void processShipmentDelivery(final ShipmentDeliveryCommand command);
 
     void cancel(final ShipmentId shipmentId);
+
+    void markLost(final ShipmentId shipmentId);
+
+    void returnAfterIncident(final ShipmentId shipmentId);
+
+    void cancelAfterIncident(final ShipmentId shipmentId);
+
+    void repackAfterIncident(final ShipmentId shipmentId, final PackagingType packagingType, final Weight weight,
+                             final Dimensions dimensions);
 
     void changeShipmentTypeTo(final ShipmentId shipmentId,
                               final ShipmentType shipmentType,

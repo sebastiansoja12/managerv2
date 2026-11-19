@@ -11,6 +11,7 @@ import com.warehouse.returning.api.dto.StringValueDto;
 import com.warehouse.shipment.application.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.application.port.primary.command.ChangeShipmentTypeRequest;
 import com.warehouse.shipment.application.port.primary.command.ShipmentCreateCommand;
+import com.warehouse.shipment.application.port.primary.command.ShipmentHandoverCommand;
 import com.warehouse.shipment.application.port.primary.command.ShipmentStatusRequest;
 import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
 import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResponse;
@@ -21,6 +22,7 @@ import com.warehouse.shipment.application.service.delivery.ShipmentDeliveryStrat
 import com.warehouse.shipment.application.service.status.*;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
+import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.enumeration.PickupMethod;
 import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
@@ -49,6 +51,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -71,9 +74,6 @@ class ShipmentPortImplTest {
 
     @Mock
     private ReturningServicePort returningServicePort;
-
-    @Mock
-    private MailNotificationServicePort mailNotificationServicePort;
 
     @Mock
     private OperatorServicePort operatorServicePort;
@@ -125,17 +125,18 @@ class ShipmentPortImplTest {
 						new ShipmentRedirectedStatusChangeStrategy(),
 						new ShipmentReroutedStatusChangeStrategy(),
 						new ShipmentSentStatusChangeStrategy(),
+						new ShipmentHandedOverStatusChangeStrategy(),
 						new ShipmentDeliveredStatusChangeStrategy(),
 						new ShipmentReturnedStatusChangeStrategy(),
 						new ShipmentPreparedStatusChangeStrategy(),
 						new ShipmentCanceledStatusChangeStrategy()));
 		final ShipmentResultFactory shipmentResultFactory = new ShipmentResultFactory(
-				departmentServicePort, routeLogService, returningServicePort);
+				departmentServicePort, routeLogService, returningServicePort, mock(ShipmentReadModelRepository.class));
 		final ShipmentDepartmentResolutionService shipmentDepartmentResolutionService =
 				new ShipmentDepartmentResolutionService(pickupPointServicePort, operatorContextProvider);
 		shipmentPort = new ShipmentPortImpl(shipmentRepository,
 				this.logger, this.departmentCountryAvailabilityService,
-				shipmentResultFactory, mailNotificationServicePort,
+				shipmentResultFactory,
                 this.trackingNumberGenerationService, this.shipmentConfigurationPort,
                 shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
                 this.domainEventPublisher, shipmentDepartmentResolutionService, addressValidationService,
@@ -412,7 +413,7 @@ class ShipmentPortImplTest {
         doThrow(new ShipmentNotFoundException(SHIPMENT_WAS_NOT_FOUND))
                 .when(shipmentRepository)
                 .findById(shipmentId);
-        final Executable executable = () -> shipmentPort.changeSenderTo(shipmentId, sender());
+        final Executable executable = () -> shipmentPort.changePersonTo(sender(), PersonType.SENDER, shipmentId);
         final RestException exception = assertThrows(RestException.class, executable);
         assertEquals(SHIPMENT_WAS_NOT_FOUND, exception.getMessage());
     }
@@ -423,7 +424,7 @@ class ShipmentPortImplTest {
         doThrow(new ShipmentNotFoundException(SHIPMENT_WAS_NOT_FOUND))
                 .when(shipmentRepository)
                 .findById(shipmentId);
-        final Executable executable = () -> shipmentPort.changeRecipientTo(shipmentId, recipient());
+        final Executable executable = () -> shipmentPort.changePersonTo(recipient(), PersonType.RECIPIENT, shipmentId);
         final RestException exception = assertThrows(RestException.class, executable);
         assertEquals(SHIPMENT_WAS_NOT_FOUND, exception.getMessage());
     }
@@ -610,10 +611,12 @@ class ShipmentPortImplTest {
         final com.warehouse.shipment.domain.vo.Party newSender =
                 com.warehouse.shipment.domain.vo.Party.builder().firstName("Anna").build();
         when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
+        when(this.postalCodeServicePort.findCountryCode(null, null)).thenReturn(Optional.of(CountryCode.PL));
 
-        this.shipmentPort.changeSenderTo(shipmentId(), newSender);
+        this.shipmentPort.changePersonTo(newSender, PersonType.SENDER, shipmentId());
 
-        assertSame(newSender, shipment.getSender());
+        assertEquals("Anna", shipment.getSender().getFirstName());
+        assertEquals(CountryCode.PL, shipment.getSender().getCountryCode());
         verify(this.shipmentRepository).createOrUpdate(shipment);
         verify(this.domainEventPublisher).publish(
                 any(ShipmentSenderChanged.class));
@@ -625,9 +628,9 @@ class ShipmentPortImplTest {
         final com.warehouse.shipment.domain.vo.Party newRecipient = recipient();
         when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
 
-        this.shipmentPort.changeRecipientTo(shipmentId(), newRecipient);
+        this.shipmentPort.changePersonTo(newRecipient, PersonType.RECIPIENT, shipmentId());
 
-        assertSame(newRecipient, shipment.getRecipient());
+        assertEquals(newRecipient.getEmail(), shipment.getRecipient().getEmail());
         verify(this.shipmentRepository).createOrUpdate(shipment);
         verify(this.domainEventPublisher).publish(any(ShipmentRecipientChanged.class));
         verify(this.domainEventPublisher, never()).publish(any(ShipmentDestinationChanged.class));
@@ -639,10 +642,11 @@ class ShipmentPortImplTest {
         final com.warehouse.shipment.domain.vo.Party newRecipient =
                 com.warehouse.shipment.domain.vo.Party.builder().firstName("Jan").city("Poznan").build();
         when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
+        when(this.postalCodeServicePort.findCountryCode(null, "Poznan")).thenReturn(Optional.of(CountryCode.PL));
 
-        this.shipmentPort.changeRecipientTo(shipmentId(), newRecipient);
+        this.shipmentPort.changePersonTo(newRecipient, PersonType.RECIPIENT, shipmentId());
 
-        assertSame(newRecipient, shipment.getRecipient());
+        assertEquals("Jan", shipment.getRecipient().getFirstName());
         verify(this.shipmentRepository).createOrUpdate(shipment);
         assertEquals("Poznan", publishedEvent(ShipmentDestinationChanged.class).getSnapshot().recipient().getCity());
     }
@@ -656,7 +660,7 @@ class ShipmentPortImplTest {
                 .street(current.getStreet() + " 2").build();
         when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
 
-        this.shipmentPort.changeRecipientTo(shipmentId(), newRecipient);
+        this.shipmentPort.changePersonTo(newRecipient, PersonType.RECIPIENT, shipmentId());
 
         assertEquals(newRecipient.getStreet(),
                 publishedEvent(ShipmentDestinationChanged.class).getSnapshot().recipient().getStreet());
@@ -788,6 +792,64 @@ class ShipmentPortImplTest {
 
         assertTrue(result.isPresent());
         assertEquals(sourceShipment.getShipmentId(), result.get().snapshot().shipmentId());
+    }
+
+    @Test
+    void shouldHandOverShipmentWhenShipmentWasSent() {
+        final TrackingNumber trackingNumber = new TrackingNumber("MGR-10");
+        final Shipment shipment = shipment();
+        shipment.notifyShipmentSent();
+        when(this.shipmentRepository.findByTrackingNumber(trackingNumber)).thenReturn(shipment);
+
+        final ShipmentResult result = this.shipmentPort.handOverShipment(new ShipmentHandoverCommand(trackingNumber));
+
+        final ShipmentStatusChanged event = publishedEvent(ShipmentStatusChanged.class);
+        assertEquals(ShipmentStatus.HANDOVER, shipment.getShipmentStatus());
+        assertEquals(ShipmentStatus.HANDOVER, result.snapshot().shipmentStatus());
+        assertEquals(ShipmentStatus.SENT, event.getPreviousSnapshot().orElseThrow().shipmentStatus());
+        assertEquals(ShipmentStatus.HANDOVER, event.getSnapshot().shipmentStatus());
+        final InOrder inOrder = inOrder(this.shipmentRepository, this.domainEventPublisher);
+        inOrder.verify(this.shipmentRepository).createOrUpdate(shipment);
+        inOrder.verify(this.domainEventPublisher).publish(event);
+    }
+
+    @Test
+    void shouldNotSaveOrPublishWhenShipmentWasAlreadyHandedOver() {
+        final TrackingNumber trackingNumber = new TrackingNumber("MGR-10");
+        final Shipment shipment = shipment();
+        shipment.notifyShipmentSent();
+        shipment.handOver();
+        when(this.shipmentRepository.findByTrackingNumber(trackingNumber)).thenReturn(shipment);
+
+        final ShipmentResult result = this.shipmentPort.handOverShipment(new ShipmentHandoverCommand(trackingNumber));
+
+        assertEquals(ShipmentStatus.HANDOVER, result.snapshot().shipmentStatus());
+        verify(this.shipmentRepository, never()).createOrUpdate(any());
+        verify(this.domainEventPublisher, never()).publish(any(DomainEvent.class));
+    }
+
+    @Test
+    void shouldRejectHandOverWhenShipmentWasNotSent() {
+        final TrackingNumber trackingNumber = new TrackingNumber("PLANNED-TRACKING-NUMBER");
+        when(this.shipmentRepository.findByTrackingNumber(trackingNumber)).thenReturn(plannedShipment());
+
+        assertThrows(com.warehouse.shipment.domain.exception.ShipmentModificationException.class,
+                () -> this.shipmentPort.handOverShipment(new ShipmentHandoverCommand(trackingNumber)));
+
+        verify(this.shipmentRepository, never()).createOrUpdate(any());
+        verify(this.domainEventPublisher, never()).publish(any(DomainEvent.class));
+    }
+
+    @Test
+    void shouldChangeShipmentStatusToHandover() {
+        final Shipment shipment = shipment();
+        shipment.notifyShipmentSent();
+        when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
+
+        this.shipmentPort.changeShipmentStatusTo(new ShipmentStatusRequest(shipmentId(), ShipmentStatus.HANDOVER));
+
+        assertEquals(ShipmentStatus.HANDOVER, shipment.getShipmentStatus());
+        verify(this.shipmentRepository).createOrUpdate(shipment);
     }
 
     private ShipmentDeliveryPlan publishedDeliveryPlan() {

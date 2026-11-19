@@ -15,6 +15,10 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentCo
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import com.warehouse.shipment.application.port.primary.ShipmentIncidentPort;
+import com.warehouse.shipment.application.port.primary.ShipmentIncidentPortImpl;
+import com.warehouse.shipment.application.port.primary.ShipmentPort;
+import com.warehouse.shipment.application.port.primary.ShipmentReadModelSyncPort;
 
 @Configuration
 public class ShipmentContentConfiguration {
@@ -26,6 +30,13 @@ public class ShipmentContentConfiguration {
                                                    final DomainEventPublisher domainEventPublisher) {
         return new ShipmentContentPortImpl(shipmentRepository, contentRepository, actorServicePort,
                 domainEventPublisher);
+    }
+
+    @Bean
+    public ShipmentIncidentPort shipmentIncidentPort(final ShipmentPort shipmentPort,
+                                                     final ShipmentReadModelSyncPort shipmentReadModelSyncPort,
+                                                     final ShipmentContentPort shipmentContentPort) {
+        return new ShipmentIncidentPortImpl(shipmentPort, shipmentReadModelSyncPort, shipmentContentPort);
     }
 
     @Bean("shipmentAuditLogServicePort")

@@ -9,7 +9,11 @@ import com.warehouse.shipment.application.port.secondary.ShipmentContentReposito
 import com.warehouse.shipment.application.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.exception.ShipmentNotFoundException;
 import com.warehouse.shipment.domain.model.ShipmentDocumentFile;
+import com.warehouse.shipment.application.port.primary.result.ShipmentNoteResult;
 import com.warehouse.shipment.domain.model.ShipmentNote;
+
+import java.util.Map;
+import java.util.Set;
 import com.warehouse.shipment.domain.event.ShipmentNoteAdded;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,15 +60,17 @@ class ShipmentContentPortImplTest {
     void shouldSaveInternalNoteWithAuthor() {
         when(shipmentRepository.exists(SHIPMENT_ID)).thenReturn(true);
         when(actorServicePort.currentUserId()).thenReturn(new UserId(7L));
+        when(actorServicePort.findUsernames(Set.of(new UserId(7L)))).thenReturn(Map.of(new UserId(7L), "jkowalski"));
 
-        final ShipmentNote note = shipmentContentPort.addNote(SHIPMENT_ID, "  Handle with care  ", true);
+        final ShipmentNoteResult note = shipmentContentPort.addNote(SHIPMENT_ID, "  Handle with care  ", true);
 
         final ArgumentCaptor<ShipmentNote> noteCaptor = ArgumentCaptor.forClass(ShipmentNote.class);
         verify(contentRepository).saveNote(noteCaptor.capture());
         assertEquals("Handle with care", noteCaptor.getValue().body());
         assertTrue(noteCaptor.getValue().internal());
         assertEquals(new UserId(7L), noteCaptor.getValue().authorUserId());
-        assertEquals(note, noteCaptor.getValue());
+        assertEquals(note.note(), noteCaptor.getValue());
+        assertEquals("jkowalski", note.authorUsername());
     }
 
     @Test

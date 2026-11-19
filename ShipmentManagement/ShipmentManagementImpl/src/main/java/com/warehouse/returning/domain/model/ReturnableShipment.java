@@ -7,8 +7,12 @@ import com.warehouse.commonassets.identificator.TrackingNumber;
 public record ReturnableShipment(ShipmentId shipmentId, TrackingNumber trackingNumber, ShipmentStatus status,
                                  ShipmentId relatedShipmentId) {
 
+    public boolean isReturnable() {
+        return status == ShipmentStatus.DELIVERY || status == ShipmentStatus.UNDELIVERABLE;
+    }
+
     public void validateReturnRequest() {
-        if (status != ShipmentStatus.DELIVERY && status != ShipmentStatus.UNDELIVERABLE) {
+        if (!isReturnable()) {
             throw new IllegalArgumentException(
                     "Return can be requested only for a delivered or undeliverable shipment");
         }

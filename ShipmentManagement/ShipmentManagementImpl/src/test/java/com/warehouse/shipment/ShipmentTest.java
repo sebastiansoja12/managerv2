@@ -226,12 +226,9 @@ class ShipmentTest {
     void shouldMarkCreatedShipmentAsSentWhenLoadedOnPallet() {
         final Shipment shipment = shipment(null);
 
-        final boolean changed = shipment.notifyShipmentLoadedOnPallet();
+        shipment.notifyShipmentLoadedOnPallet();
 
-        assertAll(
-                () -> assertTrue(changed),
-                () -> assertEquals(ShipmentStatus.SENT, shipment.getShipmentStatus())
-        );
+        assertEquals(ShipmentStatus.SENT, shipment.getShipmentStatus());
     }
 
     @Test
@@ -239,7 +236,8 @@ class ShipmentTest {
         final Shipment shipment = shipment(null);
         shipment.changeShipmentStatus(ShipmentStatus.ACCEPTED);
 
-        assertTrue(shipment.notifyShipmentLoadedOnPallet());
+        shipment.notifyShipmentLoadedOnPallet();
+
         assertEquals(ShipmentStatus.SENT, shipment.getShipmentStatus());
     }
 
@@ -248,7 +246,8 @@ class ShipmentTest {
         final Shipment shipment = shipment(null);
         shipment.notifyShipmentLoadedOnPallet();
 
-        assertFalse(shipment.notifyShipmentLoadedOnPallet());
+        shipment.notifyShipmentLoadedOnPallet();
+
         assertEquals(ShipmentStatus.SENT, shipment.getShipmentStatus());
     }
 
@@ -275,13 +274,10 @@ class ShipmentTest {
         final Shipment shipment = shipment(null);
         shipment.notifyShipmentLoadedOnPallet();
 
-        final boolean changed = shipment.revertLoadingFromPallet(
+        shipment.revertLoadingFromPallet(
                 new ShipmentWorkflowSettings(ShipmentStatus.PREPARED, null, false, false, true, 0, null));
 
-        assertAll(
-                () -> assertTrue(changed),
-                () -> assertEquals(ShipmentStatus.PREPARED, shipment.getShipmentStatus())
-        );
+        assertEquals(ShipmentStatus.PREPARED, shipment.getShipmentStatus());
     }
 
     @Test
@@ -289,7 +285,8 @@ class ShipmentTest {
         final Shipment shipment = shipment(null);
         shipment.changeShipmentStatus(ShipmentStatus.ACCEPTED);
 
-        assertFalse(shipment.revertLoadingFromPallet(ShipmentWorkflowSettings.defaults()));
+        shipment.revertLoadingFromPallet(ShipmentWorkflowSettings.defaults());
+
         assertEquals(ShipmentStatus.ACCEPTED, shipment.getShipmentStatus());
     }
 
@@ -391,11 +388,106 @@ class ShipmentTest {
     }
 
     @Test
+    void shouldHandOverShipmentWhenShipmentWasSent() {
+        final Shipment shipment = shipment(null);
+        shipment.notifyShipmentSent();
+
+        shipment.handOver();
+
+        assertEquals(ShipmentStatus.HANDOVER, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldKeepHandoverStatusWhenShipmentIsHandedOverAgain() {
+        final Shipment shipment = shipment(null);
+        shipment.notifyShipmentSent();
+        shipment.handOver();
+
+        shipment.handOver();
+
+        assertEquals(ShipmentStatus.HANDOVER, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldRejectHandOverWhenShipmentIsDraft() {
+        final Shipment shipment = shipment(null);
+
+        final ShipmentModificationException exception =
+                assertThrows(ShipmentModificationException.class, shipment::handOver);
+
+        assertEquals("Shipment cannot be handed over from status " + shipment.getShipmentStatus(),
+                exception.getMessage());
+    }
+
+    @Test
+    void shouldRejectHandOverWhenShipmentIsLost() {
+        final Shipment shipment = shipment(null);
+        shipment.markAsLost();
+
+        assertThrows(ShipmentModificationException.class, shipment::handOver);
+    }
+
+    @Test
+    void shouldDeliverShipmentWhenShipmentWasHandedOver() {
+        final Shipment shipment = shipment(null);
+        shipment.notifyShipmentSent();
+        shipment.handOver();
+
+        shipment.markAsDelivered();
+
+        assertEquals(ShipmentStatus.DELIVERY, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldMarkShipmentAsUndeliverableWhenShipmentWasHandedOver() {
+        final Shipment shipment = shipment(null);
+        shipment.notifyShipmentSent();
+        shipment.handOver();
+
+        shipment.markAsUndeliverable();
+
+        assertEquals(ShipmentStatus.UNDELIVERABLE, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldReturnShipmentAfterIncidentWhenShipmentWasHandedOver() {
+        final Shipment shipment = shipment(null);
+        shipment.notifyShipmentSent();
+        shipment.handOver();
+
+        shipment.returnAfterIncident(new ShipmentId(99L));
+
+        assertEquals(ShipmentStatus.RETURN, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldCancelShipmentAfterIncidentWhenShipmentWasHandedOver() {
+        final Shipment shipment = shipment(null);
+        shipment.notifyShipmentSent();
+        shipment.handOver();
+
+        shipment.cancelAfterIncident(LocalDateTime.now());
+
+        assertEquals(ShipmentStatus.CANCELED, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldRejectCancellationByPolicyWhenShipmentWasHandedOver() {
+        final Shipment shipment = shipment(null);
+        shipment.notifyShipmentSent();
+        shipment.handOver();
+
+        assertThrows(ShipmentModificationException.class,
+                () -> shipment.cancel(workflowSettings(60), LocalDateTime.now()));
+    }
+
+    @Test
     void shouldLoadCollectedShipmentOnPallet() {
         final Shipment shipment = shipment(null);
         shipment.notifyShipmentCollected();
 
-        assertTrue(shipment.notifyShipmentLoadedOnPallet());
+        shipment.notifyShipmentLoadedOnPallet();
+
         assertEquals(ShipmentStatus.SENT, shipment.getShipmentStatus());
     }
 
