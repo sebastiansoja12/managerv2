@@ -1,6 +1,6 @@
 package com.warehouse.supplier.infrastructure.adapter.secondary.mapper;
 
-import com.warehouse.supplier.domain.model.DeliveryArea;
+import com.warehouse.supplier.domain.vo.DeliveryArea;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.vo.DangerousGoodCertification;
 import com.warehouse.supplier.domain.vo.DriverLicense;

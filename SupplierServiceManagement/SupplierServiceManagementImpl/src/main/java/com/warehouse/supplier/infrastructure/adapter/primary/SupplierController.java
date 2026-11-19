@@ -7,9 +7,9 @@ import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.supplier.domain.exception.DomainException;
 import com.warehouse.supplier.domain.exception.SupplierDepartmentAccessDeniedException;
-import com.warehouse.supplier.domain.model.Supplier;
-import com.warehouse.supplier.domain.port.primary.SupplyPort;
-import com.warehouse.supplier.domain.vo.*;
+import com.warehouse.supplier.application.port.primary.SupplyPort;
+import com.warehouse.supplier.application.port.primary.command.*;
+import com.warehouse.supplier.application.port.primary.result.*;
 import com.warehouse.supplier.infrastructure.adapter.primary.dto.*;
 import com.warehouse.supplier.infrastructure.adapter.primary.mapper.RequestMapper;
 import com.warehouse.supplier.infrastructure.adapter.primary.mapper.ResponseMapper;
@@ -46,7 +46,7 @@ public class SupplierController {
     public ResponseEntity<?> getAllByCurrentDepartment() {
         final List<SupplierApi> suppliers = this.supplyPort.getAllInCurrentUserDepartment()
                 .stream()
-                .map(this::map)
+                .map(ResponseMapper::map)
                 .toList();
         return ResponseEntity.ok(suppliers);
     }
@@ -156,25 +156,14 @@ public class SupplierController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getOneById(@PathVariable final Long id) {
         final SupplierId supplierId = new SupplierId(id);
-        final Supplier supplier = this.supplyPort.getOneById(supplierId);
-        return ResponseEntity.ok(map(supplier));
+        return ResponseEntity.ok(this.supplyPort.getOneById(supplierId).map(ResponseMapper::map).orElse(null));
     }
 
     @GetMapping("/by-suppliercode/{code}")
     public ResponseEntity<?> getOneByCode(@PathVariable final String code) {
         final SupplierCode supplierCode = new SupplierCode(code);
-        final Supplier supplier = this.supplyPort.getOneByCode(supplierCode);
-        return ResponseEntity.ok(map(supplier));
+        return ResponseEntity.ok(this.supplyPort.getOneByCode(supplierCode).map(ResponseMapper::map).orElse(null));
     }
-
-    private SupplierApi map(final Supplier supplier) {
-        if (supplier == null) {
-            return null;
-        }
-        return ResponseMapper.map(supplier,
-                supplyPort.getDepartmentCode(supplier.getDepartmentId()));
-    }
-
 
     @ExceptionHandler(SupplierDepartmentAccessDeniedException.class)
     public ResponseEntity<?> handleException(final SupplierDepartmentAccessDeniedException ex) {

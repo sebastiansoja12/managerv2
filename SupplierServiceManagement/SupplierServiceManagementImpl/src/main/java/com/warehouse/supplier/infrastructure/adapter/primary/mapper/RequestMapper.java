@@ -5,8 +5,10 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.VehicleId;
-import com.warehouse.supplier.domain.model.DeliveryArea;
-import com.warehouse.supplier.domain.vo.*;
+import com.warehouse.supplier.application.port.primary.command.*;
+import com.warehouse.supplier.domain.vo.DangerousGoodCertification;
+import com.warehouse.supplier.domain.vo.DeliveryArea;
+import com.warehouse.supplier.domain.vo.DriverLicense;
 import com.warehouse.supplier.infrastructure.adapter.primary.dto.*;
 
 import java.util.Set;

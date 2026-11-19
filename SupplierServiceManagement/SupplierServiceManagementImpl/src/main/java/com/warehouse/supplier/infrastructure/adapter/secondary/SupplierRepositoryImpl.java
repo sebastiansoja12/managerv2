@@ -8,7 +8,7 @@ import com.warehouse.commonassets.repository.BaseRepository;
 import com.warehouse.commonassets.repository.Criteria;
 import com.warehouse.supplier.domain.enumeration.SupplierStatus;
 import com.warehouse.supplier.domain.model.Supplier;
-import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
+import com.warehouse.supplier.application.port.secondary.SupplierRepository;
 import com.warehouse.supplier.infrastructure.adapter.secondary.entity.SupplierEntity;
 import com.warehouse.supplier.infrastructure.adapter.secondary.mapper.EntityToModelMapper;
 import com.warehouse.supplier.infrastructure.adapter.secondary.mapper.ModelToEntityMapper;

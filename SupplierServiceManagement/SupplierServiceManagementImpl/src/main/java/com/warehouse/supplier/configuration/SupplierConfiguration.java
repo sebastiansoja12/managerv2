@@ -2,25 +2,27 @@ package com.warehouse.supplier.configuration;
 
 import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import com.warehouse.organisationstructure.department.api.DepartmentLifecycleParticipant;
-import com.warehouse.supplier.domain.port.secondary.CourierLimitServicePort;
+import com.warehouse.supplier.application.port.secondary.CourierLimitServicePort;
 import com.warehouse.supplier.infrastructure.adapter.primary.SupplierDepartmentLifecycleParticipant;
 import com.warehouse.supplier.infrastructure.adapter.secondary.CourierLimitServiceAdapter;
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.auth.SupplierUserEventPublisher;
 import com.warehouse.commonassets.context.OperatorContext;
+import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.organisationstructure.api.OperatorApiService;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.supplier.api.SupplierApiService;
 import com.warehouse.supplier.infrastructure.adapter.primary.SupplierApiServiceAdapter;
-import com.warehouse.supplier.domain.port.primary.*;
+import com.warehouse.supplier.infrastructure.adapter.primary.SupplierValidityJob;
+import com.warehouse.supplier.application.port.primary.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.commonassets.repository.BaseRepository;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
-import com.warehouse.supplier.domain.port.secondary.*;
+import com.warehouse.supplier.application.port.secondary.*;
 import com.warehouse.supplier.domain.service.*;
 import com.warehouse.supplier.infrastructure.adapter.secondary.*;
 import com.warehouse.supplier.infrastructure.adapter.secondary.entity.SupplierEntity;
@@ -35,19 +37,17 @@ public class SupplierConfiguration {
     private EntityManager entityManager;
 
     @Bean
-    public SupplyPort supplyPort(final SupplierService service,
-                                 final SupplierCodeGeneratorService generatorService,
-                                 final SupplierValidatorService validatorService,
+    public SupplyPort supplyPort(final SupplierRepository supplierRepository,
+                                 final SupplierCodeGeneratorService supplierCodeGeneratorService,
                                  final DriverLicenseService driverLicenseService,
-                                 final DeviceServicePort deviceServicePort,
                                  @Qualifier("supplier.departmentServicePort") final DepartmentServicePort departmentServicePort,
                                  @Qualifier("supplier.userServicePort") final UserServicePort userServicePort,
-                                 final SupplierRepository supplierRepository,
                                  final CourierLimitServicePort courierLimitServicePort,
-                                 @Qualifier("supplier.currentUserServicePort") final CurrentUserServicePort currentUserServicePort) {
-        return new SupplyPortImpl(service, generatorService, validatorService, driverLicenseService, deviceServicePort,
-                departmentServicePort, userServicePort, supplierRepository, courierLimitServicePort,
-                currentUserServicePort);
+                                 @Qualifier("supplier.currentUserServicePort") final CurrentUserServicePort currentUserServicePort,
+                                 final DomainEventPublisher domainEventPublisher) {
+        return new SupplyPortImpl(supplierRepository, supplierCodeGeneratorService, driverLicenseService,
+                departmentServicePort, userServicePort, courierLimitServicePort, currentUserServicePort,
+                domainEventPublisher);
     }
 
     @Bean("supplier.currentUserServicePort")
@@ -79,12 +79,18 @@ public class SupplierConfiguration {
     @Bean
     public DriverLicenseObserverPort driverLicenseObserverPort(
             final DriverLicenseService driverLicenseService,
-            final SupplierInvalidatorService supplierInvalidatorService,
             final OperatorServicePort operatorServicePort,
             final SupplierRepository supplierRepository,
             final OperatorContext operatorContext,
             final MailServicePort mailServicePort) {
-        return new DriverLicenseObserverPortImpl(driverLicenseService, supplierInvalidatorService, operatorServicePort, supplierRepository, operatorContext, mailServicePort);
+        return new DriverLicenseObserverPortImpl(driverLicenseService, operatorServicePort, supplierRepository,
+                operatorContext, mailServicePort);
+    }
+
+    @Bean
+    public SupplierValidityJob supplierValidityJob(final DriverLicenseObserverPort driverLicenseObserverPort,
+                                                   final DangerousGoodObserverPort dangerousGoodObserverPort) {
+        return new SupplierValidityJob(driverLicenseObserverPort, dangerousGoodObserverPort);
     }
 
     @Bean
@@ -93,31 +99,26 @@ public class SupplierConfiguration {
     }
 
     @Bean
+    public SupplierIntegrationEventServicePort supplierIntegrationEventServicePort(
+            final IntegrationEventPublisher integrationEventPublisher) {
+        return new SupplierIntegrationEventServiceAdapter(integrationEventPublisher);
+    }
+
+    @Bean
     public OperatorServicePort supplierOperatorServicePort(final OperatorApiService operatorApiService) {
         return new OperatorServiceAdapter(operatorApiService);
     }
 
     @Bean
-    public DangerousGoodObserverPort dangerousGoodObserverPort(final SupplierInvalidatorService service,
-                                                               final OperatorServicePort operatorServicePort,
+    public DangerousGoodObserverPort dangerousGoodObserverPort(final OperatorServicePort operatorServicePort,
                                                                final SupplierRepository supplierRepository,
                                                                final OperatorContext operatorContext) {
-        return new DangerousGoodObserverPortImpl(service, operatorServicePort, supplierRepository, operatorContext);
-    }
-
-    @Bean
-    public DeviceServicePort deviceServicePort(final SupplierConfig supplierConfig) {
-        return new DeviceServiceAdapter(supplierConfig);
+        return new DangerousGoodObserverPortImpl(operatorServicePort, supplierRepository, operatorContext);
     }
 
     @Bean
     public DriverLicenseService driverLicenseService() {
         return new DriverLicenseServiceImpl();
-    }
-
-    @Bean
-    public SupplierService supplierService(final SupplierRepository repository) {
-        return new SupplierServiceImpl(repository);
     }
 
     @Bean

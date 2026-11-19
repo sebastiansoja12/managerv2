@@ -9,7 +9,6 @@ import com.warehouse.commonassets.identificator.VehicleId;
 import com.warehouse.commonassets.enumeration.PackageType;
 import com.warehouse.supplier.domain.enumeration.SupplierStatus;
 import com.warehouse.supplier.domain.enumeration.UserStatus;
-import com.warehouse.supplier.domain.model.DeliveryArea;
 
 import java.time.Instant;
 import java.util.Set;
