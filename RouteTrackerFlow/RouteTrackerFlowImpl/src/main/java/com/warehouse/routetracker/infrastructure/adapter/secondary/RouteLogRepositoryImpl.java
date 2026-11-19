@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.port.secondary.RouteLogRepository;
 import com.warehouse.routetracker.domain.vo.RouteProcess;
+import com.warehouse.routetracker.domain.vo.identifier.OperatorId;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordEntity;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.exception.RouteLogException;
@@ -55,9 +56,11 @@ public class RouteLogRepositoryImpl implements RouteLogRepository {
     }
 
     @Override
-    public RouteLogRecord find(final ShipmentId shipmentId) {
-		return this.findById(shipmentId)
-				.orElseThrow(() -> new RouteLogException("Route log does not exist"));
+    public RouteLogRecord find(final ShipmentId shipmentId, final OperatorId operatorId) {
+        return this.routeLogRecordReadRepository
+                .findByShipmentIdAndOperatorId(shipmentId, operatorId.value())
+                .map(this.logToModelMapper::map)
+                .orElseThrow(() -> new RouteLogException("Route log does not exist"));
     }
 
     @Override
@@ -75,9 +78,9 @@ public class RouteLogRepositoryImpl implements RouteLogRepository {
     }
 
     @Override
-    public List<RouteLogRecord> findAll() {
-		return routeLogRecordReadRepository
-                .findAll()
+    public List<RouteLogRecord> findAll(final OperatorId operatorId) {
+        return routeLogRecordReadRepository
+                .findAllByOperatorId(operatorId.value())
                 .stream()
                 .map(mapper::mapToRecord)
                 .collect(Collectors.toList());

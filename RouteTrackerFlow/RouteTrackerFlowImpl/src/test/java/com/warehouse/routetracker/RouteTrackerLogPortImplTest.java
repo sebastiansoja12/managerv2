@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import com.warehouse.routetracker.domain.vo.identifier.OperatorId;
 import com.warehouse.routetracker.domain.vo.identifier.DepartmentId;
 import com.warehouse.routetracker.domain.vo.identifier.UserId;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPortImpl;
+import com.warehouse.routetracker.domain.port.secondary.CurrentUserServicePort;
 import com.warehouse.routetracker.domain.port.secondary.RouteLogRepository;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 
@@ -38,11 +40,14 @@ class RouteTrackerLogPortImplTest {
     @Mock
     private RouteLogRepository repository;
 
+    @Mock
+    private CurrentUserServicePort currentUserServicePort;
+
     private RouteTrackerLogPortImpl routeTrackerLogPort;
 
     @BeforeEach
     void setUp() {
-        this.routeTrackerLogPort = new RouteTrackerLogPortImpl(this.repository);
+        this.routeTrackerLogPort = new RouteTrackerLogPortImpl(this.repository, this.currentUserServicePort);
     }
 
     @Test
@@ -82,7 +87,8 @@ class RouteTrackerLogPortImplTest {
         final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
                 .shipmentId(SHIPMENT_ID)
                 .build();
-        when(this.repository.find(SHIPMENT_ID)).thenReturn(routeLogRecord);
+        when(this.currentUserServicePort.getCurrentOperatorId()).thenReturn(OPERATOR_ID);
+        when(this.repository.find(SHIPMENT_ID, OPERATOR_ID)).thenReturn(routeLogRecord);
 
         final RouteLogRecord result = this.routeTrackerLogPort.find(SHIPMENT_ID);
 
@@ -92,7 +98,8 @@ class RouteTrackerLogPortImplTest {
     @Test
     void shouldFindAllRouteLogs() {
         final List<RouteLogRecord> routeLogRecords = List.of(RouteLogRecord.builder().build());
-        when(this.repository.findAll()).thenReturn(routeLogRecords);
+        when(this.currentUserServicePort.getCurrentOperatorId()).thenReturn(OPERATOR_ID);
+        when(this.repository.findAll(OPERATOR_ID)).thenReturn(routeLogRecords);
 
         final List<RouteLogRecord> result = this.routeTrackerLogPort.findAll();
 
@@ -110,6 +117,21 @@ class RouteTrackerLogPortImplTest {
         this.routeTrackerLogPort.createOrChangeShipmentState(command("shipment.changed", ShipmentStatus.CREATED));
 
         assertThat(routeLogRecord.getRouteLogRecordDetails().getRouteLogRecordDetailSet()).hasSize(1);
+    }
+
+    @Test
+    void shouldRecordLostShipmentAsRouteEvent() {
+        final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
+                .shipmentId(SHIPMENT_ID)
+                .build();
+        when(this.repository.findById(SHIPMENT_ID)).thenReturn(Optional.of(routeLogRecord));
+
+        this.routeTrackerLogPort.createOrChangeShipmentState(command("shipment.lost", ShipmentStatus.LOST));
+
+        final RouteLogRecordDetail detail = routeLogRecord.getRouteLogRecordDetails()
+                .getRouteLogRecordDetailSet().iterator().next();
+        assertThat(detail.getShipmentStatus()).isEqualTo(ShipmentStatus.LOST);
+        assertThat(detail.getProcessType()).isEqualTo(ProcessType.ROUTE);
     }
 
     private ShipmentStatusStateChangeCommand command(final String eventType, final ShipmentStatus status) {

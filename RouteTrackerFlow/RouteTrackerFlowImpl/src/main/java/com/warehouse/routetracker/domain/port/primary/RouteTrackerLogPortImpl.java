@@ -5,6 +5,7 @@ import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.model.DeviceInformationRequest;
 import com.warehouse.routetracker.domain.model.ShipmentStatusStateChangeCommand;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
+import com.warehouse.routetracker.domain.port.secondary.CurrentUserServicePort;
 import com.warehouse.routetracker.domain.port.secondary.RouteLogRepository;
 import com.warehouse.routetracker.domain.vo.*;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
@@ -16,8 +17,12 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
 
     private final RouteLogRepository repository;
 
-    public RouteTrackerLogPortImpl(final RouteLogRepository repository) {
+    private final CurrentUserServicePort currentUserServicePort;
+
+    public RouteTrackerLogPortImpl(final RouteLogRepository repository,
+                                   final CurrentUserServicePort currentUserServicePort) {
         this.repository = repository;
+        this.currentUserServicePort = currentUserServicePort;
     }
 
     @Override
@@ -74,12 +79,12 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
 
     @Override
     public RouteLogRecord find(final ShipmentId shipmentId) {
-        return this.repository.find(shipmentId);
+        return this.repository.find(shipmentId, this.currentUserServicePort.getCurrentOperatorId());
     }
 
     @Override
     public List<RouteLogRecord> findAll() {
-        return this.repository.findAll();
+        return this.repository.findAll(this.currentUserServicePort.getCurrentOperatorId());
     }
 
     private void update(final ShipmentId shipmentId, final Consumer<RouteLogRecord> change) {
