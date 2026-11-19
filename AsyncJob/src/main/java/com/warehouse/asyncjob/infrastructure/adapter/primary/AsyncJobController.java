@@ -1,5 +1,7 @@
 package com.warehouse.asyncjob.infrastructure.adapter.primary;
 
+import com.warehouse.auth.AccessAudience;
+import com.warehouse.auth.AccessUserControl;
 import com.warehouse.asyncjob.application.port.primary.AsyncJobPort;
 import com.warehouse.asyncjob.application.port.primary.command.CreateReadModelRebuildJobCommand;
 import com.warehouse.asyncjob.domain.enumeration.ReadModelType;
@@ -22,6 +24,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/admin/async-jobs")
+@AccessUserControl(audience = AccessAudience.PLATFORM_OWNER)
 @Slf4j
 public class AsyncJobController {
 

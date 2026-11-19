@@ -1,6 +1,8 @@
 package com.warehouse.message.controller;
 
 
+import com.warehouse.auth.AccessUserControl;
+import com.warehouse.auth.AccessAudience;
 import static com.warehouse.commonassets.enumeration.ShipmentStatus.*;
 
 import java.util.List;
@@ -18,6 +20,7 @@ import com.warehouse.message.domain.vo.MessageContentUpdateRequest;
 import com.warehouse.message.domain.vo.SenderUpdateRequest;
 import com.warehouse.message.domain.vo.TitleUpdateRequest;
 
+@AccessUserControl
 @RestController
 @RequestMapping("/messages")
 public class MessageController {
@@ -70,6 +73,7 @@ public class MessageController {
     }
 
     @PutMapping("/title")
+    @AccessUserControl(audience = AccessAudience.PLATFORM_OWNER)
     public ResponseEntity<?> updateMessageTitle(@RequestBody final TitleUpdateRequestDto titleUpdateRequest) {
         final TitleUpdateRequest request = TitleUpdateRequest.from(titleUpdateRequest);
         messageService.updateMessageTitle(request);
@@ -77,6 +81,7 @@ public class MessageController {
     }
 
     @PutMapping("/sender")
+    @AccessUserControl(audience = AccessAudience.PLATFORM_OWNER)
     public ResponseEntity<?> updateMessageSender(@RequestBody final SenderUpdateRequestDto senderUpdateRequest) {
         final SenderUpdateRequest request = SenderUpdateRequest.from(senderUpdateRequest);
         messageService.updateMessageSender(request);
@@ -84,6 +89,7 @@ public class MessageController {
     }
 
     @PutMapping("/content")
+    @AccessUserControl(audience = AccessAudience.PLATFORM_OWNER)
     public ResponseEntity<?> updateMessageContent(@RequestBody final MessageContentUpdateRequestDto messageContentUpdateRequest) {
         final MessageContentUpdateRequest request = MessageContentUpdateRequest.from(messageContentUpdateRequest);
         messageService.updateMessageContent(request);
@@ -99,6 +105,7 @@ public class MessageController {
             case ACCEPTED -> ACCEPTED;
             case REROUTE -> REROUTE;
             case SENT -> SENT;
+            case HANDOVER -> HANDOVER;
             case DELIVERY -> DELIVERY;
             case RETURN -> RETURN;
             case REDIRECT -> REDIRECT;

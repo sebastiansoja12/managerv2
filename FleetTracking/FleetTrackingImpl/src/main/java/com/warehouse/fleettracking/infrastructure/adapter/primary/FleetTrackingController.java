@@ -1,5 +1,6 @@
 package com.warehouse.fleettracking.infrastructure.adapter.primary;
 
+import com.warehouse.auth.AccessUserControl;
 import com.warehouse.commonassets.identificator.TrackingSessionId;
 import com.warehouse.fleettracking.application.port.primary.FleetTrackingPort;
 import com.warehouse.fleettracking.infrastructure.adapter.primary.api.PositionFixApiResponse;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@AccessUserControl
 @RestController
 @RequestMapping("/fleet-tracking/sessions")
 public class FleetTrackingController {

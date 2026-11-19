@@ -1,5 +1,7 @@
 package com.warehouse.auditlog.infrastructure.adapter.primary;
 
+import com.warehouse.auth.AccessUserControl;
+import com.warehouse.commonassets.enumeration.UserPermission;
 import com.warehouse.auditlog.application.port.primary.AuditLogPort;
 import com.warehouse.auditlog.domain.enumeration.AuditLogResourceType;
 import com.warehouse.auditlog.infrastructure.adapter.primary.api.AuditLogEntryPageApiResponse;
@@ -7,6 +9,7 @@ import com.warehouse.auditlog.infrastructure.adapter.primary.mapper.AuditLogWebM
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_READ, UserPermission.ROLE_MANAGER_READ})
 @RestController
 @RequestMapping("/audit-log")
 public class AuditLogController {

@@ -1,5 +1,6 @@
 package com.warehouse.qrcode.infrastructure.adapter.primary;
 
+import com.warehouse.auth.AccessUserControl;
 import com.warehouse.qrcode.domain.port.primary.QrCodePort;
 import com.warehouse.qrcode.domain.vo.ShipmentId;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletResponse;
 
+@AccessUserControl
 @RestController
 @RequestMapping("/qrcodes")
 @AllArgsConstructor

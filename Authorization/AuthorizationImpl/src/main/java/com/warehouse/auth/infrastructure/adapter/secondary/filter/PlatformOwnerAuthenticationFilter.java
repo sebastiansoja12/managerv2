@@ -28,7 +28,7 @@ public class PlatformOwnerAuthenticationFilter extends OncePerRequestFilter {
     public static final String PLATFORM_OWNER_USERNAME_ATTRIBUTE =
             PlatformOwnerAuthenticationFilter.class.getName() + ".username";
 
-    private static final List<String> PLATFORM_OWNER_PATHS = List.of("/platform", "/operators");
+    private static final List<String> PLATFORM_OWNER_PATHS = List.of("/platform", "/operators", "/admin/async-jobs");
 
     private static final String ANNOUNCEMENT_PATH = "/announcements/active";
 
