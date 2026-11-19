@@ -109,7 +109,7 @@ public class PickupPoint {
         return new PickupPoint(Objects.requireNonNull(snapshot, "Pickup point snapshot cannot be null"));
     }
 
-    public boolean updateDetails(
+    public void updateDetails(
             final String name,
             final PickupPointAddress address,
             final GeoCoordinates coordinates,
@@ -134,7 +134,7 @@ public class PickupPoint {
                 && Objects.equals(this.contact, contact)
                 && Objects.equals(this.accessInstructions, validInstructions)
                 && Objects.equals(this.externalReference, externalReference)) {
-            return false;
+            return;
         }
         this.name = validName;
         this.address = address;
@@ -143,80 +143,74 @@ public class PickupPoint {
         this.contact = contact;
         this.accessInstructions = validInstructions;
         this.externalReference = externalReference;
-        touch(requiredTimestamp);
-        return true;
+        markAsModified(requiredTimestamp);
     }
 
-    public boolean changeType(final PickupPointType type, final Instant timestamp) {
+    public void changeType(final PickupPointType type, final Instant timestamp) {
         ensureMutable();
         final Instant requiredTimestamp = requiredTimestamp(timestamp);
         final PickupPointType requiredType = Objects.requireNonNull(type, "Pickup point type cannot be null");
         if (this.type == requiredType) {
-            return false;
+            return;
         }
         this.type = requiredType;
-        touch(requiredTimestamp);
-        return true;
+        markAsModified(requiredTimestamp);
     }
 
-    public boolean changeCapabilities(final Set<PickupPointCapability> capabilities, final Instant timestamp) {
+    public void changeCapabilities(final Set<PickupPointCapability> capabilities, final Instant timestamp) {
         ensureMutable();
         final Instant requiredTimestamp = requiredTimestamp(timestamp);
         final Set<PickupPointCapability> validCapabilities = validCapabilities(capabilities);
         if (this.capabilities.equals(validCapabilities)) {
-            return false;
+            return;
         }
         this.capabilities = validCapabilities;
-        touch(requiredTimestamp);
-        return true;
+        markAsModified(requiredTimestamp);
     }
 
-    public boolean changeOpeningSchedule(final OpeningSchedule openingSchedule, final Instant timestamp) {
+    public void changeOpeningSchedule(final OpeningSchedule openingSchedule, final Instant timestamp) {
         ensureMutable();
         final Instant requiredTimestamp = requiredTimestamp(timestamp);
         if (openingSchedule == null) {
             throw new InvalidPickupPointConfigurationException("Pickup point must have an opening schedule");
         }
         if (Objects.equals(this.openingSchedule, openingSchedule)) {
-            return false;
+            return;
         }
         this.openingSchedule = openingSchedule;
-        touch(requiredTimestamp);
-        return true;
+        markAsModified(requiredTimestamp);
     }
 
-    public boolean changeServicePolicy(final PickupPointServicePolicy servicePolicy, final Instant timestamp) {
+    public void changeServicePolicy(final PickupPointServicePolicy servicePolicy, final Instant timestamp) {
         ensureMutable();
         final Instant requiredTimestamp = requiredTimestamp(timestamp);
         if (servicePolicy == null) {
             throw new InvalidPickupPointConfigurationException("Pickup point must have a service policy");
         }
         if (Objects.equals(this.servicePolicy, servicePolicy)) {
-            return false;
+            return;
         }
         this.servicePolicy = servicePolicy;
-        touch(requiredTimestamp);
-        return true;
+        markAsModified(requiredTimestamp);
     }
 
-    public boolean suspend(final String reason, final Instant timestamp) {
+    public void suspend(final String reason, final Instant timestamp) {
         final Instant requiredTimestamp = requiredTimestamp(timestamp);
         if (this.status == PickupPointStatus.SUSPENDED) {
-            return false;
+            return;
         }
         if (this.status != PickupPointStatus.ACTIVE) {
             throw new InvalidPickupPointStatusTransitionException(this.status, PickupPointStatus.SUSPENDED);
         }
         this.status = PickupPointStatus.SUSPENDED;
         this.statusReason = validReason(reason);
-        touch(requiredTimestamp);
-        return true;
+        markAsModified(requiredTimestamp);
     }
 
-    public boolean resume(final boolean departmentActive, final Instant timestamp) {
+    public void resume(final boolean departmentActive, final Instant timestamp) {
         final Instant requiredTimestamp = requiredTimestamp(timestamp);
         if (this.status == PickupPointStatus.ACTIVE) {
-            return false;
+            return;
         }
         if (this.status != PickupPointStatus.SUSPENDED) {
             throw new InvalidPickupPointStatusTransitionException(this.status, PickupPointStatus.ACTIVE);
@@ -224,22 +218,20 @@ public class PickupPoint {
         validateActivationConfiguration(departmentActive);
         this.status = PickupPointStatus.ACTIVE;
         this.statusReason = null;
-        touch(requiredTimestamp);
-        return true;
+        markAsModified(requiredTimestamp);
     }
 
-    public boolean close(final String reason, final Instant timestamp) {
+    public void close(final String reason, final Instant timestamp) {
         final Instant requiredTimestamp = requiredTimestamp(timestamp);
         if (this.status == PickupPointStatus.CLOSED) {
-            return false;
+            return;
         }
         if (this.status == PickupPointStatus.DELETED) {
             throw new InvalidPickupPointStatusTransitionException(this.status, PickupPointStatus.CLOSED);
         }
         this.status = PickupPointStatus.CLOSED;
         this.statusReason = validReason(reason);
-        touch(requiredTimestamp);
-        return true;
+        markAsModified(requiredTimestamp);
     }
 
     public void delete(final Instant timestamp) {
@@ -249,7 +241,7 @@ public class PickupPoint {
         }
         this.status = PickupPointStatus.DELETED;
         this.statusReason = null;
-        touch(requiredTimestamp);
+        markAsModified(requiredTimestamp);
     }
 
     public void validateSelection(final PickupPointSelectionCriteria criteria, final boolean departmentActive) {
@@ -307,7 +299,7 @@ public class PickupPoint {
         }
     }
 
-    private void touch(final Instant timestamp) {
+    private void markAsModified(final Instant timestamp) {
         this.updatedAt = timestamp;
     }
 

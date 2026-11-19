@@ -4,6 +4,7 @@ import com.warehouse.commonassets.identificator.PickupPointId;
 import com.warehouse.pickuppoint.domain.model.PickupPoint;
 import com.warehouse.pickuppoint.domain.vo.PickupPointCode;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +16,7 @@ public interface PickupPointRepository {
 
     List<PickupPoint> findByIds(final List<PickupPointId> pickupPointIds);
 
-    List<PickupPoint> findAll();
+    List<PickupPoint> findAllCreatedBetween(final Instant createdFromInclusive, final Instant createdToExclusive);
 
     boolean existsByCode(final PickupPointCode code);
 
