@@ -4,6 +4,7 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryIntegrationEventServicePort;
 import com.warehouse.logisticsdelivery.domain.event.DeliveryCanceled;
 import com.warehouse.logisticsdelivery.domain.event.DeliveryModified;
+import com.warehouse.logisticsdelivery.domain.event.DeliveryReadModelRebuilt;
 import com.warehouse.logisticsdelivery.domain.model.Delivery;
 import com.warehouse.logisticsdelivery.domain.vo.DeliveryTarget;
 import com.warehouse.shipment.api.event.ShipmentDeliveryReadModelChanged;
@@ -37,7 +38,19 @@ class ShipmentDeliveryDetailsListenerTest {
         assertThat(event.getValue().payload().shipmentId()).isEqualTo(new ShipmentId(10L));
         assertThat(event.getValue().payload().originDepartmentId()).isEqualTo(ORIGIN_DEPARTMENT_ID);
         assertThat(event.getValue().payload().destinationDepartmentId()).isEqualTo(DESTINATION_DEPARTMENT_ID);
+        assertThat(event.getValue().payload().currentDepartmentId()).isEqualTo(ORIGIN_DEPARTMENT_ID);
         assertThat(event.getValue().eventKey()).isEqualTo("10");
+    }
+
+    @Test
+    void shouldPublishShipmentDeliveryReadModelChangedWhenDeliveryReadModelRebuilt() {
+        listener.handle(new DeliveryReadModelRebuilt(shipmentDelivery(new ShipmentId(11L)).snapshot(), Instant.now()));
+
+        final ArgumentCaptor<ShipmentDeliveryReadModelChanged> event =
+                ArgumentCaptor.forClass(ShipmentDeliveryReadModelChanged.class);
+        verify(eventServicePort).publishEvent(event.capture());
+        assertThat(event.getValue().payload().shipmentId()).isEqualTo(new ShipmentId(11L));
+        assertThat(event.getValue().payload().destinationDepartmentId()).isEqualTo(DESTINATION_DEPARTMENT_ID);
     }
 
     @Test

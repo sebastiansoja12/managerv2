@@ -2,6 +2,7 @@ package com.warehouse.logisticsdelivery.application.listener;
 
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryIntegrationEventServicePort;
 import com.warehouse.logisticsdelivery.domain.event.DeliveryChanged;
+import com.warehouse.logisticsdelivery.domain.event.DeliveryReadModelRebuilt;
 import com.warehouse.logisticsdelivery.domain.vo.DeliverySnapshot;
 import com.warehouse.shipment.api.event.ShipmentDeliveryReadModelChanged;
 import com.warehouse.shipment.api.event.snapshot.ShipmentDeliveryReadModelData;
@@ -23,12 +24,21 @@ public class ShipmentDeliveryDetailsListener {
 
     @EventListener
     public void handle(final DeliveryChanged event) {
-        final DeliverySnapshot delivery = event.getSnapshot();
+        publishShipmentDeliveryDetails(event.getSnapshot());
+    }
+
+    @EventListener
+    public void handle(final DeliveryReadModelRebuilt event) {
+        publishShipmentDeliveryDetails(event.getSnapshot());
+    }
+
+    private void publishShipmentDeliveryDetails(final DeliverySnapshot delivery) {
         if (!delivery.describesCurrentShipmentDelivery()) {
             return;
         }
         this.deliveryIntegrationEventServicePort.publishEvent(new ShipmentDeliveryReadModelChanged(
                 new ShipmentDeliveryReadModelData(delivery.shipmentId(), delivery.originDepartmentId(),
-                        delivery.destinationDepartmentId(), delivery.plannedAt(), delivery.deliveredAt())));
+                        delivery.destinationDepartmentId(), delivery.currentDepartmentId(), delivery.plannedAt(),
+                        delivery.deliveredAt())));
     }
 }

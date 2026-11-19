@@ -15,6 +15,7 @@ import com.warehouse.logisticsdelivery.domain.enumeration.PickupMethod;
 import com.warehouse.shipment.api.event.ShipmentCanceledIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentDestinationChangedIntegrationEvent;
+import com.warehouse.shipment.api.event.ShipmentStatusChangedIntegrationEvent;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -151,5 +152,24 @@ class ShipmentDeliveryEventListenerTest {
         listener.handle(event);
 
         verify(deliveryPort).cancelShipmentDeliveries(new ShipmentId(42L));
+    }
+
+    @Test
+    void shouldCancelShipmentDeliveriesWhenShipmentIsMarkedAsLost() throws Exception {
+        final DeliveryPort deliveryPort = mock(DeliveryPort.class);
+        final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(deliveryPort);
+        final ShipmentStatusChangedIntegrationEvent event = JsonMapper.builder().configureForJackson2().build().readValue("""
+                {
+                  "payload": {"shipmentId": {"value": 42}, "shipmentStatus": "LOST"},
+                  "operatorId": {"value": 7},
+                  "userId": {"value": 42},
+                  "departmentId": {"value": 12}
+                }
+                """, ShipmentStatusChangedIntegrationEvent.class);
+
+        listener.handle(event);
+
+        verify(deliveryPort).cancelShipmentDeliveries(new ShipmentId(42L));
+        verify(deliveryPort, never()).completeDelivery(any());
     }
 }

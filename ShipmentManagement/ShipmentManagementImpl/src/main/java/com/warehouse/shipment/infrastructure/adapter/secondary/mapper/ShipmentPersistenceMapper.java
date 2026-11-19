@@ -4,6 +4,7 @@ import com.warehouse.shipment.domain.vo.ShipmentDeliveryDetails;
 import java.util.UUID;
 
 import com.warehouse.commonassets.identificator.ExternalId;
+import com.warehouse.commonassets.identificator.PalletTrackingNumber;
 import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.vo.Party;
@@ -140,7 +141,28 @@ public class ShipmentPersistenceMapper {
 
     public ShipmentDeliveryDetails deliveryDetails(final ShipmentReadEntity entity) {
         return new ShipmentDeliveryDetails(entity.getOriginDepartmentId(), entity.getDestinationDepartmentId(),
-                entity.getPlannedDeliveryAt(), entity.getDeliveredAt());
+                entity.getCurrentDepartmentId(), entity.getPlannedDeliveryAt(), entity.getDeliveredAt());
+    }
+
+    public boolean incidentReported(final ShipmentReadEntity entity) {
+        return Boolean.TRUE.equals(entity.getIncidentReported());
+    }
+
+    public ShipmentReadEntity withIncidentReported(final ShipmentReadEntity entity, final boolean incidentReported) {
+        return entity.toBuilder()
+                .incidentReported(incidentReported)
+                .build();
+    }
+
+    public PalletTrackingNumber palletTrackingNumber(final ShipmentReadEntity entity) {
+        return entity.getPalletTrackingNumber();
+    }
+
+    public ShipmentReadEntity withPalletTrackingNumber(final ShipmentReadEntity entity,
+                                                       final PalletTrackingNumber palletTrackingNumber) {
+        return entity.toBuilder()
+                .palletTrackingNumber(palletTrackingNumber)
+                .build();
     }
 
     public ShipmentReadEntity withDeliveryDetails(final ShipmentReadEntity entity,
@@ -148,6 +170,7 @@ public class ShipmentPersistenceMapper {
         return entity.toBuilder()
                 .originDepartmentId(deliveryDetails.originDepartmentId())
                 .destinationDepartmentId(deliveryDetails.destinationDepartmentId())
+                .currentDepartmentId(deliveryDetails.currentDepartmentId())
                 .plannedDeliveryAt(deliveryDetails.plannedDeliveryAt())
                 .deliveredAt(deliveryDetails.deliveredAt())
                 .build();

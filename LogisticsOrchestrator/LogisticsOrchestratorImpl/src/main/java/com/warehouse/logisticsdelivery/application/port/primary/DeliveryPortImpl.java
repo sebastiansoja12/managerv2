@@ -13,6 +13,7 @@ import com.warehouse.logisticsdelivery.application.port.primary.result.DeliveryR
 import com.warehouse.logisticsdelivery.application.port.primary.command.AttachDeliveryStepSignatureCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.ChangeDeliveryConditionsCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.ChangeDeliveryRouteCommand;
+import com.warehouse.logisticsdelivery.application.port.primary.command.ChangePalletDeliveryRouteCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CommentDeliveryStepCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CorrectDeliveryStepStatusCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.ReassignDeliveryStepCarrierCommand;
@@ -143,9 +144,11 @@ public class DeliveryPortImpl implements DeliveryPort {
                             command.palletId());
                     return delivery;
                 });
-        command.shipmentIds().forEach(shipmentId -> findOutbound(DeliveryTarget.shipment(shipmentId))
-                .filter(delivery -> delivery.replaceByPalletDelivery(palletDelivery.getDeliveryId(), command.userId()))
-                .ifPresent(delivery -> save(delivery, DeliveryCanceled::new)));
+        command.shipmentIds().forEach(shipmentId -> findActiveShipmentDelivery(shipmentId)
+                .ifPresent(delivery -> {
+                    delivery.replaceByPalletDelivery(palletDelivery.getDeliveryId(), command.userId());
+                    save(delivery, DeliveryCanceled::new);
+                }));
     }
 
     @Override
@@ -192,11 +195,24 @@ public class DeliveryPortImpl implements DeliveryPort {
                 .forEach(delivery -> save(delivery, DeliveryCreated::new));
     }
 
+    @Override
+    @Transactional
+    public void changePalletDeliveryRoute(final ChangePalletDeliveryRouteCommand command) {
+        findOutbound(DeliveryTarget.pallet(command.palletId().value()))
+                .filter(Delivery::isActive)
+                .ifPresent(palletDelivery -> {
+                    palletDelivery.changeDepartments(command.originDepartmentId(),
+                            command.destinationDepartmentId());
+                    save(palletDelivery, DeliveryModified::new);
+                    log.info("Pallet delivery {} route changed for pallet {}",
+                            palletDelivery.getDeliveryId().getId(), command.palletId().value());
+                });
+    }
+
     private Delivery reopen(final Delivery delivery, final CreatePalletDeliveryCommand command) {
-        if (delivery.reopenPalletDelivery(command.originDepartmentId(), command.destinationDepartmentId())) {
-            save(delivery, DeliveryModified::new);
-            log.info("Pallet delivery {} reopened for pallet {}", delivery.getDeliveryId().getId(), command.palletId());
-        }
+        delivery.reopenPalletDelivery(command.originDepartmentId(), command.destinationDepartmentId());
+        save(delivery, DeliveryModified::new);
+        log.info("Pallet delivery {} reused for pallet {}", delivery.getDeliveryId().getId(), command.palletId());
         return delivery;
     }
 
@@ -224,11 +240,10 @@ public class DeliveryPortImpl implements DeliveryPort {
     @Transactional
     public void changeRecipientAddress(final ShipmentId shipmentId, final RecipientAddress recipientAddress) {
         findActiveShipmentDelivery(shipmentId).ifPresent(delivery -> {
-            final DeliverySnapshot before = delivery.snapshot();
             delivery.changeRecipientAddress(recipientAddress, address -> this.destinationDepartmentResolverPort
                     .resolve(address)
                     .map(this.destinationCapacityAllocator::allocate));
-            saveModifiedWhen(delivery, !delivery.snapshot().equals(before));
+            save(delivery, DeliveryModified::new);
         });
     }
 
@@ -260,7 +275,8 @@ public class DeliveryPortImpl implements DeliveryPort {
     @Transactional
     public DeliverySnapshot assignSupplier(final AssignDeliverySupplierCommand command) {
         final Delivery delivery = find(command.deliveryId());
-        return saveModifiedWhen(delivery, delivery.assignSupplier(command.supplierId(), command.vehicleId()));
+        delivery.assignSupplier(command.supplierId(), command.vehicleId());
+        return save(delivery, DeliveryModified::new);
     }
 
     @Override
@@ -268,24 +284,27 @@ public class DeliveryPortImpl implements DeliveryPort {
     public void assignShipmentSupplier(final ShipmentId shipmentId, final SupplierId supplierId,
                                        final VehicleId vehicleId) {
         findActiveShipmentDelivery(shipmentId)
-                .filter(delivery -> delivery.assignSupplier(supplierId, vehicleId))
-                .ifPresent(delivery -> save(delivery, DeliveryModified::new));
+                .ifPresent(delivery -> {
+                    delivery.assignSupplier(supplierId, vehicleId);
+                    save(delivery, DeliveryModified::new);
+                });
     }
 
     @Override
     @Transactional
     public DeliverySnapshot unassignSupplier(final DeliveryId deliveryId) {
         final Delivery delivery = find(deliveryId);
-        return saveModifiedWhen(delivery, delivery.unassignSupplier());
+        delivery.unassignSupplier();
+        return save(delivery, DeliveryModified::new);
     }
 
     @Override
     @Transactional
     public DeliverySnapshot changeRoute(final ChangeDeliveryRouteCommand command) {
         final Delivery delivery = find(command.deliveryId());
-        return saveModifiedWhen(delivery, delivery.changeRoute(command.originDepartmentId(),
-                command.destinationDepartmentId(), command.pickupMethod(), command.pickupPointId(),
-                command.deliveryPickupPointId()));
+        delivery.changeRoute(command.originDepartmentId(), command.destinationDepartmentId(),
+                command.pickupMethod(), command.pickupPointId(), command.deliveryPickupPointId());
+        return save(delivery, DeliveryModified::new);
     }
 
     @Override
@@ -303,8 +322,9 @@ public class DeliveryPortImpl implements DeliveryPort {
     @Transactional
     public DeliverySnapshot changeConditions(final ChangeDeliveryConditionsCommand command) {
         final Delivery delivery = find(command.deliveryId());
-        return saveModifiedWhen(delivery, delivery.changeConditions(command.method(), command.signatureRequired(),
-                command.instructions(), command.plannedAt()));
+        delivery.changeConditions(command.method(), command.signatureRequired(), command.instructions(),
+                command.plannedAt());
+        return save(delivery, DeliveryModified::new);
     }
 
     @Override
@@ -346,29 +366,32 @@ public class DeliveryPortImpl implements DeliveryPort {
     @Transactional
     public DeliverySnapshot commentStep(final CommentDeliveryStepCommand command) {
         final Delivery delivery = find(command.deliveryId());
-        return saveModifiedWhen(delivery, delivery.commentStep(command.stepNumber(), command.comment()));
+        delivery.commentStep(command.stepNumber(), command.comment());
+        return save(delivery, DeliveryModified::new);
     }
 
     @Override
     @Transactional
     public DeliverySnapshot correctStepStatus(final CorrectDeliveryStepStatusCommand command) {
         final Delivery delivery = find(command.deliveryId());
-        return saveModifiedWhen(delivery, delivery.correctStepStatus(command.stepNumber(), command.deliveryStatus()));
+        delivery.correctStepStatus(command.stepNumber(), command.deliveryStatus());
+        return save(delivery, DeliveryModified::new);
     }
 
     @Override
     @Transactional
     public DeliverySnapshot attachStepSignature(final AttachDeliveryStepSignatureCommand command) {
         final Delivery delivery = find(command.deliveryId());
-        return saveModifiedWhen(delivery, delivery.attachStepSignature(command.stepNumber(), command.signatureId()));
+        delivery.attachStepSignature(command.stepNumber(), command.signatureId());
+        return save(delivery, DeliveryModified::new);
     }
 
     @Override
     @Transactional
     public DeliverySnapshot reassignStepCarrier(final ReassignDeliveryStepCarrierCommand command) {
         final Delivery delivery = find(command.deliveryId());
-        return saveModifiedWhen(delivery, delivery.reassignStepCarrier(command.stepNumber(), command.supplierId(),
-                command.vehicleId()));
+        delivery.reassignStepCarrier(command.stepNumber(), command.supplierId(), command.vehicleId());
+        return save(delivery, DeliveryModified::new);
     }
 
     @Override
@@ -387,7 +410,7 @@ public class DeliveryPortImpl implements DeliveryPort {
                 .filter(Delivery::isActive)
                 .forEach(delivery -> {
                     cancel(delivery);
-                    log.info("Delivery {} canceled for canceled shipment {}", delivery.getDeliveryId().getId(),
+                    log.info("Delivery {} canceled for shipment {}", delivery.getDeliveryId().getId(),
                             shipmentId.getValue());
                 });
     }
@@ -506,10 +529,6 @@ public class DeliveryPortImpl implements DeliveryPort {
 
     private static List<DeliverySnapshot> snapshots(final List<Delivery> deliveries) {
         return deliveries.stream().map(Delivery::snapshot).toList();
-    }
-
-    private DeliverySnapshot saveModifiedWhen(final Delivery delivery, final boolean changed) {
-        return changed ? save(delivery, DeliveryModified::new) : delivery.snapshot();
     }
 
     private DeliverySnapshot save(final Delivery delivery,

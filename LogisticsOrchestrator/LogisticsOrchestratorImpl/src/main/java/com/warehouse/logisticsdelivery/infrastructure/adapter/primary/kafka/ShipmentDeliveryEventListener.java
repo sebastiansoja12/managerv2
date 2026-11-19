@@ -77,6 +77,10 @@ public class ShipmentDeliveryEventListener {
             return;
         }
         final ShipmentEventData payload = event.payload();
+        if (event instanceof ShipmentStatusChangedIntegrationEvent && payload.shipmentStatus() == ShipmentStatus.LOST) {
+            deliveryPort.cancelShipmentDeliveries(payload.shipmentId());
+            return;
+        }
         if (event instanceof ShipmentStatusChangedIntegrationEvent && payload.shipmentStatus() == ShipmentStatus.DELIVERY) {
             final CompleteDeliveryCommand command = new CompleteDeliveryCommand(payload.shipmentId(), null,
                     event.userId(), event.departmentId());

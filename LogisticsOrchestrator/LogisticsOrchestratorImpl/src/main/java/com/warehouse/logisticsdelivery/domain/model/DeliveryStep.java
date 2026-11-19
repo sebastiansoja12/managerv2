@@ -127,45 +127,48 @@ public class DeliveryStep {
 				deliverySteps);
 	}
 
-	boolean changeComment(final String comment) {
-		if (Objects.equals(this.comment, comment)) {
-			return false;
-		}
+	void changeComment(final String comment) {
 		this.comment = comment;
-		return true;
 	}
 
-	boolean correctStatus(final DeliveryStatus correctedStatus) {
+	boolean hasStatus(final DeliveryStatus status) {
+		return this.deliveryStatus == status;
+	}
+
+	void correctStatus(final DeliveryStatus correctedStatus) {
 		if (correctedStatus == null) {
 			throw new DeliveryModificationException("Delivery step status is required");
 		}
-		if (this.deliveryStatus == correctedStatus) {
-			return false;
+		if (hasStatus(correctedStatus)) {
+			return;
 		}
 		this.deliveryStatus = correctedStatus;
 		this.outcome = outcome(correctedStatus);
 		this.failureReason = this.outcome == DeliveryStepOutcome.FAILED ? this.comment : null;
-		return true;
 	}
 
-	boolean attachSignature(final SignatureId signatureId) {
+	boolean hasSignature(final SignatureId signatureId) {
+		return Objects.equals(this.signatureId, signatureId);
+	}
+
+	void ensureSignatureCanBeAttached() {
 		if (this.outcome != DeliveryStepOutcome.SUCCEEDED) {
 			throw new DeliveryModificationException("Signature can be attached only to a succeeded delivery step");
 		}
-		if (Objects.equals(this.signatureId, signatureId)) {
-			return false;
-		}
-		this.signatureId = signatureId;
-		return true;
 	}
 
-	boolean reassignCarrier(final SupplierId supplierId, final VehicleId vehicleId) {
-		if (Objects.equals(this.supplierId, supplierId) && Objects.equals(this.vehicleId, vehicleId)) {
-			return false;
-		}
+	void attachSignature(final SignatureId signatureId) {
+		ensureSignatureCanBeAttached();
+		this.signatureId = signatureId;
+	}
+
+	boolean hasCarrier(final SupplierId supplierId, final VehicleId vehicleId) {
+		return Objects.equals(this.supplierId, supplierId) && Objects.equals(this.vehicleId, vehicleId);
+	}
+
+	void reassignCarrier(final SupplierId supplierId, final VehicleId vehicleId) {
 		this.supplierId = supplierId;
 		this.vehicleId = vehicleId;
-		return true;
 	}
 
 	public DeliveryStepSnapshot snapshot() {

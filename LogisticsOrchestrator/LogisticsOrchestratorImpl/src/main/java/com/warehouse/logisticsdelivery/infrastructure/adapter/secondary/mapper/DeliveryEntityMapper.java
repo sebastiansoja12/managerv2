@@ -25,7 +25,7 @@ public interface DeliveryEntityMapper {
                 entity.getDeliveryStatus() == null ? null
                         : DeliveryStatus.valueOf(entity.getDeliveryStatus().name()),
                 entity.getStatus(), entity.getOriginDepartmentId(), entity.getDestinationDepartmentId(),
-                entity.getPickupMethod(), entity.getMethod(), entity.getPickupPointId(), entity.getDeliveryPickupPointId(),
+                entity.getCurrentDepartmentId(), entity.getPickupMethod(), entity.getMethod(), entity.getPickupPointId(), entity.getDeliveryPickupPointId(),
                 Boolean.TRUE.equals(entity.getSignatureRequired()), entity.getInstructions(), entity.getPlannedAt(),
                 entity.getDeliveredAt(), entity.getToken(),
                 entity.getReplacedByDeliveryId() == null ? null : new DeliveryId(entity.getReplacedByDeliveryId()));
@@ -55,6 +55,7 @@ public interface DeliveryEntityMapper {
                 .status(delivery.getStatus() == null ? DeliveryLifecycleStatus.CREATED : delivery.getStatus())
                 .originDepartmentId(delivery.getOriginDepartmentId())
                 .destinationDepartmentId(delivery.getDestinationDepartmentId())
+                .currentDepartmentId(delivery.getCurrentDepartmentId())
                 .pickupMethod(delivery.getPickupMethod())
                 .method(delivery.getMethod())
                 .pickupPointId(delivery.getPickupPointId())

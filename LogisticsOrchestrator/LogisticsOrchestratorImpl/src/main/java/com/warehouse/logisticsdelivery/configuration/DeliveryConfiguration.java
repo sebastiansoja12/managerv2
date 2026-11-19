@@ -107,8 +107,9 @@ public class DeliveryConfiguration {
 
     @Bean
     public DeliveryReadModelPort deliveryReadModelPort(final DeliveryRepository deliveryRepository,
-                                                       final DeliveryReadModelRepository deliveryReadModelRepository) {
-        return new DeliveryReadModelPortImpl(deliveryRepository, deliveryReadModelRepository);
+                                                       final DeliveryReadModelRepository deliveryReadModelRepository,
+                                                       final DomainEventPublisher domainEventPublisher) {
+        return new DeliveryReadModelPortImpl(deliveryRepository, deliveryReadModelRepository, domainEventPublisher);
     }
 
     @Bean

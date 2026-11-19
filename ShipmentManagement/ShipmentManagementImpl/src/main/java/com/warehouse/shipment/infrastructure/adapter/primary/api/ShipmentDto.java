@@ -43,6 +43,10 @@ public class ShipmentDto {
 
     private final ShipmentDeliveryApi delivery;
 
+    private final Boolean incidentReported;
+
+    private final PalletTrackingNumberDto palletTrackingNumber;
+
 	public ShipmentDto(final ShipmentIdDto shipmentId, final PersonApi sender, final PersonApi recipient,
                        final ShipmentStatusDto shipmentStatus,
                        final ShipmentIdDto shipmentRelatedId, final ShipmentPriorityDto shipmentPriority,
@@ -55,7 +59,7 @@ public class ShipmentDto {
                        final ShipmentServiceLevelDto serviceLevel) {
         this(shipmentId, sender, recipient, shipmentStatus, shipmentRelatedId, shipmentPriority, trackingNumber, price,
                 locked, createdAt, updatedAt, dimensions, weight, customerReference, contentDescription, declaredValue,
-                packagingType, serviceLevel, null);
+                packagingType, serviceLevel, null, false, null);
     }
 
     public ShipmentDto(final ShipmentIdDto shipmentId, final PersonApi sender, final PersonApi recipient,
@@ -67,8 +71,11 @@ public class ShipmentDto {
                        final DimensionsApi dimensions, final WeightApi weight,
                        final String customerReference, final String contentDescription,
                        final MoneyApi declaredValue, final PackagingTypeDto packagingType,
-                       final ShipmentServiceLevelDto serviceLevel, final ShipmentDeliveryApi delivery) {
+                       final ShipmentServiceLevelDto serviceLevel, final ShipmentDeliveryApi delivery,
+                       final Boolean incidentReported, final PalletTrackingNumberDto palletTrackingNumber) {
         this.delivery = delivery;
+        this.incidentReported = incidentReported;
+        this.palletTrackingNumber = palletTrackingNumber;
         this.shipmentId = shipmentId;
         this.sender = sender;
 		this.recipient = recipient;
@@ -163,5 +170,13 @@ public class ShipmentDto {
 
     public ShipmentDeliveryApi getDelivery() {
         return delivery;
+    }
+
+    public Boolean getIncidentReported() {
+        return incidentReported;
+    }
+
+    public PalletTrackingNumberDto getPalletTrackingNumber() {
+        return palletTrackingNumber;
     }
 }

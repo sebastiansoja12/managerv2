@@ -36,6 +36,8 @@ public class DeliveryResponseMapper {
                         : String.valueOf(delivery.originDepartmentId().getValue()),
                 delivery.destinationDepartmentId() == null ? null
                         : String.valueOf(delivery.destinationDepartmentId().getValue()),
+                delivery.currentDepartmentId() == null ? null
+                        : String.valueOf(delivery.currentDepartmentId().getValue()),
                 delivery.pickupMethod() == null ? null : delivery.pickupMethod().name(),
                 delivery.method() == null ? null : delivery.method().name(),
                 delivery.pickupPointId() == null ? null : String.valueOf(delivery.pickupPointId().value()),
