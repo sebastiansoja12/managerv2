@@ -170,9 +170,8 @@ class DeliveryNetworkTest {
                 OPERATOR_ID,
                 Set.of(firstConnection, secondConnection, remainingConnection));
 
-        final boolean changed = deliveryNetwork.removeConnectionsFor(new DepartmentId(2L));
+        deliveryNetwork.removeConnectionsFor(new DepartmentId(2L));
 
-        assertTrue(changed);
         assertEquals(Set.of(remainingConnection), deliveryNetwork.connections());
     }
 

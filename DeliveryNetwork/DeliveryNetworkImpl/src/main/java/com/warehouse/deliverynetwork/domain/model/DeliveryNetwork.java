@@ -102,16 +102,11 @@ public class DeliveryNetwork {
         this.connections = Set.copyOf(extendedConnections);
     }
 
-    public boolean removeConnectionsFor(final DepartmentId departmentId) {
+    public void removeConnectionsFor(final DepartmentId departmentId) {
         Objects.requireNonNull(departmentId, "Department ID cannot be null");
-        final Set<DepartmentConnection> remainingConnections = this.connections.stream()
+        this.connections = this.connections.stream()
                 .filter(connection -> !connection.connects(departmentId))
-                .collect(Collectors.toSet());
-        if (remainingConnections.size() == this.connections.size()) {
-            return false;
-        }
-        this.connections = Set.copyOf(remainingConnections);
-        return true;
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     public OperatorId operatorId() {

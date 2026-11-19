@@ -143,9 +143,7 @@ public class DeliveryNetworkPortImpl implements DeliveryNetworkPort {
     public void removeDepartmentConnections(final DepartmentId departmentId) {
         final DeliveryNetwork deliveryNetwork = loadCurrentNetwork();
         final DeliveryNetworkSnapshot previousSnapshot = deliveryNetwork.snapshot();
-        if (!deliveryNetwork.removeConnectionsFor(departmentId)) {
-            return;
-        }
+        deliveryNetwork.removeConnectionsFor(departmentId);
         this.deliveryNetworkRepository.save(deliveryNetwork);
         this.domainEventPublisher.publish(new DeliveryNetworkChanged(previousSnapshot, deliveryNetwork.snapshot(),
                 Instant.now()));
