@@ -5,9 +5,13 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.repository.Criteria;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.incident.application.port.primary.command.FindIncidentsCommand;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.incident.application.port.primary.result.DepartmentIncidentStatistics;
 import com.warehouse.incident.application.port.primary.result.IncidentPage;
 import com.warehouse.incident.application.port.primary.result.IncidentStatistics;
 import com.warehouse.incident.application.port.secondary.IncidentRepository;
+import com.warehouse.incident.domain.enumeration.IncidentCategory;
+import com.warehouse.incident.domain.enumeration.IncidentResolution;
 import com.warehouse.incident.domain.enumeration.IncidentSeverity;
 import com.warehouse.incident.domain.enumeration.IncidentStatus;
 import com.warehouse.incident.domain.model.Incident;
@@ -15,8 +19,11 @@ import com.warehouse.incident.infrastructure.adapter.secondary.entity.IncidentEn
 import com.warehouse.incident.infrastructure.adapter.secondary.mapper.IncidentPersistenceMapper;
 
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class IncidentRepositoryImpl implements IncidentRepository {
 
@@ -82,6 +89,35 @@ public class IncidentRepositoryImpl implements IncidentRepository {
                         .eq("status", IncidentStatus.RESOLVED)
                         .ge("resolvedAt", resolvedSince)
                         .count());
+    }
+
+    @Override
+    public List<DepartmentIncidentStatistics> departmentStatistics(final Instant rangeStart, final Instant rangeEnd) {
+        final Map<DepartmentCode, Long> damagedShipments = countByDepartment(
+                this.repository.createCriteria(IncidentEntity.class)
+                        .eq("category", IncidentCategory.DAMAGED)
+                        .ge("reportedAt", rangeStart)
+                        .lt("reportedAt", rangeEnd)
+                        .list());
+        final Map<DepartmentCode, Long> damageClaims = countByDepartment(
+                this.repository.createCriteria(IncidentEntity.class)
+                        .eq("resolution", IncidentResolution.DAMAGE_CLAIM_FILED)
+                        .ge("resolvedAt", rangeStart)
+                        .lt("resolvedAt", rangeEnd)
+                        .list());
+        final Map<DepartmentCode, DepartmentIncidentStatistics> statistics = new LinkedHashMap<>();
+        damagedShipments.forEach((departmentCode, count) -> statistics.put(departmentCode,
+                new DepartmentIncidentStatistics(departmentCode, count, damageClaims.getOrDefault(departmentCode, 0L))));
+        damageClaims.forEach((departmentCode, count) -> statistics.putIfAbsent(departmentCode,
+                new DepartmentIncidentStatistics(departmentCode, 0L, count)));
+        return List.copyOf(statistics.values());
+    }
+
+    private Map<DepartmentCode, Long> countByDepartment(final List<IncidentEntity> incidents) {
+        return incidents.stream()
+                .filter(incident -> incident.getDepartmentCode() != null)
+                .collect(Collectors.groupingBy(IncidentEntity::getDepartmentCode, LinkedHashMap::new,
+                        Collectors.counting()));
     }
 
     private Criteria<IncidentEntity> unresolved() {

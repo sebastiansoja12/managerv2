@@ -84,6 +84,10 @@ public class Incident {
                                   final String description,
                                   final IncidentActor reporter,
                                   final Instant reportedAt) {
+        if (shipment.lost()) {
+            throw new IncidentException(IncidentException.Reason.CONFLICT,
+                    "Cannot report an incident for a lost shipment");
+        }
         final String normalizedDescription = normalize(description);
         if (IncidentCategory.OTHER.equals(category) && normalizedDescription == null) {
             throw new IncidentException(IncidentException.Reason.INVALID_REQUEST,
@@ -135,10 +139,16 @@ public class Incident {
                         final String note,
                         final Instant resolvedAt) {
         requireNotResolved();
+        Objects.requireNonNull(resolution, "Incident resolution cannot be null");
+        final String normalizedNote = normalize(note);
+        if (resolution.requiresNote() && normalizedNote == null) {
+            throw new IncidentException(IncidentException.Reason.INVALID_REQUEST,
+                    "Incident resolution note is required for resolution " + resolution);
+        }
         this.status = IncidentStatus.RESOLVED;
-        this.resolution = Objects.requireNonNull(resolution, "Incident resolution cannot be null");
+        this.resolution = resolution;
         this.resolvedAt = resolvedAt;
-        record(new IncidentEntry(IncidentEntryType.RESOLVED, actor, normalize(note), resolvedAt));
+        record(new IncidentEntry(IncidentEntryType.RESOLVED, actor, normalizedNote, resolvedAt));
     }
 
     public void reopen(final IncidentActor actor, final String reason, final Instant reopenedAt) {

@@ -1,5 +1,7 @@
 package com.warehouse.incident.infrastructure.adapter.primary.mapper;
 
+import com.warehouse.incident.domain.vo.IncidentRepackaging;
+import com.warehouse.incident.domain.enumeration.IncidentResolution;
 import com.warehouse.commonassets.identificator.IncidentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.incident.application.port.primary.command.CommentIncidentCommand;
@@ -39,7 +41,12 @@ public class IncidentWebMapper {
     }
 
     public ResolveIncidentCommand toCommand(final IncidentId incidentId, final ResolveIncidentApiRequest request) {
-        return new ResolveIncidentCommand(incidentId, request.resolution(), request.note());
+        return new ResolveIncidentCommand(incidentId, request.resolution(), request.note(),
+                IncidentResolution.REPACKED.equals(request.resolution()) && request.repackaging() != null
+                        ? new IncidentRepackaging(request.repackaging().packagingType(),
+                        request.repackaging().weightInKilograms(), request.repackaging().lengthInCentimeters(),
+                        request.repackaging().widthInCentimeters(), request.repackaging().heightInCentimeters())
+                        : null);
     }
 
     public ReopenIncidentCommand toCommand(final IncidentId incidentId, final ReopenIncidentApiRequest request) {

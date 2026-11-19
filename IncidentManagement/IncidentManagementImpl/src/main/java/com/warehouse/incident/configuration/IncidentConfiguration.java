@@ -1,14 +1,17 @@
 package com.warehouse.incident.configuration;
 
 import com.warehouse.auth.UserApiService;
+import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.commonassets.repository.BaseRepository;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
+import com.warehouse.incident.api.IncidentStatisticsApiService;
 import com.warehouse.incident.application.port.primary.IncidentPort;
 import com.warehouse.incident.application.port.primary.IncidentPortImpl;
 import com.warehouse.incident.application.port.secondary.IncidentActorServicePort;
 import com.warehouse.incident.application.port.secondary.IncidentRepository;
 import com.warehouse.incident.application.port.secondary.IncidentShipmentServicePort;
+import com.warehouse.incident.infrastructure.adapter.primary.IncidentStatisticsApiServiceAdapter;
 import com.warehouse.incident.infrastructure.adapter.primary.mapper.IncidentWebMapper;
 import com.warehouse.incident.infrastructure.adapter.secondary.IncidentActorServiceAdapter;
 import com.warehouse.incident.infrastructure.adapter.secondary.IncidentRepositoryImpl;
@@ -49,8 +52,9 @@ public class IncidentConfiguration {
     }
 
     @Bean
-    public IncidentShipmentServicePort incidentShipmentServicePort(final ShipmentApiService shipmentApiService) {
-        return new IncidentShipmentServiceAdapter(shipmentApiService);
+    public IncidentShipmentServicePort incidentShipmentServicePort(final ShipmentApiService shipmentApiService,
+                                                                   final IntegrationEventPublisher integrationEventPublisher) {
+        return new IncidentShipmentServiceAdapter(shipmentApiService, integrationEventPublisher);
     }
 
     @Bean
@@ -59,6 +63,11 @@ public class IncidentConfiguration {
                                      final IncidentShipmentServicePort incidentShipmentServicePort) {
         return new IncidentPortImpl(incidentRepository, incidentActorServicePort, incidentShipmentServicePort,
                 Clock.systemDefaultZone());
+    }
+
+    @Bean
+    public IncidentStatisticsApiService incidentStatisticsApiService(final IncidentPort incidentPort) {
+        return new IncidentStatisticsApiServiceAdapter(incidentPort);
     }
 
     @Bean
