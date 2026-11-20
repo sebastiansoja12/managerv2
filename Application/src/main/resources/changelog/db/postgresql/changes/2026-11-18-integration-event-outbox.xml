@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-18-postgresql-table-integration-event-outbox" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="integration_event_outbox"/>
+            </not>
+        </preConditions>
+        <createTable tableName="integration_event_outbox">
+            <column name="sequence_number" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="event_id" type="VARCHAR(36)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_integration_event_outbox_event_id" />
+            </column>
+            <column name="event_type" type="VARCHAR(128)">
+                <constraints nullable="false" />
+            </column>
+            <column name="event_version" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="topic" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="message_key" type="VARCHAR(255)" />
+            <column name="payload" type="TEXT">
+                <constraints nullable="false" />
+            </column>
+            <column name="headers" type="TEXT">
+                <constraints nullable="false" />
+            </column>
+            <column name="occurred_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false" />
+            </column>
+            <column name="operator_id" type="BIGINT" />
+            <column name="status" type="VARCHAR(16)">
+                <constraints nullable="false" />
+            </column>
+            <column defaultValueNumeric="0" name="attempt_count" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="next_attempt_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_error" type="TEXT" />
+            <column name="published_at" type="TIMESTAMP WITH TIME ZONE" />
+        </createTable>
+        <createIndex tableName="integration_event_outbox" indexName="idx_integration_event_outbox_publishable">
+            <column name="status"/>
+            <column name="next_attempt_at"/>
+            <column name="sequence_number"/>
+        </createIndex>
+        <createIndex tableName="integration_event_outbox" indexName="idx_integration_event_outbox_message_key">
+            <column name="message_key"/>
+            <column name="sequence_number"/>
+        </createIndex>
+        <createIndex tableName="integration_event_outbox" indexName="idx_integration_event_outbox_published_at">
+            <column name="status"/>
+            <column name="published_at"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2026-11-18-postgresql-copy-unpublished-kafka-event-outbox" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="kafka_event_outbox"/>
+        </preConditions>
+        <sql>
+            INSERT INTO integration_event_outbox (
+                event_id,
+                event_type,
+                event_version,
+                topic,
+                message_key,
+                payload,
+                headers,
+                occurred_at,
+                operator_id,
+                status,
+                attempt_count,
+                next_attempt_at,
+                last_error
+            )
+            SELECT legacy.event_id,
+                   legacy.event_type,
+                   legacy.event_version,
+                   legacy.topic,
+                   legacy.message_key,
+                   legacy.payload_json,
+                   legacy.headers_json,
+                   legacy.occurred_at,
+                   legacy.operator_id,
+                   'PENDING',
+                   legacy.attempt_count,
+                   COALESCE(legacy.next_attempt_at, legacy.created_at),
+                   legacy.last_error
+              FROM kafka_event_outbox legacy
+             WHERE legacy.status &lt;&gt; 'PUBLISHED'
+               AND NOT EXISTS (
+                   SELECT 1
+                     FROM integration_event_outbox migrated
+                    WHERE migrated.event_id = legacy.event_id)
+             ORDER BY legacy.created_at
+        </sql>
+    </changeSet>
+</databaseChangeLog>
