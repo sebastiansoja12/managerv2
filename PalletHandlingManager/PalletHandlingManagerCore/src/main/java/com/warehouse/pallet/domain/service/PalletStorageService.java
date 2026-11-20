@@ -52,12 +52,12 @@ public interface PalletStorageService {
     Pallet revertLoading(final PalletId palletId);
 
     Pallet unload(final PalletId palletId);
-    boolean markLoaded(final PalletId palletId);
+    Pallet markLoaded(final PalletId palletId);
     Pallet changeGrossWeight(final PalletId palletId, final Weight grossWeight);
     Pallet defineMaxGrossWeight(final PalletId palletId, final BigDecimal maxGrossWeight);
     Pallet update(final PalletId palletId, final PalletType palletType,
                   final PalletHandlingPriority palletHandlingPriority, final Boolean refrigerated,
-                  final Dimension dimension, final SealNumber sealNumber);
+                  final Boolean mixedDestinationsAllowed, final Dimension dimension, final SealNumber sealNumber);
     PalletStatus changeTransportStatus(final PalletId palletId, final PalletStatus targetStatus);
     Pallet changeDepartments(final PalletId palletId, final DepartmentId originDepartmentId,
                              final DepartmentId destinationDepartmentId);

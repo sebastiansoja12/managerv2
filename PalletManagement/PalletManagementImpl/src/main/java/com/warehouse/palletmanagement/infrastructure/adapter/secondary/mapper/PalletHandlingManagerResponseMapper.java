@@ -52,6 +52,7 @@ public class PalletHandlingManagerResponseMapper {
                 pallet.created(),
                 pallet.modified(),
                 new PalletAttributes(pallet.palletType(), pallet.handlingPriority(), pallet.refrigerated(),
+                        pallet.mixedDestinationsAllowed(),
                         pallet.dimension() == null ? null : new PalletDimension(pallet.dimension().length(),
                                 pallet.dimension().width(), pallet.dimension().height())),
                 null);
@@ -111,6 +112,7 @@ public class PalletHandlingManagerResponseMapper {
     public PalletHandlingUpdateRequestApi map(final PalletUpdate update) {
         final PalletDimension dimension = update.dimension();
         return new PalletHandlingUpdateRequestApi(update.palletType(), update.handlingPriority(), update.refrigerated(),
+                update.mixedDestinationsAllowed(),
                 dimension == null ? null : dimension.length(),
                 dimension == null ? null : dimension.width(),
                 dimension == null ? null : dimension.height(),

@@ -1,0 +1,9 @@
+package com.warehouse.shipment.api.event.snapshot;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.warehouse.commonassets.identificator.PalletTrackingNumber;
+import com.warehouse.commonassets.identificator.ShipmentId;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record ShipmentPalletReadModelData(ShipmentId shipmentId, PalletTrackingNumber palletTrackingNumber) {
+}

@@ -62,9 +62,10 @@ public class PalletManagementConfiguration {
                                  final CarrierServicePort palletCarrierServicePort,
                                  final PalletTransportService palletTransportService,
                                  final PalletGrossWeightService palletGrossWeightService,
-                                 final PalletDocumentService palletDocumentService) {
+                                 final PalletDocumentService palletDocumentService,
+                                 final DomainEventPublisher domainEventPublisher) {
         return new PalletPortImpl(palletHandlingManagerServicePort, palletShipmentServicePort, palletCarrierServicePort,
-                palletTransportService, palletGrossWeightService, palletDocumentService);
+                palletTransportService, palletGrossWeightService, palletDocumentService, domainEventPublisher);
     }
 
     @Bean

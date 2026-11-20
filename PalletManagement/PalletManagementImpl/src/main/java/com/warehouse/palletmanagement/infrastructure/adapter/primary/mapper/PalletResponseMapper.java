@@ -48,6 +48,7 @@ public class PalletResponseMapper {
                 pallet.attributes().palletType(),
                 pallet.attributes().handlingPriority(),
                 pallet.attributes().refrigerated(),
+                pallet.attributes().mixedDestinationsAllowed(),
                 pallet.attributes().dimension() == null ? null : new PalletDimensionResponseApi(
                         pallet.attributes().dimension().length(), pallet.attributes().dimension().width(),
                         pallet.attributes().dimension().height()),
@@ -131,6 +132,7 @@ public class PalletResponseMapper {
             case PALLET_LOCKED -> "Pallet is locked";
             case PALLET_OVERWEIGHT -> "Pallet exceeds maximum weight";
             case PALLET_INVALID_STATUS -> "Pallet cannot be loaded in status " + result.pallet().palletStatus();
+            case SHIPMENT_DESTINATION_MISMATCH -> "Some shipments have a different destination department than the pallet";
             case SHIPMENT_STATUS_UPDATE_FAILED -> "Some shipments could not be updated";
         };
     }

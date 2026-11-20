@@ -8,6 +8,7 @@ import com.warehouse.pallet.domain.vo.SealNumber;
 public record PalletUpdate(PalletType palletType,
                            PalletHandlingPriority palletHandlingPriority,
                            Boolean refrigerated,
+                           Boolean mixedDestinationsAllowed,
                            Dimension dimension,
                            SealNumber sealNumber) {
 }

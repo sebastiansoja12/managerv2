@@ -25,11 +25,15 @@ import com.warehouse.palletmanagement.domain.event.PalletLoaded;
 import com.warehouse.palletmanagement.domain.event.PalletLoadingReverted;
 import com.warehouse.palletmanagement.domain.vo.PalletDetails;
 import com.warehouse.palletmanagement.domain.exception.PalletRequestRejectedException;
+import com.warehouse.palletmanagement.domain.vo.PalletShipment;
 import com.warehouse.palletmanagement.domain.vo.ShipmentLoadResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -242,5 +246,22 @@ class PalletScanPortImplTest {
         assertThat(result.alreadyUnloaded()).isFalse();
         assertThat(result.shipments()).extracting(ShipmentLoadResult::shipmentStatus).containsExactly("ACCEPTED");
         verify(this.domainEventPublisher).publish(any(PalletUnloaded.class));
+    }
+
+    @Test
+    void shouldRejectPalletWithShipmentForDifferentDestinationDepartment() {
+        when(this.palletHandlingManagerServicePort.getByTrackingNumber(PalletFixture.TRACKING_NUMBER))
+                .thenReturn(PalletFixture.readyPallet(DESTINATION_DEPARTMENT_ID, 1L, 2L));
+        when(this.shipmentServicePort.findShipment(new ShipmentId(1L))).thenReturn(Optional.of(new PalletShipment(
+                new ShipmentId(1L), ShipmentStatus.ACCEPTED, BigDecimal.ONE, DESTINATION_DEPARTMENT_ID)));
+        when(this.shipmentServicePort.findShipment(new ShipmentId(2L))).thenReturn(Optional.of(new PalletShipment(
+                new ShipmentId(2L), ShipmentStatus.ACCEPTED, BigDecimal.ONE, new DepartmentId(6L))));
+
+        final PalletScanResult result = this.palletScanPort.scan(COMMAND);
+
+        assertThat(result.success()).isFalse();
+        assertThat(result.errorCode()).isEqualTo(PalletScanErrorCode.SHIPMENT_DESTINATION_MISMATCH);
+        verify(this.shipmentServicePort, never()).loadOnPallet(any());
+        verify(this.domainEventPublisher, never()).publish(any());
     }
 }

@@ -8,6 +8,7 @@ import com.warehouse.pallet.domain.model.AssignDriverRequest;
 import com.warehouse.pallet.domain.model.Pallet;
 import com.warehouse.pallet.domain.model.PalletLoadedRequest;
 import com.warehouse.pallet.domain.model.PalletPage;
+import com.warehouse.pallet.domain.model.PalletRouteChangedRequest;
 import com.warehouse.pallet.domain.model.PalletSearchCriteria;
 import com.warehouse.pallet.domain.model.SealNumberRequest;
 import com.warehouse.pallet.domain.model.ShipmentAttachRequest;
@@ -40,6 +41,7 @@ public interface PalletPort {
     Pallet unload(final PalletId palletId, final OperatorId operatorId);
     List<PalletHistoryEntry> getHistory(final PalletId palletId, final OperatorId operatorId);
     void handlePalletLoaded(final PalletLoadedRequest palletLoadedRequest);
+    void handleDeliveryRouteChanged(final PalletRouteChangedRequest palletRouteChangedRequest);
     void determinePalletHandlingPriority(final PalletId palletId);
     void addSealNumber(final SealNumberRequest sealNumberRequest);
     void assignDriver(final AssignDriverRequest assignDriverRequest);

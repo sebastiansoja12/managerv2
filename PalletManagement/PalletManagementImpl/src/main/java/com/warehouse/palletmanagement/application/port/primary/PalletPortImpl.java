@@ -17,6 +17,9 @@ import com.warehouse.palletmanagement.domain.service.PalletTransportPolicy;
 import com.warehouse.palletmanagement.domain.vo.PalletCarrier;
 import com.warehouse.palletmanagement.domain.vo.PalletCarrierAssignment;
 import com.warehouse.palletmanagement.domain.vo.PalletDepartmentsChange;
+import com.warehouse.palletmanagement.domain.vo.PalletDepartmentsChangedSnapshot;
+import com.warehouse.palletmanagement.domain.event.PalletDepartmentsChanged;
+import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.palletmanagement.domain.vo.PalletDetails;
 import com.warehouse.palletmanagement.domain.vo.PalletDocumentFile;
 import com.warehouse.palletmanagement.domain.vo.PalletHistoryEntry;
@@ -45,19 +48,22 @@ public class PalletPortImpl implements PalletPort {
     private final PalletTransportService palletTransportService;
     private final PalletGrossWeightService palletGrossWeightService;
     private final PalletDocumentService palletDocumentService;
+    private final DomainEventPublisher domainEventPublisher;
 
     public PalletPortImpl(final PalletHandlingManagerServicePort palletHandlingManagerServicePort,
                           final ShipmentServicePort shipmentServicePort,
                           final CarrierServicePort carrierServicePort,
                           final PalletTransportService palletTransportService,
                           final PalletGrossWeightService palletGrossWeightService,
-                          final PalletDocumentService palletDocumentService) {
+                          final PalletDocumentService palletDocumentService,
+                          final DomainEventPublisher domainEventPublisher) {
         this.palletHandlingManagerServicePort = palletHandlingManagerServicePort;
         this.shipmentServicePort = shipmentServicePort;
         this.carrierServicePort = carrierServicePort;
         this.palletTransportService = palletTransportService;
         this.palletGrossWeightService = palletGrossWeightService;
         this.palletDocumentService = palletDocumentService;
+        this.domainEventPublisher = domainEventPublisher;
     }
 
     @Override
@@ -135,8 +141,13 @@ public class PalletPortImpl implements PalletPort {
 
     @Override
     public PalletDetails changeDepartments(final PalletId palletId, final PalletDepartmentsChange departmentsChange) {
-        return this.palletTransportService.withTransport(
-                this.palletHandlingManagerServicePort.changeDepartments(palletId, departmentsChange));
+        final PalletDetails pallet = this.palletHandlingManagerServicePort.changeDepartments(palletId,
+                departmentsChange);
+        this.domainEventPublisher.publish(new PalletDepartmentsChanged(new PalletDepartmentsChangedSnapshot(
+                pallet.palletId(), pallet.trackingNumber(), pallet.originDepartmentId(),
+                pallet.destinationDepartmentId()), Instant.now()));
+        log.info("Pallet {} departments changed", pallet.trackingNumber().value());
+        return this.palletTransportService.withTransport(pallet);
     }
 
     @Override
