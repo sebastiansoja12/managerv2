@@ -131,4 +131,9 @@
     <include file="changes/2026-11-04-department-lifecycle-capacity-connections.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-11-05-user-onboarding.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-11-05-fleet-tracking.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-06-current-department.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-06-shipment-rd-incident-reported.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-06-shipment-note-incident-source.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-12-shipment-rd-pallet-tracking-number.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-17-organization-analytics.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
