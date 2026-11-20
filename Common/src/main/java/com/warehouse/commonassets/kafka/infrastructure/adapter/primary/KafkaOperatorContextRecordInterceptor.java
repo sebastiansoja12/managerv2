@@ -4,7 +4,7 @@ import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.commonassets.kafka.domain.model.KafkaEventHeaders;
+import com.warehouse.eventoutbox.kafka.KafkaEventHeaders;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.Header;
