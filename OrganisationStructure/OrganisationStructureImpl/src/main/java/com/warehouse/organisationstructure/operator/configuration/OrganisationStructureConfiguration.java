@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.auth.OperatorUserEventPublisher;
 import com.warehouse.commonassets.context.OperatorContext;
-import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.KafkaTemplateClient;
+import com.warehouse.eventoutbox.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.organisationstructure.api.OperatorApiService;
 import com.warehouse.organisationstructure.operator.domain.port.primary.OperatorPort;
 import com.warehouse.organisationstructure.operator.domain.port.primary.OperatorPortImpl;
@@ -19,7 +19,7 @@ import com.warehouse.organisationstructure.operator.domain.port.secondary.Operat
 import com.warehouse.organisationstructure.operator.domain.service.OperatorService;
 import com.warehouse.organisationstructure.operator.domain.service.OperatorServiceImpl;
 import com.warehouse.organisationstructure.operator.infrastructure.adapter.primary.OperatorServiceAdapter;
-import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.OperatorConfigurationKafkaServiceAdapter;
+import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.OperatorConfigurationEventServiceAdapter;
 import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.OperatorContextServiceAdapter;
 import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.OperatorDepartmentNotifyAdapter;
 import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.OperatorGeocodingConfigurationEventServiceAdapter;
@@ -56,8 +56,8 @@ public class OrganisationStructureConfiguration {
 
     @Bean
     public OperatorConfigurationEventServicePort operatorConfigurationEventServicePort(
-            final KafkaTemplateClient kafkaTemplateClient) {
-        return new OperatorConfigurationKafkaServiceAdapter(kafkaTemplateClient);
+            final IntegrationEventPublisher integrationEventPublisher) {
+        return new OperatorConfigurationEventServiceAdapter(integrationEventPublisher);
     }
 
     @Bean

@@ -2,27 +2,26 @@ package com.warehouse.organisationstructure.operator.infrastructure.adapter.seco
 
 import java.time.Instant;
 
-import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.KafkaTemplateClient;
+import com.warehouse.eventoutbox.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.organisationstructure.api.event.OperatorCreatedIntegrationEvent;
 import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorConfigurationEventServicePort;
 import com.warehouse.organisationstructure.operator.domain.vo.OperatorSnapshot;
 import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.mapper.OperatorMapper;
 
-public class OperatorConfigurationKafkaServiceAdapter implements OperatorConfigurationEventServicePort {
+public class OperatorConfigurationEventServiceAdapter implements OperatorConfigurationEventServicePort {
 
-    private final KafkaTemplateClient kafkaTemplateClient;
+    private final IntegrationEventPublisher integrationEventPublisher;
 
-    public OperatorConfigurationKafkaServiceAdapter(final KafkaTemplateClient kafkaTemplateClient) {
-        this.kafkaTemplateClient = kafkaTemplateClient;
+    public OperatorConfigurationEventServiceAdapter(final IntegrationEventPublisher integrationEventPublisher) {
+        this.integrationEventPublisher = integrationEventPublisher;
     }
 
     @Override
     public void publishOperatorCreated(final OperatorSnapshot snapshot, final Instant timestamp) {
-        final OperatorCreatedIntegrationEvent event = new OperatorCreatedIntegrationEvent(
+        this.integrationEventPublisher.publish(new OperatorCreatedIntegrationEvent(
                 snapshot.operatorId(),
                 OperatorMapper.toDtoConfiguration(snapshot.configuration()),
                 timestamp
-        );
-        this.kafkaTemplateClient.publish(String.valueOf(snapshot.operatorId().getValue()), event);
+        ));
     }
 }

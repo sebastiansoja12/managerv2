@@ -3,10 +3,10 @@ package com.warehouse.organisationstructure.department.api.event;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.warehouse.commonassets.event.integration.annotation.IntegrationEventType;
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventType;
 import com.warehouse.commonassets.event.integration.context.OperatorAwareContext;
-import com.warehouse.commonassets.event.integration.model.IntegrationEvent;
-import com.warehouse.commonassets.event.integration.model.IntegrationEventKey;
+import com.warehouse.eventoutbox.integration.model.IntegrationEvent;
+import com.warehouse.eventoutbox.integration.model.IntegrationEventKey;
 import com.warehouse.organisationstructure.department.api.dto.DepartmentCodeDto;
 import com.warehouse.organisationstructure.department.api.dto.DepartmentIdDto;
 import com.warehouse.organisationstructure.department.api.dto.DepartmentStatusDto;
@@ -14,7 +14,7 @@ import com.warehouse.organisationstructure.department.api.dto.DepartmentStatusDt
 import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@IntegrationEventType(value = "department.status.changed", version = 1)
+@IntegrationEventType(value = "department.status.changed", version = 1, topic = DepartmentTopics.STATUS_EVENTS)
 public final class DepartmentStatusChangedIntegrationEvent extends OperatorAwareContext
         implements IntegrationEvent, IntegrationEventKey {
 

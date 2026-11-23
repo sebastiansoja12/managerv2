@@ -1,47 +1,28 @@
 package com.warehouse.organisationstructure.department.application.listener;
 
-import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.organisationstructure.department.api.event.DepartmentUserChangedIntegrationEvent;
 import com.warehouse.organisationstructure.department.domain.event.DepartmentEmailChanged;
 import com.warehouse.organisationstructure.department.domain.vo.DepartmentSnapshot;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
 
-@ExtendWith(MockitoExtension.class)
-class DepartmentUserIntegrationEventListenerTest {
+class DepartmentUserIntegrationEventTranslatorTest {
 
-    @Mock
-    private IntegrationEventPublisher integrationEventPublisher;
-
-    private DepartmentUserIntegrationEventListener listener;
-
-    @BeforeEach
-    void setUp() {
-        this.listener = new DepartmentUserIntegrationEventListener(this.integrationEventPublisher);
-    }
+    private final DepartmentUserIntegrationEventTranslator translator = new DepartmentUserIntegrationEventTranslator();
 
     @Test
     void shouldPublishDepartmentUserChangedIntegrationEvent() {
         final Instant timestamp = Instant.EPOCH;
 
-        this.listener.handle(new DepartmentEmailChanged(departmentSnapshot(), timestamp));
+        final DepartmentUserChangedIntegrationEvent event =
+                this.translator.translate(new DepartmentEmailChanged(departmentSnapshot(), timestamp));
 
-        final ArgumentCaptor<DepartmentUserChangedIntegrationEvent> eventCaptor =
-                ArgumentCaptor.forClass(DepartmentUserChangedIntegrationEvent.class);
-        verify(this.integrationEventPublisher).publish(eventCaptor.capture());
-        final DepartmentUserChangedIntegrationEvent event = eventCaptor.getValue();
         assertEquals("KT1", event.departmentCode().value());
         assertEquals(new UserId(20L), event.userId());
         assertEquals("123456789", event.telephoneNumber());

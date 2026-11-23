@@ -1,45 +1,26 @@
 package com.warehouse.organisationstructure.department.application.listener;
 
-import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
-import com.warehouse.commonassets.event.integration.annotation.IntegrationEventType;
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventType;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.organisationstructure.department.api.dto.DepartmentStatusDto;
 import com.warehouse.organisationstructure.department.api.event.DepartmentStatusChangedIntegrationEvent;
 import com.warehouse.organisationstructure.department.domain.event.DepartmentArchived;
 import com.warehouse.organisationstructure.department.domain.vo.DepartmentSnapshot;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
 
-@ExtendWith(MockitoExtension.class)
-class DepartmentStatusIntegrationEventListenerTest {
+class DepartmentStatusIntegrationEventTranslatorTest {
 
-    @Mock
-    private IntegrationEventPublisher integrationEventPublisher;
-
-    private DepartmentStatusIntegrationEventListener listener;
-
-    @BeforeEach
-    void setUp() {
-        this.listener = new DepartmentStatusIntegrationEventListener(this.integrationEventPublisher);
-    }
+    private final DepartmentStatusIntegrationEventTranslator translator = new DepartmentStatusIntegrationEventTranslator();
 
     @Test
     void shouldPublishArchivedDepartmentIntegrationEvent() {
-        this.listener.handle(new DepartmentArchived(departmentSnapshot(), Instant.now()));
+        final DepartmentStatusChangedIntegrationEvent publishedEvent =
+                this.translator.translate(new DepartmentArchived(departmentSnapshot(), Instant.now()));
 
-        final ArgumentCaptor<DepartmentStatusChangedIntegrationEvent> eventCaptor =
-                ArgumentCaptor.forClass(DepartmentStatusChangedIntegrationEvent.class);
-        verify(this.integrationEventPublisher).publish(eventCaptor.capture());
-        final DepartmentStatusChangedIntegrationEvent publishedEvent = eventCaptor.getValue();
         assertEquals(10L, publishedEvent.affectedDepartmentId().value());
         assertEquals("KT1", publishedEvent.departmentCode().value());
         assertEquals(DepartmentStatusDto.ARCHIVED, publishedEvent.status());

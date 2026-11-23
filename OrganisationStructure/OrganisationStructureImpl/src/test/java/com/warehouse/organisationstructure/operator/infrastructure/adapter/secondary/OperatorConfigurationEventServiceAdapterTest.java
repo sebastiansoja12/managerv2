@@ -1,7 +1,6 @@
 package com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
 import java.time.Instant;
@@ -12,31 +11,31 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.KafkaTemplateClient;
+import com.warehouse.eventoutbox.application.port.secondary.IntegrationEventPublisher;
+import com.warehouse.eventoutbox.integration.model.IntegrationEvent;
 import com.warehouse.organisationstructure.OperatorTestFixtures;
 import com.warehouse.organisationstructure.api.event.OperatorCreatedIntegrationEvent;
 
 @ExtendWith(MockitoExtension.class)
-class OperatorConfigurationKafkaServiceAdapterTest {
+class OperatorConfigurationEventServiceAdapterTest {
 
     @Mock
-    private KafkaTemplateClient kafkaTemplateClient;
+    private IntegrationEventPublisher integrationEventPublisher;
 
     @Test
-    void shouldPublishOperatorCreatedIntegrationEvent() {
-        final OperatorConfigurationKafkaServiceAdapter adapter =
-                new OperatorConfigurationKafkaServiceAdapter(kafkaTemplateClient);
+    void shouldPublishOperatorCreatedIntegrationEventKeyedByOperator() {
+        final OperatorConfigurationEventServiceAdapter adapter =
+                new OperatorConfigurationEventServiceAdapter(integrationEventPublisher);
         final Instant timestamp = Instant.now();
 
         adapter.publishOperatorCreated(OperatorTestFixtures.operator().snapshot(), timestamp);
 
-        final ArgumentCaptor<OperatorCreatedIntegrationEvent> eventCaptor =
-                ArgumentCaptor.forClass(OperatorCreatedIntegrationEvent.class);
-        verify(kafkaTemplateClient).publish(eq(String.valueOf(OperatorTestFixtures.OPERATOR_ID.getValue())),
-                eventCaptor.capture());
-        final OperatorCreatedIntegrationEvent event = eventCaptor.getValue();
+        final ArgumentCaptor<IntegrationEvent> eventCaptor = ArgumentCaptor.forClass(IntegrationEvent.class);
+        verify(integrationEventPublisher).publish(eventCaptor.capture());
+        final OperatorCreatedIntegrationEvent event = (OperatorCreatedIntegrationEvent) eventCaptor.getValue();
         assertEquals(OperatorTestFixtures.OPERATOR_ID, event.operatorId());
         assertEquals(OperatorTestFixtures.configurationDto(), event.configuration());
         assertEquals(timestamp, event.timestamp());
+        assertEquals(String.valueOf(OperatorTestFixtures.OPERATOR_ID.getValue()), event.eventKey());
     }
 }
