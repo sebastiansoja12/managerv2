@@ -35,7 +35,7 @@ import com.warehouse.palletmanagement.domain.vo.PalletDepartment;
 import com.warehouse.palletmanagement.domain.vo.PalletDepartmentsChange;
 import com.warehouse.palletmanagement.domain.vo.PalletDepartmentsChangedSnapshot;
 import com.warehouse.palletmanagement.domain.event.PalletDepartmentsChanged;
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
 import com.warehouse.palletmanagement.domain.vo.PalletDetails;
 import com.warehouse.palletmanagement.domain.vo.PalletDocumentFile;
 import com.warehouse.palletmanagement.domain.vo.PalletDocumentShipment;

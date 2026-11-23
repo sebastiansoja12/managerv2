@@ -1,6 +1,6 @@
 package com.warehouse.palletmanagement.application.port.primary;
 
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.PalletId;
 import com.warehouse.commonassets.identificator.ShipmentId;

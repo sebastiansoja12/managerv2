@@ -10,7 +10,6 @@ import com.warehouse.palletmanagement.api.event.snapshot.PalletDepartmentsChange
 import com.warehouse.palletmanagement.api.event.snapshot.PalletLoadedEventData;
 import com.warehouse.palletmanagement.api.event.snapshot.PalletLoadingRevertedEventData;
 import com.warehouse.palletmanagement.api.event.snapshot.PalletUnloadedEventData;
-import com.warehouse.palletmanagement.application.port.secondary.PalletIntegrationEventServicePort;
 import com.warehouse.palletmanagement.domain.event.PalletDepartmentsChanged;
 import com.warehouse.palletmanagement.domain.event.PalletLoaded;
 import com.warehouse.palletmanagement.domain.event.PalletLoadingReverted;
@@ -19,24 +18,14 @@ import com.warehouse.palletmanagement.domain.vo.PalletDepartmentsChangedSnapshot
 import com.warehouse.palletmanagement.domain.vo.PalletLoadedSnapshot;
 import com.warehouse.palletmanagement.domain.vo.PalletLoadingRevertedSnapshot;
 import com.warehouse.palletmanagement.domain.vo.PalletUnloadedSnapshot;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.event.EventListener;
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventTranslation;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnProperty(
-        name = {"manager.kafka.integration-events.enabled", "manager.kafka.outbox.enabled"},
-        havingValue = "true")
-public class PalletIntegrationEventListener {
+public class PalletIntegrationEventTranslator {
 
-    private final PalletIntegrationEventServicePort palletIntegrationEventServicePort;
-
-    public PalletIntegrationEventListener(final PalletIntegrationEventServicePort palletIntegrationEventServicePort) {
-        this.palletIntegrationEventServicePort = palletIntegrationEventServicePort;
-    }
-
-    @EventListener
-    public void handle(final PalletLoaded event) {
+    @IntegrationEventTranslation
+    public PalletLoadedIntegrationEvent translate(final PalletLoaded event) {
         final PalletLoadedSnapshot snapshot = event.getSnapshot();
         final PalletLoadedEventData eventData = new PalletLoadedEventData(
                 snapshot.palletId().value(),
@@ -44,21 +33,21 @@ public class PalletIntegrationEventListener {
                 snapshot.shipmentIds().stream().map(ShipmentId::getValue).toList(),
                 departmentValue(snapshot.originDepartmentId()),
                 departmentValue(snapshot.destinationDepartmentId()));
-        this.palletIntegrationEventServicePort.publishEvent(new PalletLoadedIntegrationEvent(eventData));
+        return new PalletLoadedIntegrationEvent(eventData);
     }
 
-    @EventListener
-    public void handle(final PalletLoadingReverted event) {
+    @IntegrationEventTranslation
+    public PalletLoadingRevertedIntegrationEvent translate(final PalletLoadingReverted event) {
         final PalletLoadingRevertedSnapshot snapshot = event.getSnapshot();
         final PalletLoadingRevertedEventData eventData = new PalletLoadingRevertedEventData(
                 snapshot.palletId().value(),
                 snapshot.trackingNumber().value(),
                 snapshot.shipmentIds().stream().map(ShipmentId::getValue).toList());
-        this.palletIntegrationEventServicePort.publishEvent(new PalletLoadingRevertedIntegrationEvent(eventData));
+        return new PalletLoadingRevertedIntegrationEvent(eventData);
     }
 
-    @EventListener
-    public void handle(final PalletUnloaded event) {
+    @IntegrationEventTranslation
+    public PalletUnloadedIntegrationEvent translate(final PalletUnloaded event) {
         final PalletUnloadedSnapshot snapshot = event.getSnapshot();
         final PalletUnloadedEventData eventData = new PalletUnloadedEventData(
                 snapshot.palletId(),
@@ -66,18 +55,18 @@ public class PalletIntegrationEventListener {
                 snapshot.unloadedShipmentIds(),
                 snapshot.missingShipmentIds(),
                 snapshot.unloadDepartmentId());
-        this.palletIntegrationEventServicePort.publishEvent(new PalletUnloadedIntegrationEvent(eventData));
+        return new PalletUnloadedIntegrationEvent(eventData);
     }
 
-    @EventListener
-    public void handle(final PalletDepartmentsChanged event) {
+    @IntegrationEventTranslation
+    public PalletDepartmentsChangedIntegrationEvent translate(final PalletDepartmentsChanged event) {
         final PalletDepartmentsChangedSnapshot snapshot = event.getSnapshot();
         final PalletDepartmentsChangedEventData eventData = new PalletDepartmentsChangedEventData(
                 snapshot.palletId(),
                 snapshot.trackingNumber(),
                 snapshot.originDepartmentId(),
                 snapshot.destinationDepartmentId());
-        this.palletIntegrationEventServicePort.publishEvent(new PalletDepartmentsChangedIntegrationEvent(eventData));
+        return new PalletDepartmentsChangedIntegrationEvent(eventData);
     }
 
     private static Long departmentValue(final DepartmentId departmentId) {
