@@ -1,18 +1,23 @@
 package com.warehouse.logisticsdelivery.application.listener;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.warehouse.eventoutbox.integration.model.IntegrationEvent;
+import com.warehouse.eventoutbox.publication.DomainEventTranslationBridge;
+import com.warehouse.eventoutbox.publication.IntegrationEventTranslationRegistry;
+
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.logisticsdelivery.api.event.DeliveryChangedIntegrationEvent;
 import com.warehouse.logisticsdelivery.api.event.DeliveryCompletedIntegrationEvent;
 import com.warehouse.logisticsdelivery.api.event.DeliveryCreatedIntegrationEvent;
 import com.warehouse.logisticsdelivery.api.event.snapshot.DeliveryEventData;
-import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryIntegrationEventServicePort;
 import com.warehouse.logisticsdelivery.domain.event.DeliveryCompleted;
 import com.warehouse.logisticsdelivery.domain.event.DeliveryCreated;
 import com.warehouse.logisticsdelivery.domain.model.Delivery;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.mapper.DeliveryEventDataMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import java.time.Instant;
 
@@ -21,26 +26,25 @@ import static com.warehouse.logisticsdelivery.DeliveryFixture.ORIGIN_DEPARTMENT_
 import static com.warehouse.logisticsdelivery.DeliveryFixture.USER_ID;
 import static com.warehouse.logisticsdelivery.DeliveryFixture.shipmentDelivery;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
-class DeliveryIntegrationEventListenerTest {
+class DeliveryIntegrationEventTranslatorTest {
 
-    private DeliveryIntegrationEventServicePort deliveryIntegrationEventServicePort;
-    private DeliveryIntegrationEventListener listener;
+    private final List<IntegrationEvent> published = new ArrayList<>();
+    private DomainEventTranslationBridge bridge;
 
     @BeforeEach
     void setUp() {
-        this.deliveryIntegrationEventServicePort = mock(DeliveryIntegrationEventServicePort.class);
-        this.listener = new DeliveryIntegrationEventListener(this.deliveryIntegrationEventServicePort,
-                new DeliveryEventDataMapper());
+        final IntegrationEventTranslationRegistry registry = new IntegrationEventTranslationRegistry();
+        registry.postProcessAfterInitialization(new DeliveryIntegrationEventTranslator(new DeliveryEventDataMapper()),
+                "deliveryIntegrationEventTranslator");
+        this.bridge = new DomainEventTranslationBridge(registry, this.published::add);
     }
 
     @Test
     void shouldPublishCreatedIntegrationEventWithRouteData() {
         final Delivery delivery = shipmentDelivery(new ShipmentId(10L));
 
-        this.listener.handle(new DeliveryCreated(delivery.snapshot(), Instant.now()));
+        this.bridge.onDomainEvent(new DeliveryCreated(delivery.snapshot(), Instant.now()));
 
         final DeliveryEventData payload = publishedEvent(DeliveryCreatedIntegrationEvent.class).payload();
         assertThat(payload.deliveryId()).isEqualTo(delivery.getDeliveryId());
@@ -58,7 +62,7 @@ class DeliveryIntegrationEventListenerTest {
         final Delivery delivery = shipmentDelivery(new ShipmentId(10L));
         delivery.complete(null, USER_ID, null);
 
-        this.listener.handle(new DeliveryCompleted(delivery.snapshot(), Instant.now()));
+        this.bridge.onDomainEvent(new DeliveryCompleted(delivery.snapshot(), Instant.now()));
 
         final DeliveryEventData payload = publishedEvent(DeliveryCompletedIntegrationEvent.class).payload();
         assertThat(payload.lifecycleStatus()).isEqualTo("COMPLETED");
@@ -67,10 +71,8 @@ class DeliveryIntegrationEventListenerTest {
     }
 
     private <T extends DeliveryChangedIntegrationEvent> T publishedEvent(final Class<T> eventType) {
-        final ArgumentCaptor<DeliveryChangedIntegrationEvent> event =
-                ArgumentCaptor.forClass(DeliveryChangedIntegrationEvent.class);
-        verify(this.deliveryIntegrationEventServicePort).publishEvent(event.capture());
-        assertThat(event.getValue()).isInstanceOf(eventType);
-        return eventType.cast(event.getValue());
+        assertThat(this.published).hasSize(1);
+        assertThat(this.published.getFirst()).isInstanceOf(eventType);
+        return eventType.cast(this.published.getFirst());
     }
 }

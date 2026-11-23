@@ -10,9 +10,9 @@ import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.Departme
 import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import com.warehouse.organisationstructure.department.api.DepartmentLifecycleParticipant;
 import java.time.Clock;
-import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.commonassets.context.OperatorContext;
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.repository.BaseRepository;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.geocoding.api.GeocodingCoordinatesService;
@@ -70,7 +70,7 @@ public class DeliveryConfiguration {
 
     @Bean("deliveryAuditLogServicePort")
     @ConditionalOnProperty(
-            name = {"manager.kafka.integration-events.enabled", "manager.kafka.outbox.enabled"},
+            name = "manager.events.outbox.enabled",
             havingValue = "true")
     public AuditLogServicePort deliveryAuditLogServicePort(
             final IntegrationEventPublisher integrationEventPublisher) {

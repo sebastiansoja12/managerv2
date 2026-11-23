@@ -2,7 +2,7 @@ package com.warehouse.logisticsdelivery.infrastructure.adapter.primary.kafka;
 
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaEventListener;
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventListener;
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryPort;
 import com.warehouse.logisticsdelivery.application.port.primary.command.ChangePalletDeliveryRouteCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreatePalletDeliveryCommand;
@@ -27,10 +27,7 @@ public class PalletDeliveryEventListener {
         this.deliveryPort = deliveryPort;
     }
 
-    @KafkaEventListener(
-            topics = "${manager.kafka.topics.pallet-loaded:pallet.loaded}",
-            groupId = "${manager.kafka.consumer-groups.pallet-loaded-delivery:logistics-orchestrator-pallet}"
-    )
+    @IntegrationEventListener(group = "logistics-orchestrator-pallet")
     public void handle(final PalletLoadedIntegrationEvent event) {
         final PalletLoadedEventData payload = event.payload();
         final CreatePalletDeliveryCommand command = new CreatePalletDeliveryCommand(
@@ -42,10 +39,7 @@ public class PalletDeliveryEventListener {
         deliveryPort.createPalletDelivery(command);
     }
 
-    @KafkaEventListener(
-            topics = "${manager.kafka.topics.pallet-loading-reverted:pallet.loading-reverted}",
-            groupId = "${manager.kafka.consumer-groups.pallet-loading-reverted-delivery:logistics-orchestrator-pallet-reverted}"
-    )
+    @IntegrationEventListener(group = "logistics-orchestrator-pallet-reverted")
     public void handle(final PalletLoadingRevertedIntegrationEvent event) {
         final PalletLoadingRevertedEventData payload = event.payload();
         deliveryPort.revertPalletDelivery(new RevertPalletDeliveryCommand(
@@ -54,10 +48,7 @@ public class PalletDeliveryEventListener {
                 event.userId()));
     }
 
-    @KafkaEventListener(
-            topics = "${manager.kafka.topics.pallet-unloaded:pallet.unloaded}",
-            groupId = "${manager.kafka.consumer-groups.pallet-unloaded-delivery:logistics-orchestrator-pallet-unloaded}"
-    )
+    @IntegrationEventListener(group = "logistics-orchestrator-pallet-unloaded")
     public void handle(final PalletUnloadedIntegrationEvent event) {
         final PalletUnloadedEventData payload = event.payload();
         deliveryPort.unloadPalletDelivery(new UnloadPalletDeliveryCommand(
@@ -67,10 +58,7 @@ public class PalletDeliveryEventListener {
                 event.userId()));
     }
 
-    @KafkaEventListener(
-            topics = "${manager.kafka.topics.pallet-departments-changed:pallet.departments-changed}",
-            groupId = "${manager.kafka.consumer-groups.pallet-departments-changed-delivery:logistics-orchestrator-pallet-departments-changed}"
-    )
+    @IntegrationEventListener(group = "logistics-orchestrator-pallet-departments-changed")
     public void handle(final PalletDepartmentsChangedIntegrationEvent event) {
         final PalletDepartmentsChangedEventData payload = event.payload();
         deliveryPort.changePalletDeliveryRoute(new ChangePalletDeliveryRouteCommand(

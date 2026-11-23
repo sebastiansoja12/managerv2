@@ -1,6 +1,6 @@
 package com.warehouse.logisticsdelivery.application.port.primary;
 
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
 import com.warehouse.logisticsdelivery.application.port.primary.command.SearchDeliveriesCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.result.DeliveryReadPage;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryReadModelRepository;

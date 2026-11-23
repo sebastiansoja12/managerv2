@@ -5,7 +5,7 @@ import com.warehouse.auditlog.api.dto.AuditLogResourceIdDto;
 import com.warehouse.auditlog.api.dto.AuditLogResourceTypeDto;
 import com.warehouse.auditlog.api.event.AuditLogEntryIntegrationEvent;
 import com.warehouse.auditlog.api.event.snapshot.AuditLogEntryData;
-import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.logisticsdelivery.application.port.secondary.AuditLogServicePort;
 import com.warehouse.logisticsdelivery.domain.vo.DeliveryAuditLog;
 

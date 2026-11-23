@@ -4,8 +4,8 @@ import com.warehouse.logisticsdelivery.application.service.DestinationCapacityAl
 import com.warehouse.logisticsdelivery.domain.service.DepartmentCapacityBalancer;
 import java.time.Clock;
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
-import com.warehouse.commonassets.event.domain.model.DomainEvent;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.domain.model.DomainEvent;
 import com.warehouse.commonassets.identificator.DeliveryId;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.PalletId;
