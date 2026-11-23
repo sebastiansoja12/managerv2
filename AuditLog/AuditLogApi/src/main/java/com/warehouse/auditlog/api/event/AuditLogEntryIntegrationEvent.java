@@ -4,17 +4,17 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.warehouse.auditlog.api.event.snapshot.AuditLogEntryData;
-import com.warehouse.commonassets.event.integration.annotation.IntegrationEventType;
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventType;
 import com.warehouse.commonassets.event.integration.context.OperatorAwareContext;
-import com.warehouse.commonassets.event.integration.model.IntegrationEvent;
-import com.warehouse.commonassets.event.integration.model.IntegrationEventKey;
+import com.warehouse.eventoutbox.integration.model.IntegrationEvent;
+import com.warehouse.eventoutbox.integration.model.IntegrationEventKey;
 
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@IntegrationEventType(value = "audit-log.entry", version = 1)
+@IntegrationEventType(value = "audit-log.entry", version = 1, topic = AuditLogTopics.ENTRIES)
 public final class AuditLogEntryIntegrationEvent extends OperatorAwareContext
         implements IntegrationEvent, IntegrationEventKey {
 
