@@ -23,7 +23,7 @@ import com.warehouse.chat.infrastructure.adapter.secondary.ChatUserServiceAdapte
 import com.warehouse.chat.infrastructure.adapter.secondary.InMemoryChatPresenceStore;
 import com.warehouse.chat.infrastructure.adapter.secondary.OrganizationChatRepositoryImpl;
 import com.warehouse.chat.infrastructure.adapter.secondary.mapper.ChatPersistenceMapper;
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.repository.BaseRepository;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;

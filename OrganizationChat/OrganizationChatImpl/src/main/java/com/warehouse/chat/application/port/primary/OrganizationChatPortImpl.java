@@ -15,7 +15,7 @@ import com.warehouse.chat.domain.vo.ChatMessageSnapshot;
 import com.warehouse.chat.domain.vo.ChatParticipant;
 import com.warehouse.chat.domain.vo.ChatPresence;
 import com.warehouse.chat.domain.vo.DirectChatParticipants;
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import org.springframework.transaction.annotation.Transactional;
