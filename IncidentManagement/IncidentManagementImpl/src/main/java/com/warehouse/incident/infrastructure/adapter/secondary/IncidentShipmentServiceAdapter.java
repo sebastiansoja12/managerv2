@@ -1,7 +1,7 @@
 package com.warehouse.incident.infrastructure.adapter.secondary;
 
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.incident.application.port.secondary.IncidentShipmentServicePort;
