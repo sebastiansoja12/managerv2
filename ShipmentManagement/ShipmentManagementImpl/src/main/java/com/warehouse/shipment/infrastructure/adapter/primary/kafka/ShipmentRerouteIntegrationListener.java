@@ -2,7 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.primary.kafka;
 
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.identificator.TrackingNumber;
-import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaEventListener;
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventListener;
 import com.warehouse.reroute.api.event.ShipmentRerouteRequestedIntegrationEvent;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.exception.ShipmentModificationException;
@@ -29,10 +29,7 @@ public class ShipmentRerouteIntegrationListener {
         this.mapper = new ShipmentRerouteEventMapper();
     }
 
-    @KafkaEventListener(
-            topics = "${manager.kafka.topics.shipment-reroute-requested:shipment.reroute.requested}",
-            groupId = "${manager.kafka.consumer-groups.shipment-reroute-requested:manager-shipment-reroute}"
-    )
+    @IntegrationEventListener(group = "manager-shipment-reroute")
     public void handle(final ShipmentRerouteRequestedIntegrationEvent event) {
         final TrackingNumber trackingNumber = mapper.mapTrackingNumber(event);
         final ShipmentOwnerContext context = this.shipmentPort.findContext(trackingNumber);

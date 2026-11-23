@@ -1,6 +1,6 @@
 package com.warehouse.returning.infrastructure.adapter.primary.kafka;
 
-import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaEventListener;
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventListener;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -24,14 +24,12 @@ public class ReturnIntegrationListener {
         this.returnProcessingPort = returnProcessingPort;
     }
 
-    @KafkaEventListener(topics = "${manager.kafka.topics.return-package-status-changed}",
-            groupId = "shipment-management")
+    @IntegrationEventListener(group = "shipment-management")
     public void handle(final ReturnPackageStatusChangedIntegrationEvent event) {
         returnProcessingPort.applyStatusChanged(event.getShipmentId(), event.getReturnStatus());
     }
 
-    @KafkaEventListener(topics = "${manager.kafka.topics.return-processing:return.processing.started}",
-            groupId = "shipment-management")
+    @IntegrationEventListener(group = "shipment-management")
     public void handle(final ReturnProcessingStartedIntegrationEvent event) {
         returnProcessingPort.applyProcessingStarted(new ApplyReturnProcessingStartedCommand(
                 event.eventId(), new ShipmentId(event.shipmentId().value()), returnShipmentId(event),
@@ -40,8 +38,7 @@ public class ReturnIntegrationListener {
                 event.userId() == null ? null : new UserId(event.userId().value())));
     }
 
-    @KafkaEventListener(topics = "${manager.kafka.topics.return-cancelled:return.cancelled}",
-            groupId = "shipment-management")
+    @IntegrationEventListener(group = "shipment-management")
     public void handle(final ReturnCancelledIntegrationEvent event) {
         returnProcessingPort.applyCancelled(new ApplyReturnCancelledCommand(
                 event.eventId(), new ShipmentId(event.shipmentId().value()), returnShipmentId(event),
@@ -50,8 +47,7 @@ public class ReturnIntegrationListener {
                 event.userId() == null ? null : new UserId(event.userId().value())));
     }
 
-    @KafkaEventListener(topics = "${manager.kafka.topics.return-completed:return.completed}",
-            groupId = "shipment-management")
+    @IntegrationEventListener(group = "shipment-management")
     public void handle(final ReturnCompletedIntegrationEvent event) {
         returnProcessingPort.applyCompleted(new ApplyReturnCompletedCommand(
                 event.eventId(), new ShipmentId(event.shipmentId().value()), returnShipmentId(event),

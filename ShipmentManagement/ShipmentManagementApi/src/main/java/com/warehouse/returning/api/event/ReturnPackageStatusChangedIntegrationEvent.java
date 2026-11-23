@@ -3,16 +3,16 @@ package com.warehouse.returning.api.event;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.warehouse.commonassets.enumeration.ReturnStatus;
-import com.warehouse.commonassets.event.integration.annotation.IntegrationEventType;
-import com.warehouse.commonassets.event.integration.model.IntegrationEvent;
-import com.warehouse.commonassets.event.integration.model.IntegrationEventKey;
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventType;
+import com.warehouse.eventoutbox.integration.model.IntegrationEvent;
+import com.warehouse.eventoutbox.integration.model.IntegrationEventKey;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.UserId;
 
 import java.time.Instant;
 
-@IntegrationEventType(value = "return.package.status.changed", version = 2)
+@IntegrationEventType(value = "return.package.status.changed", version = 2, topic = ReturnPackageTopics.STATUS_CHANGED)
 public class ReturnPackageStatusChangedIntegrationEvent implements IntegrationEvent, IntegrationEventKey {
 
     private final ShipmentId shipmentId;

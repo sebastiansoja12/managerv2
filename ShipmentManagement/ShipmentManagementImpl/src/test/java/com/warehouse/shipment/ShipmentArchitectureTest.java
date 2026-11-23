@@ -1,17 +1,16 @@
 package com.warehouse.shipment;
 
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
-import com.warehouse.commonassets.event.domain.model.DomainEvent;
-import com.warehouse.commonassets.event.infrastructure.adapter.secondary.SpringDomainEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.domain.model.DomainEvent;
+import com.warehouse.eventoutbox.infrastructure.adapter.secondary.SpringDomainEventPublisher;
 import com.warehouse.commonassets.event.integration.context.OperatorAwareContext;
 import com.warehouse.commonassets.event.integration.context.OperatorAwareEvent;
-import com.warehouse.commonassets.event.integration.model.IntegrationEventKey;
-import com.warehouse.commonassets.kafka.application.KafkaOutboxPublicationService;
-import com.warehouse.commonassets.kafka.application.TransactionalKafkaOutboxWriter;
-import com.warehouse.commonassets.kafka.domain.model.KafkaOutboxRecord;
-import com.warehouse.commonassets.kafka.domain.model.KafkaOutboxStatus;
-import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.JdbcKafkaOutboxAdapter;
-import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.OutboxIntegrationEventPublisher;
+import com.warehouse.eventoutbox.integration.model.IntegrationEventKey;
+import com.warehouse.eventoutbox.integration.model.IntegrationEvent;
+import com.warehouse.shipment.api.event.ShipmentTopics;
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventType;
+import com.warehouse.eventoutbox.outbox.domain.enumeration.OutboxEventStatus;
+import com.warehouse.eventoutbox.outbox.infrastructure.adapter.secondary.IntegrationEventOutboxAdapter;
 import com.warehouse.shipment.api.event.ShipmentCanceledIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
@@ -20,8 +19,8 @@ import com.warehouse.shipment.api.event.ShipmentPalletReadModelChanged;
 import com.warehouse.shipment.api.event.ShipmentReadModelChanged;
 import com.warehouse.shipment.api.event.ShipmentStatusChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.snapshot.ShipmentEventData;
-import com.warehouse.shipment.application.listener.ShipmentIntegrationEventListener;
-import com.warehouse.shipment.application.listener.ShipmentReadModelSyncIntegrationEventListener;
+import com.warehouse.shipment.application.listener.ShipmentIntegrationEventTranslator;
+import com.warehouse.shipment.application.listener.ShipmentReadModelSyncIntegrationEventTranslator;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.shipment.application.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.application.port.primary.ShipmentReadModelSyncPort;
@@ -45,6 +44,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ShipmentArchitectureTest {
+
+    private static final Path EVENT_OUTBOX_ROOT = Path.of("../../EventOutbox/src/main/java/com/warehouse/eventoutbox");
 
     @Test
     void shipmentShouldNotDependOnInfrastructureOrDomainContext() throws IOException {
@@ -198,28 +199,24 @@ class ShipmentArchitectureTest {
 
     @Test
     void integrationEventListenerShouldOnlyTranslateDomainEvents() throws IOException {
-        final String listenerSource = Files.readString(Path.of(
-                "src/main/java/com/warehouse/shipment/application/listener/ShipmentIntegrationEventListener.java"));
+        final String translatorSource = Files.readString(Path.of(
+                "src/main/java/com/warehouse/shipment/application/listener/ShipmentIntegrationEventTranslator.java"));
 
-        assertThat(listenerSource)
-                .contains("handle(final ShipmentCreated event)")
-                .contains("ShipmentIntegrationEventServicePort")
+        assertThat(translatorSource)
+                .contains("translate(final ShipmentCreated event)")
+                .contains("@IntegrationEventTranslation")
                 .contains("ShipmentEventDataMapperPort")
-                .contains("publishEvent(")
                 .doesNotContain("IntegrationEventPublisher")
+                .doesNotContain("@EventListener")
+                .doesNotContain("ConditionalOnProperty")
                 .doesNotContain("ShipmentPort")
-                .doesNotContain("PathFinderServicePort")
-                .doesNotContain("Optional<")
-                .doesNotContain("TODO")
-                .doesNotContain("handle(final ShipmentEvent event)");
-
-        final String adapterSource = Files.readString(Path.of(
-                "src/main/java/com/warehouse/shipment/infrastructure/adapter/secondary/ShipmentIntegrationEventServiceAdapter.java"));
-        assertThat(adapterSource)
-                .contains("implements ShipmentIntegrationEventServicePort")
-                .contains("publishEvent(final IntegrationEvent event)")
-                .contains("integrationEventPublisher.publish(event)")
-                .contains("IntegrationEventPublisher");
+                .doesNotContain("PathFinderServicePort");
+        assertThat(Path.of(
+                "src/main/java/com/warehouse/shipment/application/port/secondary/ShipmentIntegrationEventServicePort.java"))
+                .doesNotExist();
+        assertThat(Path.of(
+                "src/main/java/com/warehouse/shipment/infrastructure/adapter/secondary/ShipmentIntegrationEventServiceAdapter.java"))
+                .doesNotExist();
 
         final String domainListenerSource = Files.readString(Path.of(
                 "src/main/java/com/warehouse/shipment/application/listener/ShipmentDomainEventListener.java"));
@@ -232,7 +229,7 @@ class ShipmentArchitectureTest {
         final String integrationEvent = Files.readString(Path.of(
                 "../ShipmentManagementApi/src/main/java/com/warehouse/shipment/api/event/ShipmentChangedIntegrationEvent.java"));
         assertThat(integrationEvent)
-                .contains("@IntegrationEventType(value = \"shipment.changed\", version = 1)")
+                .contains("@IntegrationEventType(value = \"shipment.changed\", version = 1, topic = ShipmentTopics.EVENTS)")
                 .contains("ShipmentEventData payload")
                 .contains("ShipmentChangedIntegrationEvent(@JsonProperty(\"payload\") final ShipmentEventData shipmentEventData)")
                 .doesNotContain("UUID eventId")
@@ -301,13 +298,13 @@ class ShipmentArchitectureTest {
     @Test
     void integrationEventContractsShouldBeIndependentFromDomainAndKafka() throws IOException {
         final Path commonEventRoot = Path.of("../../Common/src/main/java/com/warehouse/commonassets/event");
-        final Path integrationRoot = commonEventRoot.resolve("integration");
+        final Path integrationRoot = EVENT_OUTBOX_ROOT.resolve("integration");
 
         assertThat(integrationRoot.resolve("annotation/IntegrationEventType.java")).exists();
         assertThat(integrationRoot.resolve("model/IntegrationEvent.java")).exists();
         assertThat(integrationRoot.resolve("model/IntegrationEventKey.java")).exists();
-        assertThat(integrationRoot.resolve("context/OperatorAwareEvent.java")).exists();
-        assertThat(integrationRoot.resolve("context/OperatorAwareContext.java")).exists();
+        assertThat(commonEventRoot.resolve("integration/context/OperatorAwareEvent.java")).exists();
+        assertThat(commonEventRoot.resolve("integration/context/OperatorAwareContext.java")).exists();
         assertThat(commonEventRoot.resolve("domain/annotation/IntegrationEventType.java")).doesNotExist();
         assertThat(commonEventRoot.resolve("domain/model/IntegrationEvent.java")).doesNotExist();
         assertThat(Path.of(
@@ -317,14 +314,14 @@ class ShipmentArchitectureTest {
                 "../../Common/src/main/java/com/warehouse/commonassets/kafka/domain/model/OperatorAwareContext.java"))
                 .doesNotExist();
 
-        try (java.util.stream.Stream<Path> sourceFiles = Files.walk(integrationRoot)) {
-            final List<String> kafkaImports = sourceFiles
+        try (java.util.stream.Stream<Path> sourceFiles = Files.walk(EVENT_OUTBOX_ROOT)) {
+            final List<String> managerImports = sourceFiles
                     .filter(path -> path.toString().endsWith(".java"))
                     .flatMap(this::lines)
-                    .filter(line -> line.startsWith("import com.warehouse.commonassets.kafka"))
+                    .filter(line -> line.startsWith("import com.warehouse.") && !line.startsWith("import com.warehouse.eventoutbox."))
                     .toList();
 
-            assertThat(kafkaImports).isEmpty();
+            assertThat(managerImports).isEmpty();
         }
     }
 
@@ -377,8 +374,8 @@ class ShipmentArchitectureTest {
                 .contains("syncPalletTrackingNumber")
                 .doesNotContain("ShipmentReadModelRepository");
 
-        assertThat(Files.readString(Path.of("../../Application/src/main/resources/application.properties")))
-                .contains("manager.kafka.integration-events.routes.shipment.read-model.pallet-changed=");
+        assertThat(ShipmentPalletReadModelChanged.class.getAnnotation(IntegrationEventType.class).topic())
+                .isEqualTo(ShipmentTopics.PALLET_READ_MODEL_SYNC);
     }
 
     @Test
@@ -427,24 +424,15 @@ class ShipmentArchitectureTest {
         final Path commonEventRoot = Path.of("../../Common/src/main/java/com/warehouse/commonassets/event");
         assertThat(commonEventRoot.resolve("domain/port/DomainEventPublisher.java")).doesNotExist();
         assertThat(commonEventRoot.resolve("application/SpringDomainEventPublisher.java")).doesNotExist();
-        assertThat(commonEventRoot.resolve("application/port/secondary/DomainEventPublisher.java")).exists();
-        assertThat(commonEventRoot.resolve(
+        assertThat(EVENT_OUTBOX_ROOT.resolve("application/port/secondary/DomainEventPublisher.java")).exists();
+        assertThat(EVENT_OUTBOX_ROOT.resolve(
                 "infrastructure/adapter/secondary/SpringDomainEventPublisher.java")).exists();
     }
 
     @Test
     void kafkaComponentsShouldUseDedicatedFeatureFlags() throws IOException, NoSuchMethodException {
-        assertThat(propertyNames(OutboxIntegrationEventPublisher.class))
-                .containsExactly("manager.kafka.outbox.enabled");
-        assertThat(propertyNames(KafkaOutboxPublicationService.class))
-                .containsExactly("manager.kafka.outbox.enabled");
-        assertThat(propertyNames(TransactionalKafkaOutboxWriter.class))
-                .containsExactly("manager.kafka.outbox.enabled");
-        assertThat(propertyNames(JdbcKafkaOutboxAdapter.class))
-                .containsExactly("manager.kafka.outbox.enabled");
-        assertThat(propertyNames(ShipmentIntegrationEventListener.class))
-                .containsExactly("manager.kafka.integration-events.enabled", "manager.kafka.outbox.enabled");
-        assertThat(ShipmentReadModelSyncIntegrationEventListener.class.getAnnotation(ConditionalOnProperty.class)).isNull();
+        assertThat(ShipmentIntegrationEventTranslator.class.getAnnotation(ConditionalOnProperty.class)).isNull();
+        assertThat(ShipmentReadModelSyncIntegrationEventTranslator.class.getAnnotation(ConditionalOnProperty.class)).isNull();
         assertThat(ShipmentIntegrationListener.class.getAnnotation(ConditionalOnProperty.class)).isNull();
 
         assertThat(Path.of(
@@ -466,12 +454,12 @@ class ShipmentArchitectureTest {
         final Path commonEventRoot = Path.of("../../Common/src/main/java/com/warehouse/commonassets/event");
         assertThat(commonEventRoot.resolve("application/SpringIntegrationEventPublisher.java")).doesNotExist();
         assertThat(commonEventRoot.resolve("domain/port/IntegrationEventPublisher.java")).doesNotExist();
-        assertThat(commonEventRoot.resolve("application/port/secondary/IntegrationEventPublisher.java")).exists();
+        assertThat(EVENT_OUTBOX_ROOT.resolve("application/port/secondary/IntegrationEventPublisher.java")).exists();
 
         final String properties = Files.readString(Path.of("../../Application/src/main/resources/application.properties"));
         assertThat(properties)
-                .contains("manager.kafka.outbox.enabled=")
-                .contains("manager.kafka.integration-events.enabled=")
+                .contains("manager.events.outbox.enabled=")
+                .doesNotContain("manager.kafka.integration-events.enabled=")
                 .doesNotContain("manager.kafka.shipment-read-model-sync.enabled=")
                 .contains("manager.kafka.consumer.retry.max-attempts=")
                 .contains("manager.kafka.consumer.retry.backoff-ms=")
@@ -479,57 +467,24 @@ class ShipmentArchitectureTest {
                 .contains("manager.kafka.consumer.dlt.publish-timeout-ms=")
                 .doesNotContain("manager.kafka.shipment-read-model-sync.retry.")
                 .doesNotContain("manager.kafka.shipment-read-model-sync.dlt-")
-                .contains("manager.kafka.integration-events.routes.shipment.status.changed="
-                        + "${manager.kafka.topics.shipment-events}")
-                .contains("manager.kafka.integration-events.routes.shipment.read-model.changed=")
+                .doesNotContain("manager.kafka.integration-events.routes.")
                 .doesNotContain("manager.kafka.domain-events.enabled=");
 
-        assertThat(KafkaOutboxStatus.values()).containsExactly(
-                KafkaOutboxStatus.PENDING,
-                KafkaOutboxStatus.PROCESSING,
-                KafkaOutboxStatus.PUBLISHED,
-                KafkaOutboxStatus.DEAD);
+        assertThat(OutboxEventStatus.values()).containsExactly(
+                OutboxEventStatus.PENDING,
+                OutboxEventStatus.PUBLISHED,
+                OutboxEventStatus.DEAD);
         final String outboxMigration = Files.readString(Path.of(
-                "../../Application/src/main/resources/changelog/db/postgresql/tables/kafka_event_outbox.xml"));
+                "../../Application/src/main/resources/changelog/db/postgresql/changes/2026-11-18-integration-event-outbox.xml"));
         assertThat(outboxMigration)
+                .contains("name=\"sequence_number\"")
                 .contains("name=\"status\"")
                 .contains("name=\"attempt_count\"")
                 .contains("name=\"next_attempt_at\"")
-                .contains("name=\"locked_by\"")
-                .contains("name=\"locked_until\"");
+                .doesNotContain("name=\"locked_by\"");
 
-        assertThat(transactionPropagation(JdbcKafkaOutboxAdapter.class, "save", KafkaOutboxRecord.class))
-                .isEqualTo(Propagation.REQUIRED);
-        assertThat(transactionPropagation(
-                JdbcKafkaOutboxAdapter.class,
-                "claimPending",
-                int.class,
-                String.class,
-                java.time.Instant.class,
-                java.time.Instant.class))
-                .isEqualTo(Propagation.REQUIRES_NEW);
-        assertThat(transactionPropagation(
-                JdbcKafkaOutboxAdapter.class,
-                "claim",
-                java.util.UUID.class,
-                String.class,
-                java.time.Instant.class,
-                java.time.Instant.class))
-                .isEqualTo(Propagation.REQUIRES_NEW);
-        assertThat(transactionPropagation(
-                JdbcKafkaOutboxAdapter.class,
-                "markPublished",
-                java.util.UUID.class,
-                String.class))
-                .isEqualTo(Propagation.REQUIRES_NEW);
-        assertThat(transactionPropagation(
-                JdbcKafkaOutboxAdapter.class,
-                "markFailed",
-                java.util.UUID.class,
-                String.class,
-                Throwable.class,
-                java.time.Instant.class))
-                .isEqualTo(Propagation.REQUIRES_NEW);
+        assertThat(transactionPropagation(IntegrationEventOutboxAdapter.class, "publish", IntegrationEvent.class))
+                .isEqualTo(Propagation.MANDATORY);
     }
 
     private String[] propertyNames(final Class<?> componentType) {

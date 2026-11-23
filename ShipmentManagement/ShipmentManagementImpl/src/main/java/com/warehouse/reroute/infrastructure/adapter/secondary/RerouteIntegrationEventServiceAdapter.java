@@ -1,6 +1,6 @@
 package com.warehouse.reroute.infrastructure.adapter.secondary;
 
-import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.reroute.api.event.ShipmentRerouteRequestedIntegrationEvent;
 import com.warehouse.reroute.api.event.snapshot.ReroutePartyData;
 import com.warehouse.reroute.application.port.secondary.RerouteIntegrationEventServicePort;

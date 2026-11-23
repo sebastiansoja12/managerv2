@@ -20,7 +20,7 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.kafka.support.converter.RecordMessageConverter;
 
-import com.warehouse.commonassets.kafka.domain.model.KafkaEventHeaders;
+import com.warehouse.eventoutbox.kafka.KafkaEventHeaders;
 import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaOperatorContextRecordInterceptor;
 import com.warehouse.commonassets.kafka.infrastructure.config.KafkaConfiguration;
 
@@ -101,9 +101,10 @@ class KafkaConfigurationTest {
 
         final ConcurrentKafkaListenerContainerFactory<String, String> factory =
                 this.configuration.kafkaListenerContainerFactory(
-                        consumerFactory, converter, interceptor, errorHandler);
+                        consumerFactory, converter, interceptor, errorHandler, true);
 
         assertThat(factory.getConsumerFactory()).isSameAs(consumerFactory);
+        assertThat(factory.getContainerProperties().isObservationEnabled()).isTrue();
         assertThat(factory.getContainerProperties().getAckMode())
                 .isEqualTo(ContainerProperties.AckMode.RECORD);
         assertThat(factory.getContainerProperties().isDeliveryAttemptHeader()).isTrue();

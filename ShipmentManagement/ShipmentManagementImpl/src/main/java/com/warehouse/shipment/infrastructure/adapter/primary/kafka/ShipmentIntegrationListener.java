@@ -1,6 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.kafka;
 
-import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaEventListener;
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventListener;
 import com.warehouse.shipment.api.event.ShipmentDeliveryReadModelChanged;
 import com.warehouse.shipment.api.event.ShipmentPalletReadModelChanged;
 import com.warehouse.shipment.api.event.ShipmentReadModelChanged;
@@ -18,15 +18,12 @@ public class ShipmentIntegrationListener {
         this.shipmentReadModelSyncPort = shipmentReadModelSyncPort;
     }
 
-    @KafkaEventListener(topics = "${manager.kafka.topics.shipment-read-model-sync:shipment.read-model.sync}",
-            groupId = "shipment-management")
+    @IntegrationEventListener(group = "shipment-management")
     public void handle(final ShipmentReadModelChanged event) {
         shipmentReadModelSyncPort.syncReadModel(event.snapshot().shipmentId());
     }
 
-    @KafkaEventListener(
-            topics = "${manager.kafka.topics.shipment-delivery-read-model-sync:shipment.read-model.delivery-sync}",
-            groupId = "shipment-management-delivery")
+    @IntegrationEventListener(group = "shipment-management-delivery")
     public void handle(final ShipmentDeliveryReadModelChanged event) {
         final ShipmentDeliveryReadModelData payload = event.payload();
         shipmentReadModelSyncPort.syncReadModel(payload.shipmentId(), new ShipmentDeliveryDetails(
@@ -34,9 +31,7 @@ public class ShipmentIntegrationListener {
                 payload.plannedDeliveryAt(), payload.deliveredAt()));
     }
 
-    @KafkaEventListener(
-            topics = "${manager.kafka.topics.shipment-pallet-read-model-sync:shipment.read-model.pallet-sync}",
-            groupId = "shipment-management-pallet")
+    @IntegrationEventListener(group = "shipment-management-pallet")
     public void handle(final ShipmentPalletReadModelChanged event) {
         final ShipmentPalletReadModelData payload = event.payload();
         shipmentReadModelSyncPort.syncPalletTrackingNumber(payload.shipmentId(), payload.palletTrackingNumber());

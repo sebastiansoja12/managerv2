@@ -1,7 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.kafka;
 
-import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaEventListener;
-import com.warehouse.shipment.api.event.IncidentChanged;
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventListener;
 import com.warehouse.shipment.api.event.IncidentCommented;
 import com.warehouse.shipment.api.event.IncidentReopened;
 import com.warehouse.shipment.api.event.IncidentReported;
@@ -25,20 +24,23 @@ public class ShipmentIncidentIntegrationListener {
         this.mapper = new ShipmentIncidentEventMapper();
     }
 
-    @KafkaEventListener(
-            topics = "${manager.kafka.topics.shipment-incident-events:shipment.incident.events}",
-            groupId = "${manager.kafka.consumer-groups.shipment-incident-events:manager-shipment-incident}"
-    )
-    public void handle(final IncidentChanged event) {
-        switch (event) {
-            case IncidentReported reported ->
-                    shipmentIncidentPort.reportIncident(mapper.map(reported, IncidentNoteType.REPORTED));
-            case IncidentCommented commented ->
-                    shipmentIncidentPort.commentIncident(mapper.map(commented, IncidentNoteType.COMMENTED));
-            case IncidentResolved resolved -> shipmentIncidentPort.resolveIncident(mapper.map(resolved));
-            case IncidentReopened reopened ->
-                    shipmentIncidentPort.reopenIncident(mapper.map(reopened, IncidentNoteType.REOPENED));
-            default -> log.warn("Unsupported incident event {}", event.getClass().getSimpleName());
-        }
+    @IntegrationEventListener(group = "manager-shipment-incident")
+    public void handle(final IncidentReported event) {
+        shipmentIncidentPort.reportIncident(mapper.map(event, IncidentNoteType.REPORTED));
+    }
+
+    @IntegrationEventListener(group = "manager-shipment-incident")
+    public void handle(final IncidentCommented event) {
+        shipmentIncidentPort.commentIncident(mapper.map(event, IncidentNoteType.COMMENTED));
+    }
+
+    @IntegrationEventListener(group = "manager-shipment-incident")
+    public void handle(final IncidentResolved event) {
+        shipmentIncidentPort.resolveIncident(mapper.map(event));
+    }
+
+    @IntegrationEventListener(group = "manager-shipment-incident")
+    public void handle(final IncidentReopened event) {
+        shipmentIncidentPort.reopenIncident(mapper.map(event, IncidentNoteType.REOPENED));
     }
 }

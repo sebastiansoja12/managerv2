@@ -1,7 +1,7 @@
 package com.warehouse.shipment;
 
 import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.exceptionhandler.exception.RestException;
@@ -29,7 +29,7 @@ import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.service.AddressValidationService;
-import com.warehouse.commonassets.event.domain.model.DomainEvent;
+import com.warehouse.eventoutbox.domain.model.DomainEvent;
 import com.warehouse.shipment.domain.vo.ShipmentDeliveryPlan;
 import com.warehouse.shipment.domain.vo.Dimensions;
 import com.warehouse.shipment.domain.vo.LengthUnit;

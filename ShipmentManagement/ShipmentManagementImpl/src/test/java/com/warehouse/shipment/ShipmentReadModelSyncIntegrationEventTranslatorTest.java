@@ -2,7 +2,6 @@ package com.warehouse.shipment;
 
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
-import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.commonassets.identificator.PalletTrackingNumber;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.api.event.ShipmentPalletReadModelChanged;
@@ -10,14 +9,10 @@ import com.warehouse.shipment.api.event.ShipmentReadModelChanged;
 import com.warehouse.shipment.api.event.snapshot.ShipmentPalletReadModelData;
 import com.warehouse.shipment.application.port.primary.ShipmentReadModelSyncPort;
 import com.warehouse.shipment.infrastructure.adapter.primary.kafka.ShipmentIntegrationListener;
-import com.warehouse.shipment.application.listener.ShipmentReadModelSyncIntegrationEventListener;
+import com.warehouse.shipment.application.listener.ShipmentReadModelSyncIntegrationEventTranslator;
 import com.warehouse.shipment.domain.event.ShipmentChanged;
 import com.warehouse.shipment.domain.model.Shipment;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 
@@ -25,25 +20,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-@ExtendWith(MockitoExtension.class)
-class ShipmentReadModelSyncIntegrationEventListenerTest {
-
-    @Mock
-    private IntegrationEventPublisher integrationEventPublisher;
+class ShipmentReadModelSyncIntegrationEventTranslatorTest {
 
     @Test
     void shouldTranslateShipmentChangeToKeyedReadModelIntegrationEvent() {
         final Shipment shipment = DataTestCreator.shipment();
         final Instant timestamp = Instant.parse("2026-08-31T12:00:00Z");
-        final ShipmentReadModelSyncIntegrationEventListener listener =
-                new ShipmentReadModelSyncIntegrationEventListener(this.integrationEventPublisher);
-        final ArgumentCaptor<ShipmentReadModelChanged> eventCaptor =
-                ArgumentCaptor.forClass(ShipmentReadModelChanged.class);
+        final ShipmentReadModelSyncIntegrationEventTranslator translator =
+                new ShipmentReadModelSyncIntegrationEventTranslator();
 
-        listener.handle(new ShipmentChanged(shipment.snapshot(), timestamp));
+        final ShipmentReadModelChanged event = translator.translate(new ShipmentChanged(shipment.snapshot(), timestamp));
 
-        verify(this.integrationEventPublisher).publish(eventCaptor.capture());
-        final ShipmentReadModelChanged event = eventCaptor.getValue();
         assertThat(event.snapshot().shipmentId()).isEqualTo(shipment.getShipmentId());
         assertThat(event.timestamp()).isEqualTo(timestamp);
         assertThat(event.eventKey()).isEqualTo(String.valueOf(shipment.getShipmentId().getValue()));
