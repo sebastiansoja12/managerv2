@@ -1,8 +1,8 @@
 package com.warehouse.pickuppoint.configuration;
 
 import com.warehouse.commonassets.context.OperatorContext;
-import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.IntegrationEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.repository.BaseRepository;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
@@ -114,7 +114,7 @@ public class PickupPointConfiguration {
 
     @Bean("pickupPointAuditLogServicePort")
     @ConditionalOnProperty(
-            name = {"manager.kafka.integration-events.enabled", "manager.kafka.outbox.enabled"},
+            name = "manager.events.outbox.enabled",
             havingValue = "true")
     public AuditLogServicePort pickupPointAuditLogServicePort(
             final IntegrationEventPublisher integrationEventPublisher) {
