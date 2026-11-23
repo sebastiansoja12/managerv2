@@ -8,8 +8,8 @@ import com.warehouse.supplier.infrastructure.adapter.secondary.CourierLimitServi
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.auth.SupplierUserEventPublisher;
 import com.warehouse.commonassets.context.OperatorContext;
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
-import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.organisationstructure.api.OperatorApiService;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.supplier.api.SupplierApiService;
@@ -96,12 +96,6 @@ public class SupplierConfiguration {
     @Bean
     public MailServicePort supplierMailServicePort(final IntegrationEventPublisher integrationEventPublisher) {
         return new MailServiceAdapter(integrationEventPublisher);
-    }
-
-    @Bean
-    public SupplierIntegrationEventServicePort supplierIntegrationEventServicePort(
-            final IntegrationEventPublisher integrationEventPublisher) {
-        return new SupplierIntegrationEventServiceAdapter(integrationEventPublisher);
     }
 
     @Bean

@@ -1,6 +1,6 @@
 package com.warehouse.supplier.infrastructure.adapter.secondary;
 
-import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.mail.api.event.SupplierDriverLicenseInvalidatedIntegrationEvent;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.infrastructure.adapter.secondary.mapper.OutputRequestMapper;

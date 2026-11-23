@@ -18,7 +18,7 @@ import com.warehouse.supplier.application.port.secondary.CurrentUserServicePort;
 import com.warehouse.supplier.application.port.secondary.DepartmentServicePort;
 import com.warehouse.supplier.application.port.secondary.SupplierRepository;
 import com.warehouse.supplier.application.port.secondary.UserServicePort;
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
 import com.warehouse.supplier.application.port.primary.command.ChangeSupplierDeviceCommand;
 import com.warehouse.supplier.application.port.primary.command.ChangeSupportedPackageTypeCommand;
 import com.warehouse.supplier.application.port.primary.command.SupplierCreateCommand;

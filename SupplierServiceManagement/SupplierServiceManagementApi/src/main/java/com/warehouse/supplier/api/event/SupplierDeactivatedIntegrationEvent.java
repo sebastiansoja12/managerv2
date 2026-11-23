@@ -3,17 +3,17 @@ package com.warehouse.supplier.api.event;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.warehouse.commonassets.event.integration.annotation.IntegrationEventType;
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventType;
 import com.warehouse.commonassets.event.integration.context.OperatorAwareContext;
-import com.warehouse.commonassets.event.integration.model.IntegrationEvent;
-import com.warehouse.commonassets.event.integration.model.IntegrationEventKey;
+import com.warehouse.eventoutbox.integration.model.IntegrationEvent;
+import com.warehouse.eventoutbox.integration.model.IntegrationEventKey;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 
 import java.time.Instant;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@IntegrationEventType(value = "supplier.deactivated", version = 1)
+@IntegrationEventType(value = "supplier.deactivated", version = 1, topic = SupplierTopics.DEACTIVATED)
 public class SupplierDeactivatedIntegrationEvent extends OperatorAwareContext implements IntegrationEvent, IntegrationEventKey {
 
     private final SupplierId supplierId;
