@@ -12,7 +12,7 @@ import com.warehouse.account.infrastructure.adapter.secondary.entity.UserInvitat
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.domain.port.primary.UserPort;
 import com.warehouse.commonassets.context.OperatorContext;
-import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.commonassets.repository.BaseRepository;
 import com.warehouse.commonassets.repository.NoOperatorContextBaseRepository;
 import com.warehouse.commonassets.repository.OperatorContextProvider;

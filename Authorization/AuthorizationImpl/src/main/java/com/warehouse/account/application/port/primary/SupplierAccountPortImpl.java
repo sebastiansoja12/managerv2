@@ -10,7 +10,7 @@ import com.warehouse.account.application.port.secondary.UserInvitationRepository
 import com.warehouse.account.domain.model.UserInvitation;
 import com.warehouse.account.domain.vo.InvitationToken;
 import com.warehouse.auth.api.event.UserInvitationIssuedIntegrationEvent;
-import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.commonassets.identificator.UserId;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;

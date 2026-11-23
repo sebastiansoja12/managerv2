@@ -1,14 +1,14 @@
 package com.warehouse.auth.api.event;
 
-import com.warehouse.commonassets.event.integration.annotation.IntegrationEventType;
-import com.warehouse.commonassets.event.integration.model.IntegrationEvent;
-import com.warehouse.commonassets.event.integration.model.IntegrationEventKey;
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventType;
+import com.warehouse.eventoutbox.integration.model.IntegrationEvent;
+import com.warehouse.eventoutbox.integration.model.IntegrationEventKey;
 import com.warehouse.commonassets.identificator.UserId;
 
 import java.time.Instant;
 import java.util.Objects;
 
-@IntegrationEventType(value = "user.invitation.issued", version = 1)
+@IntegrationEventType(value = "user.invitation.issued", version = 1, topic = AuthorizationTopics.USER_INVITATION_ISSUED)
 public record UserInvitationIssuedIntegrationEvent(
         UserId userId,
         String email,
