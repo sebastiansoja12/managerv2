@@ -29,7 +29,9 @@ public class BoundedContextVisitor extends SimpleFileVisitor<Path> implements Fi
             "RouteTrackerFlow",
             "PalletHandlingManager",
             "ReturningTrackManager",
-            "DeliveryProtection"
+            "DeliveryProtection",
+            // standalone event infrastructure library, not a bounded context
+            "EventOutbox"
     );
 
     private final Set<BoundedContext.BoundedContextBuilder> contexts;
