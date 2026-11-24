@@ -17,6 +17,7 @@ public abstract class UserToEntityMapper {
                 .language(user.getLanguage())
                 .apiKey(user.getApiKey())
                 .apiKeyIssuedAt(user.getApiKeyIssuedAt())
+                .mcpKeyId(user.getMcpKeyId())
                 .permissions(UserPermissionToEntityMapper.map(user.getPermissions()))
                 .deleted(user.isDeleted())
                 .initial(user.isInitial())

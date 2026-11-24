@@ -27,6 +27,8 @@ public class ApiExposureProperties {
             "/mcp"
     ));
 
+    private boolean mcpLegacyApiKeyEnabled = false;
+
     private List<String> externalPaths = new ArrayList<>(List.of(
             "/external"
     ));
@@ -72,6 +74,14 @@ public class ApiExposureProperties {
         return mcpPaths.stream()
                 .map(this::normalizePath)
                 .anyMatch(path -> normalizedPath.equals(path) || normalizedPath.startsWith(path + "/"));
+    }
+
+    public boolean isMcpLegacyApiKeyEnabled() {
+        return mcpLegacyApiKeyEnabled;
+    }
+
+    public void setMcpLegacyApiKeyEnabled(final boolean mcpLegacyApiKeyEnabled) {
+        this.mcpLegacyApiKeyEnabled = mcpLegacyApiKeyEnabled;
     }
 
     public String[] mcpSecurityMatchers() {

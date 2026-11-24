@@ -3,6 +3,7 @@ package com.warehouse.auth.configuration;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -40,9 +41,9 @@ public class SecurityConfiguration {
     private final AuthProperties authProperties;
     private final DepartmentReadSyncBasicAuthenticationFilter departmentReadSyncBasicAuthenticationFilter;
     private final ShipmentReadSyncBasicAuthenticationFilter shipmentReadSyncBasicAuthenticationFilter;
-    private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
 
     @Bean
+    @Order(2)
     public SecurityFilterChain securityFilterChain(final HttpSecurity http,
                                                    final CookieCsrfTokenRepository csrfTokenRepository) throws Exception {
 
@@ -54,7 +55,6 @@ public class SecurityConfiguration {
                         .ignoringRequestMatchers(
                                 "/departments/read-sync/**",
                                 "/internal/shipments/read-sync/**")
-                        .ignoringRequestMatchers(apiExposureProperties.mcpSecurityMatchers())
                         .ignoringRequestMatchers(apiExposureProperties.externalSecurityMatchers()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
@@ -83,7 +83,6 @@ public class SecurityConfiguration {
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(departmentReadSyncBasicAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(shipmentReadSyncBasicAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http
                 .authenticationProvider(authenticationProvider);
 

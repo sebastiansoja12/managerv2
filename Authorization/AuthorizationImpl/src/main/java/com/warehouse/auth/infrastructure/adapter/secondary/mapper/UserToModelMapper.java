@@ -23,6 +23,7 @@ public abstract class UserToModelMapper {
         user.setInitial(entity.getInitial());
         user.setApiKey(entity.getApiKey());
         user.setApiKeyIssuedAt(entity.getApiKeyIssuedAt());
+        user.setMcpKeyId(entity.getMcpKeyId());
         return user;
     }
 }

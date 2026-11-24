@@ -121,4 +121,20 @@ class CurrentUserControllerTest {
                 .andExpect(jsonPath("$.departmentCode").value("WAW"))
                 .andExpect(jsonPath("$.homeDepartmentCode").value("KT1"));
     }
+    @Test
+    void shouldRevealCurrentUsersApiKeyWithoutCaching() throws Exception {
+        final UserId userId = new UserId(17L);
+        final OrganizationUser user = new User();
+        user.setUserId(userId);
+        when(currentUserAuthenticationPort.getCurrentUser()).thenReturn(user);
+        when(userPort.revealApiKey(userId)).thenReturn("raw-api-secret");
+
+        mockMvc.perform(post("/auth/me/api-key/reveal"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", "no-store"))
+                .andExpect(jsonPath("$.apiKey").value("raw-api-secret"));
+
+        verify(userPort).revealApiKey(userId);
+    }
+
 }

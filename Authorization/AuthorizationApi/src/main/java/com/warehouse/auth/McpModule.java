@@ -1,0 +1,5 @@
+package com.warehouse.auth;
+
+public enum McpModule {
+    PROFILE, SHIPMENTS, PROCESSES, DEVICES, DEPARTMENTS, DELIVERIES, COURIERS, CONFIGURATION
+}

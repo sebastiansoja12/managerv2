@@ -237,10 +237,22 @@ class AuthenticationPortImplTest {
 
     private static final class InMemoryUserRepository implements UserRepository {
         private final Map<String, OrganizationUser> users = new HashMap<>();
+        private final Map<UserId, String> secrets = new HashMap<>();
 
         @Override
         public void createOrUpdate(final OrganizationUser user) {
             users.put(user.getUsername(), user);
+        }
+
+        @Override
+        public void saveApiKey(final OrganizationUser user, final String secret) {
+            createOrUpdate(user);
+            secrets.put(user.getUserId(), secret);
+        }
+
+        @Override
+        public Optional<String> findApiKeySecret(final UserId userId) {
+            return Optional.ofNullable(secrets.get(userId));
         }
 
         @Override
@@ -261,6 +273,12 @@ class AuthenticationPortImplTest {
                     .filter(user -> userId.equals(user.getUserId()))
                     .findFirst()
                     .orElse(null);
+        }
+
+        @Override
+        public Optional<OrganizationUser> findByIdInOperator(final UserId userId, final OperatorId operatorId) {
+            return Optional.ofNullable(findById(userId))
+                    .filter(user -> operatorId.equals(user.operatorId()));
         }
 
         @Override

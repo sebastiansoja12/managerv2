@@ -1,6 +1,7 @@
 package com.warehouse.auth.infrastructure.adapter.secondary.entity;
 
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.McpKeyId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.model.BelongsToOperator;
 import jakarta.persistence.*;
@@ -58,8 +59,16 @@ public class UserEntity extends BelongsToOperator implements UserDetails {
     @Column(name = "api_key")
     private String apiKey;
 
+    @Column(name = "encrypted_api_key")
+    @ToString.Exclude
+    private String encryptedApiKey;
+
     @Column(name = "api_key_issued_at")
     private Instant apiKeyIssuedAt;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "mcp_key_id"))
+    private McpKeyId mcpKeyId;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

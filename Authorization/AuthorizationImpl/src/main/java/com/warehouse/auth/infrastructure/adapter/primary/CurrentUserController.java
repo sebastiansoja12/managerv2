@@ -123,6 +123,13 @@ public class CurrentUserController {
                 .body(new GeneratedApiKeyResponseDto(apiKey));
     }
 
+    @PostMapping("/api-key/reveal")
+    public ResponseEntity<GeneratedApiKeyResponseDto> revealApiKey() {
+        final OrganizationUser user = currentUserAuthenticationPort.getCurrentUser();
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore())
+                .body(new GeneratedApiKeyResponseDto(this.userPort.revealApiKey(user.getUserId())));
+    }
+
     @DeleteMapping("/api-key")
     public ResponseEntity<Void> deleteApiKey() {
         final OrganizationUser user = currentUserAuthenticationPort.getCurrentUser();

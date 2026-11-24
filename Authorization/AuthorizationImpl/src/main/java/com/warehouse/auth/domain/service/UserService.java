@@ -10,6 +10,8 @@ import com.warehouse.auth.domain.vo.RegisterResponse;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.McpKeyId;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 
 import java.util.List;
@@ -32,9 +34,14 @@ public interface UserService {
 
     void changeLanguage(final UserId userId, final String language);
 
+    Optional<String> findApiKeySecret(final UserId userId);
+
     void changeApiKey(final UserId userId, final String apiKey);
-    void issueApiKey(final UserId userId, final String apiKeyHash, final Instant issuedAt);
+    void issueApiKey(final UserId userId, final String apiKeyHash, final String secret, final Instant issuedAt);
     Optional<OrganizationUser> findByApiKeyHash(final String apiKeyHash);
+    void assignMcpKey(final UserId userId, final McpKeyId mcpKeyId);
+    void removeMcpKey(final UserId userId, final McpKeyId mcpKeyId);
+    Optional<OrganizationUser> findByIdInOperator(final UserId userId, final OperatorId operatorId);
 
     void changeRole(final UserId userId, final OrganizationUser.Role role);
 
