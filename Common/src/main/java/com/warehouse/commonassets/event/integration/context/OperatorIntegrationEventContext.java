@@ -15,10 +15,6 @@ import com.warehouse.eventoutbox.kafka.KafkaEventHeaders;
 
 import tools.jackson.databind.node.ObjectNode;
 
-/**
- * Operator scope of the manager application: every integration event carries the operator, user and department
- * of the current request (or Kafka record) as headers and, in the legacy envelope, as {@code {"value": id}} fields.
- */
 @Component
 public class OperatorIntegrationEventContext implements IntegrationEventContext {
 
