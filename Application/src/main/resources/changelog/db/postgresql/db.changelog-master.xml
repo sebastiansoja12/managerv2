@@ -137,4 +137,8 @@
     <include file="changes/2026-11-12-shipment-rd-pallet-tracking-number.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-11-17-organization-analytics.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-11-18-integration-event-outbox.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-23-mcp-keys.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-23-mcp-access.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-23-mcp-key-reveal.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-23-api-key-reveal.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

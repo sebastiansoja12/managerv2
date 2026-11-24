@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-23-mcp-keys" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="mcp_keys"/>
+            </not>
+        </preConditions>
+        <createTable tableName="mcp_keys">
+            <column name="mcp_key_id" type="UUID">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_mcp_keys"/>
+            </column>
+            <column name="owner_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="key_hash" type="VARCHAR(64)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uq_mcp_keys_key_hash"/>
+            </column>
+            <column name="key_prefix" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expires_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="last_used_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="revoked_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="operator_id" type="BIGINT"/>
+        </createTable>
+        <createIndex tableName="mcp_keys" indexName="idx_mcp_keys_operator_owner">
+            <column name="operator_id"/>
+            <column name="owner_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="2026-11-23-users-mcp-key-id" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="users" columnName="mcp_key_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="users">
+            <column name="mcp_key_id" type="UUID"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
