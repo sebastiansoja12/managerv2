@@ -4,12 +4,24 @@ import com.warehouse.logisticsdelivery.application.port.primary.DepartmentWorklo
 import com.warehouse.logisticsdelivery.application.port.primary.DepartmentWorkloadPortImpl;
 import com.warehouse.logisticsdelivery.application.port.secondary.DepartmentCapacityServicePort;
 import com.warehouse.logisticsdelivery.application.service.DestinationCapacityAllocator;
+import com.warehouse.logisticsdelivery.application.service.DeliveryChangeService;
+import com.warehouse.logisticsdelivery.application.service.DeliveryCompletionService;
+import com.warehouse.logisticsdelivery.application.service.DeliveryDestinationResolver;
+import com.warehouse.logisticsdelivery.application.service.DeliveryFinder;
+import com.warehouse.logisticsdelivery.application.service.DeliveryRelationResolver;
+import com.warehouse.logisticsdelivery.application.service.PalletDeliveryService;
+import com.warehouse.logisticsdelivery.application.service.status.ShipmentDeliveredDeliveryStrategy;
+import com.warehouse.logisticsdelivery.application.service.status.ShipmentLostDeliveryStrategy;
+import com.warehouse.logisticsdelivery.application.service.status.ShipmentReturnedDeliveryStrategy;
+import com.warehouse.logisticsdelivery.application.service.status.ShipmentStatusDeliveryStrategy;
+import com.warehouse.logisticsdelivery.application.service.status.ShipmentStatusDeliveryStrategyResolver;
 import com.warehouse.logisticsdelivery.domain.service.DepartmentCapacityBalancer;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.DeliveryDepartmentLifecycleParticipant;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.DepartmentCapacityServiceAdapter;
 import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import com.warehouse.organisationstructure.department.api.DepartmentLifecycleParticipant;
 import java.time.Clock;
+import java.util.List;
 import com.warehouse.eventoutbox.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
@@ -125,16 +137,63 @@ public class DeliveryConfiguration {
     }
 
     @Bean
+    public DeliveryFinder deliveryFinder(final DeliveryRepository deliveryRepository) {
+        return new DeliveryFinder(deliveryRepository);
+    }
+
+    @Bean
+    public DeliveryChangeService deliveryChangeService(final DeliveryRepository deliveryRepository,
+                                                       final DomainEventPublisher domainEventPublisher) {
+        return new DeliveryChangeService(deliveryRepository, domainEventPublisher);
+    }
+
+    @Bean
+    public DeliveryDestinationResolver deliveryDestinationResolver(
+            final ShipmentServicePort shipmentServicePort,
+            final DestinationDepartmentResolverPort destinationDepartmentResolverPort,
+            final DestinationCapacityAllocator destinationCapacityAllocator) {
+        return new DeliveryDestinationResolver(shipmentServicePort, destinationDepartmentResolverPort,
+                destinationCapacityAllocator);
+    }
+
+    @Bean
+    public DeliveryRelationResolver deliveryRelationResolver(final DeliveryRepository deliveryRepository,
+                                                             final ShipmentServicePort shipmentServicePort) {
+        return new DeliveryRelationResolver(deliveryRepository, shipmentServicePort);
+    }
+
+    @Bean
+    public DeliveryCompletionService deliveryCompletionService(final OperatorContextProvider operatorContextProvider,
+                                                               final ShipmentServicePort shipmentServicePort,
+                                                               final SignatureRepository signatureRepository,
+                                                               final DeliveryChangeService deliveryChangeService) {
+        return new DeliveryCompletionService(operatorContextProvider, shipmentServicePort, signatureRepository,
+                deliveryChangeService);
+    }
+
+    @Bean
+    public PalletDeliveryService palletDeliveryService(final DeliveryRepository deliveryRepository,
+                                                       final ShipmentServicePort shipmentServicePort,
+                                                       final DeliveryFinder deliveryFinder,
+                                                       final DeliveryChangeService deliveryChangeService) {
+        return new PalletDeliveryService(deliveryRepository, shipmentServicePort, deliveryFinder,
+                deliveryChangeService);
+    }
+
+    @Bean
     public DeliveryPort deliveryPort(final DeliveryRepository deliveryRepository,
                                      final ShipmentServicePort shipmentServicePort,
-                                     final DomainEventPublisher domainEventPublisher,
                                      final OperatorContextProvider operatorContextProvider,
                                      final SignatureRepository signatureRepository,
-                                     final DestinationDepartmentResolverPort destinationDepartmentResolverPort,
-                                     final DestinationCapacityAllocator destinationCapacityAllocator) {
-        return new DeliveryPortImpl(deliveryRepository, shipmentServicePort, domainEventPublisher,
-                operatorContextProvider, signatureRepository, destinationDepartmentResolverPort,
-                destinationCapacityAllocator);
+                                     final DeliveryFinder deliveryFinder,
+                                     final DeliveryChangeService deliveryChangeService,
+                                     final DeliveryDestinationResolver deliveryDestinationResolver,
+                                     final DeliveryRelationResolver deliveryRelationResolver,
+                                     final DeliveryCompletionService deliveryCompletionService,
+                                     final PalletDeliveryService palletDeliveryService) {
+        return new DeliveryPortImpl(deliveryRepository, shipmentServicePort, operatorContextProvider,
+                signatureRepository, deliveryFinder, deliveryChangeService, deliveryDestinationResolver,
+                deliveryRelationResolver, deliveryCompletionService, palletDeliveryService);
     }
 
     @Bean
@@ -142,6 +201,27 @@ public class DeliveryConfiguration {
             final OperatorConfigurationApiService operatorConfigurationApiService,
             final DepartmentApiService departmentApiService) {
         return new DepartmentCapacityServiceAdapter(operatorConfigurationApiService, departmentApiService);
+    }
+
+    @Bean
+    public ShipmentStatusDeliveryStrategy shipmentLostDeliveryStrategy(final DeliveryPort deliveryPort) {
+        return new ShipmentLostDeliveryStrategy(deliveryPort);
+    }
+
+    @Bean
+    public ShipmentStatusDeliveryStrategy shipmentDeliveredDeliveryStrategy(final DeliveryPort deliveryPort) {
+        return new ShipmentDeliveredDeliveryStrategy(deliveryPort);
+    }
+
+    @Bean
+    public ShipmentStatusDeliveryStrategy shipmentReturnedDeliveryStrategy(final DeliveryPort deliveryPort) {
+        return new ShipmentReturnedDeliveryStrategy(deliveryPort);
+    }
+
+    @Bean
+    public ShipmentStatusDeliveryStrategyResolver shipmentStatusDeliveryStrategyResolver(
+            final List<ShipmentStatusDeliveryStrategy> strategies) {
+        return new ShipmentStatusDeliveryStrategyResolver(strategies);
     }
 
     @Bean

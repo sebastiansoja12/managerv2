@@ -1,11 +1,11 @@
 package com.warehouse.logisticsdelivery.infrastructure.adapter.primary.kafka;
 
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.eventoutbox.integration.annotation.IntegrationEventListener;
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryPort;
-import com.warehouse.logisticsdelivery.application.port.primary.command.CompleteDeliveryCommand;
+import com.warehouse.logisticsdelivery.application.port.primary.command.ApplyShipmentStatusCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDerivedDeliveryCommand;
+import com.warehouse.logisticsdelivery.application.service.status.ShipmentStatusDeliveryStrategyResolver;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryMethod;
 import com.warehouse.logisticsdelivery.domain.enumeration.PickupMethod;
 import com.warehouse.logisticsdelivery.domain.vo.RecipientAddress;
@@ -22,9 +22,12 @@ import org.springframework.stereotype.Component;
 public class ShipmentDeliveryEventListener {
 
     private final DeliveryPort deliveryPort;
+    private final ShipmentStatusDeliveryStrategyResolver shipmentStatusDeliveryStrategyResolver;
 
-    public ShipmentDeliveryEventListener(final DeliveryPort deliveryPort) {
+    public ShipmentDeliveryEventListener(final DeliveryPort deliveryPort,
+                                         final ShipmentStatusDeliveryStrategyResolver shipmentStatusDeliveryStrategyResolver) {
         this.deliveryPort = deliveryPort;
+        this.shipmentStatusDeliveryStrategyResolver = shipmentStatusDeliveryStrategyResolver;
     }
 
     @IntegrationEventListener(group = "logistics-orchestrator")
@@ -68,14 +71,10 @@ public class ShipmentDeliveryEventListener {
     @IntegrationEventListener(group = "logistics-orchestrator")
     public void handle(final ShipmentStatusChangedIntegrationEvent event) {
         final ShipmentEventData payload = event.payload();
-        if (payload.shipmentStatus() == ShipmentStatus.LOST) {
-            deliveryPort.cancelShipmentDeliveries(payload.shipmentId());
-            return;
-        }
-        if (payload.shipmentStatus() == ShipmentStatus.DELIVERY) {
-            final CompleteDeliveryCommand command = new CompleteDeliveryCommand(payload.shipmentId(), null,
-                    event.userId(), event.departmentId());
-            deliveryPort.completeDelivery(command);
-        }
+        final ApplyShipmentStatusCommand command = new ApplyShipmentStatusCommand(payload.shipmentId(),
+                payload.shipmentStatus(), payload.shipmentRelatedId(), payload.signatureRequired(), event.userId(),
+                event.departmentId());
+        shipmentStatusDeliveryStrategyResolver.resolve(payload.shipmentStatus())
+                .ifPresent(strategy -> strategy.apply(command));
     }
 }
