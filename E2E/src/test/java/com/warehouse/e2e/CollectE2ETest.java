@@ -142,11 +142,11 @@ class CollectE2ETest extends AbstractE2ETest {
     }
 
     @Test
-    void shouldFinishProcessSuccessfullyWhenSomeShipmentsAreNotCollected() {
+    void shouldFinishProcessWithFailureWhenSomeShipmentsAreNotCollected() {
         final Map<String, Object> processLog = processLog(partiallyCollectedProcessId);
 
-        assertThat(processLog.get("status")).isEqualTo("SUCCESS");
-        assertThat(processLog.get("fault_description")).isNull();
+        assertThat(processLog.get("status")).isEqualTo("FAILURE");
+        assertThat((String) processLog.get("fault_description")).isNotBlank();
         assertThat((String) processLog.get("response")).contains(partiallyCollectedProcessId.toString());
     }
 
@@ -157,7 +157,7 @@ class CollectE2ETest extends AbstractE2ETest {
         assertThat(communications).hasSize(2);
         assertThat(communications).allSatisfy(communication -> {
             assertThat(communication.get("fault_description")).isNull();
-            assertThat((String) communication.get("response")).contains("shipmentStatus=SENT");
+            assertThat((String) communication.get("response")).contains("shipmentStatus=COLLECTED");
         });
         assertThat(communications).extracting(communication -> (String) communication.get("request"))
                 .anySatisfy(request -> assertThat(request).contains(CREATED_SHIPMENT_TRACKING_NUMBER.value()))
@@ -185,9 +185,9 @@ class CollectE2ETest extends AbstractE2ETest {
                     PARTIALLY_COLLECTED_SHIPMENT_ID)) {
                 final List<Map<String, Object>> events = jdbcClient.sql("""
                                 SELECT topic, published_at, last_error
-                                FROM kafka_event_outbox
+                                FROM integration_event_outbox
                                 WHERE event_type = 'shipment.status.changed'
-                                  AND payload_json LIKE :shipmentId
+                                  AND payload LIKE :shipmentId
                                 """)
                         .param("shipmentId", "%" + shipmentId.getValue() + "%")
                         .query()

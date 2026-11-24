@@ -179,9 +179,9 @@ class DeliveryRejectE2ETest extends AbstractE2ETest {
         await().atMost(ASYNC_TIMEOUT).untilAsserted(() -> {
             final List<Map<String, Object>> events = jdbcClient.sql("""
                             SELECT topic, published_at, last_error
-                            FROM kafka_event_outbox
+                            FROM integration_event_outbox
                             WHERE event_type = 'delivery.attempt-recorded'
-                              AND payload_json LIKE :deliveryId
+                              AND payload LIKE :deliveryId
                             """)
                     .param("deliveryId", "%" + REJECTED_DELIVERY_ID + "%")
                     .query()
