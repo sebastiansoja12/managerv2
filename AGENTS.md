@@ -107,7 +107,8 @@ Rules:
 - A listener that translates a bounded context's own domain event into an outgoing integration event belongs in
   `*.application.listener` and publishes through `IntegrationEventPublisher` so the event is stored in the Kafka outbox.
 - A listener for an integration event received from another bounded context is an inbound adapter and belongs in
-  `*.infrastructure.adapter.primary`. It must consume the event through `@KafkaEventListener` and invoke a primary port;
+  `*.infrastructure.adapter.primary`. It must consume the event through `@IntegrationEventListener` (or legacy
+  `@KafkaEventListener`) and invoke a primary port;
   it must not use Spring's in-process `@EventListener` as a cross-context transport.
 - The separate `Api` Maven module contains cross-module contracts only. Implementations, controllers, entities, and application orchestration remain in the corresponding implementation module.
 - Apply this structure to all new bounded contexts and new features. Do not refactor a legacy context only to move packages unless the task explicitly includes that migration.
@@ -182,14 +183,35 @@ Listeners:
 
 - Put domain-event listeners and producers of outgoing integration events in `*.application.listener`.
 - Put consumers of integration events owned by another bounded context in `*.infrastructure.adapter.primary`.
-- Outgoing integration events must implement `IntegrationEvent`, declare `@IntegrationEventType` with a stable type and
-  version, and be published through `IntegrationEventPublisher`. Configure their
-  `manager.kafka.integration-events.routes.<event-type>` route to a Kafka topic.
+- Outgoing integration events must implement `IntegrationEvent`, declare `@IntegrationEventType` with a stable type,
+  version and topic (a constant from the context's `*Topics` class), and be published through
+  `IntegrationEventPublisher`. Do not add `manager.kafka.integration-events.routes.*` properties; the topic lives only
+  on the event class.
+- The event infrastructure (`com.warehouse.eventoutbox`: annotations, registry, listeners, translators, outbox) lives
+  in the standalone `EventOutbox` module, which must not depend on `Common` or any manager module. Separate services
+  (e.g. ReturningTrackManager) depend only on `EventOutbox`, import `EventOutboxConfiguration` and own an
+  `integration_event_outbox` table in their database. Service-specific context (operator, tenant) is added through a
+  single `IntegrationEventContext` bean; the manager application uses `OperatorIntegrationEventContext` in `Common`.
+- Tracing crosses the outbox through `OutboxTracing`: the W3C `traceparent` of the business transaction is stored in
+  the outbox headers and the relay sends inside an `outbox publish` producer span that continues it. It is active only
+  when Micrometer Tracing is on the service classpath (`spring-boot-starter-opentelemetry`); keep
+  `spring.kafka.template.observation-enabled` off (the relay span is the producer span) and enable
+  `spring.kafka.listener.observation-enabled` on consumers.
+- Events that exhaust their outbox retries (DEAD) are also sent, best effort, to the shared
+  `manager.events.outbox.dead-letter-topic` (default `outbox.dead`) with `outbox_original_topic`, `outbox_original_key`,
+  `outbox_attempts` and `outbox_error` headers. The `event-journal` service in `docker.compose.yml` (Logstash,
+  `docker/event-journal`) indexes every Kafka topic with its headers into Elasticsearch `manager-events-*`
+  (`event.type`, `event.subject`, `trace.id`, `payload`, `headers`); browse it in Kibana. New topics need no
+  configuration there.
 - Kafka producers must put the integration event's fully qualified class name in the `__TypeId__` header. Producers
   and consumers must use the same event class from the owning bounded context's `Api` module so Spring Kafka can
   serialize and deserialize it automatically. Do not add per-event `manager.kafka.type-mappings` entries.
-- Incoming cross-context listeners must use `@KafkaEventListener`, configure an explicit topic and consumer group, and
-  call a primary port. They must not call repositories or infrastructure adapters directly.
+- Incoming cross-context listeners should use `@IntegrationEventListener(group = ...)`: the topic is derived from the
+  event parameter type and only matching event types are delivered. Write one method per concrete event type; methods
+  of one listener class with the same group share one consumer and are dispatched by event type. Two listener classes
+  must not share the same group on the same topic. Legacy listeners may still use
+  `@KafkaEventListener` with an explicit topic and consumer group. Listeners call a primary port and must not call
+  repositories or infrastructure adapters directly.
 - Listener dependencies must be primary ports, secondary ports, application services, or event publishers, injected through a constructor.
 - Listeners must not call infrastructure adapters directly.
 
