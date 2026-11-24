@@ -1,0 +1,37 @@
+{
+  "index_patterns": ["manager-events-*"],
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0
+    },
+    "mappings": {
+      "dynamic": false,
+      "properties": {
+        "@timestamp": { "type": "date" },
+        "message": { "type": "text" },
+        "payload": { "type": "flattened" },
+        "headers": { "type": "flattened" },
+        "event": {
+          "properties": {
+            "id": { "type": "keyword" },
+            "type": { "type": "keyword" },
+            "source": { "type": "keyword" },
+            "subject": { "type": "keyword" },
+            "dead": { "type": "boolean" }
+          }
+        },
+        "trace": { "properties": { "id": { "type": "keyword" } } },
+        "span": { "properties": { "id": { "type": "keyword" } } },
+        "kafka": {
+          "properties": {
+            "topic": { "type": "keyword" },
+            "partition": { "type": "integer" },
+            "offset": { "type": "long" },
+            "key": { "type": "keyword" }
+          }
+        }
+      }
+    }
+  }
+}

@@ -122,6 +122,72 @@ services:
     networks:
       - manager_network
 
+  jaeger:
+    image: jaegertracing/jaeger:2.5.0
+    container_name: jaeger
+    restart: unless-stopped
+    ports:
+      - "${JAEGER_UI_PORT:-16686}:16686"
+      - "${JAEGER_OTLP_HTTP_PORT:-4318}:4318"
+    networks:
+      - manager_network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.3.1
+    container_name: elasticsearch
+    restart: unless-stopped
+    ports:
+      - "${ELASTICSEARCH_PORT:-9200}:9200"
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: ${ELASTICSEARCH_JAVA_OPTS:--Xms512m -Xmx512m}
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs 'http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s' >/dev/null"]
+      start_period: 30s
+      interval: 10s
+      timeout: 10s
+      retries: 12
+    networks:
+      - manager_network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.3.1
+    container_name: kibana
+    restart: unless-stopped
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    ports:
+      - "${KIBANA_PORT:-5601}:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    networks:
+      - manager_network
+
+  # Central event journal: Kafka topics of all services -> Elasticsearch index manager-events-*.
+  event-journal:
+    image: docker.elastic.co/logstash/logstash:8.15.3
+    container_name: event-journal
+    restart: unless-stopped
+    depends_on:
+      kafka:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: ${EVENT_JOURNAL_KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      XPACK_MONITORING_ENABLED: "false"
+      LS_JAVA_OPTS: ${EVENT_JOURNAL_JAVA_OPTS:--Xms256m -Xmx256m}
+    volumes:
+      - ./docker/event-journal/pipeline:/usr/share/logstash/pipeline:ro
+      - ./docker/event-journal/templates:/usr/share/logstash/templates:ro
+    networks:
+      - manager_network
+
   eureka-server:
     build:
       context: .
@@ -178,6 +244,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${RETURNING_MANAGER_DATASOURCE_PASSWORD:-postgres}
       SPRING_JPA_HIBERNATE_DDL_AUTO: ${RETURNING_MANAGER_JPA_HIBERNATE_DDL_AUTO:-validate}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: ${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT:-http://jaeger:4318/v1/traces}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:-http://eureka-server:8761/eureka/}
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:-true}
     depends_on:
@@ -227,3 +294,4 @@ networks:
 volumes:
   postgresql_data:
   mongo_data:
+  elasticsearch_data:
