@@ -3,8 +3,6 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <!-- Standalone library: no dependency on the manager application (Common, warehouse parent), so separate
-         services such as ReturningTrackManager can use it as well. -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -43,7 +41,6 @@
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-core</artifactId>
         </dependency>
-        <!-- Optional: services with tracing get the trace context carried through the outbox. -->
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-tracing</artifactId>

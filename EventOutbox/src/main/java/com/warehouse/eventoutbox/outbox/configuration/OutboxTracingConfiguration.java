@@ -11,10 +11,6 @@ import com.warehouse.eventoutbox.outbox.infrastructure.adapter.secondary.Microme
 import io.micrometer.tracing.Tracer;
 import io.micrometer.tracing.propagation.Propagator;
 
-/**
- * Active only in services that have Micrometer Tracing on the classpath; elsewhere the outbox uses
- * {@link OutboxTracing#NOOP} and its events carry no trace context.
- */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(name = "io.micrometer.tracing.Tracer")
 public class OutboxTracingConfiguration {
