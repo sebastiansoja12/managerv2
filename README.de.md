@@ -221,11 +221,33 @@ Separate Dockerfiles gibt es für:
 ## MCP-Server
 
 `McpServer` stellt unter `/v1/api/mcp` einen zustandslosen MCP-Endpunkt bereit (Spring AI MCP Server, Streamable HTTP).
-Anfragen werden mit einem API-Schlüssel des Benutzers authentifiziert, der als `Authorization: Bearer <key>` gesendet
-wird; der Schlüssel wird mit `POST /v1/api/auth/me/api-key` erzeugt (mit `DELETE` widerrufen) und nur als HMAC-Hash
-mit Ausstellungsdatum gespeichert. Schlüssel, die vor Einführung des Ausstellungsdatums erstellt wurden, sowie bei der
-Registrierung automatisch vergebene Schlüssel werden nicht akzeptiert. Das Sperren eines Betreibers und das Widerrufen
-von Sitzungen machen auch früher ausgestellte API-Schlüssel ungültig.
+Anfragen werden ausschließlich mit einem eigenen MCP-Schlüssel authentifiziert, der als
+`Authorization: Bearer <mcp-key>` gesendet wird. MCP-Schlüssel beginnen mit `mcp_`, werden unabhängig von
+API-Schlüsseln verwaltet und gelten nur am MCP-Endpunkt; REST-Endpunkte lehnen sie ab, der MCP-Endpunkt lehnt
+API-Schlüssel und JWTs ab. Erzeugt wird ein Schlüssel mit `POST /v1/api/auth/me/mcp-keys` (Body `name`, optional
+`expiresAt`; Authentifizierung über SHA-256-Hash, Anzeige über eine AES-GCM-verschlüsselte Kopie), aufgelistet mit `GET`
+und widerrufen mit `DELETE /v1/api/auth/me/mcp-keys/{mcpKeyId}`. Ein Benutzer hat einen aktiven MCP-Schlüssel
+(`users.mcp_key_id`); ein neuer Schlüssel widerruft den vorherigen. Fehlende, unbekannte, widerrufene oder abgelaufene
+Schlüssel ergeben `401`. Das Sperren eines Betreibers und das Widerrufen von Sitzungen machen auch früher ausgestellte
+MCP-Schlüssel ungültig. Für eine Übergangszeit akzeptiert `API_EXPOSURE_MCP_LEGACY_API_KEY_ENABLED=true` weiterhin
+API-Schlüssel am MCP-Endpunkt (Standard `false`).
+
+Schlüssel werden in der GUI unter **Benutzerprofil → MCP-Schlüssel** erstellt und widerrufen. Schlüssel sind maskiert; die Augentaste zeigt sie fünf Sekunden an. Beim Verlassen des Fensters werden sie ausgeblendet. Unter **Benutzer → MCP-Zugriff** können Administratoren MCP
+sperren, Schlüssel widerrufen und je Bereich `NONE`, `READ` oder `WRITE` (Lesen und Schreiben) festlegen. Es gilt der
+bestehende Verwaltungsbereich. Eine Sperre widerruft Schlüssel und verhindert neue; die Reaktivierung stellt keine wieder her.
+`GET /auth/me/mcp-keys/access` liefert die eigene Richtlinie, `GET`/`PUT /users/{userId}/mcp-access` liest/ersetzt
+Benutzerrichtlinien und `DELETE /users/{userId}/mcp-keys` widerruft deren Schlüssel ohne Richtlinienänderung.
+Beispiel: `{"enabled":true,"modules":{"SHIPMENTS":"READ"}}`; nicht angegebene Bereiche werden gesperrt.
+Bereiche: `PROFILE`, `SHIPMENTS`, `PROCESSES`, `DEVICES`, `DEPARTMENTS`, `DELIVERIES`, `COURIERS`, `CONFIGURATION`.
+Liquibase erstellt `mcp_access_policies` und `mcp_module_permissions`. Ohne Richtlinie bleibt der bisherige Zugriff.
+Rolle und `MCP_WRITE_ENABLED` gelten weiterhin. `tools/list` verbirgt gesperrte Werkzeuge; jeder Aufruf prüft erneut.
+Nach Berechtigungsänderungen die Werkzeugliste im MCP-Client aktualisieren.
+
+`POST /auth/me/mcp-keys/{mcpKeyId}/reveal` zeigt nur den eigenen aktiven MCP-Schlüssel.
+`POST /auth/me/api-key/reveal` bietet dieselbe Funktion für API-Schlüssel. Antworten verwenden `Cache-Control: no-store`.
+Verschlüsselung über `CREDENTIALS_ENCRYPTION_KEY`; Migrationen ergänzen `mcp_keys.encrypted_secret` und
+`users.encrypted_api_key`. Metadaten enthalten keine Geheimnisse; ein Widerruf entfernt die verschlüsselte Kopie.
+Ältere reine Hash-Schlüssel müssen zum Anzeigen und Kopieren einmal neu generiert werden.
 
 | Werkzeug | Parameter | Hinweise |
 | --- | --- | --- |
@@ -262,7 +284,7 @@ Alle Werkzeuge laufen im Betreiberkontext des Schlüsselinhabers. Den Endpunkt d
 du mit `MCP_SERVER_ENABLED=false`, nur die ändernden Werkzeuge mit `MCP_WRITE_ENABLED=false`. Beispiel für Claude Code:
 
 ```bash
-claude mcp add --transport http manager https://manager.example.com/v1/api/mcp --header "Authorization: Bearer <api-key>"
+claude mcp add --transport http manager https://manager.example.com/v1/api/mcp --header "Authorization: Bearer <mcp-key>"
 ```
 
 ## API und Dokumentation

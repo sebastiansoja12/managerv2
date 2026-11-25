@@ -167,7 +167,6 @@ services:
     networks:
       - manager_network
 
-  # Central event journal: Kafka topics of all services -> Elasticsearch index manager-events-*.
   event-journal:
     image: docker.elastic.co/logstash/logstash:8.15.3
     container_name: event-journal
