@@ -4,8 +4,12 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.tool.annotation.Tool;
+
+import com.warehouse.auth.Mcp;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 class McpServerArchitectureTest {
@@ -72,6 +76,13 @@ class McpServerArchitectureTest {
                 .and().haveSimpleNameEndingWith("ServiceAdapter")
                 .should().implement(com.tngtech.archunit.base.DescribedPredicate.describe("an application secondary port",
                         javaClass -> javaClass.getPackageName().equals("com.warehouse.mcp.application.port.secondary")))
+                .check(MCP_CLASSES);
+    }
+
+    @Test
+    void shouldMarkEveryMcpToolWithMcpAnnotation() {
+        methods().that().areAnnotatedWith(Tool.class)
+                .should().beAnnotatedWith(Mcp.class)
                 .check(MCP_CLASSES);
     }
 }
