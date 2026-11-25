@@ -5,6 +5,9 @@ import java.math.BigDecimal;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 
+import com.warehouse.auth.Mcp;
+import com.warehouse.auth.McpModule;
+import com.warehouse.commonassets.enumeration.AccountLevel;
 import com.warehouse.commonassets.identificator.DeliveryId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.VehicleId;
@@ -47,6 +50,7 @@ public class ManagerMcpCommandTools {
         this.arguments = arguments;
     }
 
+    @Mcp(module = McpModule.DELIVERIES, write = true, minimumLevel = AccountLevel.MANAGER)
     @Tool(name = "assign_delivery_courier", description = "Assigns a courier (and optionally a vehicle) to a "
             + "delivery. Returns the updated delivery." + CHANGES_DATA)
     public DeliveryToolResponse assignDeliveryCourier(
@@ -58,6 +62,7 @@ public class ManagerMcpCommandTools {
                 vehicleId != null ? new VehicleId(vehicleId) : null)));
     }
 
+    @Mcp(module = McpModule.DELIVERIES, write = true, minimumLevel = AccountLevel.MANAGER)
     @Tool(name = "unassign_delivery_courier", description = "Removes the courier from a delivery. Returns the "
             + "updated delivery." + CHANGES_DATA)
     public DeliveryToolResponse unassignDeliveryCourier(
@@ -66,6 +71,7 @@ public class ManagerMcpCommandTools {
                 () -> responseMapper.map(mcpCommandPort.unassignCourier(arguments.deliveryId(deliveryId))));
     }
 
+    @Mcp(module = McpModule.DELIVERIES, write = true, minimumLevel = AccountLevel.MANAGER)
     @Tool(name = "change_delivery_route", description = "Changes the route of a delivery. Only the given fields "
             + "change; the others keep their current values. Pickup methods: DEPARTMENT, COURIER, PICKUP_POINT, "
             + "LOCKER." + CHANGES_DATA)
@@ -85,6 +91,7 @@ public class ManagerMcpCommandTools {
                         arguments.optional(pickupPointId), arguments.optional(deliveryPickupPointId)))));
     }
 
+    @Mcp(module = McpModule.DELIVERIES, write = true, minimumLevel = AccountLevel.MANAGER)
     @Tool(name = "change_delivery_conditions", description = "Changes delivery conditions: method (COURIER, "
             + "PICKUP_POINT or LOCKER), signature requirement, instructions for the courier and planned date. "
             + "Only the given fields change." + CHANGES_DATA)
@@ -102,6 +109,7 @@ public class ManagerMcpCommandTools {
                         arguments.dateTime(plannedAt)))));
     }
 
+    @Mcp(module = McpModule.DELIVERIES, write = true, minimumLevel = AccountLevel.MANAGER)
     @Tool(name = "comment_delivery_step", description = "Adds or replaces the comment of a delivery step (steps are "
             + "numbered from 1, see get_delivery)." + CHANGES_DATA)
     public DeliveryToolResponse commentDeliveryStep(
@@ -113,6 +121,7 @@ public class ManagerMcpCommandTools {
                 arguments.required(comment, "comment"))));
     }
 
+    @Mcp(module = McpModule.DELIVERIES, write = true, minimumLevel = AccountLevel.MANAGER)
     @Tool(name = "correct_delivery_step_status", description = "Corrects the delivery status recorded on a delivery "
             + "step, e.g. DELIVERED or a failure status shown by get_delivery." + CHANGES_DATA)
     public DeliveryToolResponse correctDeliveryStepStatus(
@@ -125,6 +134,7 @@ public class ManagerMcpCommandTools {
                         arguments.upper(arguments.required(deliveryStatus, "deliveryStatus")))));
     }
 
+    @Mcp(module = McpModule.DELIVERIES, write = true, minimumLevel = AccountLevel.MANAGER)
     @Tool(name = "cancel_delivery", description = "Cancels a delivery. This cannot be undone." + CHANGES_DATA)
     public ChangeToolResponse cancelDelivery(
             @ToolParam(description = "Delivery identifier") final String deliveryId) {
@@ -135,6 +145,7 @@ public class ManagerMcpCommandTools {
         });
     }
 
+    @Mcp(module = McpModule.SHIPMENTS, write = true, minimumLevel = AccountLevel.MANAGER)
     @Tool(name = "create_shipment", description = "Creates a shipment and returns its tracking number. Telephone "
             + "numbers have exactly 9 digits. Dimensions are in cm, weight in kg. Pickup methods: DEPARTMENT, "
             + "COURIER, PICKUP_POINT, LOCKER; delivery methods: COURIER, PICKUP_POINT, LOCKER (the last two need "
@@ -195,6 +206,7 @@ public class ManagerMcpCommandTools {
                 .value()));
     }
 
+    @Mcp(module = McpModule.SHIPMENTS, write = true, minimumLevel = AccountLevel.MANAGER)
     @Tool(name = "change_shipment_party", description = "Changes the sender or recipient data of a shipment. Only "
             + "the given fields change. Returns the shipment with masked personal data." + CHANGES_DATA)
     public ShipmentToolResponse changeShipmentParty(
@@ -215,6 +227,7 @@ public class ManagerMcpCommandTools {
                         arguments.optional(postalCode), arguments.optional(street), arguments.upper(countryCode)))));
     }
 
+    @Mcp(module = McpModule.DEPARTMENTS, write = true, minimumLevel = AccountLevel.MANAGER)
     @Tool(name = "change_department_address", description = "Changes the address of a department. Returns the "
             + "updated department." + CHANGES_DATA)
     public DepartmentDetailsToolResponse changeDepartmentAddress(
@@ -229,6 +242,7 @@ public class ManagerMcpCommandTools {
                         arguments.upper(countryCode)))));
     }
 
+    @Mcp(module = McpModule.DEPARTMENTS, write = true, minimumLevel = AccountLevel.MANAGER)
     @Tool(name = "change_department_type", description = "Changes the department type, e.g. BRANCH, WAREHOUSE, "
             + "DISTRIBUTION or SORTING_FACILITY." + CHANGES_DATA)
     public DepartmentDetailsToolResponse changeDepartmentType(
@@ -239,6 +253,7 @@ public class ManagerMcpCommandTools {
                         arguments.upper(arguments.required(type, "type")))));
     }
 
+    @Mcp(module = McpModule.DEPARTMENTS, write = true, minimumLevel = AccountLevel.MANAGER)
     @Tool(name = "change_department_email", description = "Changes the contact email of a department." + CHANGES_DATA)
     public DepartmentDetailsToolResponse changeDepartmentEmail(
             @ToolParam(description = "Department code") final String departmentCode,
@@ -248,6 +263,7 @@ public class ManagerMcpCommandTools {
                         arguments.optional(email))));
     }
 
+    @Mcp(module = McpModule.DEPARTMENTS, write = true, minimumLevel = AccountLevel.ADMIN)
     @Tool(name = "change_department_status", description = "Changes the department status: ACTIVE, INACTIVE, "
             + "SUSPENDED or ARCHIVED. Requires the ADMIN role or higher." + CHANGES_DATA)
     public DepartmentDetailsToolResponse changeDepartmentStatus(
@@ -260,6 +276,7 @@ public class ManagerMcpCommandTools {
                         arguments.upper(arguments.required(status, "status")), arguments.optional(reason))));
     }
 
+    @Mcp(module = McpModule.DEPARTMENTS, write = true, minimumLevel = AccountLevel.MANAGER)
     @Tool(name = "set_department_active", description = "Activates or deactivates a department." + CHANGES_DATA)
     public DepartmentDetailsToolResponse setDepartmentActive(
             @ToolParam(description = "Department code") final String departmentCode,
@@ -271,6 +288,7 @@ public class ManagerMcpCommandTools {
                         arguments.required(active, "active"), arguments.optional(reason))));
     }
 
+    @Mcp(module = McpModule.COURIERS, write = true, minimumLevel = AccountLevel.MANAGER)
     @Tool(name = "create_courier", description = "Adds a courier (supplier) and creates the courier's user account, "
             + "which needs an email. Without departmentCode the caller's department is used. Returns the courier "
             + "code." + CHANGES_DATA)
@@ -291,6 +309,7 @@ public class ManagerMcpCommandTools {
         });
     }
 
+    @Mcp(module = McpModule.COURIERS, write = true, minimumLevel = AccountLevel.MANAGER)
     @Tool(name = "update_courier", description = "Changes a courier's first name, last name or telephone number. "
             + "Only the given fields change." + CHANGES_DATA)
     public ChangeToolResponse updateCourier(
@@ -306,6 +325,7 @@ public class ManagerMcpCommandTools {
         });
     }
 
+    @Mcp(module = McpModule.COURIERS, write = true, minimumLevel = AccountLevel.MANAGER)
     @Tool(name = "set_courier_active", description = "Activates or deactivates a courier." + CHANGES_DATA)
     public ChangeToolResponse setCourierActive(
             @ToolParam(description = "Courier (supplier) code") final String courierCode,
@@ -318,6 +338,7 @@ public class ManagerMcpCommandTools {
         });
     }
 
+    @Mcp(module = McpModule.CONFIGURATION, write = true, minimumLevel = AccountLevel.MANAGER)
     @Tool(name = "update_configuration", description = "Changes one section of the operator configuration. Pass "
             + "only the fields to change as a JSON object, nested like in get_configuration, e.g. "
             + "{\"maxVehicles\": 20}. Unknown fields are rejected. Returns the whole updated section." + CHANGES_DATA)

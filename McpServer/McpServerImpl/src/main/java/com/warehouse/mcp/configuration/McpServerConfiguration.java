@@ -2,6 +2,12 @@ package com.warehouse.mcp.configuration;
 
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
+import com.warehouse.auth.McpToolAccessApiService;
+import com.warehouse.mcp.infrastructure.adapter.primary.McpToolVisibilityTransport;
+import io.modelcontextprotocol.server.transport.WebMvcStatelessServerTransport;
+import io.modelcontextprotocol.spec.McpStatelessServerTransport;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -48,6 +54,15 @@ import com.warehouse.mcp.infrastructure.adapter.primary.McpToolExecutor;
 
 @Configuration
 public class McpServerConfiguration {
+
+    @Bean
+    @Primary
+    @ConditionalOnProperty(name = "spring.ai.mcp.server.enabled", havingValue = "true", matchIfMissing = true)
+    public McpStatelessServerTransport managerMcpTransport(final WebMvcStatelessServerTransport transport,
+                                                           final McpToolAccessApiService accessService,
+                                                           @Value("${mcp.server.write-enabled:true}") final boolean writeEnabled) {
+        return new McpToolVisibilityTransport(transport, accessService, writeEnabled);
+    }
 
     @Bean
     public McpQueryPort mcpQueryPort(final CurrentUserServicePort mcpCurrentUserServicePort,

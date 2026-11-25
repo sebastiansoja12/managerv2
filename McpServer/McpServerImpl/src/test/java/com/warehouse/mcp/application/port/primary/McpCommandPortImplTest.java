@@ -71,24 +71,7 @@ class McpCommandPortImplTest {
         verifyNoInteractions(deliveryServicePort);
     }
 
-    @Test
-    void shouldRejectChangesForRegularUser() {
-        when(currentUserServicePort.currentUser()).thenReturn(McpFixture.user("USER"));
 
-        assertThatThrownBy(() -> port(true).cancelDelivery(DELIVERY_ID))
-                .isInstanceOf(McpToolAccessException.class)
-                .hasMessage("Changing data requires the MANAGER role or higher");
-        verifyNoInteractions(deliveryServicePort);
-    }
-
-    @Test
-    void shouldRequireAdministratorToChangeDepartmentStatus() {
-        when(currentUserServicePort.currentUser()).thenReturn(McpFixture.user("MANAGER"));
-
-        assertThatThrownBy(() -> port(true).changeDepartmentStatus(new DepartmentCode("KT1"), "SUSPENDED", null))
-                .isInstanceOf(McpToolAccessException.class);
-        verifyNoInteractions(departmentServicePort);
-    }
 
     @Test
     void shouldKeepCurrentRouteValuesThatWereNotGiven() {

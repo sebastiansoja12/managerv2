@@ -1,9 +1,7 @@
 package com.warehouse.mcp.application.port.primary;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -24,7 +22,6 @@ import com.warehouse.mcp.application.port.secondary.DepartmentServicePort;
 import com.warehouse.mcp.application.port.secondary.DeviceServicePort;
 import com.warehouse.mcp.application.port.secondary.ProcessServicePort;
 import com.warehouse.mcp.application.port.secondary.ShipmentServicePort;
-import com.warehouse.mcp.domain.exception.McpToolAccessException;
 import com.warehouse.mcp.domain.service.PersonalDataMasking;
 import com.warehouse.mcp.application.port.primary.result.DepartmentList;
 import com.warehouse.mcp.domain.vo.DepartmentEntry;
@@ -58,14 +55,6 @@ class McpQueryPortImplTest {
         assertThat(shipment.latestEvents().getFirst().description()).isEqualTo("Event 0");
     }
 
-    @Test
-    void shouldRejectDeviceListForRegularUser() {
-        when(currentUserServicePort.currentUser()).thenReturn(McpFixture.user("USER"));
-
-        assertThatThrownBy(() -> port.listDevices(new DeviceFilter(null, null)))
-                .isInstanceOf(McpToolAccessException.class);
-        verifyNoInteractions(deviceServicePort);
-    }
 
     @Test
     void shouldFilterAndLimitDevicesForManager() {

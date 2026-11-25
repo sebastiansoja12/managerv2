@@ -179,9 +179,6 @@ public class McpCommandPortImpl implements McpCommandPort {
     public DepartmentDetails changeDepartmentStatus(final DepartmentCode departmentCode, final String status,
                                                     final String reason) {
         requireChangeAccess();
-        if (!currentUser().isAdministrator()) {
-            throw new McpToolAccessException("Changing department status requires the ADMIN role or higher");
-        }
         this.departmentServicePort.changeStatus(departmentCode, status, reason);
         return this.departmentServicePort.findDepartment(departmentCode);
     }
@@ -247,9 +244,6 @@ public class McpCommandPortImpl implements McpCommandPort {
     private void requireChangeAccess() {
         if (!this.writeEnabled) {
             throw new McpToolAccessException("Changing data over MCP is disabled on this server (MCP_WRITE_ENABLED)");
-        }
-        if (!currentUser().canChangeData()) {
-            throw new McpToolAccessException("Changing data requires the MANAGER role or higher");
         }
     }
 
