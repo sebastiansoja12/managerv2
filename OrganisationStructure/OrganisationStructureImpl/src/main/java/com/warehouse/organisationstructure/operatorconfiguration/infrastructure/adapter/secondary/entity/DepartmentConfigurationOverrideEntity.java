@@ -5,8 +5,10 @@ import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.DeliveryAreaMode;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.DepartmentWorkTransferMode;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.UncoveredPostalCodePolicy;
+import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.entity.embeddable.DepartmentCourierAssignmentPolicyEmbeddable;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -89,6 +91,9 @@ public class DepartmentConfigurationOverrideEntity extends BelongsToOperator {
     @Column(name = "max_couriers_per_department")
     private Integer maxCouriersPerDepartment;
 
+    @Embedded
+    private DepartmentCourierAssignmentPolicyEmbeddable courierAssignmentPolicy;
+
     protected DepartmentConfigurationOverrideEntity() {
     }
 
@@ -113,7 +118,8 @@ public class DepartmentConfigurationOverrideEntity extends BelongsToOperator {
                                                  final Integer dailyCapacity,
                                                  final Integer capacityWarningThresholdPercent,
                                                  final Boolean redirectOverflowToNeighbour,
-                                                 final Integer maxCouriersPerDepartment) {
+                                                 final Integer maxCouriersPerDepartment,
+                                                 final DepartmentCourierAssignmentPolicyEmbeddable courierAssignmentPolicy) {
         this.departmentId = departmentId;
         this.autoAssignDeliveryAreas = autoAssignDeliveryAreas;
         this.autoConnectDepartments = autoConnectDepartments;
@@ -136,5 +142,6 @@ public class DepartmentConfigurationOverrideEntity extends BelongsToOperator {
         this.capacityWarningThresholdPercent = capacityWarningThresholdPercent;
         this.redirectOverflowToNeighbour = redirectOverflowToNeighbour;
         this.maxCouriersPerDepartment = maxCouriersPerDepartment;
+        this.courierAssignmentPolicy = courierAssignmentPolicy;
     }
 }

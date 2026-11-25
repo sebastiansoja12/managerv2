@@ -7,7 +7,8 @@ public record DepartmentConfigurationOverrideDto(Boolean autoAssignDeliveryAreas
                                                  DeliveryAreaPolicy deliveryAreaPolicy,
                                                  ConnectionPolicy connectionPolicy,
                                                  LifecyclePolicy lifecyclePolicy,
-                                                 CapacityPolicy capacityPolicy) {
+                                                 CapacityPolicy capacityPolicy,
+                                                 DepartmentCourierAssignmentPolicyDto courierAssignmentPolicy) {
 
     public record DeliveryAreaPolicy(DeliveryAreaModeDto deliveryAreaMode,
                                      Integer maxDeliveryRadiusKm,

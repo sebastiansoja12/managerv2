@@ -31,6 +31,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.exception.DepartmentConfigurationAccessDeniedException;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.exception.InvalidOperatorConfigurationException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -269,6 +270,11 @@ public class OperatorConfigurationController {
     private ResponseEntity<ShipmentConfigurationDto> shipmentConfigurationResponse(
             final ShipmentConfiguration shipmentConfiguration) {
         return ResponseEntity.ok(OperatorMapper.toDtoShipmentConfiguration(shipmentConfiguration));
+    }
+
+    @ExceptionHandler(InvalidOperatorConfigurationException.class)
+    public ResponseEntity<String> handleInvalidConfiguration(final InvalidOperatorConfigurationException exception) {
+        return ResponseEntity.badRequest().body(exception.getMessage());
     }
 
     @ExceptionHandler(DepartmentConfigurationAccessDeniedException.class)

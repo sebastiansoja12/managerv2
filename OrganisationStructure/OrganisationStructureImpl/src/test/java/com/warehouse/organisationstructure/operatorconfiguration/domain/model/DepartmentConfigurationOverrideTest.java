@@ -33,7 +33,7 @@ class DepartmentConfigurationOverrideTest {
         final DepartmentConfiguration defaults = DepartmentConfiguration.defaultConfiguration();
         final DepartmentConfigurationOverride override = new DepartmentConfigurationOverride(DEPARTMENT_ID,
                 null, true, null, true, DeliveryAreaMode.RADIUS, 20, null, null, null, 2, null, null, false, true,
-                null, DepartmentWorkTransferMode.AUTOMATIC, 30, 250, null, true, 4);
+                null, DepartmentWorkTransferMode.AUTOMATIC, 30, 250, null, true, 4, null);
 
         final DepartmentConfiguration effective = override.applyTo(defaults);
 

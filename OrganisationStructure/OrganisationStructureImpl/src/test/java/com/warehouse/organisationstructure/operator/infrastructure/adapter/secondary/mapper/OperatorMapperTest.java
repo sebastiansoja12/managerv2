@@ -1,8 +1,15 @@
 package com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.mapper;
 
+import com.warehouse.organisationstructure.api.dto.CourierAssignmentDateFieldDto;
+import com.warehouse.organisationstructure.api.dto.CourierAssignmentWindowTypeDto;
+import com.warehouse.organisationstructure.api.dto.DepartmentCourierAssignmentPolicyDto;
+import java.time.LocalTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
@@ -21,6 +28,11 @@ import com.warehouse.organisationstructure.api.dto.DefaultPickupPointTypeDto;
 import com.warehouse.organisationstructure.api.dto.PickupPointConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.RecipientVerificationMethodDto;
 import com.warehouse.organisationstructure.api.dto.UncoveredPostalCodePolicyDto;
+import com.warehouse.organisationstructure.api.dto.CashOnDeliveryPaymentMethodDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentPaymentConfigurationDto;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.exception.InvalidOperatorConfigurationException;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentPaymentConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.entity.embeddable.ShipmentPaymentConfigurationEmbeddable;
 import com.warehouse.organisationstructure.operator.domain.model.Operator;
 import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.entity.OperatorEntity;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.DeliveryAreaMode;
@@ -113,7 +125,10 @@ class OperatorMapperTest {
                         UncoveredPostalCodePolicyDto.ASSIGN_NEAREST),
                 new DepartmentConnectionPolicyDto(2, 250, true, false),
                 new DepartmentLifecyclePolicyDto(true, true, DepartmentWorkTransferModeDto.AUTOMATIC, 30),
-                new DepartmentCapacityPolicyDto(1500, 90, true, 25));
+                new DepartmentCapacityPolicyDto(1500, 90, true, 25),
+                new DepartmentCourierAssignmentPolicyDto(true, CourierAssignmentDateFieldDto.DESTINATION_ARRIVAL,
+                        CourierAssignmentWindowTypeDto.TIME_OF_DAY, LocalTime.of(8, 0), LocalTime.of(12, 0),
+                        "Europe/Warsaw", 5, 15, 24, 3, 500));
 
         final DepartmentConfiguration configuration = OperatorMapper.toModelDepartmentConfiguration(dto);
 
@@ -156,5 +171,72 @@ class OperatorMapperTest {
         assertEquals(dto, OperatorMapper.toDtoPickupPointConfiguration(mappedBack));
         assertEquals(SuspendedPickupPointShipmentPolicy.WAIT,
                 mappedBack.getLifecyclePolicy().getSuspendedPointShipmentPolicy());
+    }
+
+    @Test
+    void shouldDefaultPaymentDeadlineTo72Hours() {
+        final ShipmentPaymentConfiguration configuration = OperatorMapper.toModelShipmentPaymentConfiguration(
+                new ShipmentPaymentConfigurationDto(true, 5000.0, CashOnDeliveryPaymentMethodDto.BOTH, 0.0, null, null));
+
+        assertEquals(72, configuration.getPaymentDeadlineHours());
+        assertEquals(72, ShipmentPaymentConfiguration.defaultConfiguration().getPaymentDeadlineHours());
+    }
+
+    @Test
+    void shouldMapPaymentDeadlineHours() {
+        final ShipmentPaymentConfiguration configuration = OperatorMapper.toModelShipmentPaymentConfiguration(
+                new ShipmentPaymentConfigurationDto(true, 5000.0, CashOnDeliveryPaymentMethodDto.BOTH, 0.0, 24, null));
+
+        assertEquals(24, configuration.getPaymentDeadlineHours());
+    }
+
+    @Test
+    void shouldRejectNonPositivePaymentDeadline() {
+        assertThrows(InvalidOperatorConfigurationException.class, () ->
+                OperatorMapper.toModelShipmentPaymentConfiguration(new ShipmentPaymentConfigurationDto(true, 5000.0,
+                        CashOnDeliveryPaymentMethodDto.BOTH, 0.0, 0, null)));
+        assertThrows(InvalidOperatorConfigurationException.class, () ->
+                OperatorMapper.toModelShipmentPaymentConfiguration(new ShipmentPaymentConfigurationDto(true, 5000.0,
+                        CashOnDeliveryPaymentMethodDto.BOTH, 0.0, -5, null)));
+    }
+
+    @Test
+    void shouldDisablePaymentsByDefault() {
+        assertFalse(ShipmentPaymentConfiguration.defaultConfiguration().isPaymentsEnabled());
+        assertFalse(new ShipmentPaymentConfiguration().isPaymentsEnabled());
+    }
+
+    @Test
+    void shouldDefaultPaymentsDisabledWhenMissingInCachedConfiguration() {
+        final ShipmentPaymentConfiguration configuration = OperatorMapper.toModelShipmentPaymentConfiguration(
+                new ShipmentPaymentConfigurationDto(true, 5000.0, CashOnDeliveryPaymentMethodDto.BOTH, 0.0, 24, null));
+
+        assertFalse(configuration.isPaymentsEnabled());
+    }
+
+    @Test
+    void shouldRoundTripPaymentsEnabled() {
+        final ShipmentPaymentConfigurationDto dto =
+                new ShipmentPaymentConfigurationDto(true, 5000.0, CashOnDeliveryPaymentMethodDto.BOTH, 0.0, 24, true);
+
+        final ShipmentPaymentConfiguration model = OperatorMapper.toModelShipmentPaymentConfiguration(dto);
+
+        assertTrue(model.isPaymentsEnabled());
+        assertEquals(dto, OperatorMapper.toDtoShipmentPaymentConfiguration(model));
+    }
+
+    @Test
+    void shouldRoundTripSellerBillingSettings() {
+        final ShipmentPaymentConfigurationDto dto = new ShipmentPaymentConfigurationDto(true, 5000.0,
+                CashOnDeliveryPaymentMethodDto.BOTH, 0.0, 24, true, "ul. Żółkiewskiego 5", "00-950", "Łódź", "PL",
+                "PL61109010140000071219812874");
+
+        final ShipmentPaymentConfiguration model = OperatorMapper.toModelShipmentPaymentConfiguration(dto);
+
+        assertEquals("ul. Żółkiewskiego 5", model.getBillingStreet());
+        assertEquals("PL61109010140000071219812874", model.getBankAccount());
+        assertEquals(dto, OperatorMapper.toDtoShipmentPaymentConfiguration(model));
+        assertEquals(dto, OperatorMapper.toDtoShipmentPaymentConfiguration(
+                ShipmentPaymentConfigurationEmbeddable.from(model).toModel()));
     }
 }

@@ -10,6 +10,7 @@ public class DepartmentConfiguration {
     private final DepartmentConnectionPolicy connectionPolicy;
     private final DepartmentLifecyclePolicy lifecyclePolicy;
     private final DepartmentCapacityPolicy capacityPolicy;
+    private final DepartmentCourierAssignmentPolicy courierAssignmentPolicy;
 
     public DepartmentConfiguration(final boolean autoAssignDeliveryAreas,
                                    final boolean autoConnectDepartments,
@@ -18,7 +19,8 @@ public class DepartmentConfiguration {
                                    final DepartmentDeliveryAreaPolicy deliveryAreaPolicy,
                                    final DepartmentConnectionPolicy connectionPolicy,
                                    final DepartmentLifecyclePolicy lifecyclePolicy,
-                                   final DepartmentCapacityPolicy capacityPolicy) {
+                                   final DepartmentCapacityPolicy capacityPolicy,
+                                   final DepartmentCourierAssignmentPolicy courierAssignmentPolicy) {
         this.autoAssignDeliveryAreas = autoAssignDeliveryAreas;
         this.autoConnectDepartments = autoConnectDepartments;
         this.preventDepartmentDeletion = preventDepartmentDeletion;
@@ -31,10 +33,12 @@ public class DepartmentConfiguration {
                 ? lifecyclePolicy : DepartmentLifecyclePolicy.defaultConfiguration();
         this.capacityPolicy = capacityPolicy != null
                 ? capacityPolicy : DepartmentCapacityPolicy.defaultConfiguration();
+        this.courierAssignmentPolicy = courierAssignmentPolicy != null
+                ? courierAssignmentPolicy : DepartmentCourierAssignmentPolicy.defaultConfiguration();
     }
 
     public static DepartmentConfiguration defaultConfiguration() {
-        return new DepartmentConfiguration(false, false, false, false, null, null, null, null);
+        return new DepartmentConfiguration(false, false, false, false, null, null, null, null, null);
     }
 
     public boolean isAutoAssignDeliveryAreas() { return autoAssignDeliveryAreas; }
@@ -45,4 +49,5 @@ public class DepartmentConfiguration {
     public DepartmentConnectionPolicy getConnectionPolicy() { return connectionPolicy; }
     public DepartmentLifecyclePolicy getLifecyclePolicy() { return lifecyclePolicy; }
     public DepartmentCapacityPolicy getCapacityPolicy() { return capacityPolicy; }
+    public DepartmentCourierAssignmentPolicy getCourierAssignmentPolicy() { return courierAssignmentPolicy; }
 }

@@ -1,5 +1,12 @@
 package com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.mapper;
 
+import com.warehouse.organisationstructure.api.dto.CourierAssignmentDateFieldDto;
+import com.warehouse.organisationstructure.api.dto.CourierAssignmentWindowTypeDto;
+import com.warehouse.organisationstructure.api.dto.DepartmentCourierAssignmentPolicyDto;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.exception.InvalidOperatorConfigurationException;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.CourierAssignmentDateField;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.CourierAssignmentWindowType;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.DepartmentCourierAssignmentPolicy;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.organisationstructure.api.dto.DepartmentConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.DefaultShipmentStatusDto;
@@ -686,7 +693,48 @@ public final class OperatorMapper {
                 toDtoDepartmentDeliveryAreaPolicy(configuration.getDeliveryAreaPolicy()),
                 toDtoDepartmentConnectionPolicy(configuration.getConnectionPolicy()),
                 toDtoDepartmentLifecyclePolicy(configuration.getLifecyclePolicy()),
-                toDtoDepartmentCapacityPolicy(configuration.getCapacityPolicy())
+                toDtoDepartmentCapacityPolicy(configuration.getCapacityPolicy()),
+                toDtoDepartmentCourierAssignmentPolicy(configuration.getCourierAssignmentPolicy())
+        );
+    }
+
+    public static DepartmentCourierAssignmentPolicyDto toDtoDepartmentCourierAssignmentPolicy(
+            final DepartmentCourierAssignmentPolicy configuration) {
+        if (configuration == null) {
+            return null;
+        }
+        return new DepartmentCourierAssignmentPolicyDto(
+                configuration.isEnabled(),
+                CourierAssignmentDateFieldDto.valueOf(configuration.getDateField().name()),
+                CourierAssignmentWindowTypeDto.valueOf(configuration.getWindowType().name()),
+                configuration.getWindowStart(),
+                configuration.getWindowEnd(),
+                configuration.getTimeZone(),
+                configuration.getProcessingDelayMinutes(),
+                configuration.getOverlapMinutes(),
+                configuration.getMaxWindowHours(),
+                configuration.getLookbackDays(),
+                configuration.getBatchSize()
+        );
+    }
+
+    public static DepartmentCourierAssignmentPolicy toModelDepartmentCourierAssignmentPolicy(
+            final DepartmentCourierAssignmentPolicyDto dto) {
+        if (dto == null) {
+            return null;
+        }
+        return new DepartmentCourierAssignmentPolicy(
+                dto.enabled(),
+                dto.dateField() != null ? CourierAssignmentDateField.valueOf(dto.dateField().name()) : null,
+                dto.windowType() != null ? CourierAssignmentWindowType.valueOf(dto.windowType().name()) : null,
+                dto.windowStart(),
+                dto.windowEnd(),
+                dto.timeZone(),
+                dto.processingDelayMinutes(),
+                dto.overlapMinutes(),
+                dto.maxWindowHours(),
+                dto.lookbackDays(),
+                dto.batchSize()
         );
     }
 
@@ -699,7 +747,8 @@ public final class OperatorMapper {
                 toModelDepartmentDeliveryAreaPolicy(dto.deliveryAreaPolicy()),
                 toModelDepartmentConnectionPolicy(dto.connectionPolicy()),
                 toModelDepartmentLifecyclePolicy(dto.lifecyclePolicy()),
-                toModelDepartmentCapacityPolicy(dto.capacityPolicy())
+                toModelDepartmentCapacityPolicy(dto.capacityPolicy()),
+                toModelDepartmentCourierAssignmentPolicy(dto.courierAssignmentPolicy())
         );
     }
 
@@ -1071,17 +1120,27 @@ public final class OperatorMapper {
         if (configuration == null) {
             return null;
         }
+        if (configuration.paymentDeadlineHours() != null && configuration.paymentDeadlineHours() <= 0) {
+            throw new InvalidOperatorConfigurationException("Payment deadline hours must be greater than 0");
+        }
         return new ShipmentPaymentConfiguration(
                 configuration.allowCashOnDelivery(),
                 configuration.maxCashOnDeliveryAmount(),
                 configuration.cashOnDeliveryPaymentMethod() != null
                         ? CashOnDeliveryPaymentMethod.valueOf(configuration.cashOnDeliveryPaymentMethod().name())
                         : null,
-                configuration.requireInsuranceAboveValue()
+                configuration.requireInsuranceAboveValue(),
+                configuration.paymentDeadlineHours(),
+                configuration.paymentsEnabled(),
+                configuration.billingStreet(),
+                configuration.billingPostalCode(),
+                configuration.billingCity(),
+                configuration.billingCountryCode(),
+                configuration.bankAccount()
         );
     }
 
-    private static ShipmentPaymentConfigurationDto toDtoShipmentPaymentConfiguration(final ShipmentPaymentConfiguration configuration) {
+    public static ShipmentPaymentConfigurationDto toDtoShipmentPaymentConfiguration(final ShipmentPaymentConfiguration configuration) {
         if (configuration == null) {
             return null;
         }
@@ -1091,7 +1150,14 @@ public final class OperatorMapper {
                 configuration.getCashOnDeliveryPaymentMethod() != null
                         ? CashOnDeliveryPaymentMethodDto.valueOf(configuration.getCashOnDeliveryPaymentMethod().name())
                         : null,
-                configuration.getRequireInsuranceAboveValue()
+                configuration.getRequireInsuranceAboveValue(),
+                configuration.getPaymentDeadlineHours(),
+                configuration.isPaymentsEnabled(),
+                configuration.getBillingStreet(),
+                configuration.getBillingPostalCode(),
+                configuration.getBillingCity(),
+                configuration.getBillingCountryCode(),
+                configuration.getBankAccount()
         );
     }
 

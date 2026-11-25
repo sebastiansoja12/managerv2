@@ -18,6 +18,7 @@ import com.warehouse.organisationstructure.operatorconfiguration.domain.model.Re
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.RegionalConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.RegionalDateFormat;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ScanErrorFeedback;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentPaymentConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.SortingConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.UncoveredPostalCodePolicy;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.UnresolvedDestinationPolicy;
@@ -67,7 +68,7 @@ class RedisOperatorConfigurationCacheTest {
                 .withDepartmentConfiguration(new DepartmentConfiguration(true, false, true, false,
                         new DepartmentDeliveryAreaPolicy(DeliveryAreaMode.RADIUS, 40, false, true,
                                 UncoveredPostalCodePolicy.BLOCK),
-                        null, null, new DepartmentCapacityPolicy(1500, 90, true, 25)))
+                        null, null, new DepartmentCapacityPolicy(1500, 90, true, 25), null))
                 .withFleetConfiguration(new FleetConfiguration(14, 21, 8, 30, false, 15, 33))
                 .withCommunicationConfiguration(new CommunicationConfiguration("Manager", "kontakt@example.com",
                         "Stopka", "https://example.com/logo.png", "#123ABC", CustomerLanguage.DE, 90, false, 5))
@@ -142,5 +143,16 @@ class RedisOperatorConfigurationCacheTest {
         assertThat(KEY).isEqualTo("organisation:operator:" + OperatorTestFixtures.OPERATOR_ID.value()
                 + ":configuration:v1");
         assertThat(RedisOperatorConfigurationCache.CONFIGURATION_TTL).isEqualTo(Duration.ofMinutes(10));
+    }
+
+    @Test
+    void shouldDefaultPaymentDeadlineWhenMissingInCachedConfiguration() {
+        final ShipmentPaymentConfiguration configuration = RedisOperatorConfigurationCache.JSON_MAPPER.readValue("""
+                {"allowCashOnDelivery":true,"maxCashOnDeliveryAmount":5000.0,
+                 "cashOnDeliveryPaymentMethod":"BOTH","requireInsuranceAboveValue":0.0}""",
+                ShipmentPaymentConfiguration.class);
+
+        assertThat(configuration.getPaymentDeadlineHours())
+                .isEqualTo(ShipmentPaymentConfiguration.DEFAULT_PAYMENT_DEADLINE_HOURS);
     }
 }

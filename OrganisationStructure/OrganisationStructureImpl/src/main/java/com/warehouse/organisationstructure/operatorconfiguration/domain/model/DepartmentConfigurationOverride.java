@@ -26,7 +26,8 @@ public record DepartmentConfigurationOverride(DepartmentId departmentId,
                                               Integer dailyCapacity,
                                               Integer capacityWarningThresholdPercent,
                                               Boolean redirectOverflowToNeighbour,
-                                              Integer maxCouriersPerDepartment) {
+                                              Integer maxCouriersPerDepartment,
+                                              DepartmentCourierAssignmentPolicy courierAssignmentPolicy) {
 
     public DepartmentConfigurationOverride {
         Objects.requireNonNull(departmentId, "Department ID cannot be null");
@@ -34,7 +35,7 @@ public record DepartmentConfigurationOverride(DepartmentId departmentId,
 
     public static DepartmentConfigurationOverride empty(final DepartmentId departmentId) {
         return new DepartmentConfigurationOverride(departmentId, null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null, null, null, null, null, null);
+                null, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 
     public boolean isEmpty() {
@@ -44,7 +45,8 @@ public record DepartmentConfigurationOverride(DepartmentId departmentId,
                         maxAutoConnectionDistanceKm, requireSortingConnectionForActivation,
                         bidirectionalConnectionsByDefault, requireStatusChangeReason, blockDeactivationWithActiveWork,
                         workTransferOnDeactivation, autoArchiveInactiveAfterDays, dailyCapacity,
-                        capacityWarningThresholdPercent, redirectOverflowToNeighbour, maxCouriersPerDepartment)
+                        capacityWarningThresholdPercent, redirectOverflowToNeighbour, maxCouriersPerDepartment,
+                        courierAssignmentPolicy)
                 .allMatch(Objects::isNull);
     }
 
@@ -79,7 +81,8 @@ public record DepartmentConfigurationOverride(DepartmentId departmentId,
                         valueOr(dailyCapacity, capacity.getDefaultDailyCapacity()),
                         valueOr(capacityWarningThresholdPercent, capacity.getCapacityWarningThresholdPercent()),
                         valueOr(redirectOverflowToNeighbour, capacity.isRedirectOverflowToNeighbour()),
-                        valueOr(maxCouriersPerDepartment, capacity.getMaxCouriersPerDepartment())));
+                        valueOr(maxCouriersPerDepartment, capacity.getMaxCouriersPerDepartment())),
+                valueOr(courierAssignmentPolicy, defaults.getCourierAssignmentPolicy()));
     }
 
     private static <T> T valueOr(final T value, final T fallback) {
