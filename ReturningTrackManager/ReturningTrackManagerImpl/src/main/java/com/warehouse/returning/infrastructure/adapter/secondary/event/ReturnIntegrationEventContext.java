@@ -9,10 +9,6 @@ import org.springframework.stereotype.Component;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * RTM has no operator security context of the manager application; every return event carries its operator scope
- * itself, so the headers are taken from the event.
- */
 @Component
 public class ReturnIntegrationEventContext implements IntegrationEventContext {
 

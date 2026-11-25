@@ -17,9 +17,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-/**
- * Without Kafka: tests run with {@code manager.events.outbox.relay.enabled=false}, so events stop in the outbox.
- */
 @Configuration(proxyBeanMethods = false)
 @EnableAutoConfiguration(exclude = KafkaAutoConfiguration.class)
 @EntityScan(basePackageClasses = {ReturnPackageEntity.class, OutboxEventEntity.class})

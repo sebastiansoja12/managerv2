@@ -20,10 +20,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Lifecycle domain events extend {@link ReturnPackageChanged}, so each of them is published together with the
- * read model sync event.
- */
 @Component
 public class ReturnIntegrationEventTranslator {
 
