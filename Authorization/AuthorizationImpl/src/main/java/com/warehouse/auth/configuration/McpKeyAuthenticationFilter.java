@@ -118,6 +118,7 @@ public class McpKeyAuthenticationFilter extends OncePerRequestFilter {
 
     private Optional<OrganizationUser> resolveMcpKeyOwner(final McpKeyAuthentication authentication) {
         return this.userService.findByIdInOperator(authentication.ownerId(), authentication.operatorId())
+                .filter(user -> !user.isBusinessCustomer())
                 .filter(user -> user.canAuthenticateWithMcpKey(authentication.mcpKeyId()))
                 .filter(user -> this.operatorAccessPolicy.allowsAccess(authentication.operatorId(),
                         authentication.issuedAt(), false));
@@ -127,6 +128,7 @@ public class McpKeyAuthenticationFilter extends OncePerRequestFilter {
         final Optional<OrganizationUser> user = this.userService.findByApiKeyHash(
                         this.apiKeyEncoder.decode(new ApiKey(null, credential)).key())
                 .filter(OrganizationUser::canAuthenticateWithApiKey)
+                .filter(candidate -> !candidate.isBusinessCustomer())
                 .filter(candidate -> this.operatorAccessPolicy.allowsAccess(candidate.operatorId(),
                         candidate.getApiKeyIssuedAt(), false));
         user.ifPresent(candidate -> log.warn("Deprecated API key used for MCP by user {}",

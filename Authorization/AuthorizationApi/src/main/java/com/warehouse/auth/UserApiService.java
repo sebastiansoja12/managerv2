@@ -1,6 +1,7 @@
 package com.warehouse.auth;
 
 import com.warehouse.auth.infrastructure.dto.UserApiKeyDto;
+import com.warehouse.auth.infrastructure.dto.CreateBusinessCustomerUserApiRequest;
 import com.warehouse.auth.infrastructure.dto.CreateOperatorUserApiRequest;
 import com.warehouse.auth.infrastructure.dto.UserDto;
 import com.warehouse.auth.infrastructure.dto.UserIdDto;
@@ -15,6 +16,8 @@ public interface UserApiService {
     UserIdDto findInitialUserForOperator();
     List<UserDto> findAll();
     UserIdDto createOperatorUser(final OperatorId operatorId, final CreateOperatorUserApiRequest request);
+    UserDto createBusinessCustomerUser(final CreateBusinessCustomerUserApiRequest request);
+    String regenerateApiKey(final UserId userId);
 
     List<UserApiKeyDto> findApiKeys();
 

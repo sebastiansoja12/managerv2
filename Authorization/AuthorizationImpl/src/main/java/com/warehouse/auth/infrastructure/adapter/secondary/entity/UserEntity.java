@@ -209,7 +209,9 @@ public class UserEntity extends BelongsToOperator implements UserDetails {
                         Permission.ROLE_SUPPLIER_DELETE,
                         Permission.ROLE_SUPPLIER_CREATE
                 )
-        );
+        ),
+
+        BUSINESS_CUSTOMER(Collections.emptySet());
 
         @Getter
         private final Set<Permission> permissions;

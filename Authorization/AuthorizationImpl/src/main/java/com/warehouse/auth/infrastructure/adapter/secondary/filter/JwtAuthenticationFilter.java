@@ -81,6 +81,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .orElse(true);
 
                 if (impersonationActive
+                        && !user.isBusinessCustomer()
                         && jwtService.isTokenValid(jwt, user)
                         && operatorAccessPolicy.allowsAccess(user.operatorId(),
                         jwtService.extractIssuedAt(jwt).orElse(null), impersonation.isPresent())) {
@@ -126,6 +127,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(@NonNull final HttpServletRequest request) {
         final String uri = request.getRequestURI();
         return DEVICE_ENDPOINTS.stream().anyMatch(uri::startsWith) || apiExposureProperties.isMcpPath(request)
-                || apiExposureProperties.isExternalPath(request);
+                || apiExposureProperties.isExternalPath(request)
+                || PlatformOwnerPaths.matches(request);
     }
 }

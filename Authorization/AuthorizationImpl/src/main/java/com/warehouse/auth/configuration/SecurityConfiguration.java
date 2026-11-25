@@ -43,7 +43,7 @@ public class SecurityConfiguration {
     private final ShipmentReadSyncBasicAuthenticationFilter shipmentReadSyncBasicAuthenticationFilter;
 
     @Bean
-    @Order(2)
+    @Order(3)
     public SecurityFilterChain securityFilterChain(final HttpSecurity http,
                                                    final CookieCsrfTokenRepository csrfTokenRepository) throws Exception {
 
@@ -55,13 +55,13 @@ public class SecurityConfiguration {
                         .ignoringRequestMatchers(
                                 "/departments/read-sync/**",
                                 "/internal/shipments/read-sync/**")
-                        .ignoringRequestMatchers(apiExposureProperties.externalSecurityMatchers()))
+                        .ignoringRequestMatchers(apiExposureProperties.publicSecurityMatchers()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.ERROR, DispatcherType.FORWARD).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(apiExposureProperties.externalSecurityMatchers()).permitAll()
+                        .requestMatchers(apiExposureProperties.publicSecurityMatchers()).permitAll()
                         .requestMatchers("/auth/login", "/auth/refresh", "/auth/logout", "/auth/csrf").permitAll()
                         .requestMatchers("/platform/auth/login", "/platform/auth/refresh", "/platform/auth/logout").permitAll()
                         .requestMatchers("/platform/**", "/operators", "/operators/**", "/admin/async-jobs/**")

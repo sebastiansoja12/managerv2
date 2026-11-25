@@ -1,6 +1,7 @@
 package com.warehouse.auth.domain.model;
 
 import com.warehouse.auth.domain.event.UserChangedEvent;
+import com.warehouse.auth.domain.exception.UserAccessDeniedException;
 import com.warehouse.auth.domain.exception.UserDeletedException;
 import com.warehouse.auth.domain.registry.DomainRegistry;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
@@ -68,6 +69,7 @@ public abstract class OrganizationUser extends BelongsToOperator implements Acco
             case MANAGER -> new Manager();
             case ADMIN -> new Admin();
             case SUPERADMIN -> new Superadmin();
+            case BUSINESS_CUSTOMER -> new BusinessCustomer();
         };
     }
 
@@ -373,9 +375,16 @@ public abstract class OrganizationUser extends BelongsToOperator implements Acco
         return hasApiKey() && apiKeyIssuedAt != null && !Boolean.TRUE.equals(deleted);
     }
 
+    public boolean isBusinessCustomer() {
+        return Role.BUSINESS_CUSTOMER.equals(getRole());
+    }
+
     public OrganizationUser changeRole(final Role role) {
         if (Boolean.TRUE.equals(deleted)) {
             throw new UserDeletedException("User is already deleted");
+        }
+        if (isBusinessCustomer() || Role.BUSINESS_CUSTOMER.equals(role)) {
+            throw new UserAccessDeniedException("Business customer role cannot be changed");
         }
 
         final OrganizationUser user = forRole(role);
@@ -413,7 +422,7 @@ public abstract class OrganizationUser extends BelongsToOperator implements Acco
             case SUPERADMIN, ADMIN -> getPermissions().addAll(DomainRegistry.rolePermissionService().findAllAdminPermissions());
             case MANAGER -> getPermissions().addAll(DomainRegistry.rolePermissionService().findAllManagerPermissions());
             case SUPPLIER -> getPermissions().addAll(DomainRegistry.rolePermissionService().findAllSupplierPermissions());
-            case USER -> {}
+            case USER, BUSINESS_CUSTOMER -> {}
         }
     }
 
@@ -503,7 +512,8 @@ public abstract class OrganizationUser extends BelongsToOperator implements Acco
         SUPPLIER(AccountLevel.USER),
         MANAGER(AccountLevel.MANAGER),
         ADMIN(AccountLevel.ADMIN),
-        SUPERADMIN(AccountLevel.SUPERADMIN);
+        SUPERADMIN(AccountLevel.SUPERADMIN),
+        BUSINESS_CUSTOMER(AccountLevel.USER);
 
         private final AccountLevel level;
 

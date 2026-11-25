@@ -196,6 +196,24 @@ class McpKeyAuthenticationFilterTest {
         verifyNoInteractions(mcpKeyPort);
     }
 
+    @Test
+    void shouldRejectBusinessCustomerApiKeyDuringTransitionPeriod() throws Exception {
+        apiExposureProperties.setMcpLegacyApiKeyEnabled(true);
+        final OrganizationUser user = OrganizationUser.of(USER_ID, "shop-1234567890", "password", "Sklep", "",
+                "faktury@sklep.pl", OrganizationUser.Role.BUSINESS_CUSTOMER, new DepartmentId(10L), null);
+        user.assignOperator(OPERATOR_ID);
+        user.issueApiKey(hash(LEGACY_API_KEY), ISSUED_AT);
+        when(userService.findByApiKeyHash(hash(LEGACY_API_KEY))).thenReturn(Optional.of(user));
+        when(operatorAccessPolicy.allowsAccess(OPERATOR_ID, ISSUED_AT, false)).thenReturn(true);
+        final MockHttpServletResponse response = new MockHttpServletResponse();
+        final AtomicBoolean chainCalled = new AtomicBoolean(false);
+
+        filter.doFilter(bearer(LEGACY_API_KEY), response, (servletRequest, servletResponse) -> chainCalled.set(true));
+
+        assertThat(chainCalled.get()).isFalse();
+        assertThat(response.getStatus()).isEqualTo(401);
+    }
+
     private void givenActiveMcpKey(final OrganizationUser user) {
         when(mcpKeyPort.authenticate(SECRET)).thenReturn(Optional.of(
                 new McpKeyAuthentication(MCP_KEY_ID, USER_ID, OPERATOR_ID, ISSUED_AT)));

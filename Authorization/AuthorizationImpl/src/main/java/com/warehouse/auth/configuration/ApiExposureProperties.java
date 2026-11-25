@@ -37,6 +37,11 @@ public class ApiExposureProperties {
             new PublicEndpoint("POST", "/device-activations")
     ));
 
+    private List<String> publicPaths = new ArrayList<>(List.of(
+            "/billing/webhooks",
+            "/auth/invitations"
+    ));
+
     public String getInternalPrefix() {
         return internalPrefix;
     }
@@ -119,6 +124,28 @@ public class ApiExposureProperties {
 
     public void setPublicEndpoints(final List<PublicEndpoint> publicEndpoints) {
         this.publicEndpoints = publicEndpoints;
+    }
+
+    public List<String> getPublicPaths() {
+        return publicPaths;
+    }
+
+    public void setPublicPaths(final List<String> publicPaths) {
+        this.publicPaths = publicPaths;
+    }
+
+    public boolean isPublicPath(final HttpServletRequest request) {
+        final String normalizedPath = requestPathWithoutContext(request);
+        return publicPaths.stream()
+                .map(this::normalizePath)
+                .anyMatch(path -> normalizedPath.equals(path) || normalizedPath.startsWith(path + "/"));
+    }
+
+    public String[] publicSecurityMatchers() {
+        return publicPaths.stream()
+                .map(this::normalizePath)
+                .flatMap(path -> Stream.of(path, path + "/**"))
+                .toArray(String[]::new);
     }
 
     public boolean isInternalControllerPath(final String path) {

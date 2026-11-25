@@ -12,14 +12,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.support.StaticApplicationContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
+import com.warehouse.auth.domain.model.CreateBusinessCustomerUserCommand;
 import com.warehouse.auth.domain.model.CreateOperatorUserCommand;
 import com.warehouse.auth.domain.model.CreateUserCommand;
 import com.warehouse.auth.domain.model.RefreshToken;
@@ -56,6 +59,7 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 
 class AuthenticationPortImplTest {
 
@@ -120,6 +124,45 @@ class AuthenticationPortImplTest {
         assertThat(response.refreshToken()).isNotEmpty();
         assertThat(jwtService.extractUsername(response.accessToken())).isEqualTo("s-soja");
         assertThat(refreshTokenRepository.find(response.refreshToken())).isPresent();
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void shouldRejectLoginForBusinessCustomer() {
+        givenUser("shop-1234567890", "raw-password", OrganizationUser.Role.BUSINESS_CUSTOMER, OperatorId.of(100L));
+
+        final AuthenticationErrorException exception = assertThrows(AuthenticationErrorException.class,
+                () -> port.login(new LoginRequest("shop-1234567890", "raw-password")));
+
+        assertThat(exception.getMessage()).isEqualTo("Invalid username or password");
+        assertThat(refreshTokenRepository.refreshTokens).isEmpty();
+    }
+
+    @Test
+    void shouldCreateBusinessCustomerUserInCreatorDepartmentWithoutUsableApiKey() {
+        givenUser("manager", "raw-password", OrganizationUser.Role.MANAGER, OperatorId.of(100L));
+        SecurityContextHolder.getContext().setAuthentication(new UsernameTenantPasswordAuthenticationToken(
+                new UserId(1L), OperatorId.of(100L), new DepartmentId(10L), null, List.of()));
+
+        final UserId userId = port.createBusinessCustomerUser(new CreateBusinessCustomerUserCommand(
+                "shop-1234567890", "Sklep ABC", "faktury@sklep.pl", "pl"));
+
+        final OrganizationUser createdUser = userRepository.findByUsername("shop-1234567890");
+        assertThat(createdUser.getUserId()).isEqualTo(userId);
+        assertThat(createdUser.getRole()).isEqualTo(OrganizationUser.Role.BUSINESS_CUSTOMER);
+        assertThat(createdUser.isBusinessCustomer()).isTrue();
+        assertThat(createdUser.operatorId()).isEqualTo(OperatorId.of(100L));
+        assertThat(createdUser.getDepartmentId()).isEqualTo(new DepartmentId(10L));
+        assertThat(createdUser.getLanguage()).isEqualTo("pl");
+        assertThat(createdUser.getEmail()).isEqualTo("faktury@sklep.pl");
+        assertThat(createdUser.getPassword()).isNotBlank();
+        assertThat(passwordEncoder.matches("", createdUser.getPassword())).isFalse();
+        assertThat(createdUser.canAuthenticateWithApiKey()).isFalse();
+        assertThat(createdUser.getPermissions()).isEmpty();
     }
 
     @Test

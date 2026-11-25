@@ -69,6 +69,7 @@ public class UserPortImpl implements UserPort {
         final OrganizationUser currentUser = currentUser();
         return userService.findAll()
                 .stream()
+                .filter(user -> !user.isBusinessCustomer())
                 .filter(user -> currentUser.canAccessDepartment(user.getDepartmentId()))
                 .toList();
     }

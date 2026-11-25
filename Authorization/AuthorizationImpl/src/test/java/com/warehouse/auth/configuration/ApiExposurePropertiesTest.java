@@ -1,5 +1,6 @@
 package com.warehouse.auth.configuration;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -41,6 +42,27 @@ class ApiExposurePropertiesTest {
         request.setContextPath("/v1/api");
 
         assertTrue(properties.isPublicEndpoint(request));
+    }
+
+    @Test
+    void shouldExposeBillingWebhooksWithoutMatchingSimilarPrefixes() {
+        assertTrue(properties.isPublicPath(request("/v1/api/billing/webhooks/stripe")));
+        assertFalse(properties.isPublicPath(request("/v1/api/billing/webhooks-admin")));
+        assertFalse(properties.isPublicPath(request("/v1/api/billing/payments")));
+    }
+
+    @Test
+    void shouldExposeUserInvitationsWithoutAuthentication() {
+        assertTrue(properties.isPublicPath(request("/v1/api/auth/invitations/verify")));
+        assertTrue(properties.isPublicPath(request("/v1/api/auth/invitations/accept")));
+        assertFalse(properties.isPublicPath(request("/v1/api/auth/invitations-admin")));
+    }
+
+    @Test
+    void shouldProvideSecurityMatchersForPublicPaths() {
+        assertArrayEquals(new String[]{"/billing/webhooks", "/billing/webhooks/**", "/auth/invitations",
+                        "/auth/invitations/**"},
+                properties.publicSecurityMatchers());
     }
 
     private MockHttpServletRequest request(final String uri) {
