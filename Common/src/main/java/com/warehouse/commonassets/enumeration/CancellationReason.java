@@ -5,5 +5,6 @@ public enum CancellationReason {
     INVALID_DATA,
     DUPLICATE,
     OPERATIONAL_REASON,
+    PAYMENT_EXPIRED,
     OTHER
 }

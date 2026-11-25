@@ -3,6 +3,9 @@ package com.warehouse.commonassets.repository;
 import com.warehouse.commonassets.identificator.ObjectValue;
 import org.hibernate.query.criteria.JpaCriteriaQuery;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
+import org.hibernate.Timeouts;
+import org.hibernate.jpa.SpecHints;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
@@ -19,6 +22,7 @@ public class Criteria<T> {
     private final Root<T> root;
     private Integer firstResult;
     private Integer maxResults;
+    private boolean skipLockedRows;
 
     public Criteria(final EntityManager em, Class<T> clazz) {
         this.em = em;
@@ -132,6 +136,11 @@ public class Criteria<T> {
         return this;
     }
 
+    public Criteria<T> lockSkippingLocked() {
+        this.skipLockedRows = true;
+        return this;
+    }
+
     public Criteria<T> and(final Predicate additionalPredicate) {
         final Predicate current = cq.getRestriction();
 
@@ -209,6 +218,10 @@ public class Criteria<T> {
         }
         if (maxResults != null) {
             query.setMaxResults(maxResults);
+        }
+        if (skipLockedRows) {
+            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            query.setHint(SpecHints.HINT_SPEC_LOCK_TIMEOUT, Timeouts.SKIP_LOCKED_MILLI);
         }
         return query;
     }
