@@ -57,16 +57,41 @@ public class ShipmentContentController {
     @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_CREATE, UserPermission.ROLE_MANAGER_CREATE})
     public ResponseEntity<ShipmentDocumentResponseApi> addDocument(@PathVariable final Long shipmentId,
                                                                     @RequestPart("file") final MultipartFile file) {
+        return storeDocument(new ShipmentId(shipmentId), file, readDocument(file));
+    }
+
+    @PostMapping(path = "/photos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_CREATE, UserPermission.ROLE_MANAGER_CREATE,
+            UserPermission.ROLE_SUPPLIER_CREATE})
+    public ResponseEntity<ShipmentDocumentResponseApi> addPhoto(@PathVariable final Long shipmentId,
+                                                               @RequestPart("file") final MultipartFile file) {
+        if (!MediaType.IMAGE_JPEG_VALUE.equals(file.getContentType())) {
+            throw new IllegalArgumentException("Photo must be a JPEG image");
+        }
+        final byte[] content = readDocument(file);
+        if (content.length < 3 || content[0] != (byte) 0xff || content[1] != (byte) 0xd8
+                || content[2] != (byte) 0xff) {
+            throw new IllegalArgumentException("Photo must contain JPEG image data");
+        }
+        return storeDocument(new ShipmentId(shipmentId), file, content);
+    }
+
+    private byte[] readDocument(final MultipartFile file) {
         if (file.isEmpty() || file.getSize() > MAX_DOCUMENT_SIZE) {
             throw new IllegalArgumentException("Document must contain 1 byte to 5 MB");
         }
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(
-                    shipmentContentPort.addDocument(new ShipmentId(shipmentId), file.getOriginalFilename(),
-                            file.getContentType(), file.getBytes())));
+            return file.getBytes();
         } catch (final IOException exception) {
             throw new RestException(400, "Document could not be read");
         }
+    }
+
+    private ResponseEntity<ShipmentDocumentResponseApi> storeDocument(final ShipmentId shipmentId,
+                                                                     final MultipartFile file,
+                                                                     final byte[] content) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(
+                shipmentContentPort.addDocument(shipmentId, file.getOriginalFilename(), file.getContentType(), content)));
     }
 
     @GetMapping("/documents")
