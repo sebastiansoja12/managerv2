@@ -1,6 +1,7 @@
 package com.warehouse.shipment;
 
 import java.math.BigDecimal;
+import com.warehouse.shipment.domain.enumeration.PaymentState;
 import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 
 import com.warehouse.commonassets.enumeration.*;
@@ -99,7 +100,7 @@ public class DataTestCreator {
                 new Weight(new BigDecimal("5.5"), WeightUnit.KG),
                 new CustomerReference("ORDER-2026-12345"), "Electronics",
                 new Money(new BigDecimal("2500.00"), Currency.PLN),
-                null, null, ShipmentSource.WEB
+                null, null, ShipmentSource.WEB, PaymentState.NOT_REQUIRED, null, null
         );
     }
 

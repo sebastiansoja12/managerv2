@@ -28,7 +28,7 @@ public class ShipmentIntegrationListener {
         final ShipmentDeliveryReadModelData payload = event.payload();
         shipmentReadModelSyncPort.syncReadModel(payload.shipmentId(), new ShipmentDeliveryDetails(
                 payload.originDepartmentId(), payload.destinationDepartmentId(), payload.currentDepartmentId(),
-                payload.plannedDeliveryAt(), payload.deliveredAt()));
+                payload.plannedDeliveryAt(), payload.deliveredAt(), payload.courierCode(), payload.courierName()));
     }
 
     @IntegrationEventListener(group = "shipment-management-pallet")

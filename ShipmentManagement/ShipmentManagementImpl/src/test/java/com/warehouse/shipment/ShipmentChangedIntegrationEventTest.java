@@ -48,7 +48,8 @@ class ShipmentChangedIntegrationEventTest {
         final JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(event));
 
         final JsonNode payload = json.path("payload");
-        assertThat(payload.size()).isEqualTo(17);
+        assertThat(payload.size()).isEqualTo(20);
+        assertThat(payload.path("paymentState").asText()).isEqualTo("NOT_REQUIRED");
         assertThat(payload.path("shipmentId").path("value").asLong()).isEqualTo(1L);
         assertThat(payload.path("shipmentStatus").asText()).isEqualTo("CREATED");
         assertThat(LocalDateTime.parse(payload.path("updatedAt").asText())).isEqualTo(snapshot.updatedAt());

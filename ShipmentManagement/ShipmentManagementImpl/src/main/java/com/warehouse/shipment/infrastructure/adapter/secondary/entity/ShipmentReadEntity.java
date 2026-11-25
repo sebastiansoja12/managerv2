@@ -8,6 +8,7 @@ import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
+import com.warehouse.shipment.domain.enumeration.PaymentState;
 import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
 import jakarta.persistence.*;
@@ -127,6 +128,18 @@ public class ShipmentReadEntity extends BelongsToOperator {
     @Enumerated(EnumType.STRING)
     private ShipmentSource source;
 
+    @Column(name = "payment_state", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PaymentState paymentState;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "price_quote_id"))
+    private PriceQuoteId priceQuoteId;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "billing_customer_id"))
+    private BillingCustomerId billingCustomerId;
+
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "amount", column = @Column(name = "price_amount")),
@@ -162,6 +175,12 @@ public class ShipmentReadEntity extends BelongsToOperator {
 
     @Column(name = "delivered_at")
     private LocalDateTime deliveredAt;
+
+    @Column(name = "courier_code")
+    private String courierCode;
+
+    @Column(name = "courier_name")
+    private String courierName;
 
     @Column(name = "incident_reported", nullable = false)
     private Boolean incidentReported;

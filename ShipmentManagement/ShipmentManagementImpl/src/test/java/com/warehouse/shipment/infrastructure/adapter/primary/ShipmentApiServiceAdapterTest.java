@@ -24,7 +24,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.enumeration.ProcessType;
+import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.identificator.BillingCustomerId;
+import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.commonassets.identificator.PriceQuoteId;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -32,12 +36,17 @@ import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.shipment.application.port.primary.command.ShipmentDeliveryCommand;
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
+import com.warehouse.shipment.api.event.snapshot.PaymentStateDto;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
+import com.warehouse.shipment.domain.enumeration.PaymentState;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.vo.RouteLogRecord;
 import com.warehouse.shipment.domain.vo.RouteLogRecordDetail;
 import com.warehouse.shipment.domain.vo.RouteLogRecordDetails;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentApiServiceMapper;
+import com.warehouse.shipment.infrastructure.dto.ShipmentBillingPartyDto;
+import com.warehouse.shipment.infrastructure.dto.ShipmentPaymentReferenceDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectRequestDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectRequestItemDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectResponseDto;
@@ -160,6 +169,71 @@ class ShipmentApiServiceAdapterTest {
                 new ShipmentId(1L), null, null, relatedShipmentId, null,
                 false, null, null, null);
         return new ShipmentResult(shipment.snapshot());
+    }
+
+    @Test
+    void shouldReturnBillingPartyOfShipmentWithPriceQuote() {
+        final Shipment shipment = Shipment.rehydrate(new ShipmentId(1L),
+                new Party("Jan", "Kowalski", "jan@example.com", "500600700", "Kraków", "31-147", "Długa 1",
+                        CountryCode.PL), null, ShipmentStatus.CREATED, null, null, null, null, null, false, false,
+                null, new TrackingNumber("TRK-INV"), null, null, null, null, null, null, null, null, null, null,
+                null, null, PaymentState.PAID, new PriceQuoteId(20L), new BillingCustomerId(7L));
+        when(shipmentPort.findByPriceQuote(new PriceQuoteId(20L)))
+                .thenReturn(Optional.of(new ShipmentResult(shipment.snapshot())));
+
+        final ShipmentBillingPartyDto party = adapter.findBillingParty(new PriceQuoteId(20L)).orElseThrow();
+
+        assertEquals("Kowalski", party.sender().lastName());
+        assertEquals("jan@example.com", party.sender().email());
+        assertEquals("PL", party.sender().countryCode());
+        assertEquals(new BillingCustomerId(7L), party.billingCustomerId());
+    }
+
+    @Test
+    void shouldReturnNoBillingPartyWhenNoShipmentHasPriceQuote() {
+        when(shipmentPort.findByPriceQuote(new PriceQuoteId(21L))).thenReturn(Optional.empty());
+
+        assertTrue(adapter.findBillingParty(new PriceQuoteId(21L)).isEmpty());
+    }
+
+    @Test
+    void shouldReturnPaymentReferenceOfShipmentOperator() {
+        final TrackingNumber trackingNumber = new TrackingNumber("TRK-PAY");
+        final Shipment shipment = Shipment.rehydrate(new ShipmentId(1L), null, null, ShipmentStatus.CREATED, null,
+                null, null, null, null, false, false, null, trackingNumber, null, null, null, null, null, null, null,
+                null, null, null, null, null, PaymentState.UNPAID, new PriceQuoteId(20L), new BillingCustomerId(55L));
+        when(shipmentPort.findOperator(trackingNumber)).thenReturn(Optional.of(OperatorId.of(10L)));
+        when(shipmentPort.loadShipment(trackingNumber)).thenReturn(new ShipmentResult(shipment.snapshot()));
+
+        final ShipmentPaymentReferenceDto reference = adapter.findPaymentReference(trackingNumber).orElseThrow();
+
+        assertEquals(OperatorId.of(10L), reference.operatorId());
+        assertEquals(PaymentStateDto.UNPAID, reference.paymentState());
+        assertEquals(new PriceQuoteId(20L), reference.priceQuoteId());
+        assertEquals(new BillingCustomerId(55L), reference.billingCustomerId());
+    }
+
+    @Test
+    void shouldReturnPaymentReferenceWithoutStateForLegacyShipment() {
+        final TrackingNumber trackingNumber = new TrackingNumber("TRK-LEGACY");
+        final Shipment shipment = Shipment.rehydrate(new ShipmentId(1L), null, null, ShipmentStatus.CREATED, null,
+                null, null, null, null, false, false, null, trackingNumber, null, null, null, null, null, null, null,
+                null, null, null, null, null, null, null, null);
+        when(shipmentPort.findOperator(trackingNumber)).thenReturn(Optional.of(OperatorId.of(10L)));
+        when(shipmentPort.loadShipment(trackingNumber)).thenReturn(new ShipmentResult(shipment.snapshot()));
+
+        final ShipmentPaymentReferenceDto reference = adapter.findPaymentReference(trackingNumber).orElseThrow();
+
+        assertNull(reference.paymentState());
+        assertNull(reference.priceQuoteId());
+    }
+
+    @Test
+    void shouldReturnNoPaymentReferenceWhenShipmentDoesNotExist() {
+        final TrackingNumber trackingNumber = new TrackingNumber("UNKNOWN");
+        when(shipmentPort.findOperator(trackingNumber)).thenReturn(Optional.empty());
+
+        assertTrue(adapter.findPaymentReference(trackingNumber).isEmpty());
     }
 
     @Test

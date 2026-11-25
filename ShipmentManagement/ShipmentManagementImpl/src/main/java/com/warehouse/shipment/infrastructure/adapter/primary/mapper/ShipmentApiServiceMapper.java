@@ -1,5 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
+import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.shipment.api.event.snapshot.PaymentStateDto;
 import com.warehouse.shipment.application.port.primary.result.ShipmentRerouteResult;
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
@@ -13,7 +15,9 @@ import com.warehouse.shipment.domain.vo.WeightUnit;
 import com.warehouse.shipment.infrastructure.dto.ShipmentDetailsDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentDimensionsDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentDocumentDto;
+import com.warehouse.shipment.infrastructure.dto.ShipmentBillingPartyDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentPartyDto;
+import com.warehouse.shipment.infrastructure.dto.ShipmentPaymentReferenceDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRerouteDetailsDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentTrackingDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentTrackingEventDto;
@@ -40,6 +44,20 @@ public class ShipmentApiServiceMapper {
                         ? null : shipment.snapshot().recipient().getCountryCode().name(),
                 shipment.deliveryDetails() == null ? null : shipment.deliveryDetails().destinationDepartmentId()
         );
+    }
+
+    public ShipmentPaymentReferenceDto mapPaymentReference(final OperatorId operatorId, final ShipmentResult shipment) {
+        return new ShipmentPaymentReferenceDto(operatorId,
+                shipment.snapshot().paymentState() == null
+                        ? null : PaymentStateDto.valueOf(shipment.snapshot().paymentState().name()),
+                shipment.snapshot().priceQuoteId(),
+                shipment.snapshot().billingCustomerId());
+    }
+
+    public ShipmentBillingPartyDto mapBillingParty(final ShipmentResult shipment) {
+        final ShipmentSnapshot snapshot = shipment.snapshot();
+        return new ShipmentBillingPartyDto(snapshot.sender() == null ? null : map(snapshot.sender()),
+                snapshot.billingCustomerId());
     }
 
     public ShipmentDocumentDto mapDocument(final ShipmentResult shipment) {

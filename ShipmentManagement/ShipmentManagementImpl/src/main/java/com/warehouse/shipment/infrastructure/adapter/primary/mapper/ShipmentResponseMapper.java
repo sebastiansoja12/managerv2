@@ -55,7 +55,9 @@ public interface ShipmentResponseMapper {
                 shipment.packagingType() == null ? null
                         : PackagingTypeDto.valueOf(shipment.packagingType().name()),
                 shipment.serviceLevel() == null ? null
-                        : ShipmentServiceLevelDto.valueOf(shipment.serviceLevel().name()));
+                        : ShipmentServiceLevelDto.valueOf(shipment.serviceLevel().name()),
+                PaymentStateDto.valueOf(shipment.paymentState().name()),
+                shipment.priceQuoteId() == null ? null : new PriceQuoteIdDto(shipment.priceQuoteId().value()));
         return response;
     }
 
@@ -73,7 +75,8 @@ public interface ShipmentResponseMapper {
                 shipmentResult.deliveryDetails() == null ? null : map(shipmentResult.deliveryDetails()),
                 shipmentResult.incidentReported(),
                 shipmentResult.palletTrackingNumber() == null ? null
-                        : new PalletTrackingNumberDto(shipmentResult.palletTrackingNumber().value()));
+                        : new PalletTrackingNumberDto(shipmentResult.palletTrackingNumber().value()),
+                shipment.getPaymentState(), shipment.getPriceQuoteId());
     }
 
     default ShipmentDeliveryApi map(final ShipmentDeliveryDetails deliveryDetails) {
@@ -82,7 +85,9 @@ public interface ShipmentResponseMapper {
                 DepartmentIdDto.from(deliveryDetails.destinationDepartmentId()),
                 DepartmentIdDto.from(deliveryDetails.currentDepartmentId()),
                 deliveryDetails.plannedDeliveryAt(),
-                deliveryDetails.deliveredAt());
+                deliveryDetails.deliveredAt(),
+                deliveryDetails.courierCode() == null ? null : deliveryDetails.courierCode().value(),
+                deliveryDetails.courierName());
     }
 
     default ShipmentPageDto map(final ShipmentPageResult shipmentPage) {

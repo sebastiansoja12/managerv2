@@ -24,6 +24,13 @@ import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
+import com.warehouse.billing.api.BillingCustomerApiService;
+import com.warehouse.billing.api.PriceQuoteApiService;
+import com.warehouse.shipment.application.port.primary.ShipmentCustomerPort;
+import com.warehouse.shipment.application.port.primary.ShipmentCustomerPortImpl;
+import com.warehouse.shipment.application.port.secondary.BillingCustomerServicePort;
+import com.warehouse.shipment.application.port.secondary.ShipmentActorServicePort;
+import com.warehouse.shipment.infrastructure.adapter.secondary.BillingCustomerServiceAdapter;
 import com.warehouse.organisationstructure.api.OperatorApiService;
 import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import com.warehouse.pickuppoint.api.PickupPointApiService;
@@ -58,6 +65,7 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEn
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentReadEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.OperatorShipmentConfigurationMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentPersistenceMapper;
+import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentPricingRequestMapper;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.geocoding.api.PostalCodeService;
 
@@ -83,11 +91,6 @@ public class ShipmentConfiguration {
 	@Bean
 	public DepartmentCountryAvailabilityService countryServiceAvailabilityService(final DepartmentServicePort departmentServicePort) {
 		return new DepartmentCountryAvailabilityServiceImpl(departmentServicePort);
-	}
-
-	@Bean
-	public PriceRepository priceRepository(final PriceReadRepository repository) {
-		return new PriceRepositoryImpl(repository);
 	}
 
 	@Bean
@@ -125,17 +128,37 @@ public class ShipmentConfiguration {
                                      final DomainEventPublisher domainEventPublisher,
                                      final ShipmentDepartmentResolutionService shipmentDepartmentResolutionService,
                                      final PostalCodeServicePort postalCodeServicePort,
-                                     final OperatorServicePort shipmentOperatorServicePort) {
+                                     final OperatorServicePort shipmentOperatorServicePort,
+                                     final ShipmentPricingServicePort shipmentPricingServicePort) {
 		final AddressValidationService addressValidationService = new AddressValidationService();
+		final Logger shipmentPortLogger = LOGGER_FACTORY.getLogger(ShipmentPortImpl.class);
 		return new ShipmentPortImpl(shipmentRepository,
-				LOGGER_FACTORY.getLogger(ShipmentPortImpl.class),
+				shipmentPortLogger,
 				departmentCountryAvailabilityService, shipmentResultFactory,
 				trackingNumberGenerationService,
 				shipmentConfigurationServicePort,
                 shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
                 domainEventPublisher, shipmentDepartmentResolutionService, addressValidationService,
-                postalCodeServicePort, shipmentOperatorServicePort);
+                postalCodeServicePort, shipmentOperatorServicePort, shipmentPricingServicePort,
+                new ShipmentPaymentService(shipmentRepository, domainEventPublisher, shipmentPortLogger));
 	}
+
+    @Bean
+    public BillingCustomerServicePort billingCustomerServicePort(
+            final BillingCustomerApiService billingCustomerApiService) {
+        return new BillingCustomerServiceAdapter(billingCustomerApiService);
+    }
+
+    @Bean
+    public ShipmentCustomerPort shipmentCustomerPort(final ShipmentActorServicePort shipmentActorServicePort,
+                                                     final BillingCustomerServicePort billingCustomerServicePort) {
+        return new ShipmentCustomerPortImpl(shipmentActorServicePort, billingCustomerServicePort);
+    }
+
+    @Bean
+    public ShipmentPricingServicePort shipmentPricingServicePort(final PriceQuoteApiService priceQuoteApiService) {
+        return new ShipmentPricingServiceAdapter(priceQuoteApiService, new ShipmentPricingRequestMapper());
+    }
 
     @Bean
     public OperatorServicePort shipmentOperatorServicePort(final OperatorApiService operatorApiService) {
@@ -448,8 +471,8 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public ShipmentRequestValidator shipmentRequestValidator(final PriceService priceService) {
-		return new ShipmentRequestValidatorImpl(priceService);
+	public ShipmentRequestValidator shipmentRequestValidator() {
+		return new ShipmentRequestValidatorImpl();
 	}
 
 	@Bean

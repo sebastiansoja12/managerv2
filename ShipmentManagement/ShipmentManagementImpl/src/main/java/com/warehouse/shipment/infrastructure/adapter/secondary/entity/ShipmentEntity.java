@@ -8,6 +8,7 @@ import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
+import com.warehouse.shipment.domain.enumeration.PaymentState;
 import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
 import jakarta.persistence.*;
@@ -130,6 +131,18 @@ public class ShipmentEntity extends BelongsToOperator {
     @Column(name = "source", nullable = false)
     @Enumerated(EnumType.STRING)
     private ShipmentSource source;
+
+    @Column(name = "payment_state", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PaymentState paymentState;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "price_quote_id"))
+    private PriceQuoteId priceQuoteId;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "billing_customer_id"))
+    private BillingCustomerId billingCustomerId;
 
     @Embedded
     @AttributeOverrides({

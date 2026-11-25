@@ -44,7 +44,9 @@ public class OperatorShipmentConfigurationMapper {
                 map(configuration.shipmentLimits()),
                 map(configuration.workflowConfiguration()),
                 map(configuration.trackingNumberRule(), currentDepartmentCode),
-                map(configuration.notificationConfiguration())
+                map(configuration.notificationConfiguration()),
+                configuration.paymentConfiguration() != null
+                        && Boolean.TRUE.equals(configuration.paymentConfiguration().paymentsEnabled())
         );
     }
 

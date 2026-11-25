@@ -8,7 +8,8 @@ public record OperatorShipmentConfiguration(
         ShipmentLimits limits,
         ShipmentWorkflowSettings workflowSettings,
         TrackingNumberRule trackingNumberRule,
-        ShipmentNotificationSettings notificationSettings
+        ShipmentNotificationSettings notificationSettings,
+        boolean paymentsEnabled
 ) {
 
     private static final OperatorShipmentConfiguration DEFAULT = new OperatorShipmentConfiguration(
@@ -17,7 +18,8 @@ public record OperatorShipmentConfiguration(
             ShipmentLimits.defaults(),
             ShipmentWorkflowSettings.defaults(),
             TrackingNumberRule.defaults(),
-            ShipmentNotificationSettings.defaults()
+            ShipmentNotificationSettings.defaults(),
+            false
     );
 
     public OperatorShipmentConfiguration {
@@ -27,6 +29,16 @@ public record OperatorShipmentConfiguration(
         workflowSettings = Objects.requireNonNullElse(workflowSettings, ShipmentWorkflowSettings.defaults());
         trackingNumberRule = Objects.requireNonNullElse(trackingNumberRule, TrackingNumberRule.defaults());
         notificationSettings = Objects.requireNonNullElse(notificationSettings, ShipmentNotificationSettings.defaults());
+    }
+
+    public OperatorShipmentConfiguration(final ShipmentValidationRules validationRules,
+                                         final ShipmentLabelSettings labelSettings,
+                                         final ShipmentLimits limits,
+                                         final ShipmentWorkflowSettings workflowSettings,
+                                         final TrackingNumberRule trackingNumberRule,
+                                         final ShipmentNotificationSettings notificationSettings) {
+        this(validationRules, labelSettings, limits, workflowSettings, trackingNumberRule, notificationSettings,
+                false);
     }
 
     public static OperatorShipmentConfiguration defaults() {

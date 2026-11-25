@@ -1,5 +1,9 @@
 package com.warehouse.shipment.application.port.primary;
 
+import java.util.Map;
+
+import java.util.Collection;
+
 import com.warehouse.shipment.domain.vo.Dimensions;
 
 import com.warehouse.shipment.domain.vo.Weight;
@@ -36,6 +40,8 @@ public interface ShipmentPort {
 
     ShipmentResult loadShipment(final ShipmentId shipmentId);
 
+    Map<ShipmentId, String> loadRecipientPostalCodes(final Collection<ShipmentId> shipmentIds);
+
     ShipmentResult loadShipment(final TrackingNumber trackingNumber);
 
     ShipmentRouteLog loadShipmentWithRouteLog(final ShipmentId shipmentId);
@@ -58,6 +64,8 @@ public interface ShipmentPort {
 
     Optional<ShipmentResult> findSourceShipment(final ShipmentId shipmentId);
 
+    Optional<ShipmentResult> findByPriceQuote(final PriceQuoteId priceQuoteId);
+
     ShipmentRerouteResult loadShipmentForReroute(final TrackingNumber trackingNumber);
 
     ShipmentRerouteResult reroute(final ShipmentRerouteCommand command);
@@ -69,6 +77,10 @@ public interface ShipmentPort {
     void cancel(final ShipmentId shipmentId);
 
     void markLost(final ShipmentId shipmentId);
+
+    void markAsPaid(final PriceQuoteId priceQuoteId);
+
+    void cancelForExpiredPayment(final PriceQuoteId priceQuoteId);
 
     void returnAfterIncident(final ShipmentId shipmentId);
 

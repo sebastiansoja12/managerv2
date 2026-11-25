@@ -42,7 +42,7 @@ class ShipmentCreateRequestMapperTest {
                 new DimensionsApi(new BigDecimal("40"), new BigDecimal("30"), new BigDecimal("20"), LengthUnitDto.CM),
                 new WeightApi(new BigDecimal("5.5"), WeightUnitDto.KG),
                 "Electronics", new MoneyApi(new BigDecimal("2500"), "PLN"), "ORDER-123",
-                new MoneyApi(new BigDecimal("25"), "PLN"), ShipmentPriorityDto.MEDIUM,
+                ShipmentPriorityDto.MEDIUM,
                 PackagingTypeDto.BOX, ShipmentServiceLevelDto.EXPRESS,
                 null, null, null, null);
 

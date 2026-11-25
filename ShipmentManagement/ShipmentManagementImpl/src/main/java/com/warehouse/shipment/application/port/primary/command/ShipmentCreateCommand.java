@@ -1,6 +1,7 @@
 package com.warehouse.shipment.application.port.primary.command;
 
 import com.warehouse.commonassets.enumeration.ShipmentPriority;
+import com.warehouse.commonassets.identificator.BillingCustomerId;
 import com.warehouse.commonassets.identificator.PickupPointId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
@@ -19,8 +20,6 @@ public class ShipmentCreateCommand {
 
 	private Party recipient;
 
-	private Money price;
-	
 	private ShipmentPriority shipmentPriority;
 
 	private PackagingType packagingType;
@@ -47,36 +46,34 @@ public class ShipmentCreateCommand {
 
 	private ShipmentSource source;
 
+	private BillingCustomerId billingCustomerId;
+
 	public ShipmentCreateCommand() {
 
 	}
 
-	public ShipmentCreateCommand(final Money price,
-								 final Party recipient,
+	public ShipmentCreateCommand(final Party recipient,
 								 final Party sender,
 								 final ShipmentPriority shipmentPriority) {
-		this(price, recipient, sender, shipmentPriority, PickupMethod.DEPARTMENT, DeliveryMethod.COURIER, null, null);
+		this(recipient, sender, shipmentPriority, PickupMethod.DEPARTMENT, DeliveryMethod.COURIER, null, null);
 	}
 
-	public ShipmentCreateCommand(final Money price,
-								 final Party recipient,
+	public ShipmentCreateCommand(final Party recipient,
 								 final Party sender,
 								 final ShipmentPriority shipmentPriority,
 								 final PickupMethod pickupMethod,
 								 final DeliveryMethod deliveryMethod,
 								 final PickupPointId pickupPointId) {
-		this(price, recipient, sender, shipmentPriority, pickupMethod, deliveryMethod, pickupPointId, null);
+		this(recipient, sender, shipmentPriority, pickupMethod, deliveryMethod, pickupPointId, null);
 	}
 
-	public ShipmentCreateCommand(final Money price,
-								 final Party recipient,
+	public ShipmentCreateCommand(final Party recipient,
 								 final Party sender,
 								 final ShipmentPriority shipmentPriority,
 								 final PickupMethod pickupMethod,
 								 final DeliveryMethod deliveryMethod,
 								 final PickupPointId pickupPointId,
 								 final PickupPointId deliveryPickupPointId) {
-		this.price = price;
 		this.recipient = recipient;
 		this.sender = sender;
 		this.shipmentPriority = shipmentPriority;
@@ -84,14 +81,6 @@ public class ShipmentCreateCommand {
 		this.deliveryMethod = deliveryMethod;
 		this.pickupPointId = pickupPointId;
 		this.deliveryPickupPointId = deliveryPickupPointId;
-	}
-
-	public Money getPrice() {
-		return price;
-	}
-
-	public void setPrice(final Money price) {
-		this.price = price;
 	}
 
 	public Party getRecipient() {
@@ -204,5 +193,13 @@ public class ShipmentCreateCommand {
 
 	public void setSource(final ShipmentSource source) {
 		this.source = source;
+	}
+
+	public BillingCustomerId getBillingCustomerId() {
+		return billingCustomerId;
+	}
+
+	public void setBillingCustomerId(final BillingCustomerId billingCustomerId) {
+		this.billingCustomerId = billingCustomerId;
 	}
 }

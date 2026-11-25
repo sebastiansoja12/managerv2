@@ -24,12 +24,9 @@ import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
 import com.warehouse.shipment.application.listener.ShipmentDomainEventListener;
-import com.warehouse.shipment.application.port.secondary.PriceRepository;
 import com.warehouse.shipment.application.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentInternalController;
 import com.warehouse.returning.api.ReturningApiService;
-import com.warehouse.shipment.infrastructure.adapter.secondary.PriceReadRepository;
-import com.warehouse.shipment.infrastructure.adapter.secondary.PriceRepositoryImpl;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.tools.returning.ReturnProperties;
@@ -46,11 +43,6 @@ public class ShipmentReadRepositoryTest {
     @EntityScan(basePackages = { "com.warehouse.shipment"})
     @EnableJpaRepositories(basePackages = { "com.warehouse.shipment.infrastructure.adapter.secondary"})
     public static class ShipmentReadRepositoryTestConfiguration {
-
-        @Bean
-        PriceRepository priceRepository(final PriceReadRepository repository) {
-            return new PriceRepositoryImpl(repository);
-        }
 
         @Bean
         RouteLogServicePort routeLogServicePort() {

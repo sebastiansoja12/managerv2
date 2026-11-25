@@ -1,6 +1,7 @@
 package com.warehouse.shipment;
 
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.PalletTrackingNumber;
 import com.warehouse.commonassets.repository.Criteria;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
@@ -56,6 +57,19 @@ class ShipmentReadModelRepositoryImplTest {
         assertEquals(new ShipmentDeliveryDetails(new DepartmentId(3L), new DepartmentId(5L), new DepartmentId(4L),
                         plannedAt, null),
                 mapper.deliveryDetails(entity.getValue()));
+    }
+
+    @Test
+    void shouldWriteAssignedCourierOfDelivery() {
+        when(criteria.one()).thenReturn(Optional.empty());
+        final ShipmentDeliveryDetails details = new ShipmentDeliveryDetails(new DepartmentId(3L), new DepartmentId(5L),
+                new DepartmentId(5L), plannedAt, null, new SupplierCode("genfgr"), "Agnieszka Lewandowicz");
+
+        readModelRepository.sync(snapshot, details);
+
+        final ArgumentCaptor<ShipmentReadEntity> entity = ArgumentCaptor.forClass(ShipmentReadEntity.class);
+        verify(repository).create(entity.capture());
+        assertEquals(details, mapper.deliveryDetails(entity.getValue()));
     }
 
     @Test

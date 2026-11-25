@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import com.warehouse.eventoutbox.integration.model.IntegrationEvent;
 import com.warehouse.eventoutbox.publication.DomainEventTranslationBridge;
 import com.warehouse.eventoutbox.publication.IntegrationEventTranslationRegistry;
+import com.warehouse.commonassets.enumeration.CancellationReason;
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.shipment.api.event.ShipmentCanceledIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentChangedIntegrationEvent;
@@ -21,6 +24,7 @@ import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentDeliveredIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentDestinationChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentStatusChangedIntegrationEvent;
+import com.warehouse.shipment.api.event.snapshot.PaymentStateDto;
 import com.warehouse.shipment.api.event.snapshot.ShipmentDeliveryData;
 import com.warehouse.shipment.application.listener.ShipmentIntegrationEventTranslator;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
@@ -35,6 +39,7 @@ import com.warehouse.shipment.domain.event.ShipmentReturned;
 import com.warehouse.shipment.domain.event.ShipmentSent;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.vo.ShipmentDeliveryPlan;
+import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentEventDataMapper;
 
 class ShipmentIntegrationEventTranslatorTest {
@@ -102,6 +107,19 @@ class ShipmentIntegrationEventTranslatorTest {
         this.bridge.onDomainEvent(new ShipmentCanceled(this.shipment.snapshot(), Instant.now()));
 
         assertPublished(ShipmentStatusChangedIntegrationEvent.class, ShipmentCanceledIntegrationEvent.class);
+    }
+
+    @Test
+    void shouldPublishPreviousStatusAndPaymentStateWhenShipmentIsCanceled() {
+        final ShipmentSnapshot previousSnapshot = this.shipment.snapshot();
+        this.shipment.markAsCanceledWithoutPolicy(CancellationReason.CUSTOMER_REQUEST, LocalDateTime.now());
+
+        this.bridge.onDomainEvent(new ShipmentCanceled(previousSnapshot, this.shipment.snapshot(), Instant.now()));
+
+        final ShipmentCanceledIntegrationEvent event = (ShipmentCanceledIntegrationEvent) this.published.get(1);
+        assertEquals(ShipmentStatus.CREATED, event.previousStatus());
+        assertEquals(ShipmentStatus.CANCELED, event.payload().shipmentStatus());
+        assertEquals(PaymentStateDto.NOT_REQUIRED, event.payload().paymentState());
     }
 
     @Test

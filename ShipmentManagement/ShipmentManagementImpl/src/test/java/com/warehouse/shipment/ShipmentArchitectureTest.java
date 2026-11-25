@@ -504,7 +504,6 @@ class ShipmentArchitectureTest {
         final List<String> applicationServices = List.of(
                 "CountryDetermineService",
                 "DepartmentCountryAvailabilityService",
-                "PriceService",
                 "RouteLogService"
         );
 

@@ -5,7 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.organisationstructure.api.dto.DefaultShipmentStatusDto;
+import com.warehouse.organisationstructure.api.dto.CashOnDeliveryPaymentMethodDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentPaymentConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentLabelConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentLabelFormatDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentLimitsDto;
@@ -83,5 +85,21 @@ class OperatorShipmentConfigurationMapperTest {
         final OperatorShipmentConfiguration configuration = mapper.map(null, null);
 
         assertThat(configuration).isEqualTo(OperatorShipmentConfiguration.defaults());
+    }
+
+    @Test
+    void shouldExposePaymentsEnabledFromPaymentConfiguration() {
+        assertThat(mapper.map(configurationWithPayments(true), null).paymentsEnabled()).isTrue();
+        assertThat(mapper.map(configurationWithPayments(false), null).paymentsEnabled()).isFalse();
+        assertThat(mapper.map(configurationWithPayments(null), null).paymentsEnabled()).isFalse();
+        assertThat(mapper.map(new ShipmentConfigurationDto(null, null, null, null, null, null), null)
+                .paymentsEnabled()).isFalse();
+    }
+
+    private ShipmentConfigurationDto configurationWithPayments(final Boolean paymentsEnabled) {
+        return new ShipmentConfigurationDto(null, null, null, null, null, null, null, null,
+                new ShipmentPaymentConfigurationDto(true, 5000.0, CashOnDeliveryPaymentMethodDto.BOTH, 0.0, 72,
+                        paymentsEnabled),
+                null, null);
     }
 }

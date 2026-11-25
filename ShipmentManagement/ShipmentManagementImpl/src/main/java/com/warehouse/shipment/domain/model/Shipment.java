@@ -5,6 +5,7 @@ import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.exception.ShipmentModificationException;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
+import com.warehouse.shipment.domain.enumeration.PaymentState;
 import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
@@ -68,6 +69,12 @@ public class Shipment {
 
     private ShipmentSource source;
 
+    private PaymentState paymentState;
+
+    private PriceQuoteId priceQuoteId;
+
+    private BillingCustomerId billingCustomerId;
+
     private Shipment(final ShipmentId shipmentId,
                     final Party sender,
                     final Party recipient,
@@ -125,6 +132,7 @@ public class Shipment {
         this.trackingNumber = trackingNumber;
         this.externalShipmentId = ExternalId.randomUUID();
         this.source = ShipmentSource.WEB;
+        this.paymentState = PaymentState.NOT_REQUIRED;
     }
 
     public Shipment(final ShipmentId shipmentId,
@@ -143,7 +151,10 @@ public class Shipment {
                     final Money declaredValue,
                     final ShipmentServiceLevel serviceLevel,
                     final PackagingType packagingType,
-                    final ShipmentSource source) {
+                    final ShipmentSource source,
+                    final PaymentState paymentState,
+                    final PriceQuoteId priceQuoteId,
+                    final BillingCustomerId billingCustomerId) {
         this.shipmentId = shipmentId;
         this.sender = sender;
         this.recipient = recipient;
@@ -166,6 +177,9 @@ public class Shipment {
         this.contentDescription = contentDescription;
         this.declaredValue = declaredValue;
         this.source = source;
+        this.paymentState = paymentState;
+        this.priceQuoteId = priceQuoteId;
+        this.billingCustomerId = billingCustomerId;
     }
 
     public static Shipment parentShipment(final ShipmentId shipmentId,
@@ -207,7 +221,10 @@ public class Shipment {
                                      final Money declaredValue,
                                      final ShipmentServiceLevel serviceLevel,
                                      final PackagingType packagingType,
-                                     final ShipmentSource source) {
+                                     final ShipmentSource source,
+                                     final PaymentState paymentState,
+                                     final PriceQuoteId priceQuoteId,
+                                     final BillingCustomerId billingCustomerId) {
         final Shipment shipment = new Shipment(shipmentId, sender, recipient, shipmentStatus, shipmentType,
                 shipmentRelatedId, price, createdAt, updatedAt, locked, signatureRequired,
                 shipmentPriority, trackingNumber, externalShipmentId);
@@ -222,6 +239,9 @@ public class Shipment {
         shipment.serviceLevel = serviceLevel == null ? ShipmentServiceLevel.STANDARD : serviceLevel;
         shipment.packagingType = packagingType;
         shipment.source = source;
+        shipment.paymentState = paymentState;
+        shipment.priceQuoteId = priceQuoteId;
+        shipment.billingCustomerId = billingCustomerId;
         return shipment;
     }
 
@@ -229,7 +249,8 @@ public class Shipment {
 		return new ShipmentSnapshot(shipmentId, sender, recipient,
 				shipmentStatus, shipmentType, shipmentRelatedId, price, createdAt, updatedAt, locked, signatureRequired,
 				shipmentPriority, trackingNumber, externalShipmentId, acceptedAt, cancelledAt, cancellationReason, dimensions, weight, customerReference,
-				contentDescription, declaredValue, serviceLevel, packagingType, source);
+				contentDescription, declaredValue, serviceLevel, packagingType, source, paymentState, priceQuoteId,
+				billingCustomerId);
 	}
 
     public Party getSender() {
@@ -332,6 +353,18 @@ public class Shipment {
         return source;
     }
 
+    public PaymentState getPaymentState() {
+        return paymentState;
+    }
+
+    public PriceQuoteId getPriceQuoteId() {
+        return priceQuoteId;
+    }
+
+    public BillingCustomerId getBillingCustomerId() {
+        return billingCustomerId;
+    }
+
     public void prepareShipmentToCreate() {
         ensureShipmentIsActive();
         this.shipmentStatus = ShipmentStatus.CREATED;
@@ -345,6 +378,7 @@ public class Shipment {
     }
 
     public void prepareShipmentToRedirect(final ShipmentId newRelatedShipmentId) {
+        ensurePaid();
         ensureShipmentIsActive();
         this.shipmentStatus = ShipmentStatus.REDIRECT;
         this.shipmentType = ShipmentType.CHILD;
@@ -360,12 +394,14 @@ public class Shipment {
     }
 
     public void prepareShipmentToSend() {
+        ensurePaid();
         ensureShipmentIsActive();
         this.shipmentStatus = ShipmentStatus.SENT;
         markAsModified();
     }
 
     public void prepareShipmentToDeliver() {
+        ensurePaid();
         ensureShipmentIsActive();
         this.shipmentStatus = ShipmentStatus.DELIVERY;
         markAsModified();
@@ -418,6 +454,7 @@ public class Shipment {
                        final CustomerReference customerReference, final String contentDescription,
                        final Money declaredValue, final ShipmentServiceLevel serviceLevel,
                        final PackagingType packagingType) {
+        ensurePaidFor(shipmentStatus);
         ensureCanBeModified();
         this.recipient = recipient;
         this.sender = sender;
@@ -444,12 +481,14 @@ public class Shipment {
     }
 
     public void changeShipmentStatus(final ShipmentStatus shipmentStatus) {
+        ensurePaidFor(shipmentStatus);
         ensureCanBeModified();
         this.shipmentStatus = shipmentStatus;
         markAsModified();
     }
 
     public void notifyRelatedShipmentRedirected(final ShipmentId relatedShipmentId) {
+        ensurePaid();
         ensureShipmentIsActive();
         this.shipmentRelatedId = relatedShipmentId;
         this.shipmentType = ShipmentType.CHILD;
@@ -526,6 +565,7 @@ public class Shipment {
     }
 
     public void notifyShipmentSent() {
+        ensurePaid();
         ensureShipmentIsActive();
         this.shipmentStatus = ShipmentStatus.SENT;
         markAsModified();
@@ -611,6 +651,7 @@ public class Shipment {
     }
 
     public void markAsDelivered() {
+        ensurePaid();
         ensureShipmentIsNotLost();
         this.shipmentStatus = ShipmentStatus.DELIVERY;
         this.locked = true;
@@ -618,6 +659,7 @@ public class Shipment {
     }
 
     public void notifyShipmentReturnCanceled() {
+        ensurePaid();
         ensureShipmentIsNotLost();
         if (!this.shipmentStatus.equals(ShipmentStatus.RETURN)) {
             throw new ShipmentModificationException("Cannot undone return for not returned shipment");
@@ -629,6 +671,7 @@ public class Shipment {
     }
 
     public void notifyShipmentAccepted() {
+        ensurePaid();
         ensureCanBeModified();
         if (!ShipmentStatus.SENT.equals(this.shipmentStatus)
                 && !ShipmentStatus.COLLECTED.equals(this.shipmentStatus)) {
@@ -640,6 +683,7 @@ public class Shipment {
     }
 
     public void acceptInDepartment() {
+        ensurePaid();
         ensureCanBeModified();
         if (!departmentAcceptableStatuses().contains(this.shipmentStatus)) {
             throw new ShipmentModificationException("Shipment cannot be accepted in department from status "
@@ -669,6 +713,7 @@ public class Shipment {
         if (ShipmentStatus.SENT.equals(this.shipmentStatus)) {
             return;
         }
+        ensurePaid();
         ensureShipmentIsActive();
         if (!ShipmentStatus.CREATED.equals(this.shipmentStatus)
                 && !ShipmentStatus.PREPARED.equals(this.shipmentStatus)
@@ -694,6 +739,7 @@ public class Shipment {
         if (ShipmentStatus.ACCEPTED.equals(this.shipmentStatus)) {
             return;
         }
+        ensurePaid();
         if (!ShipmentStatus.SENT.equals(this.shipmentStatus)) {
             throw new ShipmentModificationException("Shipment cannot be unloaded from pallet in status "
                     + shipmentStatus);
@@ -706,6 +752,7 @@ public class Shipment {
         if (ShipmentStatus.HANDOVER.equals(this.shipmentStatus)) {
             return;
         }
+        ensurePaid();
         ensureShipmentIsNotLost();
         if (!handoverableStatuses().contains(this.shipmentStatus)) {
             throw new ShipmentModificationException("Shipment cannot be handed over from status " + shipmentStatus);
@@ -715,6 +762,7 @@ public class Shipment {
     }
 
     public void notifyShipmentCollected() {
+        ensurePaid();
         ensureShipmentIsNotLost();
         if (!draftStatuses().contains(this.shipmentStatus)) {
             throw new ShipmentModificationException("Shipment cannot be collected from status " + shipmentStatus);
@@ -751,6 +799,7 @@ public class Shipment {
     }
 
     public void changeShipmentTypeWithRelatedId(final ShipmentType shipmentType, final ShipmentId relatedShipmentId) {
+        ensurePaid();
         ensureShipmentIsActive();
         this.shipmentType = shipmentType;
         this.shipmentRelatedId = relatedShipmentId;
@@ -785,6 +834,7 @@ public class Shipment {
 
     public Shipment redirectToSender(final ShipmentId shipmentId, final TrackingNumber trackingNumber,
                                      final ExternalId<UUID> externalShipmentId, final ShipmentWorkflowSettings shipmentWorkflowSettings) {
+        ensurePaid();
         ensureShipmentIsActive();
         this.shipmentId = shipmentId;
         this.shipmentType = ShipmentType.PARENT;
@@ -819,6 +869,7 @@ public class Shipment {
         this.externalShipmentId = externalShipmentId;
         this.trackingNumber = trackingNumber;
         this.shipmentRelatedId = null;
+        clearPayment();
 
         markAsModified();
 
@@ -883,8 +934,51 @@ public class Shipment {
         this.locked = false;
         this.createdAt = LocalDateTime.now();
         this.acceptedAt = null;
+        clearPayment();
 
         markAsModified();
+    }
+
+    public void markAsPaid() {
+        if (PaymentState.PAID.equals(this.paymentState)) {
+            return;
+        }
+        if (!PaymentState.UNPAID.equals(this.paymentState)) {
+            throw new ShipmentModificationException("Shipment does not require payment");
+        }
+        this.paymentState = PaymentState.PAID;
+        markAsModified();
+    }
+
+    public void cancelForExpiredPayment(final LocalDateTime currentTime) {
+        if (ShipmentStatus.CANCELED.equals(this.shipmentStatus)) {
+            return;
+        }
+        if (!PaymentState.UNPAID.equals(this.paymentState) || !draftStatuses().contains(this.shipmentStatus)) {
+            throw new ShipmentModificationException("Shipment cannot be cancelled for expired payment");
+        }
+        this.locked = true;
+        this.shipmentStatus = ShipmentStatus.CANCELED;
+        recordCancellation(currentTime, CancellationReason.PAYMENT_EXPIRED);
+        markAsModified();
+    }
+
+    private void ensurePaid() {
+        if (PaymentState.UNPAID.equals(this.paymentState)) {
+            throw new ShipmentModificationException("Shipment must be paid before it leaves draft statuses");
+        }
+    }
+
+    private void ensurePaidFor(final ShipmentStatus targetStatus) {
+        if (paymentRequiredStatuses().contains(targetStatus)) {
+            ensurePaid();
+        }
+    }
+
+    private void clearPayment() {
+        this.paymentState = PaymentState.NOT_REQUIRED;
+        this.priceQuoteId = null;
+        this.billingCustomerId = null;
     }
 
     private void ensureShipmentIsActive() {
@@ -966,6 +1060,11 @@ public class Shipment {
 
     private List<ShipmentStatus> draftStatuses() {
         return List.of(ShipmentStatus.PLANNED, ShipmentStatus.CREATED, ShipmentStatus.PREPARED);
+    }
+
+    private List<ShipmentStatus> paymentRequiredStatuses() {
+        return List.of(ShipmentStatus.COLLECTED, ShipmentStatus.ACCEPTED, ShipmentStatus.SENT,
+                ShipmentStatus.HANDOVER, ShipmentStatus.DELIVERY);
     }
 
     private List<ShipmentStatus> departmentAcceptableStatuses() {

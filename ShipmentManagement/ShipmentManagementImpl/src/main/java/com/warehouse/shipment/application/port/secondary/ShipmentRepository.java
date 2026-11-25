@@ -5,6 +5,7 @@ import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.vo.ShipmentOwnerContext;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,9 +25,13 @@ public interface ShipmentRepository {
 
     Shipment findByTrackingNumber(final TrackingNumber trackingNumber);
 
+    Optional<Shipment> findByPriceQuoteId(final PriceQuoteId priceQuoteId);
+
     Optional<OperatorId> findOperatorIdByTrackingNumber(final TrackingNumber trackingNumber);
 
     List<Shipment> findAll();
+
+    List<Shipment> findAllByIds(final Collection<ShipmentId> shipmentIds);
 
     List<Shipment> findAllCreatedBetween(final LocalDateTime createdFromInclusive,
                                          final LocalDateTime createdToExclusive);

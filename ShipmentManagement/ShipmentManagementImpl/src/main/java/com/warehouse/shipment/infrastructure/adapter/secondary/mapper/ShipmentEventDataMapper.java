@@ -3,6 +3,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary.mapper;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.api.event.snapshot.MoneySnapshot;
 import com.warehouse.shipment.api.event.snapshot.PartySnapshot;
+import com.warehouse.shipment.api.event.snapshot.PaymentStateDto;
 import com.warehouse.shipment.api.event.snapshot.ShipmentDeliveryData;
 import com.warehouse.shipment.api.event.snapshot.ShipmentEventData;
 import com.warehouse.shipment.application.port.secondary.ShipmentEventDataMapperPort;
@@ -34,7 +35,10 @@ public class ShipmentEventDataMapper implements ShipmentEventDataMapperPort {
                 shipment.serviceLevel() == null ? null
                         : ShipmentEventData.ShipmentServiceLevel.valueOf(shipment.serviceLevel().name()),
                 shipment.packagingType() == null ? null : shipment.packagingType().name(),
-                shipment.source() == null ? null : shipment.source().name()
+                shipment.source() == null ? null : shipment.source().name(),
+                PaymentStateDto.valueOf(shipment.paymentState().name()),
+                shipment.priceQuoteId(),
+                shipment.billingCustomerId()
         );
     }
 

@@ -24,7 +24,10 @@ public record ShipmentEventData(
         ExternalId<UUID> externalShipmentId,
         ShipmentServiceLevel serviceLevel,
         String packagingType,
-        String source
+        String source,
+        PaymentStateDto paymentState,
+        PriceQuoteId priceQuoteId,
+        BillingCustomerId billingCustomerId
 ) {
     public enum ShipmentServiceLevel {
         ECONOMY,

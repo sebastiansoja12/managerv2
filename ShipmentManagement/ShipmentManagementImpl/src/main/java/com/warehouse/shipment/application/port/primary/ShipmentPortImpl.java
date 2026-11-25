@@ -6,6 +6,7 @@ import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.identificator.*;
+import com.warehouse.shipment.application.service.ShipmentPaymentService;
 import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.shipment.application.port.primary.command.*;
 import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResponse;
@@ -20,6 +21,7 @@ import com.warehouse.shipment.application.service.TrackingNumberGenerationServic
 import com.warehouse.shipment.application.service.delivery.ShipmentDeliveryStrategyResolver;
 import com.warehouse.shipment.application.service.status.ShipmentStatusChangeStrategyResolver;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
+import com.warehouse.shipment.domain.enumeration.PaymentState;
 import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.enumeration.PickupMethod;
 import com.warehouse.shipment.domain.enumeration.ShipmentSource;
@@ -33,12 +35,14 @@ import com.warehouse.shipment.domain.service.ShipmentStateValidatorServiceImpl;
 import com.warehouse.shipment.domain.vo.Address;
 import com.warehouse.shipment.domain.vo.Dimensions;
 import com.warehouse.shipment.domain.vo.Party;
+import com.warehouse.shipment.domain.vo.PricedShipment;
 import com.warehouse.shipment.domain.vo.ShipmentDeliveryPlan;
 import com.warehouse.shipment.domain.vo.ShipmentOwnerContext;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 import com.warehouse.shipment.domain.vo.Weight;
 import com.warehouse.shipment.domain.vo.conf.OperatorShipmentConfiguration;
 import com.warehouse.shipment.domain.vo.conf.ShipmentMetrics;
+import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
 import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
 import com.warehouse.shipment.domain.vo.conf.TrackingNumberPrefixMode;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +50,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Collection;
 
 public class ShipmentPortImpl implements ShipmentPort {
 
@@ -62,6 +69,9 @@ public class ShipmentPortImpl implements ShipmentPort {
     private final AddressValidationService addressValidationService;
     private final PostalCodeServicePort postalCodeServicePort;
     private final OperatorServicePort operatorServicePort;
+    private final ShipmentPricingServicePort shipmentPricingServicePort;
+
+    private final ShipmentPaymentService shipmentPaymentService;
     private final ShipmentStateValidatorService shipmentStateValidatorService = new ShipmentStateValidatorServiceImpl();
 
     public ShipmentPortImpl(final ShipmentRepository shipmentRepository,
@@ -76,7 +86,9 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final ShipmentDepartmentResolutionService shipmentDepartmentResolutionService,
                             final AddressValidationService addressValidationService,
                             final PostalCodeServicePort postalCodeServicePort,
-                            final OperatorServicePort operatorServicePort) {
+                            final OperatorServicePort operatorServicePort,
+                            final ShipmentPricingServicePort shipmentPricingServicePort,
+                            final ShipmentPaymentService shipmentPaymentService) {
         this.shipmentRepository = shipmentRepository;
         this.logger = logger;
         this.departmentCountryAvailabilityService = departmentCountryAvailabilityService;
@@ -90,6 +102,8 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.addressValidationService = addressValidationService;
         this.postalCodeServicePort = postalCodeServicePort;
         this.operatorServicePort = operatorServicePort;
+        this.shipmentPricingServicePort = shipmentPricingServicePort;
+        this.shipmentPaymentService = shipmentPaymentService;
     }
 
     @Override
@@ -146,6 +160,21 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         final PickupMethod pickupMethod = command.getPickupMethod();
         final ShipmentWorkflowSettings workflowSettings = shipmentConfiguration.workflowSettings();
+        final ShipmentServiceLevel serviceLevel = command.getServiceLevel() == null
+                ? workflowSettings.defaultServiceLevel()
+                : command.getServiceLevel();
+
+        final boolean paymentsEnabled = shipmentConfiguration.paymentsEnabled();
+        PricedShipment pricedShipment = null;
+        if (paymentsEnabled) {
+            final Result<PricedShipment, ErrorCode> quote =
+                    this.shipmentPricingServicePort.quote(command, serviceLevel);
+            if (quote.isFailure()) {
+                return Result.failure(quote.getFailure());
+            }
+            pricedShipment = quote.getSuccess();
+        }
+
         final ShipmentStatus initialStatus = pickupMethod.isPickupPointBased()
                 ? ShipmentStatus.PLANNED
                 : workflowSettings.defaultStatus();
@@ -161,7 +190,7 @@ public class ShipmentPortImpl implements ShipmentPort {
                 sender,
                 recipient,
                 null,
-                command.getPrice(),
+                paymentsEnabled ? pricedShipment.gross() : null,
                 false,
                 command.getShipmentPriority(),
                 trackingNumber,
@@ -171,9 +200,12 @@ public class ShipmentPortImpl implements ShipmentPort {
                 command.getCustomerReference(),
                 command.getContentDescription(),
                 command.getDeclaredValue(),
-                command.getServiceLevel() == null ? workflowSettings.defaultServiceLevel() : command.getServiceLevel(),
+                serviceLevel,
                 command.getPackagingType(),
-                command.getSource()
+                command.getSource(),
+                paymentsEnabled ? PaymentState.UNPAID : PaymentState.NOT_REQUIRED,
+                paymentsEnabled ? pricedShipment.quoteId() : null,
+                command.getBillingCustomerId()
         );
 
         this.shipmentRepository.createOrUpdate(shipment);
@@ -191,7 +223,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.domainEventPublisher.publish(new ShipmentCreated(shipment.snapshot(), deliveryPlan, Instant.now()));
 
         return Result.success(new ShipmentCreateResponse(shipment.getExternalShipmentId(),
-                shipment.getTrackingNumber().value()));
+                shipment.getTrackingNumber().value(), paymentsEnabled));
     }
 
     @Override
@@ -223,6 +255,18 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Transactional
     public void markLost(final ShipmentId shipmentId) {
         changeShipmentStatusTo(new ShipmentStatusRequest(shipmentId, ShipmentStatus.LOST));
+    }
+
+    @Override
+    @Transactional
+    public void markAsPaid(final PriceQuoteId priceQuoteId) {
+        this.shipmentPaymentService.markAsPaid(priceQuoteId);
+    }
+
+    @Override
+    @Transactional
+    public void cancelForExpiredPayment(final PriceQuoteId priceQuoteId) {
+        this.shipmentPaymentService.cancelForExpiredPayment(priceQuoteId);
     }
 
     @Override
@@ -365,6 +409,15 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Map<ShipmentId, String> loadRecipientPostalCodes(final Collection<ShipmentId> shipmentIds) {
+        return this.shipmentRepository.findAllByIds(shipmentIds).stream()
+                .filter(shipment -> shipment.getRecipient() != null && shipment.getRecipient().getPostalCode() != null)
+                .collect(Collectors.toMap(Shipment::getShipmentId, shipment -> shipment.getRecipient().getPostalCode(),
+                        (first, second) -> first));
+    }
+
+    @Override
     public ShipmentResult loadShipment(final ShipmentId shipmentId) {
         return this.shipmentResultFactory.createWithDeliveryDetails(find(shipmentId));
     }
@@ -392,6 +445,13 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Override
     public Optional<ShipmentResult> findSourceShipment(final ShipmentId shipmentId) {
         return this.shipmentRepository.findByShipmentRelatedId(shipmentId)
+                .map(Shipment::snapshot)
+                .map(ShipmentResult::new);
+    }
+
+    @Override
+    public Optional<ShipmentResult> findByPriceQuote(final PriceQuoteId priceQuoteId) {
+        return this.shipmentRepository.findByPriceQuoteId(priceQuoteId)
                 .map(Shipment::snapshot)
                 .map(ShipmentResult::new);
     }

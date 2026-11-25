@@ -91,7 +91,6 @@ public class ShipmentManagementApiServiceAdapter implements ShipmentManagementAp
                 request.contentDescription(),
                 request.declaredValue() != null ? new MoneyApi(request.declaredValue(), request.currency()) : null,
                 request.customerReference(),
-                new MoneyApi(request.price(), request.currency()),
                 value(ShipmentPriorityDto.class, request.priority()),
                 value(PackagingTypeDto.class, request.packagingType()),
                 value(ShipmentServiceLevelDto.class, request.serviceLevel()),

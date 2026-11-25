@@ -21,6 +21,8 @@ import com.warehouse.shipment.application.service.*;
 import com.warehouse.shipment.application.service.delivery.ShipmentDeliveryStrategyResolver;
 import com.warehouse.shipment.application.service.status.*;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
+import com.warehouse.shipment.domain.enumeration.PaymentState;
+import com.warehouse.shipment.domain.vo.PricedShipment;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
 import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.enumeration.PickupMethod;
@@ -109,6 +111,12 @@ class ShipmentPortImplTest {
     @Mock
     private PostalCodeServicePort postalCodeServicePort;
 
+    @Mock
+    private ShipmentPricingServicePort shipmentPricingServicePort;
+
+    private static final PricedShipment PRICED_SHIPMENT = new PricedShipment(new PriceQuoteId(55L),
+            new com.warehouse.commonassets.model.Money(new java.math.BigDecimal("24.60"), Currency.PLN));
+
     private final AddressValidationService addressValidationService = new AddressValidationService();
 
     private ShipmentPortImpl shipmentPort;
@@ -140,7 +148,11 @@ class ShipmentPortImplTest {
                 this.trackingNumberGenerationService, this.shipmentConfigurationPort,
                 shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
                 this.domainEventPublisher, shipmentDepartmentResolutionService, addressValidationService,
-                this.postalCodeServicePort, operatorServicePort);
+                this.postalCodeServicePort, operatorServicePort, this.shipmentPricingServicePort,
+                new ShipmentPaymentService(shipmentRepository, this.domainEventPublisher, this.logger));
+        lenient().when(this.shipmentPricingServicePort.quote(any(ShipmentCreateCommand.class),
+                        any(ShipmentServiceLevel.class)))
+                .thenReturn(Result.success(PRICED_SHIPMENT));
         lenient().when(this.postalCodeServicePort.findCountryCode("00-000", "test"))
                 .thenReturn(Optional.of(CountryCode.PL), Optional.of(CountryCode.DE));
 	}
@@ -176,7 +188,151 @@ class ShipmentPortImplTest {
         assertEquals(ShipmentServiceLevel.EXPRESS, shipmentCaptor.getValue().getServiceLevel());
         assertEquals(PackagingType.BOX, shipmentCaptor.getValue().getPackagingType());
         assertEquals(shipmentCaptor.getValue().getCreatedAt(), shipmentCaptor.getValue().getUpdatedAt());
+        assertEquals(PaymentState.UNPAID, shipmentCaptor.getValue().getPaymentState());
+        assertEquals(PRICED_SHIPMENT.quoteId(), shipmentCaptor.getValue().getPriceQuoteId());
+        assertEquals(PRICED_SHIPMENT.gross(), shipmentCaptor.getValue().getPrice());
+        verify(this.shipmentPricingServicePort).quote(request, ShipmentServiceLevel.EXPRESS);
         verifyNoInteractions(pickupPointServicePort);
+    }
+
+    @Test
+    void shouldCreateShipmentWithoutPricingWhenPaymentsDisabled() {
+        final ShipmentCreateCommand request = shipmentCreateCommand();
+        final OperatorShipmentConfiguration configuration = paymentsDisabledConfiguration();
+        when(this.shipmentConfigurationPort.getCurrentOperatorShipmentConfiguration()).thenReturn(configuration);
+        when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.PL)).thenReturn(true);
+        when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.DE)).thenReturn(true);
+        when(this.operatorContextProvider.currentDepartmentId()).thenReturn(new DepartmentId(9L));
+        when(this.trackingNumberGenerationService.generate(eq(configuration.workflowSettings()),
+                eq(configuration.trackingNumberRule()), any(ShipmentId.class)))
+                .thenReturn(new TrackingNumber("MGR-101"));
+        final ArgumentCaptor<Shipment> shipmentCaptor = ArgumentCaptor.forClass(Shipment.class);
+
+        final Result<ShipmentCreateResponse, ErrorCode> response = shipmentPort.ship(request);
+
+        assertTrue(response.isSuccess());
+        assertFalse(response.getSuccess().paymentRequired());
+        verifyNoInteractions(this.shipmentPricingServicePort);
+        verify(this.shipmentRepository).createOrUpdate(shipmentCaptor.capture());
+        assertEquals(PaymentState.NOT_REQUIRED, shipmentCaptor.getValue().getPaymentState());
+        assertNull(shipmentCaptor.getValue().getPrice());
+        assertNull(shipmentCaptor.getValue().getPriceQuoteId());
+    }
+
+    @Test
+    void shouldPriceShipmentWhenPaymentsEnabled() {
+        final ShipmentCreateCommand request = shipmentCreateCommand();
+        final OperatorShipmentConfiguration configuration = permissiveConfiguration();
+        when(this.shipmentConfigurationPort.getCurrentOperatorShipmentConfiguration()).thenReturn(configuration);
+        when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.PL)).thenReturn(true);
+        when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.DE)).thenReturn(true);
+        when(this.operatorContextProvider.currentDepartmentId()).thenReturn(new DepartmentId(9L));
+        when(this.trackingNumberGenerationService.generate(eq(configuration.workflowSettings()),
+                eq(configuration.trackingNumberRule()), any(ShipmentId.class)))
+                .thenReturn(new TrackingNumber("MGR-102"));
+        final ArgumentCaptor<Shipment> shipmentCaptor = ArgumentCaptor.forClass(Shipment.class);
+        request.setBillingCustomerId(new BillingCustomerId(55L));
+
+        final Result<ShipmentCreateResponse, ErrorCode> response = shipmentPort.ship(request);
+
+        assertTrue(response.getSuccess().paymentRequired());
+        verify(this.shipmentPricingServicePort).quote(any(ShipmentCreateCommand.class),
+                any(ShipmentServiceLevel.class));
+        verify(this.shipmentRepository).createOrUpdate(shipmentCaptor.capture());
+        assertEquals(new BillingCustomerId(55L), shipmentCaptor.getValue().getBillingCustomerId());
+        assertEquals(PaymentState.UNPAID, shipmentCaptor.getValue().getPaymentState());
+        assertEquals(PRICED_SHIPMENT.gross(), shipmentCaptor.getValue().getPrice());
+    }
+
+    @Test
+    void shouldAllowCollectionOfShipmentCreatedWithPaymentsDisabled() {
+        final ShipmentCreateCommand request = shipmentCreateCommand();
+        final OperatorShipmentConfiguration configuration = paymentsDisabledConfiguration();
+        when(this.shipmentConfigurationPort.getCurrentOperatorShipmentConfiguration()).thenReturn(configuration);
+        when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.PL)).thenReturn(true);
+        when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.DE)).thenReturn(true);
+        when(this.operatorContextProvider.currentDepartmentId()).thenReturn(new DepartmentId(9L));
+        when(this.trackingNumberGenerationService.generate(eq(configuration.workflowSettings()),
+                eq(configuration.trackingNumberRule()), any(ShipmentId.class)))
+                .thenReturn(new TrackingNumber("MGR-103"));
+        final ArgumentCaptor<Shipment> shipmentCaptor = ArgumentCaptor.forClass(Shipment.class);
+        shipmentPort.ship(request);
+        verify(this.shipmentRepository).createOrUpdate(shipmentCaptor.capture());
+        final Shipment created = shipmentCaptor.getValue();
+
+        created.notifyShipmentCollected();
+
+        assertEquals(ShipmentStatus.COLLECTED, created.getShipmentStatus());
+    }
+
+    @Test
+    void shouldReturnNotPriceableFailureFromShip() {
+        final ShipmentCreateCommand request = shipmentCreateCommand();
+        when(this.shipmentConfigurationPort.getCurrentOperatorShipmentConfiguration())
+                .thenReturn(permissiveConfiguration());
+        when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.PL)).thenReturn(true);
+        when(this.departmentCountryAvailabilityService.isCountryAvailable(CountryCode.DE)).thenReturn(true);
+        when(this.operatorContextProvider.currentDepartmentId()).thenReturn(new DepartmentId(9L));
+        when(this.shipmentPricingServicePort.quote(request, ShipmentServiceLevel.STANDARD))
+                .thenReturn(Result.failure(ErrorCode.SHIPMENT_NOT_PRICEABLE));
+
+        final Result<ShipmentCreateResponse, ErrorCode> result = shipmentPort.ship(request);
+
+        assertTrue(result.isFailure());
+        assertEquals(ErrorCode.SHIPMENT_NOT_PRICEABLE, result.getFailure());
+        verify(this.shipmentRepository, never()).createOrUpdate(any());
+        verifyNoInteractions(domainEventPublisher);
+        verifyNoInteractions(trackingNumberGenerationService);
+    }
+
+    @Test
+    void shouldRejectSplitOfUnpaidShipmentWithoutSavingParent() {
+        final Shipment shipment = unpaidShipment();
+        final OperatorShipmentConfiguration configuration = permissiveConfiguration();
+        when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
+        when(this.shipmentConfigurationPort.getCurrentOperatorShipmentConfiguration()).thenReturn(configuration);
+        when(this.trackingNumberGenerationService.generate(eq(configuration.trackingNumberRule()),
+                any(ShipmentId.class))).thenReturn(new TrackingNumber("MGR-PARENT"));
+
+        assertThrows(com.warehouse.shipment.domain.exception.ShipmentModificationException.class,
+                () -> shipmentPort.changeShipmentTypeTo(new ChangeShipmentTypeRequest(shipmentId(), ShipmentType.CHILD)));
+
+        verify(this.shipmentRepository, never()).createOrUpdate(any());
+        verifyNoInteractions(domainEventPublisher);
+    }
+
+    @Test
+    void shouldRejectRedirectStatusOfUnpaidShipment() {
+        final Shipment shipment = unpaidShipment();
+        when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
+
+        assertThrows(com.warehouse.shipment.domain.exception.ShipmentModificationException.class,
+                () -> shipmentPort.changeShipmentStatusTo(new ShipmentStatusRequest(shipmentId(), ShipmentStatus.REDIRECT)));
+
+        verify(this.shipmentRepository, never()).createOrUpdate(any());
+        verifyNoInteractions(domainEventPublisher);
+    }
+
+    @Test
+    void shouldCreateParentAsPaymentNotRequiredWhenShipmentIsSplit() {
+        final Shipment shipment = shipment();
+        final OperatorShipmentConfiguration configuration = permissiveConfiguration();
+        when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
+        when(this.shipmentConfigurationPort.getCurrentOperatorShipmentConfiguration()).thenReturn(configuration);
+        when(this.trackingNumberGenerationService.generate(eq(configuration.trackingNumberRule()),
+                any(ShipmentId.class))).thenReturn(new TrackingNumber("MGR-PARENT"));
+        final ArgumentCaptor<Shipment> shipmentCaptor = ArgumentCaptor.forClass(Shipment.class);
+
+        shipmentPort.changeShipmentTypeTo(new ChangeShipmentTypeRequest(shipmentId(), ShipmentType.CHILD));
+
+        verify(this.shipmentRepository, times(2)).createOrUpdate(shipmentCaptor.capture());
+        final Shipment parent = shipmentCaptor.getAllValues().stream()
+                .filter(saved -> !shipmentId().equals(saved.getShipmentId()))
+                .findFirst()
+                .orElseThrow();
+        assertEquals(PaymentState.NOT_REQUIRED, parent.getPaymentState());
+        assertNull(parent.getPriceQuoteId());
+        assertEquals(shipmentId(), parent.getShipmentRelatedId());
     }
 
     @Test
@@ -734,6 +890,77 @@ class ShipmentPortImplTest {
     }
 
     @Test
+    void shouldMarkUnpaidShipmentAsPaidAndPublishChange() {
+        final Shipment shipment = unpaidShipment();
+        when(this.shipmentRepository.findByPriceQuoteId(new PriceQuoteId(55L))).thenReturn(Optional.of(shipment));
+
+        this.shipmentPort.markAsPaid(new PriceQuoteId(55L));
+
+        assertEquals(PaymentState.PAID, shipment.getPaymentState());
+        verify(this.shipmentRepository).createOrUpdate(shipment);
+        verify(this.domainEventPublisher).publish(any(ShipmentChanged.class));
+    }
+
+    @Test
+    void shouldIgnoreMarkAsPaidForAlreadyPaidShipment() {
+        final Shipment shipment = unpaidShipment();
+        shipment.markAsPaid();
+        when(this.shipmentRepository.findByPriceQuoteId(new PriceQuoteId(55L))).thenReturn(Optional.of(shipment));
+
+        this.shipmentPort.markAsPaid(new PriceQuoteId(55L));
+
+        verify(this.shipmentRepository, never()).createOrUpdate(any());
+        verify(this.domainEventPublisher, never()).publish(any());
+    }
+
+    @Test
+    void shouldIgnorePaidPriceQuoteWithoutShipment() {
+        when(this.shipmentRepository.findByPriceQuoteId(new PriceQuoteId(77L))).thenReturn(Optional.empty());
+
+        this.shipmentPort.markAsPaid(new PriceQuoteId(77L));
+
+        verify(this.shipmentRepository, never()).createOrUpdate(any());
+        verify(this.domainEventPublisher, never()).publish(any());
+    }
+
+    @Test
+    void shouldCancelUnpaidDraftShipmentForExpiredPayment() {
+        final Shipment shipment = unpaidShipment();
+        when(this.shipmentRepository.findByPriceQuoteId(new PriceQuoteId(55L))).thenReturn(Optional.of(shipment));
+
+        this.shipmentPort.cancelForExpiredPayment(new PriceQuoteId(55L));
+
+        assertEquals(ShipmentStatus.CANCELED, shipment.getShipmentStatus());
+        verify(this.shipmentRepository).createOrUpdate(shipment);
+        final ArgumentCaptor<ShipmentCanceled> event = ArgumentCaptor.forClass(ShipmentCanceled.class);
+        verify(this.domainEventPublisher).publish(event.capture());
+        assertEquals(ShipmentStatus.CREATED, event.getValue().getPreviousSnapshot().orElseThrow().shipmentStatus());
+        assertEquals(ShipmentStatus.CANCELED, event.getValue().getSnapshot().shipmentStatus());
+    }
+
+    @Test
+    void shouldIgnoreExpiredPaymentOfAlreadyCanceledShipment() {
+        final Shipment shipment = unpaidShipment();
+        shipment.cancelForExpiredPayment(java.time.LocalDateTime.now());
+        when(this.shipmentRepository.findByPriceQuoteId(new PriceQuoteId(55L))).thenReturn(Optional.of(shipment));
+
+        this.shipmentPort.cancelForExpiredPayment(new PriceQuoteId(55L));
+
+        verify(this.shipmentRepository, never()).createOrUpdate(any());
+        verify(this.domainEventPublisher, never()).publish(any());
+    }
+
+    @Test
+    void shouldIgnoreExpiredPaymentWithoutShipment() {
+        when(this.shipmentRepository.findByPriceQuoteId(new PriceQuoteId(77L))).thenReturn(Optional.empty());
+
+        this.shipmentPort.cancelForExpiredPayment(new PriceQuoteId(77L));
+
+        verify(this.shipmentRepository, never()).createOrUpdate(any());
+        verify(this.domainEventPublisher, never()).publish(any());
+    }
+
+    @Test
     void shouldLockShipmentAndPublishEvent() {
         final Shipment shipment = shipment();
         when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
@@ -868,7 +1095,6 @@ class ShipmentPortImplTest {
 
     private ShipmentCreateCommand shipmentCreateCommand() {
         final ShipmentCreateCommand command = new ShipmentCreateCommand(
-                DataTestCreator.money(),
                 recipient(),
                 sender(),
                 ShipmentPriority.MEDIUM
@@ -877,6 +1103,16 @@ class ShipmentPortImplTest {
                 new java.math.BigDecimal("20"), LengthUnit.CM));
         command.setWeight(new Weight(new java.math.BigDecimal("5"), WeightUnit.KG));
         return command;
+    }
+
+    private Shipment unpaidShipment() {
+        return new Shipment(shipmentId(), sender(), recipient(), null, DataTestCreator.money(), false,
+                ShipmentPriority.MEDIUM, trackingNumber(), ShipmentStatus.CREATED,
+                new Dimensions(new java.math.BigDecimal("20"), new java.math.BigDecimal("20"),
+                        new java.math.BigDecimal("20"), LengthUnit.CM),
+                new Weight(new java.math.BigDecimal("5"), WeightUnit.KG), null, null, null,
+                ShipmentServiceLevel.STANDARD, null, ShipmentSource.WEB, PaymentState.UNPAID,
+                new PriceQuoteId(55L), null);
     }
 
     private Shipment plannedShipment() {
@@ -916,7 +1152,21 @@ class ShipmentPortImplTest {
                 new ShipmentLimits(0, 0, 0, 0, 0, 0, true),
                 defaults.workflowSettings(),
                 defaults.trackingNumberRule(),
-                defaults.notificationSettings()
+                defaults.notificationSettings(),
+                true
+        );
+    }
+
+    private OperatorShipmentConfiguration paymentsDisabledConfiguration() {
+        final OperatorShipmentConfiguration enabled = permissiveConfiguration();
+        return new OperatorShipmentConfiguration(
+                enabled.validationRules(),
+                enabled.labelSettings(),
+                enabled.limits(),
+                enabled.workflowSettings(),
+                enabled.trackingNumberRule(),
+                enabled.notificationSettings(),
+                false
         );
     }
 

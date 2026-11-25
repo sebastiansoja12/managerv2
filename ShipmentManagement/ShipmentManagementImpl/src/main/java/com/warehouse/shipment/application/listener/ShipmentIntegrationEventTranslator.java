@@ -17,6 +17,7 @@ import com.warehouse.shipment.domain.event.ShipmentCreated;
 import com.warehouse.shipment.domain.event.ShipmentDelivered;
 import com.warehouse.shipment.domain.event.ShipmentDestinationChanged;
 import com.warehouse.shipment.domain.event.ShipmentStatusChanged;
+import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 
 @Component
 public class ShipmentIntegrationEventTranslator {
@@ -49,7 +50,8 @@ public class ShipmentIntegrationEventTranslator {
     public List<IntegrationEvent> translate(final ShipmentCanceled event) {
         return List.of(
                 new ShipmentStatusChangedIntegrationEvent(shipmentEventDataMapper.map(event.getSnapshot())),
-                new ShipmentCanceledIntegrationEvent(shipmentEventDataMapper.map(event.getSnapshot())));
+                new ShipmentCanceledIntegrationEvent(shipmentEventDataMapper.map(event.getSnapshot()),
+                        event.getPreviousSnapshot().map(ShipmentSnapshot::shipmentStatus).orElse(null)));
     }
 
     @IntegrationEventTranslation

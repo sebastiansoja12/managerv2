@@ -10,6 +10,7 @@ import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
+import com.warehouse.shipment.domain.enumeration.PaymentState;
 import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.PartyEntity;
@@ -54,6 +55,7 @@ final class ShipmentStatisticsFixture {
                 .shipmentPriority(ShipmentPriority.MEDIUM)
                 .serviceLevel(ShipmentServiceLevel.STANDARD)
                 .source(ShipmentSource.WEB)
+                .paymentState(PaymentState.NOT_REQUIRED)
                 .price(priceAmount == null ? null : new Money(new BigDecimal(priceAmount), currency))
                 .signatureRequired(false)
                 .externalId(new ExternalId<>("external-" + sequence))
