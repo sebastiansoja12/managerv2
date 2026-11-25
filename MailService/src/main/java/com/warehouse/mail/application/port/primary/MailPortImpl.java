@@ -2,6 +2,7 @@ package com.warehouse.mail.application.port.primary;
 
 import com.warehouse.mail.application.port.secondary.MailSenderServicePort;
 import com.warehouse.mail.application.port.secondary.MailTemplateRepository;
+import com.warehouse.mail.application.service.MailAttachmentResolver;
 import com.warehouse.mail.domain.model.MailMessage;
 import com.warehouse.mail.domain.model.MailRequest;
 import com.warehouse.mail.domain.model.MailTemplate;
@@ -24,24 +25,28 @@ public class MailPortImpl implements MailPort {
     private final MailSenderServicePort mailSenderServicePort;
     private final Locale defaultLocale;
     private final Map<String, String> globalVariables;
+    private final MailAttachmentResolver mailAttachmentResolver;
 
     public MailPortImpl(final MailTemplateRepository mailTemplateRepository,
                         final MailTemplateRenderer mailTemplateRenderer,
                         final MailSenderServicePort mailSenderServicePort,
                         final Locale defaultLocale,
-                        final Map<String, String> globalVariables) {
+                        final Map<String, String> globalVariables,
+                        final MailAttachmentResolver mailAttachmentResolver) {
         this.mailTemplateRepository = mailTemplateRepository;
         this.mailTemplateRenderer = mailTemplateRenderer;
         this.mailSenderServicePort = mailSenderServicePort;
         this.defaultLocale = defaultLocale;
         this.globalVariables = Map.copyOf(globalVariables);
+        this.mailAttachmentResolver = mailAttachmentResolver;
     }
 
     @Override
     public void send(final List<MailRequest> mailRequests) {
         final List<MailMessage> messages = mailRequests.stream()
                 .flatMap(request -> template(request)
-                        .map(template -> this.mailTemplateRenderer.render(template, withGlobalVariables(request)))
+                        .map(template -> this.mailTemplateRenderer.render(template, withGlobalVariables(request))
+                                .withAttachments(this.mailAttachmentResolver.resolve(request)))
                         .stream())
                 .toList();
         messages.forEach(this.mailSenderServicePort::send);
@@ -66,7 +71,8 @@ public class MailPortImpl implements MailPort {
     private MailRequest withGlobalVariables(final MailRequest request) {
         final Map<String, String> variables = new HashMap<>(this.globalVariables);
         variables.putAll(request.variables());
-        return new MailRequest(request.templateKey(), request.locale(), request.recipient(), variables);
+        return new MailRequest(request.templateKey(), request.locale(), request.recipient(), variables,
+                request.attachments());
     }
 
     private Optional<MailTemplate> languageFallback(final MailRequest request) {

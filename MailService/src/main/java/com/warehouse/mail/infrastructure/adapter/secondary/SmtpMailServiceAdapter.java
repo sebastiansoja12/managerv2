@@ -2,9 +2,11 @@ package com.warehouse.mail.infrastructure.adapter.secondary;
 
 import com.warehouse.mail.application.port.secondary.MailSenderServicePort;
 import com.warehouse.mail.domain.model.MailMessage;
+import com.warehouse.mail.domain.vo.MailAttachment;
 import com.warehouse.mail.infrastructure.adapter.secondary.exception.WarehouseMailException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -31,11 +33,16 @@ public class SmtpMailServiceAdapter implements MailSenderServicePort {
     @Override
     public void send(final MailMessage mailMessage) {
         final MimeMessagePreparator preparator = mimeMessage -> {
-            final MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false, StandardCharsets.UTF_8.name());
+            final MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, !mailMessage.attachments().isEmpty(),
+                    StandardCharsets.UTF_8.name());
             helper.setFrom(this.fromAddress, this.fromName);
             helper.setTo(mailMessage.recipient().value());
             helper.setSubject(mailMessage.subject());
             helper.setText(mailMessage.body(), false);
+            for (final MailAttachment attachment : mailMessage.attachments()) {
+                helper.addAttachment(attachment.fileName(), new ByteArrayResource(attachment.content()),
+                        attachment.contentType());
+            }
         };
         try {
             this.javaMailSender.send(preparator);

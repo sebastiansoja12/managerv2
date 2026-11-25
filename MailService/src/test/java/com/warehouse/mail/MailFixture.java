@@ -63,7 +63,7 @@ public final class MailFixture {
                                              final String source) {
         return new ShipmentEventData(new ShipmentId(100L), sender, recipient, status, null,
                 relatedShipmentId, null, null, null, false, false, null, new TrackingNumber("PL 123/45"), null,
-                null, null, source);
+                null, null, source, null, null, null);
     }
 
     public static final class InMemoryMailTemplateRepository implements MailTemplateRepository {

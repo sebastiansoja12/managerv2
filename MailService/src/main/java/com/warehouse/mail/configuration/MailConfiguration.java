@@ -2,20 +2,26 @@ package com.warehouse.mail.configuration;
 
 import com.warehouse.mail.application.port.primary.MailPort;
 import com.warehouse.mail.application.port.primary.MailPortImpl;
+import com.warehouse.document.api.DocumentStorageApiService;
+import com.warehouse.mail.application.port.secondary.MailAttachmentServicePort;
 import com.warehouse.mail.application.port.secondary.MailSenderServicePort;
 import com.warehouse.mail.application.port.secondary.MailTemplateRepository;
 import com.warehouse.mail.application.port.secondary.ShipmentNotificationPolicyPort;
+import com.warehouse.mail.application.service.MailAttachmentResolver;
 import com.warehouse.mail.domain.service.MailTemplateRenderer;
 import com.warehouse.mail.infrastructure.adapter.primary.MailListener;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
+import com.warehouse.mail.infrastructure.adapter.primary.kafka.InvoiceMailKafkaListener;
 import com.warehouse.mail.infrastructure.adapter.primary.kafka.MailKafkaListener;
 import com.warehouse.mail.infrastructure.adapter.primary.kafka.SupplierMailKafkaListener;
 import com.warehouse.mail.infrastructure.adapter.primary.kafka.UserInvitationMailKafkaListener;
+import com.warehouse.mail.infrastructure.adapter.primary.mapper.InvoiceMailRequestMapper;
 import com.warehouse.mail.infrastructure.adapter.primary.mapper.MailLocaleResolver;
 import com.warehouse.mail.infrastructure.adapter.primary.mapper.ShipmentMailRequestMapper;
 import com.warehouse.mail.infrastructure.adapter.primary.mapper.SupplierMailRequestMapper;
 import com.warehouse.mail.infrastructure.adapter.primary.mapper.UserInvitationMailRequestMapper;
 import com.warehouse.mail.infrastructure.adapter.secondary.DisabledMailServiceAdapter;
+import com.warehouse.mail.infrastructure.adapter.secondary.MailAttachmentServiceAdapter;
 import com.warehouse.mail.infrastructure.adapter.secondary.MailTemplateReadRepository;
 import com.warehouse.mail.infrastructure.adapter.secondary.MailTemplateRepositoryImpl;
 import com.warehouse.mail.infrastructure.adapter.secondary.NotificationEventPublisherImpl;
@@ -72,12 +78,20 @@ public class MailConfiguration {
     }
 
     @Bean
+    public MailAttachmentServicePort mailAttachmentServicePort(
+            final DocumentStorageApiService documentStorageApiService) {
+        return new MailAttachmentServiceAdapter(documentStorageApiService);
+    }
+
+    @Bean
     public MailPort mailPort(final MailTemplateRepository mailTemplateRepository,
                              final MailSenderServicePort mailSenderServicePort,
                              final MailLocaleResolver mailLocaleResolver,
+                             final MailAttachmentServicePort mailAttachmentServicePort,
                              @Value("${manager.mail.from.name}") final String fromName) {
         return new MailPortImpl(mailTemplateRepository, new MailTemplateRenderer(), mailSenderServicePort,
-                mailLocaleResolver.defaultLocale(), Map.of("fromName", fromName));
+                mailLocaleResolver.defaultLocale(), Map.of("fromName", fromName),
+                new MailAttachmentResolver(mailAttachmentServicePort));
     }
 
     @Bean
@@ -111,6 +125,12 @@ public class MailConfiguration {
     public SupplierMailKafkaListener supplierMailKafkaListener(final MailPort mailPort,
                                                                final MailLocaleResolver mailLocaleResolver) {
         return new SupplierMailKafkaListener(mailPort, new SupplierMailRequestMapper(mailLocaleResolver));
+    }
+
+    @Bean
+    public InvoiceMailKafkaListener invoiceMailKafkaListener(final MailPort mailPort,
+                                                             final MailLocaleResolver mailLocaleResolver) {
+        return new InvoiceMailKafkaListener(mailPort, new InvoiceMailRequestMapper(mailLocaleResolver));
     }
 
     @Bean
