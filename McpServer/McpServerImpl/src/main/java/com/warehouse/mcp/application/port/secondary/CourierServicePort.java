@@ -5,8 +5,10 @@ import java.util.Optional;
 
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.commonassets.identificator.VehicleId;
 import com.warehouse.mcp.domain.vo.Courier;
 import com.warehouse.mcp.domain.vo.CourierChange;
+import com.warehouse.mcp.domain.vo.CourierDeliveryArea;
 import com.warehouse.mcp.domain.vo.CourierDraft;
 
 public interface CourierServicePort {
@@ -16,4 +18,6 @@ public interface CourierServicePort {
     void update(final CourierChange change);
     void activate(final SupplierCode courierCode);
     void deactivate(final SupplierCode courierCode);
+    void assignVehicle(final SupplierCode courierCode, final VehicleId vehicleId);
+    void changeDeliveryArea(final SupplierCode courierCode, final CourierDeliveryArea deliveryArea);
 }

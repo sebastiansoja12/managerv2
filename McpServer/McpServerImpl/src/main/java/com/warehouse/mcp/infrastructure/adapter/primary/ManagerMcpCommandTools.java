@@ -14,6 +14,7 @@ import com.warehouse.commonassets.identificator.VehicleId;
 import com.warehouse.mcp.application.port.primary.McpCommandPort;
 import com.warehouse.mcp.domain.vo.ConfigurationSection;
 import com.warehouse.mcp.domain.vo.CourierChange;
+import com.warehouse.mcp.domain.vo.CourierDeliveryArea;
 import com.warehouse.mcp.domain.vo.CourierDraft;
 import com.warehouse.mcp.domain.vo.DeliveryConditions;
 import com.warehouse.mcp.domain.vo.DeliveryRouteChange;
@@ -21,6 +22,7 @@ import com.warehouse.mcp.domain.vo.DepartmentAddress;
 import com.warehouse.mcp.domain.vo.ShipmentDraft;
 import com.warehouse.mcp.domain.vo.ShipmentParty;
 import com.warehouse.mcp.domain.vo.ShipmentPartyChange;
+import com.warehouse.mcp.domain.vo.VehicleDraft;
 import com.warehouse.mcp.infrastructure.adapter.primary.response.ChangeToolResponse;
 import com.warehouse.mcp.infrastructure.adapter.primary.response.ConfigurationToolResponse;
 import com.warehouse.mcp.infrastructure.adapter.primary.response.DeliveryToolResponse;
@@ -173,8 +175,8 @@ public class ManagerMcpCommandTools {
             @ToolParam(description = "Width in cm") final BigDecimal widthCm,
             @ToolParam(description = "Height in cm") final BigDecimal heightCm,
             @ToolParam(description = "Weight in kg") final BigDecimal weightKg,
-            @ToolParam(description = "Shipment price") final BigDecimal price,
-            @ToolParam(required = false, description = "Currency, default PLN") final String currency,
+            @ToolParam(required = false, description = "Currency of the declared value, default PLN")
+            final String currency,
             @ToolParam(required = false, description = "Declared value of the content") final BigDecimal declaredValue,
             @ToolParam(required = false, description = "Content description") final String contentDescription,
             @ToolParam(required = false, description = "Customer reference") final String customerReference,
@@ -198,7 +200,7 @@ public class ManagerMcpCommandTools {
                                 arguments.optional(recipientEmail), arguments.optional(recipientTelephoneNumber),
                                 arguments.optional(recipientCity), arguments.optional(recipientPostalCode),
                                 arguments.optional(recipientStreet), arguments.countryCode(recipientCountryCode)),
-                        lengthCm, widthCm, heightCm, weightKg, arguments.optional(contentDescription), price,
+                        lengthCm, widthCm, heightCm, weightKg, arguments.optional(contentDescription),
                         declaredValue, arguments.currency(currency), arguments.optional(customerReference),
                         arguments.upper(priority), arguments.upper(packagingType), arguments.upper(serviceLevel),
                         arguments.upper(pickupMethod), arguments.upper(deliveryMethod),
@@ -335,6 +337,62 @@ public class ManagerMcpCommandTools {
             final boolean activate = arguments.required(active, "active");
             mcpCommandPort.changeCourierActive(code, activate);
             return ChangeToolResponse.done("Courier " + code.value() + (activate ? " activated" : " deactivated"));
+        });
+    }
+
+    @Mcp(module = McpModule.COURIERS, write = true, minimumLevel = AccountLevel.MANAGER)
+    @Tool(name = "create_vehicle", description = "Adds a vehicle to a carrier's fleet and returns the vehicle "
+            + "identifier, which assign_courier_vehicle uses. Vehicle types: VAN, TRUCK, SEMI_TRAILER, "
+            + "REFRIGERATED_TRUCK, OTHER. The registration number must be unique within the carrier." + CHANGES_DATA)
+    public ChangeToolResponse createVehicle(
+            @ToolParam(description = "Carrier identifier that owns the vehicle") final Long carrierId,
+            @ToolParam(description = "Registration number, e.g. SGL 12345") final String registrationNumber,
+            @ToolParam(required = false, description = "Brand, e.g. Fiat") final String brand,
+            @ToolParam(required = false, description = "Model, e.g. Ducato") final String model,
+            @ToolParam(required = false, description = "Vehicle type, default VAN") final String vehicleType,
+            @ToolParam(required = false, description = "Maximum load in kg") final BigDecimal maxLoadKg) {
+        return executor.execute("create_vehicle", () -> {
+            final String type = arguments.upper(vehicleType);
+            final VehicleId created = mcpCommandPort.createVehicle(new VehicleDraft(arguments.carrierId(carrierId),
+                    arguments.required(registrationNumber, "registrationNumber"), arguments.optional(brand),
+                    arguments.optional(model), type != null ? type : "VAN", maxLoadKg));
+            return ChangeToolResponse.done("Vehicle " + created.value() + " created");
+        });
+    }
+
+    @Mcp(module = McpModule.COURIERS, write = true, minimumLevel = AccountLevel.MANAGER)
+    @Tool(name = "assign_courier_vehicle", description = "Assigns a vehicle (see create_vehicle) to a courier as "
+            + "the courier's default vehicle." + CHANGES_DATA)
+    public ChangeToolResponse assignCourierVehicle(
+            @ToolParam(description = "Courier (supplier) code") final String courierCode,
+            @ToolParam(description = "Vehicle identifier") final Long vehicleId) {
+        return executor.execute("assign_courier_vehicle", () -> {
+            final SupplierCode code = arguments.courierCode(courierCode);
+            final VehicleId vehicle = arguments.vehicleId(vehicleId);
+            mcpCommandPort.assignCourierVehicle(code, vehicle);
+            return ChangeToolResponse.done("Vehicle " + vehicle.value() + " assigned to courier " + code.value());
+        });
+    }
+
+    @Mcp(module = McpModule.COURIERS, write = true, minimumLevel = AccountLevel.MANAGER)
+    @Tool(name = "change_courier_delivery_area", description = "Sets the delivery area of a courier. Deliveries "
+            + "to the given postal codes are routed to this courier. Replaces the previous area." + CHANGES_DATA)
+    public ChangeToolResponse changeCourierDeliveryArea(
+            @ToolParam(description = "Courier (supplier) code") final String courierCode,
+            @ToolParam(description = "Area name, e.g. Gliwice Centrum") final String areaName,
+            @ToolParam(description = "City") final String city,
+            @ToolParam(description = "Comma separated postal codes, e.g. 44-100,44-101") final String postalCodes,
+            @ToolParam(required = false, description = "District of the city") final String district,
+            @ToolParam(required = false, description = "Municipality") final String municipality,
+            @ToolParam(required = false, description = "Region, e.g. slaskie") final String region,
+            @ToolParam(required = false, description = "Country code, default PL") final String country) {
+        return executor.execute("change_courier_delivery_area", () -> {
+            final SupplierCode code = arguments.courierCode(courierCode);
+            mcpCommandPort.changeCourierDeliveryArea(code, new CourierDeliveryArea(
+                    arguments.required(areaName, "areaName"), arguments.required(city, "city"),
+                    arguments.optional(district), arguments.optional(municipality), arguments.optional(region),
+                    arguments.countryCode(country), arguments.postalCodes(postalCodes)));
+            return ChangeToolResponse.done("Delivery area of courier " + code.value() + " changed");
         });
     }
 

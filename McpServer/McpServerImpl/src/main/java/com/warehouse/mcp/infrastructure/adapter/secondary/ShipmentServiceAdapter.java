@@ -46,7 +46,7 @@ public class ShipmentServiceAdapter implements ShipmentServicePort {
     public TrackingNumber createShipment(final ShipmentDraft shipment) {
         return this.shipmentManagementApiService.createShipment(new ShipmentCreateApiRequestDto(
                 map(shipment.sender()), map(shipment.recipient()), shipment.lengthCm(), shipment.widthCm(),
-                shipment.heightCm(), shipment.weightKg(), shipment.contentDescription(), shipment.price(),
+                shipment.heightCm(), shipment.weightKg(), shipment.contentDescription(),
                 shipment.declaredValue(), shipment.currency(), shipment.customerReference(), shipment.priority(),
                 shipment.packagingType(), shipment.serviceLevel(), shipment.pickupMethod(),
                 shipment.deliveryMethod(), shipment.pickupPointId(), shipment.deliveryPickupPointId()))
