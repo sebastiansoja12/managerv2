@@ -1,7 +1,7 @@
 package com.warehouse.deliverynetwork.configuration;
 
-import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.IntegrationEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.repository.BaseRepository;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.deliverynetwork.api.DeliveryNetworkApiService;
@@ -82,14 +82,14 @@ public class DeliveryNetworkConfiguration {
 
     @Bean("deliveryNetworkAuditLogServicePort")
     @ConditionalOnProperty(
-            name = {"manager.kafka.integration-events.enabled", "manager.kafka.outbox.enabled"},
+            name = "manager.events.outbox.enabled",
             havingValue = "true")
     public AuditLogServicePort deliveryNetworkAuditLogServicePort(
             final IntegrationEventPublisher integrationEventPublisher) {
         return new AuditLogServiceAdapter(integrationEventPublisher);
     }
 
-    @Bean
+    @Bean("deliveryNetwork.shipmentDeliveryServicePort")
     public ShipmentDeliveryServicePort shipmentDeliveryServicePort(
             final ShipmentApiService shipmentApiService,
             final DeliveryApiService deliveryApiService) {

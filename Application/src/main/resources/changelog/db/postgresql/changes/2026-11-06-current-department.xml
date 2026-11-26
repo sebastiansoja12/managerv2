@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-06-delivery-current-department" author="s-soja">
+        <addColumn tableName="delivery">
+            <column name="current_department_id" type="BIGINT"/>
+        </addColumn>
+        <sql>UPDATE delivery d
+             SET current_department_id = COALESCE(
+                 (SELECT step.department_id
+                  FROM delivery_step step
+                  WHERE step.delivery_id = d.id AND step.department_id IS NOT NULL
+                  ORDER BY step.step_number DESC
+                  LIMIT 1),
+                 d.origin_department_id)</sql>
+        <createIndex tableName="delivery" indexName="idx_delivery_current_department_id">
+            <column name="current_department_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="2026-11-06-shipment-rd-current-department" author="s-soja">
+        <addColumn tableName="shipment_rd">
+            <column name="current_department_id" type="BIGINT"/>
+        </addColumn>
+        <sql>
+            UPDATE shipment_rd rd
+            SET current_department_id = current_delivery.current_department_id
+            FROM (SELECT DISTINCT ON (target_id) target_id, current_department_id
+                  FROM delivery
+                  WHERE target_type = 'SHIPMENT' AND delivery_type = 'OUTBOUND' AND status &lt;&gt; 'CANCELED'
+                  ORDER BY target_id, created DESC) current_delivery
+            WHERE CAST(rd.shipment_id AS VARCHAR(255)) = current_delivery.target_id
+        </sql>
+        <createIndex tableName="shipment_rd" indexName="idx_shipment_rd_current_department_id">
+            <column name="current_department_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

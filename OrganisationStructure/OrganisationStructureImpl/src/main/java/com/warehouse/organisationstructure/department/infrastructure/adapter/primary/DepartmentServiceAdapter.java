@@ -38,6 +38,11 @@ public class DepartmentServiceAdapter implements DepartmentApiService {
     }
 
     @Override
+    public int archiveInactiveDepartments() {
+        return this.departmentPort.archiveInactiveDepartments();
+    }
+
+    @Override
     public List<DepartmentDto> getAllDepartments() {
         return this.departmentPort.findAll()
                 .stream()

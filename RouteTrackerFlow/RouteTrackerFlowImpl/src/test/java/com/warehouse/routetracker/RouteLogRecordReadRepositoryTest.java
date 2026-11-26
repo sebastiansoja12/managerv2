@@ -128,6 +128,30 @@ public class RouteLogRecordReadRepositoryTest {
     }
 
     @Test
+    void shouldReturnRouteLogsOnlyToOperatorThatOwnsThem() {
+        final ShipmentId shipmentId = new ShipmentId(456789L);
+        final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
+                .id(java.util.UUID.randomUUID())
+                .shipmentId(shipmentId)
+                .build();
+        routeLogRecord.createShipmentEvent(new ShipmentStatusStateChangeCommand(
+                shipmentId,
+                "shipment.changed",
+                ShipmentStatus.CREATED,
+                LocalDateTime.now(),
+                new OperatorId(3L),
+                new DepartmentId(30L),
+                new UserId(4L)));
+        repository.saveAndFlush(entityMapper.map(routeLogRecord));
+
+        assertTrue(repository.findByShipmentIdAndOperatorId(shipmentId, 3L).isPresent());
+        assertTrue(repository.findByShipmentIdAndOperatorId(shipmentId, 999L).isEmpty());
+        assertTrue(repository.findAllByOperatorId(3L).stream()
+                .anyMatch(record -> shipmentId.equals(record.getShipmentId())));
+        assertTrue(repository.findAllByOperatorId(999L).isEmpty());
+    }
+
+    @Test
     void shouldNotFindRouteLogRecordByShipmentId() {
         // given
         final Long id = 2L;

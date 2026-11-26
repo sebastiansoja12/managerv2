@@ -3,6 +3,9 @@ package com.warehouse.mcp.infrastructure.adapter.primary;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 
+import com.warehouse.auth.Mcp;
+import com.warehouse.auth.McpModule;
+import com.warehouse.commonassets.enumeration.AccountLevel;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.mcp.application.port.primary.McpQueryPort;
 import com.warehouse.mcp.domain.vo.DepartmentFilter;
@@ -41,12 +44,14 @@ public class ManagerMcpTools {
         this.arguments = arguments;
     }
 
+    @Mcp(module = McpModule.PROFILE)
     @Tool(name = "whoami", description = "Returns the Manager account used by this connection: username, role, "
             + "department code and operator. Call it first to learn which department and permissions apply.")
     public CurrentUserToolResponse whoami() {
         return executor.execute("whoami", () -> responseMapper.map(mcpQueryPort.currentUser()));
     }
 
+    @Mcp(module = McpModule.SHIPMENTS)
     @Tool(name = "find_shipment", description = "Finds a shipment by its tracking number and returns its status, "
             + "dates, masked sender and recipient (initials, city, postal code) and the latest tracking events, "
             + "newest first. Only shipments of the caller's operator are visible.")
@@ -57,6 +62,7 @@ public class ManagerMcpTools {
                 () -> responseMapper.map(mcpQueryPort.findShipment(arguments.trackingNumber(trackingNumber))));
     }
 
+    @Mcp(module = McpModule.PROCESSES)
     @Tool(name = "get_process", description = "Returns a terminal process (for example a collection, rejection or "
             + "handover sent from a scanner) by its UUID: status, fault description, the device and user that sent "
             + "it and the communication steps in chronological order. Use it to explain why a scan failed.")
@@ -67,6 +73,7 @@ public class ManagerMcpTools {
                 () -> responseMapper.map(mcpQueryPort.findProcess(arguments.processId(processId))));
     }
 
+    @Mcp(module = McpModule.DEVICES, minimumLevel = AccountLevel.MANAGER)
     @Tool(name = "list_devices", description = "Lists the operator's terminals, scanners and mobile devices with "
             + "status, department, assignment mode (PERSONAL or SHARED), app version, last heartbeat and the "
             + "operator currently signed in. Returns at most 50 devices. Requires the MANAGER role or higher.")
@@ -79,6 +86,7 @@ public class ManagerMcpTools {
                 () -> responseMapper.map(mcpQueryPort.listDevices(new DeviceFilter(status, departmentCode))));
     }
 
+    @Mcp(module = McpModule.SHIPMENTS)
     @Tool(name = "get_shipment_route", description = "Returns the planned route of a shipment through the delivery "
             + "network: the departments it passes from origin to destination, in order, and the total distance in "
             + "kilometres. Use it to explain where a shipment goes next.")
@@ -91,6 +99,7 @@ public class ManagerMcpTools {
         });
     }
 
+    @Mcp(module = McpModule.DEPARTMENTS)
     @Tool(name = "list_departments", description = "Lists the operator's departments with code, type (for example "
             + "BRANCH, WAREHOUSE or SORTING_FACILITY) and status. Returns at most 100 departments.")
     public DepartmentListToolResponse listDepartments(
@@ -102,6 +111,7 @@ public class ManagerMcpTools {
                 () -> responseMapper.map(mcpQueryPort.listDepartments(new DepartmentFilter(status, type))));
     }
 
+    @Mcp(module = McpModule.DEPARTMENTS)
     @Tool(name = "get_department", description = "Returns a department by its code: city, street, postal code, "
             + "country and coordinates.")
     public DepartmentDetailsToolResponse getDepartment(
@@ -111,6 +121,7 @@ public class ManagerMcpTools {
                 () -> responseMapper.map(mcpQueryPort.findDepartment(arguments.departmentCode(departmentCode))));
     }
 
+    @Mcp(module = McpModule.DELIVERIES)
     @Tool(name = "list_deliveries", description = "Lists the newest deliveries (shipment and pallet transports) with "
             + "status, origin and destination department, courier, delivery method and steps. Filter by department "
             + "or courier. Returns 25 deliveries by default, at most 100.")
@@ -126,6 +137,7 @@ public class ManagerMcpTools {
                         arguments.optionalCourierCode(courierCode), limit))));
     }
 
+    @Mcp(module = McpModule.DELIVERIES)
     @Tool(name = "get_delivery", description = "Returns one delivery with its route, courier, conditions and all "
             + "delivery steps. Pass either the deliveryId or the shipment trackingNumber.")
     public DeliveryToolResponse getDelivery(
@@ -138,12 +150,14 @@ public class ManagerMcpTools {
                 : responseMapper.map(mcpQueryPort.findShipmentDelivery(arguments.trackingNumber(trackingNumber))));
     }
 
+    @Mcp(module = McpModule.COURIERS, minimumLevel = AccountLevel.MANAGER)
     @Tool(name = "list_couriers", description = "Lists the couriers (suppliers) of the caller's department with "
             + "code, name, phone number and status. Requires the MANAGER role or higher.")
     public CourierListToolResponse listCouriers() {
         return executor.execute("list_couriers", () -> responseMapper.map(mcpQueryPort.listCouriers()));
     }
 
+    @Mcp(module = McpModule.CONFIGURATION)
     @Tool(name = "get_configuration", description = "Returns one section of the operator configuration as JSON: "
             + "SHIPMENT, DEPARTMENTS, FLEET, COMMUNICATION, REGIONAL, SORTING or PICKUP_POINTS. Use it before "
             + "update_configuration to see the field names and current values.")

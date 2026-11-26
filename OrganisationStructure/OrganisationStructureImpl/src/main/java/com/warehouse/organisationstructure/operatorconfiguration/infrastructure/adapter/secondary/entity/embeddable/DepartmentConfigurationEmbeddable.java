@@ -32,6 +32,9 @@ public class DepartmentConfigurationEmbeddable {
     @Embedded
     private DepartmentCapacityPolicyEmbeddable capacityPolicy;
 
+    @Embedded
+    private DepartmentCourierAssignmentPolicyEmbeddable courierAssignmentPolicy;
+
     public DepartmentConfigurationEmbeddable() {
     }
 
@@ -48,6 +51,8 @@ public class DepartmentConfigurationEmbeddable {
         embeddable.connectionPolicy = DepartmentConnectionPolicyEmbeddable.from(source.getConnectionPolicy());
         embeddable.lifecyclePolicy = DepartmentLifecyclePolicyEmbeddable.from(source.getLifecyclePolicy());
         embeddable.capacityPolicy = DepartmentCapacityPolicyEmbeddable.from(source.getCapacityPolicy());
+        embeddable.courierAssignmentPolicy = DepartmentCourierAssignmentPolicyEmbeddable.from(
+                source.getCourierAssignmentPolicy());
         return embeddable;
     }
 
@@ -60,7 +65,8 @@ public class DepartmentConfigurationEmbeddable {
                 deliveryAreaPolicy != null ? deliveryAreaPolicy.toModel() : null,
                 connectionPolicy != null ? connectionPolicy.toModel() : null,
                 lifecyclePolicy != null ? lifecyclePolicy.toModel() : null,
-                capacityPolicy != null ? capacityPolicy.toModel() : null
+                capacityPolicy != null ? capacityPolicy.toModel() : null,
+                courierAssignmentPolicy != null ? courierAssignmentPolicy.toModel() : null
         );
     }
 }

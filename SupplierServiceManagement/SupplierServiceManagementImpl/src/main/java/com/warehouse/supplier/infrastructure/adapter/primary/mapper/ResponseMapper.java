@@ -1,10 +1,18 @@
 package com.warehouse.supplier.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.supplier.domain.model.DeliveryArea;
-import com.warehouse.supplier.domain.model.Supplier;
-import com.warehouse.supplier.domain.vo.*;
-import com.warehouse.supplier.infrastructure.adapter.primary.dto.*;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.supplier.application.port.primary.result.CertificationUpdateResponse;
+import com.warehouse.supplier.application.port.primary.result.DriverLicenseResponse;
+import com.warehouse.supplier.application.port.primary.result.SupplierCreateResponse;
+import com.warehouse.supplier.application.port.primary.result.SupplierResult;
+import com.warehouse.supplier.application.port.primary.result.SupplierUpdateResponse;
+import com.warehouse.supplier.domain.vo.DangerousGoodCertification;
+import com.warehouse.supplier.domain.vo.DeliveryArea;
+import com.warehouse.supplier.domain.vo.DriverLicense;
+import com.warehouse.supplier.domain.vo.SupplierSnapshot;
+import com.warehouse.supplier.infrastructure.adapter.primary.dto.*;
+
+import java.util.stream.Collectors;
 
 public abstract class ResponseMapper {
 
@@ -12,42 +20,40 @@ public abstract class ResponseMapper {
         return new SupplierCreateApiResponse(response.supplierCode().value());
     }
 
-    public static SupplierApi map(final Supplier supplier, final DepartmentCode departmentCode) {
-        if (supplier == null) {
-            return null;
-        }
-
+    public static SupplierApi map(final SupplierResult result) {
+        final SupplierSnapshot supplier = result.supplier();
+        final DepartmentCode departmentCode = result.departmentCode();
         return new SupplierApi(
-                supplier.getSupplierId() != null ? supplier.getSupplierId().value() : null,
+                supplier.supplierId() != null ? supplier.supplierId().value() : null,
                 supplier.supplierCode() != null ? new SupplierCodeApi(supplier.supplierCode().value()) : null,
-                supplier.getFirstName(),
-                supplier.getLastName(),
-                supplier.getTelephoneNumber(),
-                supplier.getEmail(),
+                supplier.firstName(),
+                supplier.lastName(),
+                supplier.telephoneNumber(),
+                supplier.email(),
                 departmentCode != null ? new DepartmentCodeApi(departmentCode.getValue()) : null,
-                supplier.getStatus() != null ? supplier.getStatus().name() : null,
-                supplier.getUserStatus() != null ? supplier.getUserStatus().name() : null,
-                supplier.getVehicleId() != null ? new VehicleIdApi(supplier.getVehicleId().value()) : null,
-                supplier.getDeviceId() != null ? new DeviceIdApi(supplier.getDeviceId().getValue()) : null,
-                supplier.getDangerousGoodCertification() != null ? map(supplier.getDangerousGoodCertification()) : null,
-                supplier.getDriverLicense() != null ? map(supplier.getDriverLicense()) : null,
-                supplier.getDeliveryArea() != null ? map(supplier.getDeliveryArea()) : null,
-				supplier.getSupportedPackageTypes() != null ? supplier.getSupportedPackageTypes().stream()
-						.map(pt -> PackageTypeApi.valueOf(pt.name()))
-                        .collect(java.util.stream.Collectors.toSet()) : null,
+                supplier.status() != null ? supplier.status().name() : null,
+                supplier.userStatus() != null ? supplier.userStatus().name() : null,
+                supplier.vehicleId() != null ? new VehicleIdApi(supplier.vehicleId().value()) : null,
+                supplier.deviceId() != null ? new DeviceIdApi(supplier.deviceId().getValue()) : null,
+                supplier.dangerousGoodCertification() != null ? map(supplier.dangerousGoodCertification()) : null,
+                supplier.driverLicense() != null ? map(supplier.driverLicense()) : null,
+                supplier.deliveryArea() != null ? map(supplier.deliveryArea()) : null,
+                supplier.supportedPackageTypes() != null ? supplier.supportedPackageTypes().stream()
+                        .map(packageType -> PackageTypeApi.valueOf(packageType.name()))
+                        .collect(Collectors.toSet()) : null,
                 supplier.termsAccepted(),
-                supplier.getCreatedAt() != null ? supplier.getCreatedAt().toString() : null,
-                supplier.getUpdatedAt() != null ? supplier.getUpdatedAt().toString() : null,
+                supplier.createdAt() != null ? supplier.createdAt().toString() : null,
+                supplier.updatedAt() != null ? supplier.updatedAt().toString() : null,
                 supplier.createdUserId() != null ? new UserIdApi(supplier.createdUserId().getValue()) : null
         );
     }
-    
-	public static DeliveryAreaApi map(final DeliveryArea deliveryArea) {
-		return new DeliveryAreaApi(deliveryArea.getAreaName(), deliveryArea.getCity(), deliveryArea.getDistrict(),
-				deliveryArea.getMunicipality(), deliveryArea.getRegion(), deliveryArea.getCountry(),
-				deliveryArea.getPostalCodes());
-	}
-    
+
+    public static DeliveryAreaApi map(final DeliveryArea deliveryArea) {
+        return new DeliveryAreaApi(deliveryArea.areaName(), deliveryArea.city(), deliveryArea.district(),
+                deliveryArea.municipality(), deliveryArea.region(), deliveryArea.country(),
+                deliveryArea.postalCodes());
+    }
+
 	public static DangerousGoodCertificationApi map(final DangerousGoodCertification dangerousGoodCertification) {
 		return new DangerousGoodCertificationApi(dangerousGoodCertification.certificateNumber(),
 				dangerousGoodCertification.issueDate(), dangerousGoodCertification.expiryDate(),

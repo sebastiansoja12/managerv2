@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-24-postgresql-price-list-copy-for-operators" author="s-soja">
+        <sql>
+            INSERT INTO price_lists (id, operator_id, template, currency, insurance_percent, vat_percent, updated_at)
+            SELECT 1000 + row_number() OVER (ORDER BY o.operator_id), o.operator_id, false, t.currency,
+                   t.insurance_percent, t.vat_percent, now()
+            FROM operators o
+            CROSS JOIN price_lists t
+            WHERE t.template = true
+              AND NOT EXISTS (SELECT 1 FROM price_lists existing WHERE existing.operator_id = o.operator_id);
+            INSERT INTO price_list_size_classes (price_list_id, position, code, max_length_cm, max_width_cm, max_height_cm, net_price)
+            SELECT c.id, s.position, s.code, s.max_length_cm, s.max_width_cm, s.max_height_cm, s.net_price
+            FROM price_lists c
+            JOIN price_lists t ON t.template = true
+            JOIN price_list_size_classes s ON s.price_list_id = t.id
+            WHERE c.template = false
+              AND NOT EXISTS (SELECT 1 FROM price_list_size_classes x WHERE x.price_list_id = c.id);
+            INSERT INTO price_list_weight_bands (price_list_id, position, from_kg, to_kg, net_surcharge)
+            SELECT c.id, w.position, w.from_kg, w.to_kg, w.net_surcharge
+            FROM price_lists c
+            JOIN price_lists t ON t.template = true
+            JOIN price_list_weight_bands w ON w.price_list_id = t.id
+            WHERE c.template = false
+              AND NOT EXISTS (SELECT 1 FROM price_list_weight_bands x WHERE x.price_list_id = c.id);
+            INSERT INTO price_list_service_levels (price_list_id, service_level, multiplier)
+            SELECT c.id, s.service_level, s.multiplier
+            FROM price_lists c
+            JOIN price_lists t ON t.template = true
+            JOIN price_list_service_levels s ON s.price_list_id = t.id
+            WHERE c.template = false
+              AND NOT EXISTS (SELECT 1 FROM price_list_service_levels x WHERE x.price_list_id = c.id);
+            INSERT INTO price_list_delivery_methods (price_list_id, delivery_method, surcharge)
+            SELECT c.id, d.delivery_method, d.surcharge
+            FROM price_lists c
+            JOIN price_lists t ON t.template = true
+            JOIN price_list_delivery_methods d ON d.price_list_id = t.id
+            WHERE c.template = false
+              AND NOT EXISTS (SELECT 1 FROM price_list_delivery_methods x WHERE x.price_list_id = c.id);
+        </sql>
+    </changeSet>
+</databaseChangeLog>

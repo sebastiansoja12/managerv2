@@ -38,7 +38,8 @@ public class DepartmentConfigurationOverrideApiMapper {
                         override.autoArchiveInactiveAfterDays()),
                 new DepartmentConfigurationOverrideDto.CapacityPolicy(override.dailyCapacity(),
                         override.capacityWarningThresholdPercent(), override.redirectOverflowToNeighbour(),
-                        override.maxCouriersPerDepartment()));
+                        override.maxCouriersPerDepartment()),
+                OperatorMapper.toDtoDepartmentCourierAssignmentPolicy(override.courierAssignmentPolicy()));
     }
 
     public DepartmentConfigurationOverride toModel(final DepartmentId departmentId,
@@ -70,7 +71,8 @@ public class DepartmentConfigurationOverrideApiMapper {
                         : DepartmentWorkTransferMode.valueOf(lifecycle.workTransferOnDeactivation().name()),
                 lifecycle.autoArchiveInactiveAfterDays(), capacity.defaultDailyCapacity(),
                 capacity.capacityWarningThresholdPercent(), capacity.redirectOverflowToNeighbour(),
-                capacity.maxCouriersPerDepartment());
+                capacity.maxCouriersPerDepartment(),
+                OperatorMapper.toModelDepartmentCourierAssignmentPolicy(dto.courierAssignmentPolicy()));
     }
 
     public DepartmentConfigurationsDto toDto(final DepartmentConfigurations configurations) {

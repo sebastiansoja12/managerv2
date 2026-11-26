@@ -7,19 +7,26 @@ import com.warehouse.document.api.DocumentMetadata;
 import com.warehouse.shipment.domain.model.ShipmentDocument;
 import com.warehouse.shipment.domain.model.ShipmentDocumentFile;
 import com.warehouse.shipment.domain.model.ShipmentNote;
+import com.warehouse.shipment.domain.vo.ShipmentNoteIncidentSource;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentNoteEntity;
 
 public class ShipmentContentPersistenceMapper {
 
     public ShipmentNoteEntity toEntity(final ShipmentNote note, final OperatorId operatorId) {
+        final ShipmentNoteIncidentSource incidentSource = note.incidentSource();
         return new ShipmentNoteEntity(note.noteId(), note.shipmentId(), operatorId,
-                note.body(), note.internal(), note.authorUserId(), note.createdAt());
+                note.body(), note.internal(), note.authorUserId(), note.createdAt(),
+                incidentSource == null ? null : incidentSource.incidentId(),
+                incidentSource == null ? null : incidentSource.type(),
+                incidentSource == null ? null : incidentSource.reason());
     }
 
     public ShipmentNote toDomain(final ShipmentNoteEntity entity) {
         return new ShipmentNote(entity.getNoteId(), entity.getShipmentId(),
                 entity.getBody(), entity.isInternal(), entity.getAuthorUserId(),
-                entity.getCreatedAt());
+                entity.getCreatedAt(), entity.getIncidentId() == null ? null
+                : new ShipmentNoteIncidentSource(entity.getIncidentId(), entity.getIncidentNoteType(),
+                entity.getIncidentReason()));
     }
 
     public DocumentFile toDocumentFile(final ShipmentDocumentFile documentFile) {

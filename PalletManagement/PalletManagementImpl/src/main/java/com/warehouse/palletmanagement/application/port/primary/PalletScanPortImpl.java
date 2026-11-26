@@ -1,6 +1,6 @@
 package com.warehouse.palletmanagement.application.port.primary;
 
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.PalletId;
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -58,7 +58,11 @@ public class PalletScanPortImpl implements PalletScanPort {
     public PalletScanResult scan(final PalletScanCommand command) {
         final PalletDetails pallet = this.palletHandlingManagerServicePort.getByTrackingNumber(command.trackingNumber());
         final PalletScan palletScan = new PalletScan(pallet);
-        final Optional<PalletScanErrorCode> rejectionReason = palletScan.rejectionReason();
+        final Optional<PalletScanErrorCode> rejectionReason = palletScan.rejectionReason(
+                () -> pallet.shipmentIds().stream()
+                        .map(this.shipmentServicePort::findShipment)
+                        .flatMap(Optional::stream)
+                        .toList());
         if (rejectionReason.isPresent()) {
             log.info("Pallet {} scan rejected: {}", pallet.trackingNumber().value(), rejectionReason.get());
             return PalletScanResult.rejected(pallet, rejectionReason.get());

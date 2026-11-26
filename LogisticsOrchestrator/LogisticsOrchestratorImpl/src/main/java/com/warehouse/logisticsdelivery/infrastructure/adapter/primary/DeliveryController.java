@@ -1,5 +1,6 @@
 package com.warehouse.logisticsdelivery.infrastructure.adapter.primary;
 
+import com.warehouse.auth.AccessUserControl;
 import com.warehouse.commonassets.identificator.DeliveryId;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -31,6 +32,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+@AccessUserControl
 @RestController
 @RequestMapping("/deliveries")
 public class DeliveryController {

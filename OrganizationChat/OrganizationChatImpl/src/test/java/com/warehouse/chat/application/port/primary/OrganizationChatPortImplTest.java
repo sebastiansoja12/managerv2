@@ -14,7 +14,7 @@ import com.warehouse.chat.domain.model.ChatConversation;
 import com.warehouse.chat.domain.vo.ChatMessageSnapshot;
 import com.warehouse.chat.domain.vo.ChatPresence;
 import com.warehouse.chat.domain.vo.ChatRecipient;
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.identificator.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

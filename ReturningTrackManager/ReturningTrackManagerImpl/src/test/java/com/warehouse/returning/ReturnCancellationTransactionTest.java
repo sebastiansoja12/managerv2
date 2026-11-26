@@ -5,7 +5,7 @@ import com.warehouse.returning.application.service.ReturnProcessingService;
 import com.warehouse.returning.domain.model.ReturnStatus;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
 import com.warehouse.returning.domain.vo.ReturnPackageId;
-import com.warehouse.returning.infrastructure.adapter.secondary.outbox.ReturningOutboxRepository;
+import com.warehouse.eventoutbox.outbox.infrastructure.adapter.secondary.OutboxEventJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,18 +18,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = ReturnPersistenceTestConfiguration.class, properties = {
         "spring.liquibase.enabled=false", "spring.sql.init.mode=never",
-        "manager.kafka.integration-events.routes.return.cancelled=return.cancelled",
-        "manager.kafka.integration-events.routes.return.read-model.changed=return.read-model.sync"})
+        "manager.events.outbox.enabled=true", "manager.events.outbox.relay.enabled=false"})
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class ReturnCancellationTransactionTest {
     private final ReturnProcessingService service;
     private final ReturnRepository returns;
-    private final ReturningOutboxRepository outbox;
+    private final OutboxEventJpaRepository outbox;
     private final JdbcTemplate jdbc;
     private final TransactionTemplate transactions;
 
     ReturnCancellationTransactionTest(final ReturnProcessingService service, final ReturnRepository returns,
-                                       final ReturningOutboxRepository outbox, final JdbcTemplate jdbc,
+                                       final OutboxEventJpaRepository outbox, final JdbcTemplate jdbc,
                                        final PlatformTransactionManager transactions) {
         this.service = service;
         this.returns = returns;
@@ -51,9 +50,9 @@ class ReturnCancellationTransactionTest {
 
         assertEquals(ReturnStatus.CANCELLED, returns.findDetailsById(new ReturnPackageId(123L)).getReturnStatus());
         assertEquals(1L, jdbc.queryForObject(
-                "SELECT COUNT(*) FROM returning_event_outbox WHERE event_type = 'return.cancelled'", Long.class));
+                "SELECT COUNT(*) FROM integration_event_outbox WHERE event_type = 'return.cancelled'", Long.class));
         final String payload = jdbc.queryForObject(
-                "SELECT payload_json FROM returning_event_outbox WHERE event_type = 'return.cancelled'", String.class);
+                "SELECT payload FROM integration_event_outbox WHERE event_type = 'return.cancelled'", String.class);
         assertTrue(payload.contains("\"eventType\":\"return.cancelled\""));
         assertTrue(payload.contains("\"shipmentId\":{\"value\":456}"));
         assertTrue(payload.contains("\"returnPackageId\":{\"value\":123}"));
@@ -61,19 +60,25 @@ class ReturnCancellationTransactionTest {
         assertTrue(payload.contains("\"operatorId\":{\"value\":7}"));
         assertTrue(payload.contains("\"userId\":{\"value\":12}"));
         final String headers = jdbc.queryForObject(
-                "SELECT headers_json FROM returning_event_outbox WHERE event_type = 'return.cancelled'", String.class);
+                "SELECT headers FROM integration_event_outbox WHERE event_type = 'return.cancelled'", String.class);
         assertTrue(headers.contains("com.warehouse.returning.api.event.ReturnCancelledIntegrationEvent"));
+        assertTrue(headers.contains("\"ce_type\":\"return.cancelled\""));
+        assertTrue(headers.contains("\"operatorId\":\"7\""));
+        assertTrue(headers.contains("\"departmentId\":\"3\""));
+        assertEquals(1L, jdbc.queryForObject(
+                "SELECT COUNT(*) FROM integration_event_outbox WHERE event_type = 'return.read-model.changed'"
+                        + " AND topic = 'return.read-model.sync'", Long.class));
     }
 
     @Test
     void shouldRollBackCancellationWhenOutboxCannotBeWritten() {
-        jdbc.execute("ALTER TABLE returning_event_outbox ADD CONSTRAINT reject_cancellation CHECK (attempt_count < 0)");
+        jdbc.execute("ALTER TABLE integration_event_outbox ADD CONSTRAINT reject_cancellation CHECK (attempt_count < 0)");
         try {
             assertThrows(RuntimeException.class, () -> service.cancel(new ReturnPackageId(123L)));
             assertEquals(ReturnStatus.PROCESSING, returns.findDetailsById(new ReturnPackageId(123L)).getReturnStatus());
             assertEquals(0L, outbox.count());
         } finally {
-            jdbc.execute("ALTER TABLE returning_event_outbox DROP CONSTRAINT reject_cancellation");
+            jdbc.execute("ALTER TABLE integration_event_outbox DROP CONSTRAINT reject_cancellation");
         }
     }
 }

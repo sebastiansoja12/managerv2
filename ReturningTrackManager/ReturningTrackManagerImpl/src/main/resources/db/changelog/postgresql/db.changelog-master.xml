@@ -8,4 +8,5 @@
     <include file="tables/returning_event_outbox.xml" relativeToChangelogFile="true"/>
     <include file="tables/returning_return_read_model.xml" relativeToChangelogFile="true"/>
     <include file="schema-objects.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-22-integration-event-outbox.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

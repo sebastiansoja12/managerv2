@@ -32,6 +32,10 @@ import com.warehouse.palletmanagement.application.port.secondary.PalletDocumentR
 import com.warehouse.palletmanagement.domain.enumeration.PalletStatus;
 import com.warehouse.palletmanagement.domain.model.PalletDocumentData;
 import com.warehouse.palletmanagement.domain.vo.PalletDepartment;
+import com.warehouse.palletmanagement.domain.vo.PalletDepartmentsChange;
+import com.warehouse.palletmanagement.domain.vo.PalletDepartmentsChangedSnapshot;
+import com.warehouse.palletmanagement.domain.event.PalletDepartmentsChanged;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
 import com.warehouse.palletmanagement.domain.vo.PalletDetails;
 import com.warehouse.palletmanagement.domain.vo.PalletDocumentFile;
 import com.warehouse.palletmanagement.domain.vo.PalletDocumentShipment;
@@ -65,6 +69,7 @@ class PalletPortImplTest {
     private PalletDocumentRendererServicePort palletDocumentRendererServicePort;
     private CarrierServicePort carrierServicePort;
     private PalletTransportRepository palletTransportRepository;
+    private DomainEventPublisher domainEventPublisher;
 
     @BeforeEach
     void setUp() {
@@ -74,21 +79,42 @@ class PalletPortImplTest {
         this.palletDocumentRendererServicePort = mock(PalletDocumentRendererServicePort.class);
         this.carrierServicePort = mock(CarrierServicePort.class);
         this.palletTransportRepository = mock(PalletTransportRepository.class);
+        this.domainEventPublisher = mock(DomainEventPublisher.class);
         when(this.palletTransportRepository.findCurrent(any(PalletId.class))).thenReturn(Optional.empty());
         this.palletPort = new PalletPortImpl(this.palletHandlingManagerServicePort, this.shipmentServicePort,
                 this.carrierServicePort, new PalletTransportService(this.palletTransportRepository),
                 new PalletGrossWeightService(this.palletHandlingManagerServicePort, this.shipmentServicePort),
                 new PalletDocumentService(this.shipmentServicePort, this.departmentServicePort,
-                        this.palletDocumentRendererServicePort));
+                        this.palletDocumentRendererServicePort), this.domainEventPublisher);
+    }
+
+    @Test
+    void shouldPublishDepartmentsChangedEventWhenPalletDepartmentsAreChanged() {
+        final PalletDetails base = PalletFixture.readyPallet(1L);
+        final PalletDetails changed = new PalletDetails(base.palletId(), base.trackingNumber(), base.palletStatus(),
+                base.storageStatus(), base.shipmentIds(), false, true, null, null, null, new DepartmentId(10L),
+                new DepartmentId(20L), null, base.created(), base.modified(), null, null);
+        final PalletDepartmentsChange departmentsChange = new PalletDepartmentsChange(new DepartmentId(10L),
+                new DepartmentId(20L));
+        when(this.palletHandlingManagerServicePort.changeDepartments(PalletFixture.PALLET_ID, departmentsChange))
+                .thenReturn(changed);
+
+        final PalletDetails result = this.palletPort.changeDepartments(PalletFixture.PALLET_ID, departmentsChange);
+
+        final ArgumentCaptor<PalletDepartmentsChanged> event = ArgumentCaptor.forClass(PalletDepartmentsChanged.class);
+        verify(this.domainEventPublisher).publish(event.capture());
+        assertThat(event.getValue().getSnapshot()).isEqualTo(new PalletDepartmentsChangedSnapshot(
+                PalletFixture.PALLET_ID, PalletFixture.TRACKING_NUMBER, new DepartmentId(10L), new DepartmentId(20L)));
+        assertThat(result.destinationDepartmentId()).isEqualTo(new DepartmentId(20L));
     }
 
     @Test
     void shouldAddPalletizableShipments() {
         final List<ShipmentId> shipmentIds = List.of(new ShipmentId(1L), new ShipmentId(2L));
         when(this.shipmentServicePort.findShipment(new ShipmentId(1L))).thenReturn(Optional.of(
-                new PalletShipment(new ShipmentId(1L), ShipmentStatus.CREATED, new BigDecimal("12.5"))));
+                new PalletShipment(new ShipmentId(1L), ShipmentStatus.CREATED, new BigDecimal("12.5"), null)));
         when(this.shipmentServicePort.findShipment(new ShipmentId(2L))).thenReturn(Optional.of(
-                new PalletShipment(new ShipmentId(2L), ShipmentStatus.PREPARED, new BigDecimal("0.75"))));
+                new PalletShipment(new ShipmentId(2L), ShipmentStatus.PREPARED, new BigDecimal("0.75"), null)));
         when(this.palletHandlingManagerServicePort.addShipments(PalletFixture.PALLET_ID, shipmentIds))
                 .thenReturn(PalletFixture.readyPallet(1L, 2L));
         when(this.palletHandlingManagerServicePort.changeGrossWeight(any(), any()))
@@ -105,7 +131,7 @@ class PalletPortImplTest {
     @Test
     void shouldRejectDeliveredShipment() {
         when(this.shipmentServicePort.findShipment(new ShipmentId(1L))).thenReturn(Optional.of(
-                new PalletShipment(new ShipmentId(1L), ShipmentStatus.DELIVERY, BigDecimal.ONE)));
+                new PalletShipment(new ShipmentId(1L), ShipmentStatus.DELIVERY, BigDecimal.ONE, null)));
 
         assertThatThrownBy(() -> this.palletPort.createPallet(new CreatePalletCommand(List.of(new ShipmentId(1L)))))
                 .isInstanceOfSatisfying(PalletRequestRejectedException.class,
@@ -128,7 +154,7 @@ class PalletPortImplTest {
         when(this.palletHandlingManagerServicePort.removeShipment(PalletFixture.PALLET_ID, new ShipmentId(1L)))
                 .thenReturn(PalletFixture.readyPallet(2L));
         when(this.shipmentServicePort.findShipment(new ShipmentId(2L))).thenReturn(Optional.of(
-                new PalletShipment(new ShipmentId(2L), ShipmentStatus.CREATED, BigDecimal.TEN)));
+                new PalletShipment(new ShipmentId(2L), ShipmentStatus.CREATED, BigDecimal.TEN, null)));
         when(this.palletHandlingManagerServicePort.changeGrossWeight(any(), any()))
                 .thenThrow(new PalletServiceUnavailableException("unavailable"));
 

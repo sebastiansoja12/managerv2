@@ -1,12 +1,14 @@
 package com.warehouse.auth.domain.model;
 
 import com.warehouse.auth.domain.event.UserChangedEvent;
+import com.warehouse.auth.domain.exception.UserAccessDeniedException;
 import com.warehouse.auth.domain.exception.UserDeletedException;
 import com.warehouse.auth.domain.registry.DomainRegistry;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.auth.domain.vo.UserSnapshot;
 import com.warehouse.commonassets.enumeration.AccountLevel;
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.McpKeyId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.model.BelongsToOperator;
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +44,8 @@ public abstract class OrganizationUser extends BelongsToOperator implements Acco
     private String apiKey;
     private Instant apiKeyIssuedAt;
 
+    private McpKeyId mcpKeyId;
+
     private Set<RolePermission> permissions;
 
     private Boolean deleted;
@@ -65,6 +69,7 @@ public abstract class OrganizationUser extends BelongsToOperator implements Acco
             case MANAGER -> new Manager();
             case ADMIN -> new Admin();
             case SUPERADMIN -> new Superadmin();
+            case BUSINESS_CUSTOMER -> new BusinessCustomer();
         };
     }
 
@@ -370,9 +375,16 @@ public abstract class OrganizationUser extends BelongsToOperator implements Acco
         return hasApiKey() && apiKeyIssuedAt != null && !Boolean.TRUE.equals(deleted);
     }
 
+    public boolean isBusinessCustomer() {
+        return Role.BUSINESS_CUSTOMER.equals(getRole());
+    }
+
     public OrganizationUser changeRole(final Role role) {
         if (Boolean.TRUE.equals(deleted)) {
             throw new UserDeletedException("User is already deleted");
+        }
+        if (isBusinessCustomer() || Role.BUSINESS_CUSTOMER.equals(role)) {
+            throw new UserAccessDeniedException("Business customer role cannot be changed");
         }
 
         final OrganizationUser user = forRole(role);
@@ -394,6 +406,7 @@ public abstract class OrganizationUser extends BelongsToOperator implements Acco
         this.language = source.language;
         this.apiKey = source.apiKey;
         this.apiKeyIssuedAt = source.apiKeyIssuedAt;
+        this.mcpKeyId = source.mcpKeyId;
         this.permissions = new HashSet<>(source.getPermissions());
         this.deleted = source.deleted;
         this.initial = source.initial;
@@ -409,7 +422,7 @@ public abstract class OrganizationUser extends BelongsToOperator implements Acco
             case SUPERADMIN, ADMIN -> getPermissions().addAll(DomainRegistry.rolePermissionService().findAllAdminPermissions());
             case MANAGER -> getPermissions().addAll(DomainRegistry.rolePermissionService().findAllManagerPermissions());
             case SUPPLIER -> getPermissions().addAll(DomainRegistry.rolePermissionService().findAllSupplierPermissions());
-            case USER -> {}
+            case USER, BUSINESS_CUSTOMER -> {}
         }
     }
 
@@ -439,10 +452,40 @@ public abstract class OrganizationUser extends BelongsToOperator implements Acco
         return apiKey != null && !apiKey.isBlank();
     }
 
+    public McpKeyId getMcpKeyId() {
+        return mcpKeyId;
+    }
+
+    public void setMcpKeyId(final McpKeyId mcpKeyId) {
+        this.mcpKeyId = mcpKeyId;
+    }
+
+    public void assignMcpKey(final McpKeyId mcpKeyId) {
+        this.mcpKeyId = mcpKeyId;
+        markAsModified();
+    }
+
+    public void removeMcpKey(final McpKeyId mcpKeyId) {
+        if (!hasMcpKey(mcpKeyId)) {
+            return;
+        }
+        this.mcpKeyId = null;
+        markAsModified();
+    }
+
+    public boolean hasMcpKey(final McpKeyId mcpKeyId) {
+        return this.mcpKeyId != null && this.mcpKeyId.equals(mcpKeyId);
+    }
+
+    public boolean canAuthenticateWithMcpKey(final McpKeyId mcpKeyId) {
+        return hasMcpKey(mcpKeyId) && !Boolean.TRUE.equals(deleted);
+    }
+
     public void markAsDeleted() {
         this.deleted = true;
         this.apiKey = null;
         this.apiKeyIssuedAt = null;
+        this.mcpKeyId = null;
         getPermissions().clear();
         markAsModified();
     }
@@ -469,7 +512,8 @@ public abstract class OrganizationUser extends BelongsToOperator implements Acco
         SUPPLIER(AccountLevel.USER),
         MANAGER(AccountLevel.MANAGER),
         ADMIN(AccountLevel.ADMIN),
-        SUPERADMIN(AccountLevel.SUPERADMIN);
+        SUPERADMIN(AccountLevel.SUPERADMIN),
+        BUSINESS_CUSTOMER(AccountLevel.USER);
 
         private final AccountLevel level;
 

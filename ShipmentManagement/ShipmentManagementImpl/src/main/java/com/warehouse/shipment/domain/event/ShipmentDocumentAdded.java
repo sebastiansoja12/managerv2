@@ -1,6 +1,6 @@
 package com.warehouse.shipment.domain.event;
 
-import com.warehouse.commonassets.event.domain.model.DomainEvent;
+import com.warehouse.eventoutbox.domain.model.DomainEvent;
 import com.warehouse.commonassets.identificator.ShipmentId;
 
 import java.time.Instant;

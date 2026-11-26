@@ -23,7 +23,7 @@ class RerouteTokenTest {
 
     private static final Instant NOW = Instant.parse("2026-10-17T10:00:00Z");
 
-    private static final RerouteTokenPolicy POLICY = new RerouteTokenPolicy(Duration.ofMinutes(30), 3);
+    private static final RerouteTokenPolicy POLICY = new RerouteTokenPolicy(Duration.ofMinutes(30), 3, 3, Duration.ofMinutes(30));
 
     private final RerouteToken rerouteToken = RerouteToken.issue(new ShipmentId(1L), "client@example.com",
             new RerouteTokenValue(42), NOW, POLICY);

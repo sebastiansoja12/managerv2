@@ -10,6 +10,7 @@ import com.warehouse.pickuppoint.infrastructure.adapter.secondary.mapper.PickupP
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -58,8 +59,12 @@ public class PickupPointRepositoryImpl implements PickupPointRepository {
     }
 
     @Override
-    public List<PickupPoint> findAll() {
+    public List<PickupPoint> findAllCreatedBetween(
+            final Instant createdFromInclusive,
+            final Instant createdToExclusive) {
         return this.repository.createCriteria(PickupPointEntity.class)
+                .ge("createdAt", createdFromInclusive)
+                .lt("createdAt", createdToExclusive)
                 .list()
                 .stream()
                 .map(this.persistenceMapper::toModel)

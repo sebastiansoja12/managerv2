@@ -1,6 +1,5 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.validator;
 
-import com.warehouse.shipment.application.service.PriceService;
 import com.warehouse.shipment.domain.vo.conf.ShipmentValidationRules;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;
@@ -12,12 +11,6 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
-
-    private final PriceService priceService;
-
-    public ShipmentRequestValidatorImpl(final PriceService priceService) {
-        this.priceService = priceService;
-    }
 
     private void validateRequest(final ShipmentCreateRequestApi request) {
         validateRequestObj(request);
@@ -53,10 +46,6 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
 
         if (request.customerReference() != null && StringUtils.isBlank(request.customerReference())) {
             errors.add("Customer reference cannot be blank");
-        }
-
-        if (validateShipmentPrice(request.price())) {
-            errors.add("Invalid price");
         }
 
         if (request.declaredValue() != null && validateShipmentPrice(request.declaredValue())) {

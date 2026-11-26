@@ -38,6 +38,7 @@ manager:
   kafka:
     topics:
       pallet-loaded: ${PALLET_LOADED_TOPIC:pallet.loaded}
+      delivery-events: ${DELIVERY_EVENTS_TOPIC:delivery.events}
 
 logging:
   level:

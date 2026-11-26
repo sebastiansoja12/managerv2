@@ -43,6 +43,14 @@ public class ShipmentDto {
 
     private final ShipmentDeliveryApi delivery;
 
+    private final Boolean incidentReported;
+
+    private final PalletTrackingNumberDto palletTrackingNumber;
+
+    private final PaymentStateDto paymentState;
+
+    private final PriceQuoteIdDto priceQuoteId;
+
 	public ShipmentDto(final ShipmentIdDto shipmentId, final PersonApi sender, final PersonApi recipient,
                        final ShipmentStatusDto shipmentStatus,
                        final ShipmentIdDto shipmentRelatedId, final ShipmentPriorityDto shipmentPriority,
@@ -52,10 +60,11 @@ public class ShipmentDto {
                        final DimensionsApi dimensions, final WeightApi weight,
                        final String customerReference, final String contentDescription,
                        final MoneyApi declaredValue, final PackagingTypeDto packagingType,
-                       final ShipmentServiceLevelDto serviceLevel) {
+                       final ShipmentServiceLevelDto serviceLevel, final PaymentStateDto paymentState,
+                       final PriceQuoteIdDto priceQuoteId) {
         this(shipmentId, sender, recipient, shipmentStatus, shipmentRelatedId, shipmentPriority, trackingNumber, price,
                 locked, createdAt, updatedAt, dimensions, weight, customerReference, contentDescription, declaredValue,
-                packagingType, serviceLevel, null);
+                packagingType, serviceLevel, null, false, null, paymentState, priceQuoteId);
     }
 
     public ShipmentDto(final ShipmentIdDto shipmentId, final PersonApi sender, final PersonApi recipient,
@@ -67,8 +76,12 @@ public class ShipmentDto {
                        final DimensionsApi dimensions, final WeightApi weight,
                        final String customerReference, final String contentDescription,
                        final MoneyApi declaredValue, final PackagingTypeDto packagingType,
-                       final ShipmentServiceLevelDto serviceLevel, final ShipmentDeliveryApi delivery) {
+                       final ShipmentServiceLevelDto serviceLevel, final ShipmentDeliveryApi delivery,
+                       final Boolean incidentReported, final PalletTrackingNumberDto palletTrackingNumber,
+                       final PaymentStateDto paymentState, final PriceQuoteIdDto priceQuoteId) {
         this.delivery = delivery;
+        this.incidentReported = incidentReported;
+        this.palletTrackingNumber = palletTrackingNumber;
         this.shipmentId = shipmentId;
         this.sender = sender;
 		this.recipient = recipient;
@@ -87,6 +100,8 @@ public class ShipmentDto {
         this.customerReference = customerReference;
         this.contentDescription = contentDescription;
         this.declaredValue = declaredValue;
+        this.paymentState = paymentState;
+        this.priceQuoteId = priceQuoteId;
     }
 
     public ShipmentIdDto getShipmentId() {
@@ -163,5 +178,21 @@ public class ShipmentDto {
 
     public ShipmentDeliveryApi getDelivery() {
         return delivery;
+    }
+
+    public Boolean getIncidentReported() {
+        return incidentReported;
+    }
+
+    public PalletTrackingNumberDto getPalletTrackingNumber() {
+        return palletTrackingNumber;
+    }
+
+    public PaymentStateDto getPaymentState() {
+        return paymentState;
+    }
+
+    public PriceQuoteIdDto getPriceQuoteId() {
+        return priceQuoteId;
     }
 }

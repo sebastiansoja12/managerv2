@@ -2,6 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.primary;
 
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
+import com.warehouse.commonassets.identificator.PriceQuoteId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
@@ -13,7 +14,9 @@ import com.warehouse.shipment.infrastructure.ShipmentApiService;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentApiServiceMapper;
 import com.warehouse.shipment.infrastructure.dto.*;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class ShipmentApiServiceAdapter implements ShipmentApiService {
@@ -33,6 +36,11 @@ public class ShipmentApiServiceAdapter implements ShipmentApiService {
     @Override
     public ShipmentDetailsDto getShipment(final ShipmentId shipmentId) {
         return mapper.map(shipmentPort.loadShipment(shipmentId));
+    }
+
+    @Override
+    public Map<ShipmentId, String> findRecipientPostalCodes(final Collection<ShipmentId> shipmentIds) {
+        return shipmentPort.loadRecipientPostalCodes(shipmentIds);
     }
 
     @Override
@@ -86,6 +94,18 @@ public class ShipmentApiServiceAdapter implements ShipmentApiService {
         return shipmentPort.findOperator(trackingNumber)
                 .map(operatorId -> operatorContext.runAs(operatorId,
                         () -> mapper.map(shipmentPort.loadShipmentForReroute(trackingNumber))));
+    }
+
+    @Override
+    public Optional<ShipmentPaymentReferenceDto> findPaymentReference(final TrackingNumber trackingNumber) {
+        return shipmentPort.findOperator(trackingNumber)
+                .map(operatorId -> operatorContext.runAs(operatorId,
+                        () -> mapper.mapPaymentReference(operatorId, shipmentPort.loadShipment(trackingNumber))));
+    }
+
+    @Override
+    public Optional<ShipmentBillingPartyDto> findBillingParty(final PriceQuoteId priceQuoteId) {
+        return shipmentPort.findByPriceQuote(priceQuoteId).map(mapper::mapBillingParty);
     }
 
     @Override

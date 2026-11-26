@@ -425,7 +425,7 @@ public final class OperatorTestFixtures {
                 ),
                 new ShipmentDeliveryConfigurationDto(false, ProofOfDeliveryModeDto.SIGNATURE, 2, false, false, true),
                 new ShipmentReturnConfigurationDto(true, 14, true, 7, false),
-                new ShipmentPaymentConfigurationDto(true, 5000.0, CashOnDeliveryPaymentMethodDto.BOTH, 0.0),
+                new ShipmentPaymentConfigurationDto(true, 5000.0, CashOnDeliveryPaymentMethodDto.BOTH, 0.0, 72, false),
                 new ShipmentSlaConfigurationDto(96, 48, 24, 24, true, false),
                 new ShipmentDataRetentionConfigurationDto(365, 90, 180)
         );

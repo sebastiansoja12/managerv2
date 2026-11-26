@@ -9,6 +9,8 @@ import com.warehouse.logisticsdelivery.domain.vo.RecipientAddress;
 import com.warehouse.shipment.infrastructure.ShipmentApiService;
 import com.warehouse.shipment.infrastructure.dto.ShipmentDetailsDto;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 
 public class ShipmentServiceAdapter implements ShipmentServicePort {
@@ -37,6 +39,11 @@ public class ShipmentServiceAdapter implements ShipmentServicePort {
         return Optional.ofNullable(this.shipmentApiService.getShipment(shipmentId))
                 .map(shipment -> new RecipientAddress(shipment.recipientCity(), shipment.recipientStreet(),
                         shipment.recipientPostalCode(), shipment.recipientCountryCode()));
+    }
+
+    @Override
+    public Map<ShipmentId, String> findRecipientPostalCodes(final Collection<ShipmentId> shipmentIds) {
+        return shipmentIds.isEmpty() ? Map.of() : this.shipmentApiService.findRecipientPostalCodes(shipmentIds);
     }
 
     @Override

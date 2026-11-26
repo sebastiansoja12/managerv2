@@ -24,4 +24,8 @@ public interface SupplierConfigurationPort {
     SupplierConfigurationPolicy updatePolicy(final UpdateSupplierConfigurationPolicyCommand command);
     Optional<SupplierConfigurationResult> findEffectiveBySupplierId(final SupplierId supplierId);
     Optional<SupplierConfigurationResult> findEffectiveByUserId(final UserId userId);
+
+    void releaseSubstitute(final SupplierId substituteSupplierId, final UserId changedBy);
+
+    void removeConfiguration(final SupplierId supplierId, final UserId changedBy);
 }

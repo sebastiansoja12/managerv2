@@ -5,7 +5,7 @@ import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.deliverynetwork.application.exception.ShipmentDestinationDepartmentNotAssignedException;
 import com.warehouse.deliverynetwork.application.exception.ShipmentOriginDepartmentNotAssignedException;

@@ -1,5 +1,9 @@
 package com.warehouse.auth.infrastructure.adapter.primary;
 
+import java.time.Clock;
+import java.time.Duration;
+import com.warehouse.auth.domain.service.LoginThrottle;
+import com.warehouse.commonassets.security.InMemoryAttemptLimiter;
 import com.warehouse.auth.configuration.AuthCookieService;
 import com.warehouse.auth.configuration.AuthProperties;
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
@@ -47,7 +51,10 @@ class PlatformOwnerAuthenticationControllerTest {
         jwtProvider.setExpiration(60_000L);
         jwtProvider.setRefreshTokenExpiration(120_000L);
         final PlatformOwnerAuthenticationController controller = new PlatformOwnerAuthenticationController(
-                platformOwnerAuthenticationPort, new AuthCookieService(new AuthProperties(), jwtProvider));
+                platformOwnerAuthenticationPort, new AuthCookieService(new AuthProperties(), jwtProvider),
+                new LoginThrottle(
+                    new InMemoryAttemptLimiter(2, Duration.ofMinutes(15), Clock.systemUTC()),
+                    new InMemoryAttemptLimiter(100, Duration.ofMinutes(15), Clock.systemUTC())));
         mockMvc = standaloneSetup(controller)
                 .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
                 .build();
@@ -73,6 +80,20 @@ class PlatformOwnerAuthenticationControllerTest {
                 .anyMatch(cookie -> cookie.startsWith("PLATFORM-AUTH-TOKEN=access-token"))
                 .anyMatch(cookie -> cookie.startsWith("PLATFORM-REFRESH-TOKEN=refresh-token")
                         && cookie.contains("Path=/v1/api/platform/auth"));
+    }
+
+    @Test
+    void shouldRejectLoginAfterTooManyFailedAttempts() throws Exception {
+        when(platformOwnerAuthenticationPort.login(new LoginRequest("owner", "bad")))
+                .thenThrow(new AuthenticationErrorException("Invalid username or password"));
+        final String body = "{\"username\":\"owner\",\"password\":\"bad\"}";
+
+        mockMvc.perform(post("/platform/auth/login").contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(post("/platform/auth/login").contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(post("/platform/auth/login").contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isTooManyRequests());
     }
 
     @Test

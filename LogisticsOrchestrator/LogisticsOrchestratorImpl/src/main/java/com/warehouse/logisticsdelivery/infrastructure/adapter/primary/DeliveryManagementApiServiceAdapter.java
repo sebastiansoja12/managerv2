@@ -128,6 +128,7 @@ public class DeliveryManagementApiServiceAdapter implements DeliveryManagementAp
                 response.lifecycleStatus(),
                 departmentId(response.originDepartmentId()),
                 departmentId(response.destinationDepartmentId()),
+                departmentId(response.currentDepartmentId()),
                 response.pickupMethod(),
                 response.method(),
                 response.pickupPointId(),

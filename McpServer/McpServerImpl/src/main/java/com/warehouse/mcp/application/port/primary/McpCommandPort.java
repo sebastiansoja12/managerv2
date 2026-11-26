@@ -10,6 +10,7 @@ import com.warehouse.mcp.application.port.primary.result.DeliveryOverview;
 import com.warehouse.mcp.application.port.primary.result.ShipmentOverview;
 import com.warehouse.mcp.domain.vo.ConfigurationSection;
 import com.warehouse.mcp.domain.vo.CourierChange;
+import com.warehouse.mcp.domain.vo.CourierDeliveryArea;
 import com.warehouse.mcp.domain.vo.CourierDraft;
 import com.warehouse.mcp.domain.vo.DeliveryConditions;
 import com.warehouse.mcp.domain.vo.DeliveryRouteChange;
@@ -18,6 +19,7 @@ import com.warehouse.mcp.domain.vo.DepartmentDetails;
 import com.warehouse.mcp.domain.vo.PartyRole;
 import com.warehouse.mcp.domain.vo.ShipmentDraft;
 import com.warehouse.mcp.domain.vo.ShipmentPartyChange;
+import com.warehouse.mcp.domain.vo.VehicleDraft;
 
 import java.util.Map;
 
@@ -44,5 +46,8 @@ public interface McpCommandPort {
     SupplierCode createCourier(final CourierDraft courier);
     void updateCourier(final CourierChange change);
     void changeCourierActive(final SupplierCode courierCode, final boolean active);
+    VehicleId createVehicle(final VehicleDraft vehicle);
+    void assignCourierVehicle(final SupplierCode courierCode, final VehicleId vehicleId);
+    void changeCourierDeliveryArea(final SupplierCode courierCode, final CourierDeliveryArea deliveryArea);
     ConfigurationView updateConfiguration(final ConfigurationSection section, final Map<String, Object> changes);
 }

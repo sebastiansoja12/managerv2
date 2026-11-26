@@ -75,6 +75,10 @@ public class SupplierConfiguration {
         return apply(normalize(policy.applyTo(SupplierConfigurationValues.defaults())), changedBy, timestamp);
     }
 
+    public List<SupplierConfigurationChange> releaseSubstitute(final UserId changedBy, final Instant timestamp) {
+        return apply(values.withSubstitute(null), changedBy, timestamp);
+    }
+
     public SupplierConfigurationValues effectiveValues(final SupplierConfigurationPolicy policy) {
         return normalize(policy.applyTo(values));
     }

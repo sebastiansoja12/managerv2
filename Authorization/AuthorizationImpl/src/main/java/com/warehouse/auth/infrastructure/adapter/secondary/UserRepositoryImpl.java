@@ -11,6 +11,8 @@ import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.repository.NoOperatorContextRepository;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
+import com.warehouse.commonassets.security.CredentialCipher;
+import java.util.Objects;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,12 +22,15 @@ import java.util.Optional;
 public class UserRepositoryImpl implements UserRepository {
 
     private final OperatorFilteredRepository<UserEntity> repository;
+    private final CredentialCipher credentialCipher;
 
     private final NoOperatorContextRepository<UserEntity> noOperatorContextRepository;
 
     public UserRepositoryImpl(final OperatorFilteredRepository<UserEntity> repository,
-                              final NoOperatorContextRepository<UserEntity> noOperatorContextRepository) {
+                              final NoOperatorContextRepository<UserEntity> noOperatorContextRepository,
+                              final CredentialCipher credentialCipher) {
         this.repository = repository;
+        this.credentialCipher = credentialCipher;
         this.noOperatorContextRepository = noOperatorContextRepository;
     }
 
@@ -33,12 +38,35 @@ public class UserRepositoryImpl implements UserRepository {
     public void createOrUpdate(final OrganizationUser user) {
         final UserEntity userEntity = UserToEntityMapper.map(user);
 
-        if (findById(user.getUserId()) == null) {
+        final Optional<UserEntity> stored = findEntityById(user.getUserId());
+        if (stored.isEmpty()) {
             repository.create(userEntity);
         } else {
+            final UserEntity previous = stored.orElseThrow();
+            if (userEntity.getApiKey() != null && Objects.equals(previous.getApiKey(), userEntity.getApiKey())
+                    && !Boolean.TRUE.equals(userEntity.getDeleted())) {
+                userEntity.setEncryptedApiKey(previous.getEncryptedApiKey());
+            }
             repository.update(userEntity);
         }
 
+    }
+
+    @Override
+    public void saveApiKey(final OrganizationUser user, final String secret) {
+        final UserEntity entity = UserToEntityMapper.map(user);
+        entity.setEncryptedApiKey(this.credentialCipher.encrypt(secret));
+        this.repository.update(entity);
+    }
+
+    @Override
+    public Optional<String> findApiKeySecret(final UserId userId) {
+        return findEntityById(userId).filter(entity -> entity.getApiKey() != null && !Boolean.TRUE.equals(entity.getDeleted()))
+                .map(UserEntity::getEncryptedApiKey).map(this.credentialCipher::decrypt);
+    }
+
+    private Optional<UserEntity> findEntityById(final UserId userId) {
+        return this.repository.createCriteria(UserEntity.class).eq("userId.value", userId.value()).one();
     }
 
     @Override
@@ -54,6 +82,15 @@ public class UserRepositoryImpl implements UserRepository {
     public Optional<OrganizationUser> findByApiKeyHash(final String apiKeyHash) {
         return noOperatorContextRepository.createCriteria(UserEntity.class)
                 .eq("apiKey", apiKeyHash)
+                .one()
+                .map(UserToModelMapper::map);
+    }
+
+    @Override
+    public Optional<OrganizationUser> findByIdInOperator(final UserId userId, final OperatorId operatorId) {
+        return noOperatorContextRepository.createCriteria(UserEntity.class)
+                .eq("userId.value", userId.value())
+                .eq("operatorId.value", operatorId.value())
                 .one()
                 .map(UserToModelMapper::map);
     }

@@ -1,9 +1,10 @@
 package com.warehouse.supplier.infrastructure.adapter.secondary;
 
-import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.mail.api.event.SupplierDriverLicenseInvalidatedIntegrationEvent;
 import com.warehouse.supplier.domain.model.Supplier;
-import com.warehouse.supplier.domain.port.secondary.MailServicePort;
+import com.warehouse.supplier.infrastructure.adapter.secondary.mapper.OutputRequestMapper;
+import com.warehouse.supplier.application.port.secondary.MailServicePort;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -24,10 +25,8 @@ public class MailServiceAdapter implements MailServicePort {
             log.warn("Supplier {} has no email, skipping driver license notification", supplier.supplierCode().value());
             return;
         }
-        this.integrationEventPublisher.publish(new SupplierDriverLicenseInvalidatedIntegrationEvent(
-                supplier.supplierCode(),
-                supplier.getEmail(),
-                supplier.getFirstName(),
-                Instant.now()));
+        final SupplierDriverLicenseInvalidatedIntegrationEvent event =
+                OutputRequestMapper.map(supplier, Instant.now());
+        this.integrationEventPublisher.publish(event);
     }
 }

@@ -70,6 +70,7 @@ public class ReturnProcessingPortImpl implements ReturnProcessingPort {
                             || !returnConsumedEventServicePort.tryConsume(command.eventId())) {
                         return;
                     }
+                    applyMissingReturn(command.shipmentId(), command.returnShipmentId());
                     completeShipmentReturn(command.shipmentId(), command.returnShipmentId());
                 }));
     }
@@ -86,6 +87,14 @@ public class ReturnProcessingPortImpl implements ReturnProcessingPort {
 
     private boolean alreadyReturned(final ShipmentId shipmentId) {
         return shipmentServicePort.getShipment(shipmentId).status() == ShipmentStatus.RETURN;
+    }
+
+    private void applyMissingReturn(final ShipmentId shipmentId, final ShipmentId returnShipmentId) {
+        // return.processing.started and return.completed use separate topics, so completion may arrive first
+        if (returnShipmentId == null || !shipmentServicePort.getShipment(shipmentId).isReturnable()) {
+            return;
+        }
+        shipmentServicePort.markReturned(shipmentId, returnShipmentId);
     }
 
     private void completeShipmentReturn(final ShipmentId shipmentId, final ShipmentId returnShipmentId) {

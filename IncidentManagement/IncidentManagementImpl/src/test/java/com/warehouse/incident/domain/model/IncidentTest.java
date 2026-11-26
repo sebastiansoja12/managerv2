@@ -88,11 +88,26 @@ class IncidentTest {
     }
 
     @Test
+    void shouldRejectReportingIncidentForLostShipment() {
+        assertThatThrownBy(() -> Incident.report(new IncidentShipment(new ShipmentId(10L), new TrackingNumber("KT1"), true),
+                null, IncidentCategory.DAMAGED, IncidentSeverity.LOW, null, REPORTER, NOW))
+                .isInstanceOf(IncidentException.class).hasFieldOrPropertyWithValue("reason", CONFLICT);
+    }
+
+    @Test
+    void shouldRequireNoteWhenWritingOffShipment() {
+        final Incident incident = incident(IncidentCategory.MISSING, null);
+
+        assertThatThrownBy(() -> incident.resolve(HANDLER, IncidentResolution.WRITTEN_OFF, " ", NOW))
+                .isInstanceOf(IncidentException.class).hasFieldOrPropertyWithValue("reason", INVALID_REQUEST);
+    }
+
+    @Test
     void shouldRejectResolvingResolvedIncident() {
         final Incident incident = incident(IncidentCategory.DAMAGED, null);
-        incident.resolve(HANDLER, IncidentResolution.EXPLAINED, null, NOW);
+        incident.resolve(HANDLER, IncidentResolution.FOUND, null, NOW);
 
-        assertThatThrownBy(() -> incident.resolve(HANDLER, IncidentResolution.EXPLAINED, null, NOW))
+        assertThatThrownBy(() -> incident.resolve(HANDLER, IncidentResolution.FOUND, null, NOW))
                 .isInstanceOf(IncidentException.class).hasFieldOrPropertyWithValue("reason", CONFLICT);
     }
 
@@ -100,7 +115,7 @@ class IncidentTest {
     void shouldReopenResolvedIncidentBackToAssignee() {
         final Incident incident = incident(IncidentCategory.DAMAGED, null);
         incident.assign(HANDLER, NOW);
-        incident.resolve(HANDLER, IncidentResolution.EXPLAINED, null, NOW);
+        incident.resolve(HANDLER, IncidentResolution.FOUND, null, NOW);
 
         incident.reopen(REPORTER, "Still damaged", NOW.plusSeconds(60));
 

@@ -58,5 +58,10 @@
             <artifactId>SupplierServiceManagementApi</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.transport</groupId>
+            <artifactId>DriverHubApi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>

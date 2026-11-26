@@ -18,6 +18,26 @@ public class JwtProvider {
     @NotNull
     private String refreshTokenExpiration;
 
+    private String issuer = "manager-v2";
+
+    private String audience = "manager-v2-gui";
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(final String issuer) {
+        this.issuer = issuer;
+    }
+
+    public String getAudience() {
+        return audience;
+    }
+
+    public void setAudience(final String audience) {
+        this.audience = audience;
+    }
+
     public Long getExpiration() {
         return expiration;
     }

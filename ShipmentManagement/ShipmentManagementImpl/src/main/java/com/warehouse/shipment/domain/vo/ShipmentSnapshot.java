@@ -5,11 +5,14 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.identificator.BillingCustomerId;
 import com.warehouse.commonassets.identificator.ExternalId;
+import com.warehouse.commonassets.identificator.PriceQuoteId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
+import com.warehouse.shipment.domain.enumeration.PaymentState;
 import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
 
@@ -38,5 +41,8 @@ public record ShipmentSnapshot(ShipmentId shipmentId,
                                Money declaredValue,
                                ShipmentServiceLevel serviceLevel,
                                PackagingType packagingType,
-                               ShipmentSource source) {
+                               ShipmentSource source,
+                               PaymentState paymentState,
+                               PriceQuoteId priceQuoteId,
+                               BillingCustomerId billingCustomerId) {
 }

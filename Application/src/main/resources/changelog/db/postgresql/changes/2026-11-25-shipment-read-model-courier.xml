@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-25-shipment-read-model-courier" author="s-soja">
+        <addColumn tableName="shipment_rd">
+            <column name="courier_code" type="VARCHAR(64)"/>
+            <column name="courier_name" type="VARCHAR(255)"/>
+        </addColumn>
+        <sql>
+            UPDATE shipment_rd rd
+            SET courier_code = s.supplier_code,
+                courier_name = TRIM(CONCAT(s.first_name, ' ', s.last_name))
+            FROM (SELECT DISTINCT ON (target_id) target_id, supplier_id
+                  FROM delivery
+                  WHERE target_type = 'SHIPMENT' AND delivery_type = 'OUTBOUND' AND status &lt;&gt; 'CANCELED'
+                  ORDER BY target_id, created DESC) current_delivery
+            JOIN suppliers s ON s.supplier_id = current_delivery.supplier_id
+            WHERE CAST(rd.shipment_id AS VARCHAR(255)) = current_delivery.target_id
+        </sql>
+    </changeSet>
+</databaseChangeLog>

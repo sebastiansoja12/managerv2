@@ -7,19 +7,12 @@ import com.warehouse.organisationstructure.department.api.dto.DepartmentStatusDt
 import com.warehouse.organisationstructure.department.api.event.DepartmentStatusChangedIntegrationEvent;
 import com.warehouse.organisationstructure.department.api.event.DepartmentUserChangedIntegrationEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.annotation.KafkaHandler;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventListener;
 
 @Slf4j
 @Component
-@KafkaListener(
-        topics = {
-                "${manager.kafka.topics.department-user-events:department.user.events}",
-                "${manager.kafka.topics.department-status-events:department.status.events}"
-        },
-        groupId = "${manager.kafka.consumer-groups.department-user-events:${spring.application.name}-auth-department-users}"
-)
 public class DepartmentUserEventKafkaListener {
 
     private final UserPort userPort;
@@ -28,7 +21,7 @@ public class DepartmentUserEventKafkaListener {
         this.userPort = userPort;
     }
 
-    @KafkaHandler
+    @IntegrationEventListener(group = "manager-auth-department-users")
     public void handle(final DepartmentUserChangedIntegrationEvent event) {
         final DepartmentCode departmentCode = new DepartmentCode(event.departmentCode().value());
         final UserDepartmentUpdateRequest request = new UserDepartmentUpdateRequest(
@@ -41,7 +34,7 @@ public class DepartmentUserEventKafkaListener {
         log.info("Department user updated for department {}", departmentCode.getValue());
     }
 
-    @KafkaHandler
+    @IntegrationEventListener(group = "manager-auth-department-users")
     public void handle(final DepartmentStatusChangedIntegrationEvent event) {
         if (event.status() == DepartmentStatusDto.DELETED) {
             final DepartmentCode departmentCode = new DepartmentCode(event.departmentCode().value());

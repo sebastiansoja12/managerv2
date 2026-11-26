@@ -3,6 +3,7 @@ package com.warehouse.driverhub.infrastructure.adapter.primary.mapper;
 import com.warehouse.commonassets.identificator.TaxId;
 import com.warehouse.driverhub.api.dto.CarrierDriverDto;
 import com.warehouse.driverhub.api.dto.CarrierDto;
+import com.warehouse.driverhub.api.dto.CarrierVehicleCreateDto;
 import com.warehouse.driverhub.api.dto.CarrierVehicleDto;
 import com.warehouse.driverhub.application.port.primary.command.CarrierCommand;
 import com.warehouse.driverhub.application.port.primary.command.DriverCommand;
@@ -64,6 +65,12 @@ public final class CarrierApiMapper {
         return new VehicleCommand(request.registrationNumber(), request.brand(), request.model(),
                 vehicleType(request.vehicleType()),
                 request.trailerRegistrationNumber(), request.maxLoadKg());
+    }
+
+    public static VehicleCommand map(final CarrierVehicleCreateDto vehicle) {
+        requireBody(vehicle);
+        return new VehicleCommand(vehicle.registrationNumber(), vehicle.brand(), vehicle.model(),
+                vehicleType(vehicle.vehicleType()), null, vehicle.maxLoadKg());
     }
 
     public static String value(final FieldValueRequestApi request) {

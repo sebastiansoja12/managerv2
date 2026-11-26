@@ -15,6 +15,8 @@ import com.warehouse.organisationstructure.department.api.dto.DepartmentAddressD
 
 public interface DepartmentApiService {
     List<DepartmentDto> getAllDepartments();
+
+    int archiveInactiveDepartments();
     List<DepartmentDirectoryEntryDto> getDepartmentDirectory();
     DepartmentDto getDepartmentByCode(final DepartmentCode departmentCode);
     DepartmentDto getDepartmentById(final DepartmentId departmentId);

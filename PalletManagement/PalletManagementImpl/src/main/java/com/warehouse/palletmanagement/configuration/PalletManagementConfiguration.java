@@ -1,6 +1,6 @@
 package com.warehouse.palletmanagement.configuration;
 
-import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.IntegrationEventPublisher;
 import org.springframework.beans.factory.annotation.Qualifier;
 import com.warehouse.palletmanagement.application.service.PalletDocumentService;
 import com.warehouse.palletmanagement.application.service.PalletGrossWeightService;
@@ -24,7 +24,7 @@ import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import org.springframework.beans.factory.annotation.Value;
 import java.time.ZoneId;
 import tools.jackson.databind.ObjectMapper;
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.commonassets.resilience.CircuitBreakerExecutor;
 import com.warehouse.palletmanagement.api.PalletApiService;
@@ -62,9 +62,10 @@ public class PalletManagementConfiguration {
                                  final CarrierServicePort palletCarrierServicePort,
                                  final PalletTransportService palletTransportService,
                                  final PalletGrossWeightService palletGrossWeightService,
-                                 final PalletDocumentService palletDocumentService) {
+                                 final PalletDocumentService palletDocumentService,
+                                 final DomainEventPublisher domainEventPublisher) {
         return new PalletPortImpl(palletHandlingManagerServicePort, palletShipmentServicePort, palletCarrierServicePort,
-                palletTransportService, palletGrossWeightService, palletDocumentService);
+                palletTransportService, palletGrossWeightService, palletDocumentService, domainEventPublisher);
     }
 
     @Bean
@@ -94,7 +95,7 @@ public class PalletManagementConfiguration {
 
     @Bean("palletAuditLogServicePort")
     @ConditionalOnProperty(
-            name = {"manager.kafka.integration-events.enabled", "manager.kafka.outbox.enabled"},
+            name = "manager.events.outbox.enabled",
             havingValue = "true")
     public AuditLogServicePort palletAuditLogServicePort(
             final IntegrationEventPublisher integrationEventPublisher) {

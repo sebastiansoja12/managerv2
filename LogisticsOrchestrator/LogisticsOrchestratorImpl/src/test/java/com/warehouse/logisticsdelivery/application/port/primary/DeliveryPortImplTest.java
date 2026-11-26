@@ -4,8 +4,8 @@ import com.warehouse.logisticsdelivery.application.service.DestinationCapacityAl
 import com.warehouse.logisticsdelivery.domain.service.DepartmentCapacityBalancer;
 import java.time.Clock;
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
-import com.warehouse.commonassets.event.domain.model.DomainEvent;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.domain.model.DomainEvent;
 import com.warehouse.commonassets.identificator.DeliveryId;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.PalletId;
@@ -19,6 +19,7 @@ import com.warehouse.logisticsdelivery.application.port.primary.command.Register
 import com.warehouse.logisticsdelivery.application.port.primary.command.CompleteDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDerivedDeliveryCommand;
+import com.warehouse.logisticsdelivery.application.port.primary.command.ChangePalletDeliveryRouteCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreatePalletDeliveryCommand;
 import com.warehouse.logisticsdelivery.domain.model.DeliveryStep;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryCommentCode;
@@ -31,6 +32,12 @@ import com.warehouse.logisticsdelivery.application.port.secondary.DestinationDep
 import com.warehouse.logisticsdelivery.application.port.secondary.ShipmentServicePort;
 import com.warehouse.logisticsdelivery.application.port.secondary.SignatureRepository;
 import com.warehouse.logisticsdelivery.application.port.secondary.SourceShipment;
+import com.warehouse.logisticsdelivery.application.service.DeliveryChangeService;
+import com.warehouse.logisticsdelivery.application.service.DeliveryCompletionService;
+import com.warehouse.logisticsdelivery.application.service.DeliveryDestinationResolver;
+import com.warehouse.logisticsdelivery.application.service.DeliveryFinder;
+import com.warehouse.logisticsdelivery.application.service.DeliveryRelationResolver;
+import com.warehouse.logisticsdelivery.application.service.PalletDeliveryService;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryDerivationType;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryLifecycleStatus;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryMethod;
@@ -46,7 +53,6 @@ import com.warehouse.logisticsdelivery.domain.exception.DeliveryAlreadyExistsExc
 import com.warehouse.logisticsdelivery.domain.exception.DeliveryModificationException;
 import com.warehouse.logisticsdelivery.domain.exception.DeliveryNotFoundException;
 import com.warehouse.logisticsdelivery.domain.exception.DestinationDepartmentNotResolvedException;
-import com.warehouse.logisticsdelivery.domain.exception.SourceShipmentNotFoundException;
 import com.warehouse.logisticsdelivery.domain.model.Delivery;
 import com.warehouse.logisticsdelivery.domain.model.Signature;
 import com.warehouse.logisticsdelivery.domain.vo.DeliverySnapshot;
@@ -93,10 +99,21 @@ class DeliveryPortImplTest {
         this.operatorContextProvider = mock(OperatorContextProvider.class);
         this.signatureRepository = mock(SignatureRepository.class);
         this.destinationDepartmentResolverPort = mock(DestinationDepartmentResolverPort.class);
+        final DeliveryFinder deliveryFinder = new DeliveryFinder(this.deliveryRepository);
+        final DeliveryChangeService deliveryChangeService = new DeliveryChangeService(this.deliveryRepository,
+                this.domainEventPublisher);
+        final DeliveryDestinationResolver deliveryDestinationResolver = new DeliveryDestinationResolver(
+                this.shipmentServicePort, this.destinationDepartmentResolverPort,
+                new DestinationCapacityAllocator(this.deliveryRepository, List::of, new DepartmentCapacityBalancer(),
+                        Clock.systemDefaultZone()));
         this.deliveryPort = new DeliveryPortImpl(this.deliveryRepository, this.shipmentServicePort,
-                this.domainEventPublisher, this.operatorContextProvider, this.signatureRepository,
-                this.destinationDepartmentResolverPort, new DestinationCapacityAllocator(this.deliveryRepository,
-                        List::of, new DepartmentCapacityBalancer(), Clock.systemDefaultZone()));
+                this.operatorContextProvider, this.signatureRepository, deliveryFinder, deliveryChangeService,
+                deliveryDestinationResolver, new DeliveryRelationResolver(this.deliveryRepository,
+                        this.shipmentServicePort),
+                new DeliveryCompletionService(this.operatorContextProvider, this.shipmentServicePort,
+                        this.signatureRepository, deliveryChangeService),
+                new PalletDeliveryService(this.deliveryRepository, this.shipmentServicePort, deliveryFinder,
+                        deliveryChangeService));
     }
 
     @Test
@@ -262,15 +279,27 @@ class DeliveryPortImplTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenSourceShipmentDoesNotExist() {
+    void shouldSkipDerivedDeliveryWhenShipmentIsNotLinkedToSourceShipmentYet() {
         when(this.deliveryRepository.findCurrentByTargetAndType(any(DeliveryTarget.class), any(DeliveryType.class)))
                 .thenReturn(Optional.empty());
         when(this.shipmentServicePort.findSourceShipment(new ShipmentId(11L))).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> this.deliveryPort.createDerivedDelivery(new CreateDerivedDeliveryCommand(
-                new ShipmentId(11L), false, USER_ID))).isInstanceOf(SourceShipmentNotFoundException.class);
+        this.deliveryPort.createDerivedDelivery(new CreateDerivedDeliveryCommand(new ShipmentId(11L), false, USER_ID));
+
         verify(this.deliveryRepository, never()).createOrUpdate(any());
         verifyNoInteractions(this.domainEventPublisher);
+    }
+
+    @Test
+    void shouldSkipDerivedDeliveryWhenDeliveryAlreadyExists() {
+        final ShipmentId shipmentId = new ShipmentId(11L);
+        when(this.deliveryRepository.findCurrentByTargetAndType(DeliveryTarget.shipment(shipmentId), DeliveryType.OUTBOUND))
+                .thenReturn(Optional.of(shipmentDelivery(shipmentId)));
+
+        this.deliveryPort.createDerivedDelivery(new CreateDerivedDeliveryCommand(shipmentId, false, USER_ID));
+
+        verify(this.deliveryRepository, never()).createOrUpdate(any());
+        verifyNoInteractions(this.shipmentServicePort, this.domainEventPublisher);
     }
 
     @Test
@@ -291,9 +320,9 @@ class DeliveryPortImplTest {
         final Delivery shipmentDelivery = courierShipmentDelivery(new ShipmentId(10L));
         when(this.deliveryRepository.findCurrentByTargetAndType(DeliveryTarget.pallet("pallet-1"), DeliveryType.OUTBOUND))
                 .thenReturn(Optional.empty());
-        when(this.deliveryRepository.findCurrentByTargetAndType(DeliveryTarget.shipment(new ShipmentId(10L)),
+        when(this.deliveryRepository.findActiveByTargetAndType(DeliveryTarget.shipment(new ShipmentId(10L)),
                 DeliveryType.OUTBOUND)).thenReturn(Optional.of(shipmentDelivery));
-        when(this.deliveryRepository.findCurrentByTargetAndType(DeliveryTarget.shipment(new ShipmentId(11L)),
+        when(this.deliveryRepository.findActiveByTargetAndType(DeliveryTarget.shipment(new ShipmentId(11L)),
                 DeliveryType.OUTBOUND)).thenReturn(Optional.empty());
 
         this.deliveryPort.createPalletDelivery(new CreatePalletDeliveryCommand("pallet-1",
@@ -385,7 +414,7 @@ class DeliveryPortImplTest {
     }
 
     @Test
-    void shouldCompletePalletDeliveryAndContinueShipmentDeliveriesFromUnloadDepartment() {
+    void shouldCompletePalletDeliveryAndContinueShipmentDeliveriesKeepingOrigin() {
         final DepartmentId unloadDepartmentId = new DepartmentId(8L);
         final Delivery palletDelivery = Delivery.forPallet(DeliveryTarget.pallet("pallet-1"), ORIGIN_DEPARTMENT_ID,
                 unloadDepartmentId, USER_ID);
@@ -406,10 +435,12 @@ class DeliveryPortImplTest {
         final Delivery continuation = saved.getAllValues().get(1);
         assertThat(palletDelivery.getStatus()).isEqualTo(DeliveryLifecycleStatus.COMPLETED);
         assertThat(continuation.isActive()).isTrue();
-        assertThat(continuation.getOriginDepartmentId()).isEqualTo(unloadDepartmentId);
+        assertThat(continuation.getOriginDepartmentId()).isEqualTo(ORIGIN_DEPARTMENT_ID);
         assertThat(continuation.getDestinationDepartmentId()).isEqualTo(DESTINATION_DEPARTMENT_ID);
         assertThat(continuation.getDeliverySteps().getLast().commentCode())
                 .isEqualTo(DeliveryCommentCode.UNLOADED_FROM_PALLET);
+        assertThat(continuation.getDeliverySteps().getLast().snapshot().departmentId())
+                .isEqualTo(unloadDepartmentId);
         assertThat(publishedEvent(DeliveryCompleted.class).getSnapshot().deliveryId())
                 .isEqualTo(palletDelivery.getDeliveryId());
         assertThat(publishedEvent(DeliveryCreated.class).getSnapshot().deliveryId())
@@ -461,6 +492,37 @@ class DeliveryPortImplTest {
 
         this.deliveryPort.unloadPalletDelivery(new UnloadPalletDeliveryCommand(new PalletId("pallet-1"),
                 List.of(new ShipmentId(10L)), DESTINATION_DEPARTMENT_ID, USER_ID));
+
+        verify(this.deliveryRepository, never()).createOrUpdate(any());
+        verifyNoInteractions(this.domainEventPublisher);
+    }
+
+    @Test
+    void shouldChangePalletDeliveryRouteWhenPalletDepartmentsAreChanged() {
+        final Delivery palletDelivery = Delivery.forPallet(DeliveryTarget.pallet("pallet-1"), ORIGIN_DEPARTMENT_ID,
+                DESTINATION_DEPARTMENT_ID, USER_ID);
+        when(this.deliveryRepository.findCurrentByTargetAndType(DeliveryTarget.pallet("pallet-1"), DeliveryType.OUTBOUND))
+                .thenReturn(Optional.of(palletDelivery));
+
+        this.deliveryPort.changePalletDeliveryRoute(new ChangePalletDeliveryRouteCommand(new PalletId("pallet-1"),
+                new DepartmentId(8L), new DepartmentId(9L)));
+
+        verify(this.deliveryRepository).createOrUpdate(palletDelivery);
+        assertThat(palletDelivery.getOriginDepartmentId()).isEqualTo(new DepartmentId(8L));
+        assertThat(palletDelivery.getDestinationDepartmentId()).isEqualTo(new DepartmentId(9L));
+        assertThat(publishedEvent(DeliveryModified.class).getSnapshot().deliveryId())
+                .isEqualTo(palletDelivery.getDeliveryId());
+    }
+
+    @Test
+    void shouldIgnoreRouteChangeWhenPalletDeliveryIsAlreadyCanceled() {
+        final Delivery palletDelivery = Delivery.forPallet(DeliveryTarget.pallet("pallet-1"), null, null, USER_ID);
+        palletDelivery.markAsCanceled();
+        when(this.deliveryRepository.findCurrentByTargetAndType(DeliveryTarget.pallet("pallet-1"), DeliveryType.OUTBOUND))
+                .thenReturn(Optional.of(palletDelivery));
+
+        this.deliveryPort.changePalletDeliveryRoute(new ChangePalletDeliveryRouteCommand(new PalletId("pallet-1"),
+                new DepartmentId(8L), new DepartmentId(9L)));
 
         verify(this.deliveryRepository, never()).createOrUpdate(any());
         verifyNoInteractions(this.domainEventPublisher);

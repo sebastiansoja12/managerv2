@@ -1,6 +1,6 @@
 package com.warehouse.palletmanagement.domain.event;
 
-import com.warehouse.commonassets.event.domain.model.DomainEvent;
+import com.warehouse.eventoutbox.domain.model.DomainEvent;
 import com.warehouse.palletmanagement.domain.vo.PalletUnloadedSnapshot;
 
 import java.time.Instant;

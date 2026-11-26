@@ -28,8 +28,6 @@ public class PlatformOwnerAuthenticationFilter extends OncePerRequestFilter {
     public static final String PLATFORM_OWNER_USERNAME_ATTRIBUTE =
             PlatformOwnerAuthenticationFilter.class.getName() + ".username";
 
-    private static final List<String> PLATFORM_OWNER_PATHS = List.of("/platform", "/operators");
-
     private static final String ANNOUNCEMENT_PATH = "/announcements/active";
 
     private final PlatformOwnerAuthenticationPort platformOwnerAuthenticationPort;
@@ -84,7 +82,6 @@ public class PlatformOwnerAuthenticationFilter extends OncePerRequestFilter {
         final String path = request.getRequestURI().substring(request.getContextPath().length());
         final boolean announcementChange = path.equals(ANNOUNCEMENT_PATH)
                 && !HttpMethod.GET.matches(request.getMethod());
-        return announcementChange || PLATFORM_OWNER_PATHS.stream()
-                .anyMatch(platformPath -> path.equals(platformPath) || path.startsWith(platformPath + "/"));
+        return announcementChange || PlatformOwnerPaths.matches(request);
     }
 }

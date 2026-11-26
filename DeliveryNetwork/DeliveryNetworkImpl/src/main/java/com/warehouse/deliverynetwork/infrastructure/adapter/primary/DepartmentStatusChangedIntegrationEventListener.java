@@ -1,7 +1,7 @@
 package com.warehouse.deliverynetwork.infrastructure.adapter.primary;
 
 import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaEventListener;
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventListener;
 import com.warehouse.deliverynetwork.application.port.primary.DeliveryNetworkPort;
 import com.warehouse.organisationstructure.department.api.dto.DepartmentStatusDto;
 import com.warehouse.organisationstructure.department.api.event.DepartmentStatusChangedIntegrationEvent;
@@ -18,10 +18,7 @@ public class DepartmentStatusChangedIntegrationEventListener {
         this.deliveryNetworkPort = deliveryNetworkPort;
     }
 
-    @KafkaEventListener(
-            topics = "${manager.kafka.topics.department-status-events:department.status.events}",
-            groupId = "${manager.kafka.consumer-groups.delivery-network-department-status:manager-delivery-network-department-status}"
-    )
+    @IntegrationEventListener(group = "manager-delivery-network-department-status")
     public void handle(final DepartmentStatusChangedIntegrationEvent event) {
         if (event.status() == DepartmentStatusDto.ARCHIVED
                 || event.status() == DepartmentStatusDto.DELETED) {

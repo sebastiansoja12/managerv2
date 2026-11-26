@@ -2,6 +2,12 @@ package com.warehouse.mcp.configuration;
 
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
+import com.warehouse.auth.McpToolAccessApiService;
+import com.warehouse.mcp.infrastructure.adapter.primary.McpToolVisibilityTransport;
+import io.modelcontextprotocol.server.transport.WebMvcStatelessServerTransport;
+import io.modelcontextprotocol.spec.McpStatelessServerTransport;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,11 +41,14 @@ import com.warehouse.mcp.application.port.primary.McpCommandPortImpl;
 import com.warehouse.mcp.application.port.secondary.ConfigurationServicePort;
 import com.warehouse.mcp.application.port.secondary.CourierServicePort;
 import com.warehouse.mcp.application.port.secondary.DeliveryServicePort;
+import com.warehouse.mcp.application.port.secondary.VehicleServicePort;
 import com.warehouse.mcp.domain.service.ConfigurationMerge;
 import com.warehouse.mcp.infrastructure.adapter.primary.ManagerMcpCommandTools;
 import com.warehouse.mcp.infrastructure.adapter.secondary.ConfigurationServiceAdapter;
 import com.warehouse.mcp.infrastructure.adapter.secondary.CourierServiceAdapter;
 import com.warehouse.mcp.infrastructure.adapter.secondary.DeliveryServiceAdapter;
+import com.warehouse.mcp.infrastructure.adapter.secondary.VehicleServiceAdapter;
+import com.warehouse.driverhub.api.CarrierApiService;
 import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import com.warehouse.shipment.infrastructure.ShipmentManagementApiService;
 import com.warehouse.supplier.api.SupplierApiService;
@@ -48,6 +57,15 @@ import com.warehouse.mcp.infrastructure.adapter.primary.McpToolExecutor;
 
 @Configuration
 public class McpServerConfiguration {
+
+    @Bean
+    @Primary
+    @ConditionalOnProperty(name = "spring.ai.mcp.server.enabled", havingValue = "true", matchIfMissing = true)
+    public McpStatelessServerTransport managerMcpTransport(final WebMvcStatelessServerTransport transport,
+                                                           final McpToolAccessApiService accessService,
+                                                           @Value("${mcp.server.write-enabled:true}") final boolean writeEnabled) {
+        return new McpToolVisibilityTransport(transport, accessService, writeEnabled);
+    }
 
     @Bean
     public McpQueryPort mcpQueryPort(final CurrentUserServicePort mcpCurrentUserServicePort,
@@ -71,10 +89,12 @@ public class McpServerConfiguration {
                                          final DeliveryServicePort mcpDeliveryServicePort,
                                          final CourierServicePort mcpCourierServicePort,
                                          final ConfigurationServicePort mcpConfigurationServicePort,
+                                         final VehicleServicePort mcpVehicleServicePort,
                                          final McpQueryPort mcpQueryPort,
                                          @Value("${mcp.server.write-enabled:true}") final boolean writeEnabled) {
         return new McpCommandPortImpl(mcpCurrentUserServicePort, mcpShipmentServicePort, mcpDepartmentServicePort,
-                mcpDeliveryServicePort, mcpCourierServicePort, mcpConfigurationServicePort, mcpQueryPort,
+                mcpDeliveryServicePort, mcpCourierServicePort, mcpConfigurationServicePort, mcpVehicleServicePort,
+                mcpQueryPort,
                 new ConfigurationMerge(), writeEnabled);
     }
 
@@ -87,6 +107,11 @@ public class McpServerConfiguration {
     @Bean
     public CourierServicePort mcpCourierServicePort(final SupplierApiService supplierApiService) {
         return new CourierServiceAdapter(supplierApiService);
+    }
+
+    @Bean
+    public VehicleServicePort mcpVehicleServicePort(final CarrierApiService carrierApiService) {
+        return new VehicleServiceAdapter(carrierApiService);
     }
 
     @Bean

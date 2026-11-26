@@ -177,7 +177,17 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
+            <artifactId>BillingImpl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
             <artifactId>FleetTrackingImpl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>OrganizationAnalyticsImpl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -208,6 +218,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-opentelemetry</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

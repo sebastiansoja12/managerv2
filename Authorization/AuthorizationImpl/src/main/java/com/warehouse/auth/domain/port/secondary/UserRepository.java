@@ -10,6 +10,9 @@ import java.util.Optional;
 
 public interface UserRepository {
 
+    void saveApiKey(final OrganizationUser user, final String secret);
+    Optional<String> findApiKeySecret(final UserId userId);
+
     void createOrUpdate(final OrganizationUser user);
 
     OrganizationUser findByUsername(final String username);
@@ -17,6 +20,8 @@ public interface UserRepository {
     Optional<OrganizationUser> findByApiKeyHash(final String apiKeyHash);
 
     OrganizationUser findById(final UserId userId);
+
+    Optional<OrganizationUser> findByIdInOperator(final UserId userId, final OperatorId operatorId);
 
     List<OrganizationUser> findAll();
 

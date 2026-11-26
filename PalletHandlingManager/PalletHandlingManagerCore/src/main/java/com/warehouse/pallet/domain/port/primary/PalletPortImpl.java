@@ -3,6 +3,7 @@ package com.warehouse.pallet.domain.port.primary;
 import com.warehouse.pallet.domain.model.PalletUpdate;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,7 @@ import com.warehouse.pallet.domain.model.Driver;
 import com.warehouse.pallet.domain.model.Pallet;
 import com.warehouse.pallet.domain.model.PalletLoadedRequest;
 import com.warehouse.pallet.domain.model.PalletPage;
+import com.warehouse.pallet.domain.model.PalletRouteChangedRequest;
 import com.warehouse.pallet.domain.model.PalletSearchCriteria;
 import com.warehouse.pallet.domain.model.SealNumberRequest;
 import com.warehouse.pallet.domain.model.ShipmentAttachRequest;
@@ -142,17 +144,40 @@ public class PalletPortImpl implements PalletPort {
     public void handlePalletLoaded(final PalletLoadedRequest palletLoadedRequest) {
         final PalletId palletId = palletLoadedRequest.palletId();
         try {
-            final boolean changed = this.palletStorageService.markLoaded(palletId);
-            if (changed) {
-                record(this.palletStorageService.find(palletId), PalletHistoryEventType.LOADED, null);
-                log.info("Pallet {} marked as loaded by event {}", palletId.value(), palletLoadedRequest.eventId());
-            } else {
+            final boolean alreadyLoaded = this.palletStorageService.find(palletId).isLoaded();
+            final Pallet pallet = this.palletStorageService.markLoaded(palletId);
+            if (alreadyLoaded) {
                 log.info("Pallet {} already loaded, event {} ignored", palletId.value(), palletLoadedRequest.eventId());
+                return;
             }
+            record(pallet, PalletHistoryEventType.LOADED, null);
+            log.info("Pallet {} marked as loaded by event {}", palletId.value(), palletLoadedRequest.eventId());
         } catch (final PalletNotFoundException | PalletModificationException
                        | PalletStatusTransitionException exception) {
             log.warn("Pallet loaded event {} for pallet {} cannot be applied: {}",
                     palletLoadedRequest.eventId(), palletId.value(), exception.getMessage());
+        }
+    }
+
+    @Override
+    public void handleDeliveryRouteChanged(final PalletRouteChangedRequest palletRouteChangedRequest) {
+        final PalletId palletId = palletRouteChangedRequest.palletId();
+        final DepartmentId originDepartmentId = palletRouteChangedRequest.originDepartmentId();
+        final DepartmentId destinationDepartmentId = palletRouteChangedRequest.destinationDepartmentId();
+        try {
+            final Pallet current = this.palletStorageService.find(palletId);
+            if (Objects.equals(current.getOriginDepartmentId(), originDepartmentId)
+                    && Objects.equals(current.getDestinationDepartmentId(), destinationDepartmentId)) {
+                return;
+            }
+            record(this.palletStorageService.changeDepartments(palletId, originDepartmentId, destinationDepartmentId),
+                    PalletHistoryEventType.DEPARTMENTS_CHANGED,
+                    departmentDetails(originDepartmentId) + " -> " + departmentDetails(destinationDepartmentId));
+            log.info("Pallet {} departments changed by delivery event {}", palletId.value(),
+                    palletRouteChangedRequest.eventId());
+        } catch (final PalletNotFoundException exception) {
+            log.warn("Delivery event {} for pallet {} cannot be applied: {}",
+                    palletRouteChangedRequest.eventId(), palletId.value(), exception.getMessage());
         }
     }
 
@@ -228,7 +253,8 @@ public class PalletPortImpl implements PalletPort {
         }
         getPallet(palletId, operatorId);
         final Pallet pallet = this.palletStorageService.update(palletId, update.palletType(),
-                update.palletHandlingPriority(), update.refrigerated(), update.dimension(), update.sealNumber());
+                update.palletHandlingPriority(), update.refrigerated(), update.mixedDestinationsAllowed(),
+                update.dimension(), update.sealNumber());
         return record(pallet, PalletHistoryEventType.PALLET_UPDATED, updateDetails(pallet));
     }
 
@@ -249,6 +275,9 @@ public class PalletPortImpl implements PalletPort {
                 .append(" · ").append(pallet.getPalletHandlingPriority());
         if (Boolean.TRUE.equals(pallet.isRefrigerated())) {
             details.append(" · refrigerated");
+        }
+        if (Boolean.TRUE.equals(pallet.isMixedDestinationsAllowed())) {
+            details.append(" · mixed destinations allowed");
         }
         if (pallet.getDimension() != null) {
             details.append(" · ").append(pallet.getDimension().getLength())

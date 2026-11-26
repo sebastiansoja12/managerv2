@@ -13,8 +13,6 @@ import java.util.Optional;
 
 public class SupplierDirectoryServiceAdapter implements SupplierDirectoryServicePort {
 
-    private static final String ACTIVE_STATUS = "ACTIVE";
-
     private final SupplierApiService supplierApiService;
 
     public SupplierDirectoryServiceAdapter(final SupplierApiService supplierApiService) {
@@ -52,6 +50,6 @@ public class SupplierDirectoryServiceAdapter implements SupplierDirectoryService
                 supplierProfile.firstName(),
                 supplierProfile.lastName(),
                 supplierProfile.departmentId(),
-                ACTIVE_STATUS.equals(supplierProfile.status()));
+                supplierProfile.active());
     }
 }

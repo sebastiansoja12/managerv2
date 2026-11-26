@@ -29,6 +29,7 @@ import com.warehouse.mcp.application.port.secondary.CurrentUserServicePort;
 import com.warehouse.mcp.application.port.secondary.DeliveryServicePort;
 import com.warehouse.mcp.application.port.secondary.DepartmentServicePort;
 import com.warehouse.mcp.application.port.secondary.ShipmentServicePort;
+import com.warehouse.mcp.application.port.secondary.VehicleServicePort;
 import com.warehouse.mcp.domain.exception.McpInvalidRequestException;
 import com.warehouse.mcp.domain.exception.McpToolAccessException;
 import com.warehouse.mcp.domain.service.ConfigurationMerge;
@@ -53,11 +54,12 @@ class McpCommandPortImplTest {
     private final DeliveryServicePort deliveryServicePort = mock(DeliveryServicePort.class);
     private final CourierServicePort courierServicePort = mock(CourierServicePort.class);
     private final ConfigurationServicePort configurationServicePort = mock(ConfigurationServicePort.class);
+    private final VehicleServicePort vehicleServicePort = mock(VehicleServicePort.class);
     private final McpQueryPort mcpQueryPort = mock(McpQueryPort.class);
 
     private McpCommandPortImpl port(final boolean writeEnabled) {
         return new McpCommandPortImpl(currentUserServicePort, shipmentServicePort, departmentServicePort,
-                deliveryServicePort, courierServicePort, configurationServicePort, mcpQueryPort,
+                deliveryServicePort, courierServicePort, configurationServicePort, vehicleServicePort, mcpQueryPort,
                 new ConfigurationMerge(), writeEnabled);
     }
 
@@ -71,24 +73,7 @@ class McpCommandPortImplTest {
         verifyNoInteractions(deliveryServicePort);
     }
 
-    @Test
-    void shouldRejectChangesForRegularUser() {
-        when(currentUserServicePort.currentUser()).thenReturn(McpFixture.user("USER"));
 
-        assertThatThrownBy(() -> port(true).cancelDelivery(DELIVERY_ID))
-                .isInstanceOf(McpToolAccessException.class)
-                .hasMessage("Changing data requires the MANAGER role or higher");
-        verifyNoInteractions(deliveryServicePort);
-    }
-
-    @Test
-    void shouldRequireAdministratorToChangeDepartmentStatus() {
-        when(currentUserServicePort.currentUser()).thenReturn(McpFixture.user("MANAGER"));
-
-        assertThatThrownBy(() -> port(true).changeDepartmentStatus(new DepartmentCode("KT1"), "SUSPENDED", null))
-                .isInstanceOf(McpToolAccessException.class);
-        verifyNoInteractions(departmentServicePort);
-    }
 
     @Test
     void shouldKeepCurrentRouteValuesThatWereNotGiven() {

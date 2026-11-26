@@ -73,7 +73,8 @@ public class ShipmentServiceAdapter implements ShipmentServicePort {
     public Optional<PalletShipment> findShipment(final ShipmentId shipmentId) {
         try {
             return Optional.ofNullable(this.shipmentApiService.getShipment(shipmentId))
-                    .map(shipment -> new PalletShipment(shipmentId, shipment.status(), shipment.weightInKilograms()));
+                    .map(shipment -> new PalletShipment(shipmentId, shipment.status(), shipment.weightInKilograms(),
+                            shipment.destinationDepartmentId()));
         } catch (final RuntimeException exception) {
             log.warn("Shipment {} could not be read: {}", shipmentId.getValue(), exception.getMessage());
             return Optional.empty();

@@ -219,10 +219,32 @@ Osobne pliki Dockerfile są dostępne dla:
 ## Serwer MCP
 
 `McpServer` wystawia bezstanowy endpoint MCP (Spring AI MCP Server, streamable HTTP) pod `/v1/api/mcp`.
-Żądania są uwierzytelniane kluczem API użytkownika wysyłanym jako `Authorization: Bearer <key>`; klucz generuje
-się przez `POST /v1/api/auth/me/api-key` (unieważnia przez `DELETE`) i jest przechowywany wyłącznie jako skrót HMAC
-wraz z datą wydania. Klucze utworzone przed wprowadzeniem daty wydania oraz klucze przypisywane automatycznie przy
-rejestracji nie są akceptowane. Zablokowanie operatora i unieważnienie sesji unieważniają też wcześniej wydane klucze API.
+Żądania są uwierzytelniane wyłącznie dedykowanym kluczem MCP wysyłanym jako `Authorization: Bearer <mcp-key>`.
+Klucze MCP mają prefiks `mcp_`, są zarządzane niezależnie od kluczy API i działają tylko na endpoincie MCP; endpointy
+REST je odrzucają, a endpoint MCP odrzuca klucze API i JWT. Klucz generuje się przez `POST /v1/api/auth/me/mcp-keys`
+(body `name`, opcjonalnie `expiresAt`; uwierzytelnianie korzysta ze skrótu SHA-256, a odsłanianie z zaszyfrowanej kopii AES-GCM),
+listuje przez `GET` i unieważnia przez `DELETE /v1/api/auth/me/mcp-keys/{mcpKeyId}`. Użytkownik ma jeden aktywny
+klucz MCP (`users.mcp_key_id`), więc wygenerowanie nowego unieważnia poprzedni. Brakujący, nieznany, unieważniony lub
+wygasły klucz zwraca `401`. Zablokowanie operatora i unieważnienie sesji unieważniają też wcześniej wydane klucze MCP.
+Na okres przejściowy `API_EXPOSURE_MCP_LEGACY_API_KEY_ENABLED=true` nadal akceptuje klucze API na endpoincie MCP
+(domyślnie `false`).
+
+Klucze można tworzyć i unieważniać w GUI: **Profil użytkownika → Klucz MCP**. Klucz jest zasłonięty gwiazdkami; przycisk oka odsłania go na pięć sekund. Opuszczenie okna natychmiast go zasłania. **Użytkownicy → Dostęp MCP** pozwala administratorowi blokować MCP, unieważniać
+klucze i ustawiać dla obszarów `NONE`, `READ` lub `WRITE` (odczyt i zapis), w dotychczasowym zakresie zarządzania
+użytkownikami. Blokada unieważnia klucze i zabrania tworzenia nowych; ponowne włączenie nie przywraca kluczy.
+`GET /auth/me/mcp-keys/access` zwraca własną politykę, `GET`/`PUT /users/{userId}/mcp-access` odczytuje/zastępuje
+politykę użytkownika, a `DELETE /users/{userId}/mcp-keys` unieważnia jego klucze bez zmiany polityki.
+Przykład: `{"enabled":true,"modules":{"SHIPMENTS":"READ"}}`; pominięte obszary są blokowane.
+Obszary: `PROFILE`, `SHIPMENTS`, `PROCESSES`, `DEVICES`, `DEPARTMENTS`, `DELIVERIES`, `COURIERS`, `CONFIGURATION`.
+Liquibase tworzy `mcp_access_policies` i `mcp_module_permissions`. Brak polityki zachowuje dotychczasowy dostęp.
+Rola i `MCP_WRITE_ENABLED` nadal obowiązują. `tools/list` ukrywa niedozwolone narzędzia, a wykonanie ponownie
+sprawdza aktualne prawa. Po zmianie uprawnień odśwież listę narzędzi w kliencie MCP.
+
+`POST /auth/me/mcp-keys/{mcpKeyId}/reveal` odsłania wyłącznie własny aktywny klucz MCP.
+`POST /auth/me/api-key/reveal` zapewnia ten sam mechanizm dla klucza API. Odpowiedzi mają `Cache-Control: no-store`.
+Kopie szyfruje istniejący `CREDENTIALS_ENCRYPTION_KEY`; migracje dodają `mcp_keys.encrypted_secret` i
+`users.encrypted_api_key`. Listy i profil nie zawierają sekretów. Unieważnienie usuwa zaszyfrowaną kopię.
+Starszych kluczy zapisanych wyłącznie jako skrót nie można odtworzyć; aby je odsłaniać i kopiować, trzeba wygenerować nowe.
 
 | Narzędzie | Parametry | Uwagi |
 | --- | --- | --- |
@@ -255,11 +277,11 @@ pola opcjonalne zachowują obecne wartości.
 | `update_courier` / `set_courier_active` | `courierCode` i pola do zmiany / `active` | Edycja, aktywacja lub dezaktywacja kuriera. |
 | `update_configuration` | `section`, `changes` (obiekt JSON) | Zmienia tylko podane pola sekcji konfiguracji; nieznane pola są odrzucane. |
 
-Wszystkie narzędzia działają w kontekście operatora właściciela klucza API. Endpoint wyłączysz
+Wszystkie narzędzia działają w kontekście operatora właściciela klucza MCP. Endpoint wyłączysz
 przez `MCP_SERVER_ENABLED=false`, a same narzędzia zmieniające dane przez `MCP_WRITE_ENABLED=false`. Przykład dla Claude Code:
 
 ```bash
-claude mcp add --transport http manager https://manager.example.com/v1/api/mcp --header "Authorization: Bearer <api-key>"
+claude mcp add --transport http manager https://manager.example.com/v1/api/mcp --header "Authorization: Bearer <mcp-key>"
 ```
 
 ## API i dokumentacja

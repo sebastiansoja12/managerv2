@@ -63,6 +63,15 @@ class UserPortImplAccessTest {
     }
 
     @Test
+    void shouldHideBusinessCustomersFromDepartmentUserList() {
+        final OrganizationUser admin = givenCurrentUser(OrganizationUser.Role.ADMIN, OWN_DEPARTMENT);
+        final OrganizationUser shop = user(2L, OrganizationUser.Role.BUSINESS_CUSTOMER, OWN_DEPARTMENT);
+        when(userService.findAll()).thenReturn(List.of(admin, shop));
+
+        assertThat(userPort.findAllInCurrentDepartment()).containsExactly(admin);
+    }
+
+    @Test
     void shouldNotReturnUserFromOtherDepartmentByUsername() {
         givenCurrentUser(OrganizationUser.Role.MANAGER, OWN_DEPARTMENT);
         final OrganizationUser target = user(2L, OrganizationUser.Role.USER, OTHER_DEPARTMENT);

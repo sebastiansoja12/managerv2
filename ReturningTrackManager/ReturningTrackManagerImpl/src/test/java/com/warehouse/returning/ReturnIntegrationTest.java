@@ -35,10 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = ReturnPersistenceTestConfiguration.class, properties = {
         "spring.liquibase.enabled=false", "spring.sql.init.mode=never",
-        "manager.kafka.integration-events.routes.return.processing.started=return.processing.started",
-        "manager.kafka.integration-events.routes.return.cancelled=return.cancelled",
-        "manager.kafka.integration-events.routes.return.completed=return.completed",
-        "manager.kafka.integration-events.routes.return.read-model.changed=return.read-model.sync"
+        "manager.events.outbox.enabled=true", "manager.events.outbox.relay.enabled=false"
 })
 @Transactional
 class ReturnIntegrationTest {

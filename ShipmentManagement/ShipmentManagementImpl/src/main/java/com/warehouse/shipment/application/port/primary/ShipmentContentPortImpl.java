@@ -1,14 +1,17 @@
 package com.warehouse.shipment.application.port.primary;
 
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.shipment.application.port.secondary.ShipmentActorServicePort;
 import com.warehouse.shipment.application.port.secondary.ShipmentContentRepository;
 import com.warehouse.shipment.application.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.exception.ShipmentNotFoundException;
 import com.warehouse.shipment.domain.model.ShipmentDocument;
 import com.warehouse.shipment.domain.model.ShipmentDocumentFile;
+import com.warehouse.shipment.application.port.primary.result.ShipmentNoteResult;
 import com.warehouse.shipment.domain.model.ShipmentNote;
+import com.warehouse.shipment.domain.vo.ShipmentNoteIncidentSource;
 import com.warehouse.shipment.domain.event.ShipmentDocumentAdded;
 import com.warehouse.shipment.domain.event.ShipmentNoteAdded;
 import com.warehouse.exceptionhandler.exception.RestException;
@@ -18,6 +21,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.Map;
 
 public class ShipmentContentPortImpl implements ShipmentContentPort {
 
@@ -44,20 +49,39 @@ public class ShipmentContentPortImpl implements ShipmentContentPort {
 
     @Override
     @Transactional
-    public ShipmentNote addNote(final ShipmentId shipmentId, final String body, final boolean internal) {
+    public ShipmentNoteResult addNote(final ShipmentId shipmentId, final String body, final boolean internal) {
         requireShipment(shipmentId);
         final ShipmentNote note = new ShipmentNote(UUID.randomUUID(), shipmentId, body == null ? null : body.trim(), internal,
-                actorServicePort.currentUserId(), Instant.now());
+                actorServicePort.currentUserId(), Instant.now(), null);
         contentRepository.saveNote(note);
         domainEventPublisher.publish(new ShipmentNoteAdded(shipmentId, internal, note.createdAt()));
-        return note;
+        return withAuthorUsername(List.of(note)).getFirst();
+    }
+
+    @Override
+    @Transactional
+    public void addIncidentNote(final ShipmentId shipmentId, final ShipmentNoteIncidentSource incidentSource,
+                                final String body, final UserId authorUserId, final Instant occurredAt) {
+        requireShipment(shipmentId);
+        final ShipmentNote note = ShipmentNote.fromIncident(shipmentId, incidentSource, body, authorUserId, occurredAt);
+        contentRepository.saveIncidentNote(note);
+        domainEventPublisher.publish(new ShipmentNoteAdded(shipmentId, true, note.createdAt()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ShipmentNote> listNotes(final ShipmentId shipmentId) {
+    public List<ShipmentNoteResult> listNotes(final ShipmentId shipmentId) {
         requireShipment(shipmentId);
-        return contentRepository.listNotes(shipmentId);
+        return withAuthorUsername(contentRepository.listNotes(shipmentId));
+    }
+
+    private List<ShipmentNoteResult> withAuthorUsername(final List<ShipmentNote> notes) {
+        final Map<UserId, String> usernames = actorServicePort.findUsernames(notes.stream()
+                .map(ShipmentNote::authorUserId)
+                .collect(Collectors.toSet()));
+        return notes.stream()
+                .map(note -> new ShipmentNoteResult(note, usernames.get(note.authorUserId())))
+                .toList();
     }
 
     @Override

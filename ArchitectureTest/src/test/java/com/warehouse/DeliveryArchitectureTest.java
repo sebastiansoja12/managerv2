@@ -57,9 +57,6 @@ class DeliveryArchitectureTest {
         classes().that().haveSimpleName("DeliveryHistoryRepositoryImpl")
                 .should().implement(DELIVERY + ".application.port.secondary.DeliveryHistoryRepository")
                 .check(DELIVERY_CLASSES);
-        classes().that().haveSimpleName("DeliveryIntegrationEventServiceAdapter")
-                .should().implement(DELIVERY + ".application.port.secondary.DeliveryIntegrationEventServicePort")
-                .check(DELIVERY_CLASSES);
         classes().that().haveSimpleName("DeliveryEventDataMapper")
                 .should().implement(DELIVERY + ".application.port.secondary.DeliveryEventDataMapperPort")
                 .check(DELIVERY_CLASSES);

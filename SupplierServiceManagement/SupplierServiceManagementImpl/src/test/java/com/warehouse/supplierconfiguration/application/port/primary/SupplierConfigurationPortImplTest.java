@@ -10,10 +10,16 @@ import com.warehouse.supplierconfiguration.application.port.primary.command.Supp
 import com.warehouse.supplierconfiguration.application.port.primary.command.UpdateSupplierConfigurationCommand;
 import com.warehouse.supplierconfiguration.application.port.primary.result.SubstituteSupplierResult;
 import com.warehouse.supplierconfiguration.application.port.primary.result.SupplierConfigurationResult;
+import com.warehouse.supplierconfiguration.application.service.SubstituteSupplierService;
+import com.warehouse.supplierconfiguration.application.service.SupplierConfigurationResultFactory;
+import com.warehouse.supplierconfiguration.application.service.SupplierConfigurationService;
+import com.warehouse.supplierconfiguration.application.service.SupplierResolutionService;
 import com.warehouse.supplierconfiguration.domain.enumeration.SupplierConfigurationChangeType;
 import com.warehouse.supplierconfiguration.domain.enumeration.SupplierConfigurationViolationCode;
 import com.warehouse.supplierconfiguration.domain.enumeration.SupplierSetting;
 import com.warehouse.supplierconfiguration.domain.exception.InvalidSupplierConfigurationException;
+import com.warehouse.supplierconfiguration.domain.model.SupplierConfiguration;
+import com.warehouse.supplierconfiguration.domain.model.SupplierConfigurationPolicy;
 import com.warehouse.supplierconfiguration.domain.vo.SupplierConfigurationRevision;
 import com.warehouse.supplierconfiguration.domain.vo.SupplierConfigurationValues;
 import org.junit.jupiter.api.Test;
@@ -39,11 +45,17 @@ class SupplierConfigurationPortImplTest {
     private final SupplierConfigurationFixture.FakeCurrentUser currentUser =
             new SupplierConfigurationFixture.FakeCurrentUser();
 
+    private final SupplierConfigurationFixture.InMemorySupplierDirectory supplierDirectory =
+            new SupplierConfigurationFixture.InMemorySupplierDirectory();
+    private final SubstituteSupplierService substituteSupplierService =
+            new SubstituteSupplierService(supplierDirectory);
+
     private final SupplierConfigurationPortImpl port = new SupplierConfigurationPortImpl(
-            configurationRepository,
-            policyRepository,
-            historyRepository,
-            new SupplierConfigurationFixture.InMemorySupplierDirectory(),
+            new SupplierConfigurationService(configurationRepository, policyRepository, historyRepository),
+            new SupplierResolutionService(supplierDirectory, currentUser),
+            substituteSupplierService,
+            new SupplierConfigurationResultFactory(substituteSupplierService),
+            supplierDirectory,
             currentUser,
             Clock.fixed(Instant.parse("2026-10-22T10:00:00Z"), ZoneOffset.UTC));
 
@@ -235,5 +247,38 @@ class SupplierConfigurationPortImplTest {
         assertThat(result.values().isEnabled(SupplierSetting.REQUIRE_RECIPIENT_SIGNATURE)).isTrue();
         assertThat(configurationRepository.findBySupplierId(SupplierConfigurationFixture.SECOND_SUPPLIER.supplierId()))
                 .isEmpty();
+    }
+
+    @Test
+    void shouldReleaseSubstituteAndRecordHistoryWhenSubstituteIsDeactivated() {
+        final SupplierConfigurationResult current = port.get(SupplierConfigurationTarget.currentSupplier());
+        port.update(new UpdateSupplierConfigurationCommand(SupplierConfigurationTarget.currentSupplier(),
+                current.version(), current.values(), SupplierConfigurationFixture.SECOND_SUPPLIER.supplierCode()));
+
+        port.releaseSubstitute(SupplierConfigurationFixture.SECOND_SUPPLIER.supplierId(),
+                SupplierConfigurationFixture.ADMIN_USER);
+
+        final SupplierConfigurationResult released = port.get(SupplierConfigurationTarget.currentSupplier());
+        assertThat(released.values().substituteSupplierId()).isNull();
+        assertThat(released.substituteSupplierCode()).isNull();
+        assertThat(historyRepository.findBySupplierId(SupplierConfigurationFixture.FIRST_SUPPLIER.supplierId()))
+                .hasSize(2);
+    }
+
+    @Test
+    void shouldRemoveConfigurationAndReleaseSubstituteWhenSupplierIsAnonymized() {
+        final SupplierConfigurationResult current = port.get(SupplierConfigurationTarget.currentSupplier());
+        port.update(new UpdateSupplierConfigurationCommand(SupplierConfigurationTarget.currentSupplier(),
+                current.version(), current.values(), SupplierConfigurationFixture.SECOND_SUPPLIER.supplierCode()));
+        configurationRepository.save(SupplierConfiguration.createDefault(
+                SupplierConfigurationFixture.SECOND_SUPPLIER.supplierId(), SupplierConfigurationPolicy.empty(),
+                Instant.parse("2026-10-22T10:00:00Z")));
+
+        port.removeConfiguration(SupplierConfigurationFixture.SECOND_SUPPLIER.supplierId(),
+                SupplierConfigurationFixture.ADMIN_USER);
+
+        assertThat(configurationRepository.findBySupplierId(SupplierConfigurationFixture.SECOND_SUPPLIER.supplierId()))
+                .isEmpty();
+        assertThat(port.get(SupplierConfigurationTarget.currentSupplier()).values().substituteSupplierId()).isNull();
     }
 }

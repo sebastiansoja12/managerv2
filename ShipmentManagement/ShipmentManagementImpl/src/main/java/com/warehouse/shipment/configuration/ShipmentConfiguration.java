@@ -17,13 +17,20 @@ import tools.jackson.databind.ObjectMapper;
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.auth.UserApiService;
 import com.warehouse.commonassets.context.OperatorContext;
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.repository.NoOperatorContextRepository;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
+import com.warehouse.billing.api.BillingCustomerApiService;
+import com.warehouse.billing.api.PriceQuoteApiService;
+import com.warehouse.shipment.application.port.primary.ShipmentCustomerPort;
+import com.warehouse.shipment.application.port.primary.ShipmentCustomerPortImpl;
+import com.warehouse.shipment.application.port.secondary.BillingCustomerServicePort;
+import com.warehouse.shipment.application.port.secondary.ShipmentActorServicePort;
+import com.warehouse.shipment.infrastructure.adapter.secondary.BillingCustomerServiceAdapter;
 import com.warehouse.organisationstructure.api.OperatorApiService;
 import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import com.warehouse.pickuppoint.api.PickupPointApiService;
@@ -41,6 +48,12 @@ import com.warehouse.shipment.application.service.delivery.*;
 import com.warehouse.shipment.application.service.status.*;
 import com.warehouse.shipment.domain.service.*;
 import com.warehouse.shipment.infrastructure.ShipmentApiService;
+import com.warehouse.shipment.infrastructure.ShipmentStatisticsApiService;
+import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentStatisticsApiServiceAdapter;
+import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentStatisticsApiMapper;
+import com.warehouse.shipment.application.port.primary.ShipmentStatisticsPort;
+import com.warehouse.shipment.application.port.primary.ShipmentStatisticsPortImpl;
+import com.warehouse.shipment.application.port.secondary.ShipmentStatisticsRepository;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentApiServiceAdapter;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
@@ -52,6 +65,7 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEn
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentReadEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.OperatorShipmentConfigurationMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentPersistenceMapper;
+import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentPricingRequestMapper;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.geocoding.api.PostalCodeService;
 
@@ -80,11 +94,6 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public PriceRepository priceRepository(final PriceReadRepository repository) {
-		return new PriceRepositoryImpl(repository);
-	}
-
-	@Bean
 	public PostalCodeServicePort postalCodeServicePort(final PostalCodeService postalCodeService) {
 		return new PostalCodeServiceAdapter(postalCodeService);
 	}
@@ -102,15 +111,16 @@ public class ShipmentConfiguration {
 	@Bean
 	public ShipmentResultFactory shipmentResultFactory(final DepartmentServicePort departmentServicePort,
 												 final RouteLogService routeLogService,
-												 final ReturningServicePort returningServicePort) {
-		return new ShipmentResultFactory(departmentServicePort, routeLogService, returningServicePort);
+												 final ReturningServicePort returningServicePort,
+												 final ShipmentReadModelRepository shipmentReadModelRepository) {
+		return new ShipmentResultFactory(departmentServicePort, routeLogService, returningServicePort,
+				shipmentReadModelRepository);
 	}
 
 	@Bean
 	public ShipmentPort shipmentPort(final ShipmentRepository shipmentRepository,
 									 final DepartmentCountryAvailabilityService departmentCountryAvailabilityService,
 									 final ShipmentResultFactory shipmentResultFactory,
-									 final MailNotificationServicePort mailNotificationServicePort,
 									 final TrackingNumberGenerationService trackingNumberGenerationService,
                                      final ShipmentConfigurationPort shipmentConfigurationServicePort,
                                      final ShipmentDeliveryStrategyResolver shipmentDeliveryStrategyResolver,
@@ -118,17 +128,37 @@ public class ShipmentConfiguration {
                                      final DomainEventPublisher domainEventPublisher,
                                      final ShipmentDepartmentResolutionService shipmentDepartmentResolutionService,
                                      final PostalCodeServicePort postalCodeServicePort,
-                                     final OperatorServicePort shipmentOperatorServicePort) {
+                                     final OperatorServicePort shipmentOperatorServicePort,
+                                     final ShipmentPricingServicePort shipmentPricingServicePort) {
 		final AddressValidationService addressValidationService = new AddressValidationService();
+		final Logger shipmentPortLogger = LOGGER_FACTORY.getLogger(ShipmentPortImpl.class);
 		return new ShipmentPortImpl(shipmentRepository,
-				LOGGER_FACTORY.getLogger(ShipmentPortImpl.class),
+				shipmentPortLogger,
 				departmentCountryAvailabilityService, shipmentResultFactory,
-				mailNotificationServicePort, trackingNumberGenerationService,
+				trackingNumberGenerationService,
 				shipmentConfigurationServicePort,
                 shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
                 domainEventPublisher, shipmentDepartmentResolutionService, addressValidationService,
-                postalCodeServicePort, shipmentOperatorServicePort);
+                postalCodeServicePort, shipmentOperatorServicePort, shipmentPricingServicePort,
+                new ShipmentPaymentService(shipmentRepository, domainEventPublisher, shipmentPortLogger));
 	}
+
+    @Bean
+    public BillingCustomerServicePort billingCustomerServicePort(
+            final BillingCustomerApiService billingCustomerApiService) {
+        return new BillingCustomerServiceAdapter(billingCustomerApiService);
+    }
+
+    @Bean
+    public ShipmentCustomerPort shipmentCustomerPort(final ShipmentActorServicePort shipmentActorServicePort,
+                                                     final BillingCustomerServicePort billingCustomerServicePort) {
+        return new ShipmentCustomerPortImpl(shipmentActorServicePort, billingCustomerServicePort);
+    }
+
+    @Bean
+    public ShipmentPricingServicePort shipmentPricingServicePort(final PriceQuoteApiService priceQuoteApiService) {
+        return new ShipmentPricingServiceAdapter(priceQuoteApiService, new ShipmentPricingRequestMapper());
+    }
 
     @Bean
     public OperatorServicePort shipmentOperatorServicePort(final OperatorApiService operatorApiService) {
@@ -214,6 +244,11 @@ public class ShipmentConfiguration {
     }
 
     @Bean
+    public ShipmentStatusChangeStrategy shipmentHandedOverStatusChangeStrategy() {
+        return new ShipmentHandedOverStatusChangeStrategy();
+    }
+
+    @Bean
     public ShipmentStatusChangeStrategy shipmentDeliveredStatusChangeStrategy() {
         return new ShipmentDeliveredStatusChangeStrategy();
     }
@@ -221,6 +256,11 @@ public class ShipmentConfiguration {
     @Bean
     public ShipmentStatusChangeStrategy shipmentUndeliverableStatusChangeStrategy() {
         return new ShipmentUndeliverableStatusChangeStrategy();
+    }
+
+    @Bean
+    public ShipmentStatusChangeStrategy shipmentLostStatusChangeStrategy() {
+        return new ShipmentLostStatusChangeStrategy();
     }
 
     @Bean
@@ -273,6 +313,22 @@ public class ShipmentConfiguration {
                                                 final OperatorContext operatorContext) {
 		return new ShipmentApiServiceAdapter(shipmentPort, shipmentApiServiceMapper, operatorContext);
 	}
+
+    @Bean
+    public ShipmentStatisticsRepository shipmentStatisticsRepository(
+            final OperatorFilteredRepository<ShipmentReadEntity> repository) {
+        return new ShipmentStatisticsRepositoryImpl(repository);
+    }
+
+    @Bean
+    public ShipmentStatisticsPort shipmentStatisticsPort(final ShipmentStatisticsRepository shipmentStatisticsRepository) {
+        return new ShipmentStatisticsPortImpl(shipmentStatisticsRepository);
+    }
+
+    @Bean
+    public ShipmentStatisticsApiService shipmentStatisticsApiService(final ShipmentStatisticsPort shipmentStatisticsPort) {
+        return new ShipmentStatisticsApiServiceAdapter(shipmentStatisticsPort, new ShipmentStatisticsApiMapper());
+    }
 
     @Bean
     public ShipmentManagementApiService shipmentManagementApiService(
@@ -415,8 +471,8 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public ShipmentRequestValidator shipmentRequestValidator(final PriceService priceService) {
-		return new ShipmentRequestValidatorImpl(priceService);
+	public ShipmentRequestValidator shipmentRequestValidator() {
+		return new ShipmentRequestValidatorImpl();
 	}
 
 	@Bean

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-24-postgresql-operator-payments-enabled" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="operator_configurations"/>
+                <not>
+                    <columnExists tableName="operator_configurations" columnName="shipment_payments_enabled"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="operator_configurations">
+            <column name="shipment_payments_enabled" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2026-11-24-postgresql-operator-payments-enabled-aud" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="operator_configurations_aud"/>
+                <not>
+                    <columnExists tableName="operator_configurations_aud" columnName="shipment_payments_enabled"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="operator_configurations_aud">
+            <column name="shipment_payments_enabled" type="BOOLEAN"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

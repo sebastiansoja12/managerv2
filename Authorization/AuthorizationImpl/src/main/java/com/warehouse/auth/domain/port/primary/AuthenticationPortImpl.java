@@ -56,7 +56,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
     public AuthenticationResponse login(final LoginRequest loginRequest) {
         final OrganizationUser user = userService.findUser(loginRequest.username());
 
-        if (user == null || user.isDeleted()) {
+        if (user == null || user.isDeleted() || user.isBusinessCustomer()) {
             throw new AuthenticationErrorException("Invalid username or password");
         } else if (!passwordEncoder.matches(loginRequest.password(), user.getPassword())) {
             throw new AuthenticationErrorException("Invalid username or password");
@@ -78,6 +78,10 @@ public class AuthenticationPortImpl implements AuthenticationPort {
     public AuthenticationResponse refresh(final String refreshToken) {
         final LoginResponse loginResponse = authenticationService.refresh(refreshToken);
         final OrganizationUser user = userService.findUser(loginResponse.username());
+        if (user.isBusinessCustomer()) {
+            authenticationService.logout(loginResponse.refreshToken().value());
+            throw new AuthenticationErrorException("Invalid refresh token");
+        }
         if (!operatorAccessPolicy.allowsAccess(user.operatorId(), java.time.Instant.now(), false)) {
             authenticationService.logout(loginResponse.refreshToken().value());
             throw new AuthenticationErrorException("Operator access is blocked");
@@ -113,6 +117,11 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
         validateDepartmentCode(departmentCode);
         final DepartmentId departmentId = departmentService.getDepartmentId(departmentCode);
+        final OrganizationUser currentUser = userService.findUserById(authenticationService.currentUserId());
+        if (!currentUser.canAssignRole(role) || !currentUser.canAccessDepartment(departmentId)) {
+            throw new UserAccessDeniedException("Current user cannot create user with role " + role
+                    + " in department " + departmentCode.getValue());
+        }
 
         final OrganizationUser user = OrganizationUser.createWithRole(
                 userId, username, password, firstName, lastName, email, role, departmentId,
@@ -197,6 +206,28 @@ public class AuthenticationPortImpl implements AuthenticationPort {
                 apiKeyEncoder.encode(userId, command.username()).key(),
                 command.language()
         );
+        userService.create(user);
+        return userId;
+    }
+
+    @Override
+    public UserId createBusinessCustomerUser(final CreateBusinessCustomerUserCommand command) {
+        final OrganizationUser creator = userService.findUserById(authenticationService.currentUserId());
+        final UserId userId = userService.nextUserId();
+        final String password = passwordEncoder.encode(RandomPasswordService.generatePassword(32, true, true, true));
+        final OrganizationUser user = OrganizationUser.createWithRole(
+                userId,
+                command.username(),
+                password,
+                command.name(),
+                "",
+                command.email(),
+                OrganizationUser.Role.BUSINESS_CUSTOMER,
+                creator.getDepartmentId(),
+                null,
+                command.language()
+        );
+        user.assignOperator(creator.operatorId());
         userService.create(user);
         return userId;
     }

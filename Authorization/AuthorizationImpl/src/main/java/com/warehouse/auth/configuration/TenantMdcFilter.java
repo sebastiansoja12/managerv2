@@ -46,7 +46,6 @@ public class TenantMdcFilter extends OncePerRequestFilter {
             "/v1/api/departments/read-sync",
             "/v1/api/internal/shipments/read-sync",
             "/internal/shipments/read-sync",
-            "/v1/api/admin/async-jobs",
             "/v1/api/ws",
             "/ws"
     );
@@ -124,7 +123,7 @@ public class TenantMdcFilter extends OncePerRequestFilter {
             return true;
         }
         final String uri = request.getRequestURI();
-        if (apiExposureProperties.isPublicEndpoint(request)) {
+        if (apiExposureProperties.isPublicEndpoint(request) || apiExposureProperties.isPublicPath(request)) {
             return true;
         }
         return WHITELIST.stream().anyMatch(uri::startsWith);

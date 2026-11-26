@@ -10,14 +10,20 @@ import com.warehouse.logisticsdelivery.application.port.primary.DeliveryPort;
 import com.warehouse.logisticsdelivery.domain.vo.RecipientAddress;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDerivedDeliveryCommand;
+import com.warehouse.logisticsdelivery.application.service.status.ShipmentDeliveredDeliveryStrategy;
+import com.warehouse.logisticsdelivery.application.service.status.ShipmentLostDeliveryStrategy;
+import com.warehouse.logisticsdelivery.application.service.status.ShipmentReturnedDeliveryStrategy;
+import com.warehouse.logisticsdelivery.application.service.status.ShipmentStatusDeliveryStrategyResolver;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryMethod;
 import com.warehouse.logisticsdelivery.domain.enumeration.PickupMethod;
 import com.warehouse.shipment.api.event.ShipmentCanceledIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentDestinationChangedIntegrationEvent;
+import com.warehouse.shipment.api.event.ShipmentStatusChangedIntegrationEvent;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,6 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 class ShipmentDeliveryEventListenerTest {
 
@@ -57,7 +64,7 @@ class ShipmentDeliveryEventListenerTest {
     @Test
     void shouldCreateDeliveryFromShipmentCreatedEvent() throws Exception {
         final DeliveryPort deliveryPort = mock(DeliveryPort.class);
-        final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(deliveryPort);
+        final ShipmentDeliveryEventListener listener = listener(deliveryPort);
         final ShipmentCreatedIntegrationEvent event = JsonMapper.builder().configureForJackson2().build().readValue("""
                 {
                   "payload": {"shipmentId": {"value": 42}},
@@ -94,7 +101,7 @@ class ShipmentDeliveryEventListenerTest {
     @Test
     void shouldCreateDerivedDeliveryWhenShipmentCreatedEventHasNoDeliveryData() throws Exception {
         final DeliveryPort deliveryPort = mock(DeliveryPort.class);
-        final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(deliveryPort);
+        final ShipmentDeliveryEventListener listener = listener(deliveryPort);
         final ShipmentCreatedIntegrationEvent event = JsonMapper.builder().configureForJackson2().build().readValue("""
                 {
                   "payload": {"shipmentId": {"value": 43}, "signatureRequired": true},
@@ -117,7 +124,7 @@ class ShipmentDeliveryEventListenerTest {
     @Test
     void shouldChangeDestinationDepartmentFromDestinationChangedEvent() throws Exception {
         final DeliveryPort deliveryPort = mock(DeliveryPort.class);
-        final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(deliveryPort);
+        final ShipmentDeliveryEventListener listener = listener(deliveryPort);
         final ShipmentDestinationChangedIntegrationEvent event = JsonMapper.builder().configureForJackson2().build().readValue("""
                 {
                   "payload": {"shipmentId": {"value": 42}, "recipient": {"city": "Poznań", "street": "Długa 1",
@@ -138,7 +145,7 @@ class ShipmentDeliveryEventListenerTest {
     @Test
     void shouldCancelShipmentDeliveriesFromShipmentCanceledEvent() throws Exception {
         final DeliveryPort deliveryPort = mock(DeliveryPort.class);
-        final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(deliveryPort);
+        final ShipmentDeliveryEventListener listener = listener(deliveryPort);
         final ShipmentCanceledIntegrationEvent event = JsonMapper.builder().configureForJackson2().build().readValue("""
                 {
                   "payload": {"shipmentId": {"value": 42}},
@@ -151,5 +158,73 @@ class ShipmentDeliveryEventListenerTest {
         listener.handle(event);
 
         verify(deliveryPort).cancelShipmentDeliveries(new ShipmentId(42L));
+    }
+
+    @Test
+    void shouldCancelShipmentDeliveriesWhenShipmentIsMarkedAsLost() throws Exception {
+        final DeliveryPort deliveryPort = mock(DeliveryPort.class);
+        final ShipmentDeliveryEventListener listener = listener(deliveryPort);
+        final ShipmentStatusChangedIntegrationEvent event = JsonMapper.builder().configureForJackson2().build().readValue("""
+                {
+                  "payload": {"shipmentId": {"value": 42}, "shipmentStatus": "LOST"},
+                  "operatorId": {"value": 7},
+                  "userId": {"value": 42},
+                  "departmentId": {"value": 12}
+                }
+                """, ShipmentStatusChangedIntegrationEvent.class);
+
+        listener.handle(event);
+
+        verify(deliveryPort).cancelShipmentDeliveries(new ShipmentId(42L));
+        verify(deliveryPort, never()).completeDelivery(any());
+    }
+
+    @Test
+    void shouldCreateDerivedDeliveryForReturnShipmentWhenShipmentIsMarkedAsReturned() throws Exception {
+        final DeliveryPort deliveryPort = mock(DeliveryPort.class);
+        final ShipmentDeliveryEventListener listener = listener(deliveryPort);
+        final ShipmentStatusChangedIntegrationEvent event = JsonMapper.builder().configureForJackson2().build().readValue("""
+                {
+                  "payload": {"shipmentId": {"value": 42}, "shipmentStatus": "RETURN",
+                              "shipmentRelatedId": {"value": 43}, "signatureRequired": true},
+                  "operatorId": {"value": 7},
+                  "userId": {"value": 42},
+                  "departmentId": {"value": 12}
+                }
+                """, ShipmentStatusChangedIntegrationEvent.class);
+
+        listener.handle(event);
+
+        final ArgumentCaptor<CreateDerivedDeliveryCommand> command =
+                ArgumentCaptor.forClass(CreateDerivedDeliveryCommand.class);
+        verify(deliveryPort).createDerivedDelivery(command.capture());
+        verify(deliveryPort, never()).completeDelivery(any());
+        assertEquals(new ShipmentId(43L), command.getValue().shipmentId());
+        assertEquals(Boolean.TRUE, command.getValue().signatureRequired());
+    }
+
+    @Test
+    void shouldIgnoreStatusWithoutDeliveryStrategy() throws Exception {
+        final DeliveryPort deliveryPort = mock(DeliveryPort.class);
+        final ShipmentDeliveryEventListener listener = listener(deliveryPort);
+        final ShipmentStatusChangedIntegrationEvent event = JsonMapper.builder().configureForJackson2().build().readValue("""
+                {
+                  "payload": {"shipmentId": {"value": 42}, "shipmentStatus": "SENT"},
+                  "operatorId": {"value": 7},
+                  "userId": {"value": 42},
+                  "departmentId": {"value": 12}
+                }
+                """, ShipmentStatusChangedIntegrationEvent.class);
+
+        listener.handle(event);
+
+        verifyNoInteractions(deliveryPort);
+    }
+
+    private static ShipmentDeliveryEventListener listener(final DeliveryPort deliveryPort) {
+        return new ShipmentDeliveryEventListener(deliveryPort, new ShipmentStatusDeliveryStrategyResolver(List.of(
+                new ShipmentLostDeliveryStrategy(deliveryPort),
+                new ShipmentDeliveredDeliveryStrategy(deliveryPort),
+                new ShipmentReturnedDeliveryStrategy(deliveryPort))));
     }
 }

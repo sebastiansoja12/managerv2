@@ -11,6 +11,7 @@ import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryDerivationType
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryLifecycleStatus;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryMethod;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryStepOutcome;
+import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryType;
 import com.warehouse.logisticsdelivery.domain.enumeration.PickupMethod;
 import com.warehouse.logisticsdelivery.domain.exception.DeliveryModificationException;
 import com.warehouse.logisticsdelivery.domain.exception.DeliveryStepNotFoundException;
@@ -147,6 +148,33 @@ class DeliveryTest {
     }
 
     @Test
+    void shouldStartInOriginDepartment() {
+        final Delivery delivery = shipmentDelivery(new ShipmentId(10L));
+
+        assertThat(delivery.getCurrentDepartmentId()).isEqualTo(ORIGIN_DEPARTMENT_ID);
+        assertThat(delivery.snapshot().currentDepartmentId()).isEqualTo(ORIGIN_DEPARTMENT_ID);
+    }
+
+    @Test
+    void shouldMoveToDepartmentOfRecordedAttempt() {
+        final Delivery delivery = shipmentDelivery(new ShipmentId(10L));
+
+        delivery.recordAttempt(DeliveryStatus.REJECTED, USER_ID, null, new DepartmentId(7L), null, null, null);
+
+        assertThat(delivery.getCurrentDepartmentId()).isEqualTo(new DepartmentId(7L));
+    }
+
+    @Test
+    void shouldKeepCurrentDepartmentWhenAttemptHasNoDepartment() {
+        final Delivery delivery = shipmentDelivery(new ShipmentId(10L));
+        delivery.recordAttempt(DeliveryStatus.REJECTED, USER_ID, null, new DepartmentId(7L), null, null, null);
+
+        delivery.recordAttempt(DeliveryStatus.DELIVERY, USER_ID, null, null, null, null, null);
+
+        assertThat(delivery.getCurrentDepartmentId()).isEqualTo(new DepartmentId(7L));
+    }
+
+    @Test
     void shouldCompleteDeliveryWithFinalStep() {
         final Delivery delivery = shipmentDelivery(new ShipmentId(10L));
 
@@ -202,11 +230,12 @@ class DeliveryTest {
         final DeliveryStepSnapshot replacementStep = replaced.snapshot().deliverySteps().getLast();
         assertThat(replacementStep.commentCode()).isEqualTo(DeliveryCommentCode.REPLACED_BY_PALLET_DELIVERY);
         assertThat(replacementStep.comment()).isNull();
-        assertThat(replaced.replaceByPalletDelivery(replaced.getDeliveryId(), USER_ID)).isFalse();
+        replaced.replaceByPalletDelivery(replaced.getDeliveryId(), USER_ID);
+        assertThat(replaced.getReplacedByDeliveryId()).isEqualTo(palletDelivery.getDeliveryId());
     }
 
     @Test
-    void shouldContinueReplacedDeliveryFromUnloadDepartmentAfterPalletUnloading() {
+    void shouldKeepOriginalOriginAndRecordUnloadDepartmentAfterPalletUnloading() {
         final DepartmentId unloadDepartmentId = new DepartmentId(8L);
         final Delivery replaced = shipmentDelivery(new ShipmentId(10L));
         replaced.replaceByPalletDelivery(
@@ -218,7 +247,7 @@ class DeliveryTest {
         assertThat(snapshot.deliveryId()).isNotEqualTo(replaced.getDeliveryId());
         assertThat(snapshot.target()).isEqualTo(replaced.getTarget());
         assertThat(snapshot.status()).isEqualTo(DeliveryLifecycleStatus.CREATED);
-        assertThat(snapshot.originDepartmentId()).isEqualTo(unloadDepartmentId);
+        assertThat(snapshot.originDepartmentId()).isEqualTo(ORIGIN_DEPARTMENT_ID);
         assertThat(snapshot.destinationDepartmentId()).isEqualTo(DESTINATION_DEPARTMENT_ID);
         assertThat(snapshot.method()).isEqualTo(DeliveryMethod.LOCKER);
         assertThat(snapshot.deliveryPickupPointId()).isEqualTo(DELIVERY_PICKUP_POINT_ID);
@@ -226,6 +255,22 @@ class DeliveryTest {
         final DeliveryStepSnapshot continuationStep = snapshot.deliverySteps().getLast();
         assertThat(continuationStep.commentCode()).isEqualTo(DeliveryCommentCode.UNLOADED_FROM_PALLET);
         assertThat(continuationStep.departmentId()).isEqualTo(unloadDepartmentId);
+        assertThat(snapshot.currentDepartmentId()).isEqualTo(unloadDepartmentId);
+    }
+
+    @Test
+    void shouldUseUnloadDepartmentAsOriginWhenReplacedDeliveryHasNoOrigin() {
+        final DepartmentId unloadDepartmentId = new DepartmentId(8L);
+        final Delivery replaced = new Delivery(DeliveryTarget.shipment(new ShipmentId(10L)), new ShipmentId(10L),
+                DeliveryType.OUTBOUND, null, DESTINATION_DEPARTMENT_ID, PickupMethod.DEPARTMENT,
+                DeliveryMethod.COURIER, null, null, null, false, USER_ID);
+        replaced.replaceByPalletDelivery(
+                Delivery.forPallet(DeliveryTarget.pallet("p"), null, null, USER_ID).getDeliveryId(), USER_ID);
+
+        final Delivery continuation = Delivery.continuedAfterPalletUnloading(replaced, unloadDepartmentId, USER_ID);
+
+        assertThat(continuation.getOriginDepartmentId()).isEqualTo(unloadDepartmentId);
+        assertThat(continuation.getDestinationDepartmentId()).isEqualTo(DESTINATION_DEPARTMENT_ID);
     }
 
     @Test
@@ -254,9 +299,8 @@ class DeliveryTest {
     void shouldAssignSupplierAndVehicleToActiveDelivery() {
         final Delivery delivery = shipmentDelivery(new ShipmentId(10L));
 
-        final boolean changed = delivery.assignSupplier(new SupplierId(4L), new VehicleId(9L));
+        delivery.assignSupplier(new SupplierId(4L), new VehicleId(9L));
 
-        assertThat(changed).isTrue();
         assertThat(delivery.getSupplierId()).isEqualTo(new SupplierId(4L));
         assertThat(delivery.getVehicleId()).isEqualTo(new VehicleId(9L));
         assertThat(delivery.getStatus()).isEqualTo(DeliveryLifecycleStatus.MODIFIED);
@@ -266,10 +310,9 @@ class DeliveryTest {
     void shouldChangeConditionsOfDelivery() {
         final Delivery delivery = shipmentDelivery(new ShipmentId(10L));
 
-        final boolean changed = delivery.changeConditions(DeliveryMethod.COURIER, true, "Call before", null);
+        delivery.changeConditions(DeliveryMethod.COURIER, true, "Call before", null);
 
         final DeliverySnapshot snapshot = delivery.snapshot();
-        assertThat(changed).isTrue();
         assertThat(snapshot.method()).isEqualTo(DeliveryMethod.COURIER);
         assertThat(snapshot.signatureRequired()).isTrue();
         assertThat(snapshot.instructions()).isEqualTo("Call before");
@@ -280,9 +323,8 @@ class DeliveryTest {
         final Delivery delivery = shipmentDelivery(new ShipmentId(10L));
         delivery.complete(null, USER_ID, null);
 
-        final boolean changed = delivery.commentStep(2, "Left at reception");
+        delivery.commentStep(2, "Left at reception");
 
-        assertThat(changed).isTrue();
         assertThat(delivery.snapshot().deliverySteps().get(1).comment()).isEqualTo("Left at reception");
         assertThat(delivery.getStatus()).isEqualTo(DeliveryLifecycleStatus.COMPLETED);
     }
@@ -292,10 +334,9 @@ class DeliveryTest {
         final Delivery delivery = shipmentDelivery(new ShipmentId(10L));
         delivery.recordAttempt(DeliveryStatus.REJECTED, USER_ID, null, null, null, "Recipient absent", null);
 
-        final boolean changed = delivery.correctStepStatus(2, DeliveryStatus.DELIVERED);
+        delivery.correctStepStatus(2, DeliveryStatus.DELIVERED);
 
         final DeliveryStepSnapshot step = delivery.snapshot().deliverySteps().get(1);
-        assertThat(changed).isTrue();
         assertThat(step.outcome()).isEqualTo(DeliveryStepOutcome.SUCCEEDED);
         assertThat(step.failureReason()).isNull();
     }
@@ -308,7 +349,7 @@ class DeliveryTest {
 
         assertThatThrownBy(() -> delivery.attachStepSignature(2, new SignatureId(11L)))
                 .isInstanceOf(DeliveryModificationException.class);
-        assertThat(delivery.attachStepSignature(3, new SignatureId(11L))).isTrue();
+        delivery.attachStepSignature(3, new SignatureId(11L));
         assertThat(delivery.snapshot().deliverySteps().get(2).signatureId()).isEqualTo(new SignatureId(11L));
     }
 
@@ -317,10 +358,9 @@ class DeliveryTest {
         final Delivery delivery = shipmentDelivery(new ShipmentId(10L));
         delivery.recordAttempt(DeliveryStatus.DELIVERY, USER_ID, null, null, null, null, null);
 
-        final boolean changed = delivery.reassignStepCarrier(2, new SupplierId(4L), new VehicleId(9L));
+        delivery.reassignStepCarrier(2, new SupplierId(4L), new VehicleId(9L));
 
         final DeliveryStepSnapshot step = delivery.snapshot().deliverySteps().get(1);
-        assertThat(changed).isTrue();
         assertThat(step.supplierId()).isEqualTo(new SupplierId(4L));
         assertThat(step.vehicleId()).isEqualTo(new VehicleId(9L));
     }

@@ -25,10 +25,11 @@ public interface DeliveryEntityMapper {
                 entity.getDeliveryStatus() == null ? null
                         : DeliveryStatus.valueOf(entity.getDeliveryStatus().name()),
                 entity.getStatus(), entity.getOriginDepartmentId(), entity.getDestinationDepartmentId(),
-                entity.getPickupMethod(), entity.getMethod(), entity.getPickupPointId(), entity.getDeliveryPickupPointId(),
+                entity.getCurrentDepartmentId(), entity.getPickupMethod(), entity.getMethod(), entity.getPickupPointId(), entity.getDeliveryPickupPointId(),
                 Boolean.TRUE.equals(entity.getSignatureRequired()), entity.getInstructions(), entity.getPlannedAt(),
                 entity.getDeliveredAt(), entity.getToken(),
-                entity.getReplacedByDeliveryId() == null ? null : new DeliveryId(entity.getReplacedByDeliveryId()));
+                entity.getReplacedByDeliveryId() == null ? null : new DeliveryId(entity.getReplacedByDeliveryId()),
+                entity.getVersion());
     }
 
     default DeliveryStep toDomain(final DeliveryStepEntity entity) {
@@ -55,6 +56,7 @@ public interface DeliveryEntityMapper {
                 .status(delivery.getStatus() == null ? DeliveryLifecycleStatus.CREATED : delivery.getStatus())
                 .originDepartmentId(delivery.getOriginDepartmentId())
                 .destinationDepartmentId(delivery.getDestinationDepartmentId())
+                .currentDepartmentId(delivery.getCurrentDepartmentId())
                 .pickupMethod(delivery.getPickupMethod())
                 .method(delivery.getMethod())
                 .pickupPointId(delivery.getPickupPointId())
@@ -63,10 +65,12 @@ public interface DeliveryEntityMapper {
                 .instructions(delivery.getInstructions())
                 .plannedAt(delivery.getPlannedAt())
                 .deliveredAt(delivery.getDeliveredAt())
+                .currentDepartmentSince(delivery.getCurrentDepartmentSince())
                 .token(delivery.getToken())
                 .replacedByDeliveryId(delivery.getReplacedByDeliveryId() == null ? null
                         : delivery.getReplacedByDeliveryId().getId())
                 .deliverySteps(steps)
+                .version(delivery.getVersion())
                 .build();
     }
 

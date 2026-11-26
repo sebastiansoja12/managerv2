@@ -45,6 +45,11 @@ public class ShipmentContentRepositoryImpl implements ShipmentContentRepository 
     }
 
     @Override
+    public void saveIncidentNote(final ShipmentNote note) {
+        entityManager.merge(mapper.toEntity(note, operatorContextProvider.currentOperatorId()));
+    }
+
+    @Override
     public List<ShipmentNote> listNotes(final ShipmentId shipmentId) {
         return entityManager.createQuery("select note from shipment.ShipmentNoteEntity note "
                         + "where note.shipmentId.value = :shipmentId and note.operatorId.value = :operatorId "

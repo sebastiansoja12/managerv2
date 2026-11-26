@@ -100,6 +100,16 @@ class JwtAuthenticationFilterImpersonationTest {
     }
 
     @Test
+    void shouldNotAuthenticateOrganizationUserOnPlatformOwnerPath() throws Exception {
+        final MockHttpServletRequest request = request(jwtService.generateToken(superadmin));
+        request.setRequestURI("/v1/api/platform/audit-log");
+
+        final Authentication authentication = filter(request);
+
+        assertThat(authentication).isNull();
+    }
+
+    @Test
     void shouldRejectImpersonationWithoutActiveOwnerOrConsent() throws Exception {
         when(platformOwnerAuthenticationPort.isImpersonationActive(new Impersonation(PLATFORM_OWNER_ID, "owner", 77L), OperatorId.of(20L))).thenReturn(false);
         final MockHttpServletRequest request = request(impersonationToken());

@@ -1,5 +1,6 @@
 package com.warehouse.auth.infrastructure.adapter.primary;
 
+import com.warehouse.auth.domain.service.PasswordPolicy;
 import com.warehouse.auth.domain.model.FullNameChangeCommand;
 import com.warehouse.auth.infrastructure.dto.*;
 import org.springframework.http.CacheControl;
@@ -38,6 +39,8 @@ public class CurrentUserController {
     private final ResponseMapper responseMapper;
 
     private final ActingDepartmentHeader actingDepartmentHeader = new ActingDepartmentHeader();
+
+    private final PasswordPolicy passwordPolicy = new PasswordPolicy();
 
     public CurrentUserController(final CurrentUserAuthenticationPort currentUserAuthenticationPort,
                                  final UserPort userPort,
@@ -81,6 +84,11 @@ public class CurrentUserController {
             return ResponseEntity.badRequest().body("Current password is incorrect");
         }
 
+        if (!passwordPolicy.isAcceptable(request.newPassword(), user.getUsername())) {
+            return ResponseEntity.badRequest().body("New password must have between " + PasswordPolicy.MIN_LENGTH
+                    + " characters and " + PasswordPolicy.MAX_BYTES + " bytes and differ from the username");
+        }
+
         userPort.changePassword(user.getUserId(), passwordEncoder.encode(request.newPassword()));
         return ResponseEntity.ok().build();
     }
@@ -113,6 +121,13 @@ public class CurrentUserController {
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.noStore())
                 .body(new GeneratedApiKeyResponseDto(apiKey));
+    }
+
+    @PostMapping("/api-key/reveal")
+    public ResponseEntity<GeneratedApiKeyResponseDto> revealApiKey() {
+        final OrganizationUser user = currentUserAuthenticationPort.getCurrentUser();
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore())
+                .body(new GeneratedApiKeyResponseDto(this.userPort.revealApiKey(user.getUserId())));
     }
 
     @DeleteMapping("/api-key")

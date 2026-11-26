@@ -67,6 +67,6 @@ class PalletDocumentTest {
         return new PalletDocument(new PalletId("legacy"), null, null, shipmentIds,
                 null, null, Instant.now(), Instant.now(),
                 PalletStatus.EMPTY, StorageStatus.UNLOCKED, null, null, null, PalletHandlingPriority.LOW,
-                PalletType.PARENT, null, false, null);
+                PalletType.PARENT, null, false, null, null);
     }
 }

@@ -2,6 +2,7 @@ package com.warehouse.routetracker.domain.port.secondary;
 
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.vo.RouteProcess;
+import com.warehouse.routetracker.domain.vo.identifier.OperatorId;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 
 import java.util.List;
@@ -11,11 +12,11 @@ public interface RouteLogRepository {
 
     RouteProcess save(final RouteLogRecord routeLogRecord);
 
-    RouteLogRecord find(final ShipmentId shipmentId);
+    RouteLogRecord find(final ShipmentId shipmentId, final OperatorId operatorId);
 
     Optional<RouteLogRecord> findById(final ShipmentId shipmentId);
 
     void update(final RouteLogRecord routeLogRecord);
 
-    List<RouteLogRecord> findAll();
+    List<RouteLogRecord> findAll(final OperatorId operatorId);
 }

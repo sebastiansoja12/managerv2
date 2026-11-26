@@ -15,6 +15,7 @@ import com.warehouse.organisationstructure.operator.domain.model.UpdateOperatorC
 import com.warehouse.organisationstructure.operator.domain.port.primary.OperatorPort;
 import com.warehouse.organisationstructure.operator.infrastructure.adapter.primary.mapper.OperatorRequestMapper;
 import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.mapper.OperatorMapper;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.exception.InvalidOperatorConfigurationException;
 
 import java.util.List;
 
@@ -54,5 +55,10 @@ public class OperatorController {
                                               @RequestBody final UpdateOperatorApiRequest request) {
         final UpdateOperatorCommand command = OperatorRequestMapper.toCommand(request);
         return ResponseEntity.ok(OperatorMapper.toDto(operatorPort.update(OperatorId.of(operatorId), command)));
+    }
+
+    @ExceptionHandler(InvalidOperatorConfigurationException.class)
+    public ResponseEntity<String> handleInvalidConfiguration(final InvalidOperatorConfigurationException exception) {
+        return ResponseEntity.badRequest().body(exception.getMessage());
     }
 }

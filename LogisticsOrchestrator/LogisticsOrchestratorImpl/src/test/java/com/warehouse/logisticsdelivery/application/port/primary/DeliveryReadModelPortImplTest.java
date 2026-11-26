@@ -1,11 +1,14 @@
 package com.warehouse.logisticsdelivery.application.port.primary;
 
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryReadModelRepository;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryRepository;
+import com.warehouse.logisticsdelivery.domain.event.DeliveryReadModelRebuilt;
 import com.warehouse.logisticsdelivery.domain.model.Delivery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,6 +17,7 @@ import java.util.List;
 import static com.warehouse.logisticsdelivery.DeliveryFixture.shipmentDelivery;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -21,14 +25,16 @@ class DeliveryReadModelPortImplTest {
 
     private DeliveryRepository deliveryRepository;
     private DeliveryReadModelRepository deliveryReadModelRepository;
+    private DomainEventPublisher domainEventPublisher;
     private DeliveryReadModelPortImpl deliveryReadModelPort;
 
     @BeforeEach
     void setUp() {
         this.deliveryRepository = mock(DeliveryRepository.class);
         this.deliveryReadModelRepository = mock(DeliveryReadModelRepository.class);
+        this.domainEventPublisher = mock(DomainEventPublisher.class);
         this.deliveryReadModelPort = new DeliveryReadModelPortImpl(this.deliveryRepository,
-                this.deliveryReadModelRepository);
+                this.deliveryReadModelRepository, this.domainEventPublisher);
     }
 
     @Test
@@ -44,5 +50,10 @@ class DeliveryReadModelPortImplTest {
         assertThat(rebuilt).isEqualTo(2);
         verify(this.deliveryReadModelRepository).sync(firstDelivery.snapshot());
         verify(this.deliveryReadModelRepository).sync(secondDelivery.snapshot());
+        final ArgumentCaptor<DeliveryReadModelRebuilt> rebuiltEvents =
+                ArgumentCaptor.forClass(DeliveryReadModelRebuilt.class);
+        verify(this.domainEventPublisher, times(2)).publish(rebuiltEvents.capture());
+        assertThat(rebuiltEvents.getAllValues()).extracting(DeliveryReadModelRebuilt::getSnapshot)
+                .containsExactly(firstDelivery.snapshot(), secondDelivery.snapshot());
     }
 }

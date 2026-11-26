@@ -1,7 +1,6 @@
 package com.warehouse.returning.domain.event;
 
-import java.time.Instant;
+import com.warehouse.eventoutbox.domain.model.DomainEvent;
 
-public interface ReturnPackageEvent {
-    Instant getTimestamp();
+public interface ReturnPackageEvent extends DomainEvent {
 }

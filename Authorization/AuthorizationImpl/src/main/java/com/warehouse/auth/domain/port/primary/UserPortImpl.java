@@ -15,6 +15,7 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import lombok.extern.slf4j.Slf4j;
+import com.warehouse.commonassets.exception.ProblemDetailsException;
 
 import java.security.SecureRandom;
 import java.time.Instant;
@@ -68,6 +69,7 @@ public class UserPortImpl implements UserPort {
         final OrganizationUser currentUser = currentUser();
         return userService.findAll()
                 .stream()
+                .filter(user -> !user.isBusinessCustomer())
                 .filter(user -> currentUser.canAccessDepartment(user.getDepartmentId()))
                 .toList();
     }
@@ -91,6 +93,7 @@ public class UserPortImpl implements UserPort {
     @Override
     public void changePassword(final UserId userId, final String encodedPassword) {
         this.userService.changePassword(userId, encodedPassword);
+        this.authenticationService.revokeSessions(this.userService.findUserById(userId).getUsername());
     }
 
     @Override
@@ -99,9 +102,22 @@ public class UserPortImpl implements UserPort {
     }
 
     @Override
+    public String revealApiKey(final UserId userId) {
+        if (!userId.equals(this.authenticationService.currentUserId())) {
+            throw new ProblemDetailsException(403, "Only your own API key can be revealed");
+        }
+        final OrganizationUser user = this.userService.findUserById(userId);
+        if (user == null || !user.canAuthenticateWithApiKey()) {
+            throw new ProblemDetailsException(404, "Active API key was not found");
+        }
+        return this.userService.findApiKeySecret(userId).orElseThrow(() -> new ProblemDetailsException(409,
+                "This API key was stored as a hash only. Generate a new key to enable revealing it."));
+    }
+
+    @Override
     public String regenerateApiKey(final UserId userId) {
         final String apiKey = generateApiKey();
-        this.userService.issueApiKey(userId, this.apiKeyEncoder.encode(userId, apiKey).key(), Instant.now());
+        this.userService.issueApiKey(userId, this.apiKeyEncoder.encode(userId, apiKey).key(), apiKey, Instant.now());
         return apiKey;
     }
 

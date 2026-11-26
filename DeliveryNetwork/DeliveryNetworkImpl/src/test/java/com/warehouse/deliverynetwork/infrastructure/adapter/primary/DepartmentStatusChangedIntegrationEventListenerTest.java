@@ -1,7 +1,9 @@
 package com.warehouse.deliverynetwork.infrastructure.adapter.primary;
 
 import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaEventListener;
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventListener;
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventType;
+import com.warehouse.organisationstructure.department.api.event.DepartmentTopics;
 import com.warehouse.deliverynetwork.application.port.primary.DeliveryNetworkPort;
 import com.warehouse.organisationstructure.department.api.dto.DepartmentCodeDto;
 import com.warehouse.organisationstructure.department.api.dto.DepartmentIdDto;
@@ -55,17 +57,14 @@ class DepartmentStatusChangedIntegrationEventListenerTest {
 
     @Test
     void shouldConsumeDepartmentStatusEventsFromDedicatedKafkaTopic() throws NoSuchMethodException {
-        final KafkaEventListener annotation = DepartmentStatusChangedIntegrationEventListener.class
+        final IntegrationEventListener annotation = DepartmentStatusChangedIntegrationEventListener.class
                 .getDeclaredMethod("handle", DepartmentStatusChangedIntegrationEvent.class)
-                .getAnnotation(KafkaEventListener.class);
+                .getAnnotation(IntegrationEventListener.class);
 
         assertNotNull(annotation);
-        assertEquals(
-                "${manager.kafka.topics.department-status-events:department.status.events}",
-                annotation.topics()[0]);
-        assertEquals(
-                "${manager.kafka.consumer-groups.delivery-network-department-status:manager-delivery-network-department-status}",
-                annotation.groupId());
+        assertEquals("manager-delivery-network-department-status", annotation.group());
+        assertEquals(DepartmentTopics.STATUS_EVENTS,
+                DepartmentStatusChangedIntegrationEvent.class.getAnnotation(IntegrationEventType.class).topic());
     }
 
     private static DepartmentStatusChangedIntegrationEvent event(final DepartmentStatusDto status) {

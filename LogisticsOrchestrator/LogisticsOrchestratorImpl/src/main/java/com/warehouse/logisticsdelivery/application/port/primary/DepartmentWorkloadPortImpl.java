@@ -1,6 +1,6 @@
 package com.warehouse.logisticsdelivery.application.port.primary;
 
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryRepository;
 import com.warehouse.logisticsdelivery.application.service.DestinationCapacityAllocator;
@@ -50,11 +50,10 @@ public class DepartmentWorkloadPortImpl implements DepartmentWorkloadPort {
             final DepartmentId destinationDepartmentId = Objects.equals(delivery.getDestinationDepartmentId(),
                     sourceDepartmentId) ? targetDepartmentId : delivery.getDestinationDepartmentId();
             try {
-                if (delivery.changeRoute(originDepartmentId, destinationDepartmentId, delivery.getPickupMethod(),
-                        delivery.getPickupPointId(), delivery.getDeliveryPickupPointId())) {
-                    this.deliveryRepository.createOrUpdate(delivery);
-                    this.domainEventPublisher.publish(new DeliveryModified(delivery.snapshot(), Instant.now()));
-                }
+                delivery.changeRoute(originDepartmentId, destinationDepartmentId, delivery.getPickupMethod(),
+                        delivery.getPickupPointId(), delivery.getDeliveryPickupPointId());
+                this.deliveryRepository.createOrUpdate(delivery);
+                this.domainEventPublisher.publish(new DeliveryModified(delivery.snapshot(), Instant.now()));
             } catch (final DeliveryModificationException exception) {
                 log.warn("Delivery {} was not transferred from department {} to {}: {}",
                         delivery.getDeliveryId().getId(), sourceDepartmentId.getValue(),

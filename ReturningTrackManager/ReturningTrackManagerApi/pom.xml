@@ -8,4 +8,12 @@
         <version>2026.4-SNAPSHOT</version>
     </parent>
     <artifactId>ReturningTrackManagerApi</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>EventOutbox</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>

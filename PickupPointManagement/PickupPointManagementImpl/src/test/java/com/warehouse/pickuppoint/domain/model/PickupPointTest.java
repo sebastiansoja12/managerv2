@@ -161,6 +161,46 @@ class PickupPointTest {
     }
 
     @Test
+    void shouldIgnoreRepeatedClose() {
+        final PickupPoint pickupPoint = activePickupPoint();
+        pickupPoint.close("Location closed", UPDATED_AT);
+
+        pickupPoint.close("Another reason", UPDATED_AT.plusSeconds(60));
+
+        assertEquals("Location closed", pickupPoint.snapshot().statusReason());
+        assertEquals(UPDATED_AT, pickupPoint.snapshot().updatedAt());
+    }
+
+    @Test
+    void shouldIgnoreRepeatedSuspend() {
+        final PickupPoint pickupPoint = activePickupPoint();
+        pickupPoint.suspend("Technical maintenance", UPDATED_AT);
+
+        pickupPoint.suspend("Another reason", UPDATED_AT.plusSeconds(60));
+
+        assertEquals("Technical maintenance", pickupPoint.snapshot().statusReason());
+        assertEquals(UPDATED_AT, pickupPoint.snapshot().updatedAt());
+    }
+
+    @Test
+    void shouldIgnoreResumeWhenPickupPointIsActive() {
+        final PickupPoint pickupPoint = activePickupPoint();
+
+        pickupPoint.resume(true, UPDATED_AT);
+
+        assertEquals(CREATED_AT, pickupPoint.snapshot().updatedAt());
+    }
+
+    @Test
+    void shouldNotTouchPickupPointWhenTypeIsUnchanged() {
+        final PickupPoint pickupPoint = activePickupPoint();
+
+        pickupPoint.changeType(PickupPointType.SERVICE_POINT, UPDATED_AT);
+
+        assertEquals(CREATED_AT, pickupPoint.snapshot().updatedAt());
+    }
+
+    @Test
     void shouldAcceptEligibleShipment() {
         final PickupPoint pickupPoint = activePickupPoint();
         final PickupPointSelectionCriteria criteria = new PickupPointSelectionCriteria(

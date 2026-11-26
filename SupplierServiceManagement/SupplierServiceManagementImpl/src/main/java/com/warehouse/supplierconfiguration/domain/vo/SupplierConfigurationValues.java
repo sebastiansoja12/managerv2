@@ -37,6 +37,11 @@ public record SupplierConfigurationValues(Map<SupplierSetting, Boolean> settings
         return Boolean.TRUE.equals(settings.get(setting));
     }
 
+    public SupplierConfigurationValues withSubstitute(final SupplierId substituteSupplierId) {
+        return new SupplierConfigurationValues(settings, maxDeliveryAttempts, maxShipmentsPerRoute,
+                substituteSupplierId, preferredLabelFormat, defaultShipmentSortOrder);
+    }
+
     public SupplierConfigurationValues withSettings(final Map<SupplierSetting, Boolean> changedSettings) {
         final EnumMap<SupplierSetting, Boolean> mergedSettings = new EnumMap<>(SupplierSetting.class);
         mergedSettings.putAll(settings);

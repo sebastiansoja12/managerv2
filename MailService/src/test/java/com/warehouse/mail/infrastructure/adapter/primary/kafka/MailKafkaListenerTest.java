@@ -15,8 +15,11 @@ import com.warehouse.shipment.api.event.ShipmentStatusChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.snapshot.ShipmentEventData;
 import org.junit.jupiter.api.Test;
 
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventListener;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -51,10 +54,14 @@ class MailKafkaListenerTest {
     }
 
     @Test
-    void shouldIgnoreOtherEventsFromSharedShipmentTopic() {
-        listener.handle(new ShipmentDestinationChangedIntegrationEvent(shipment));
+    void shouldNotSubscribeToOtherEventsFromSharedShipmentTopic() {
+        final List<Class<?>> handledEventTypes = Arrays.stream(MailKafkaListener.class.getDeclaredMethods())
+                .filter(method -> method.isAnnotationPresent(IntegrationEventListener.class))
+                .<Class<?>>map(method -> method.getParameterTypes()[0])
+                .toList();
 
-        assertEquals(List.of(), mailPort.templateKeys());
+        assertEquals(false, handledEventTypes.stream()
+                .anyMatch(eventType -> eventType.isAssignableFrom(ShipmentDestinationChangedIntegrationEvent.class)));
     }
 
     @Test

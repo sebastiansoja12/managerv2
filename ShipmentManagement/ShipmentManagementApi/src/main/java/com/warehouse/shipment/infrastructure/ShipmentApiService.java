@@ -1,12 +1,17 @@
 package com.warehouse.shipment.infrastructure;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 
+import com.warehouse.commonassets.identificator.PriceQuoteId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
+import com.warehouse.shipment.infrastructure.dto.ShipmentBillingPartyDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentDetailsDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentDocumentDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentHandoverRequestDto;
+import com.warehouse.shipment.infrastructure.dto.ShipmentPaymentReferenceDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRerouteDetailsDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentReturnResponseDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectRequestDto;
@@ -16,6 +21,8 @@ import com.warehouse.shipment.infrastructure.dto.SourceShipmentDto;
 
 public interface ShipmentApiService {
     ShipmentDetailsDto getShipment(final ShipmentId shipmentId);
+
+    Map<ShipmentId, String> findRecipientPostalCodes(final Collection<ShipmentId> shipmentIds);
 
     ShipmentDetailsDto getShipment(final TrackingNumber trackingNumber);
 
@@ -36,6 +43,10 @@ public interface ShipmentApiService {
     ShipmentDetailsDto unloadShipmentFromPallet(final ShipmentId shipmentId);
 
     Optional<ShipmentRerouteDetailsDto> getShipmentForReroute(final TrackingNumber trackingNumber);
+
+    Optional<ShipmentPaymentReferenceDto> findPaymentReference(final TrackingNumber trackingNumber);
+
+    Optional<ShipmentBillingPartyDto> findBillingParty(final PriceQuoteId priceQuoteId);
 
     Optional<SourceShipmentDto> findSourceShipment(final ShipmentId shipmentId);
 

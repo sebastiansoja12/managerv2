@@ -198,9 +198,8 @@ public class PalletStorageServiceImpl implements PalletStorageService {
     @Override
     public Pallet cancel(final PalletId palletId) {
         final Pallet pallet = find(palletId);
-        if (pallet.cancel()) {
-            this.palletRepository.createOrUpdate(pallet);
-        }
+        pallet.cancel();
+        this.palletRepository.createOrUpdate(pallet);
         return pallet;
     }
 
@@ -221,13 +220,11 @@ public class PalletStorageServiceImpl implements PalletStorageService {
     }
 
     @Override
-    public boolean markLoaded(final PalletId palletId) {
+    public Pallet markLoaded(final PalletId palletId) {
         final Pallet pallet = find(palletId);
-        final boolean changed = pallet.markLoaded();
-        if (changed) {
-            this.palletRepository.createOrUpdate(pallet);
-        }
-        return changed;
+        pallet.markLoaded();
+        this.palletRepository.createOrUpdate(pallet);
+        return pallet;
     }
 
     @Override
@@ -249,9 +246,11 @@ public class PalletStorageServiceImpl implements PalletStorageService {
     @Override
     public Pallet update(final PalletId palletId, final PalletType palletType,
                          final PalletHandlingPriority palletHandlingPriority, final Boolean refrigerated,
-                         final Dimension dimension, final SealNumber sealNumber) {
+                         final Boolean mixedDestinationsAllowed, final Dimension dimension,
+                         final SealNumber sealNumber) {
         final Pallet pallet = find(palletId);
-        pallet.update(palletType, palletHandlingPriority, refrigerated, dimension, sealNumber);
+        pallet.update(palletType, palletHandlingPriority, refrigerated, mixedDestinationsAllowed, dimension,
+                sealNumber);
         this.palletRepository.createOrUpdate(pallet);
         return pallet;
     }

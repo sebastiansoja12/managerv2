@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-23-mcp-access-policies" author="s-soja">
+        <createTable tableName="mcp_access_policies">
+            <column name="user_id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_mcp_access_policies"/>
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="mcp_access_policies" indexName="idx_mcp_access_operator">
+            <column name="operator_id"/>
+        </createIndex>
+        <createTable tableName="mcp_module_permissions">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="module" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="access_level" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="mcp_module_permissions" columnNames="user_id,module" constraintName="pk_mcp_module_permissions"/>
+        <addForeignKeyConstraint baseTableName="mcp_module_permissions" baseColumnNames="user_id"
+                                 referencedTableName="mcp_access_policies" referencedColumnNames="user_id"
+                                 constraintName="fk_mcp_permissions_policy" onDelete="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>

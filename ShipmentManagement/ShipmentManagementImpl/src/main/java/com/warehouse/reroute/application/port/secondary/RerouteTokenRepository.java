@@ -11,7 +11,10 @@ public interface RerouteTokenRepository {
 
     RerouteToken save(final RerouteToken rerouteToken);
 
-    Optional<RerouteToken> findLatestByShipmentId(final ShipmentId shipmentId);
+    /** Locks the token row until the surrounding transaction ends, so failed attempts are counted one by one. */
+    Optional<RerouteToken> findLatestByShipmentIdForUpdate(final ShipmentId shipmentId);
+
+    long countIssuedSince(final ShipmentId shipmentId, final Instant since);
 
     List<RerouteToken> findActiveByShipmentId(final ShipmentId shipmentId, final Instant now);
 

@@ -3,10 +3,13 @@ package com.warehouse.auth.infrastructure.adapter.primary;
 import com.warehouse.auth.infrastructure.dto.UserApiKeyDto;
 import com.warehouse.auth.UserApiService;
 import com.warehouse.auth.domain.model.OrganizationUser;
+import com.warehouse.auth.domain.model.CreateBusinessCustomerUserCommand;
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
+import com.warehouse.auth.domain.port.primary.UserPort;
 import com.warehouse.auth.domain.service.UserService;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.OperatorUserRequestMapper;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.ResponseMapper;
+import com.warehouse.auth.infrastructure.dto.CreateBusinessCustomerUserApiRequest;
 import com.warehouse.auth.infrastructure.dto.CreateOperatorUserApiRequest;
 import com.warehouse.auth.infrastructure.dto.UserDto;
 import com.warehouse.auth.infrastructure.dto.UserIdDto;
@@ -23,12 +26,16 @@ public class UserApiServiceAdapter implements UserApiService {
 
     private final AuthenticationPort authenticationPort;
 
+    private final UserPort userPort;
+
     public UserApiServiceAdapter(final UserService userService,
                                  final ResponseMapper responseMapper,
-                                 final AuthenticationPort authenticationPort) {
+                                 final AuthenticationPort authenticationPort,
+                                 final UserPort userPort) {
         this.userService = userService;
         this.responseMapper = responseMapper;
         this.authenticationPort = authenticationPort;
+        this.userPort = userPort;
     }
 
     @Override
@@ -64,10 +71,23 @@ public class UserApiServiceAdapter implements UserApiService {
     }
 
     @Override
+    public UserDto createBusinessCustomerUser(final CreateBusinessCustomerUserApiRequest request) {
+        final UserId userId = authenticationPort.createBusinessCustomerUser(new CreateBusinessCustomerUserCommand(
+                request.username(), request.name(), request.email(), request.language()));
+        return map(userService.findUserById(userId));
+    }
+
+    @Override
+    public String regenerateApiKey(final UserId userId) {
+        return userPort.regenerateApiKey(userId);
+    }
+
+    @Override
     public List<UserApiKeyDto> findApiKeys() {
         return userService.findAll()
                 .stream()
                 .filter(OrganizationUser::hasApiKey)
+                .filter(user -> !user.isBusinessCustomer())
                 .filter(user -> !Boolean.TRUE.equals(user.isDeleted()))
                 .map(user -> {
                     final com.warehouse.commonassets.identificator.DepartmentCode departmentCode =

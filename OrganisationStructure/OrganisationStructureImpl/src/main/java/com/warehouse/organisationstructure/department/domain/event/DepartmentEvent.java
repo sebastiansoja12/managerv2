@@ -1,4 +1,6 @@
 package com.warehouse.organisationstructure.department.domain.event;
 
-public interface DepartmentEvent {
+import com.warehouse.eventoutbox.domain.model.DomainEvent;
+
+public interface DepartmentEvent extends DomainEvent {
 }

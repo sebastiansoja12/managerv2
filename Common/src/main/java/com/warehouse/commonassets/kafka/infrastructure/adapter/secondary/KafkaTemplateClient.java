@@ -5,7 +5,7 @@ import tools.jackson.databind.ObjectMapper;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.commonassets.kafka.domain.model.KafkaEventHeaders;
+import com.warehouse.eventoutbox.kafka.KafkaEventHeaders;
 import com.warehouse.commonassets.event.integration.context.OperatorAwareEvent;
 import com.warehouse.commonassets.kafka.infrastructure.annotation.KafkaTopic;
 import com.warehouse.commonassets.repository.OperatorContextProvider;

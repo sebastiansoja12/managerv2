@@ -1,5 +1,6 @@
 package com.warehouse.returning.api.event;
 
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventType;
 import com.warehouse.returning.api.identificator.DepartmentId;
 import com.warehouse.returning.api.identificator.OperatorId;
 import com.warehouse.returning.api.identificator.ShipmentId;
@@ -9,6 +10,7 @@ import com.warehouse.returning.domain.vo.ReturnPackageId;
 import java.time.Instant;
 import java.util.UUID;
 
+@IntegrationEventType(value = "return.processing.started", topic = ReturnTopics.PROCESSING_STARTED)
 public record ReturnProcessingStartedIntegrationEvent(
         UUID eventId,
         ShipmentId shipmentId,
@@ -18,16 +20,6 @@ public record ReturnProcessingStartedIntegrationEvent(
         OperatorId operatorId,
         UserId userId,
         Instant occurredAt) implements ReturnLifecycleIntegrationEvent {
-
-    @Override
-    public String eventType() {
-        return "return.processing.started";
-    }
-
-    @Override
-    public int version() {
-        return 1;
-    }
 
     @Override
     public String eventKey() {

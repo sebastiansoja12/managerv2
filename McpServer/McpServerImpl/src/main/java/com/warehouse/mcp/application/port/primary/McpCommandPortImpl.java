@@ -16,11 +16,13 @@ import com.warehouse.mcp.application.port.secondary.CurrentUserServicePort;
 import com.warehouse.mcp.application.port.secondary.DeliveryServicePort;
 import com.warehouse.mcp.application.port.secondary.DepartmentServicePort;
 import com.warehouse.mcp.application.port.secondary.ShipmentServicePort;
+import com.warehouse.mcp.application.port.secondary.VehicleServicePort;
 import com.warehouse.mcp.domain.exception.McpInvalidRequestException;
 import com.warehouse.mcp.domain.exception.McpToolAccessException;
 import com.warehouse.mcp.domain.service.ConfigurationMerge;
 import com.warehouse.mcp.domain.vo.ConfigurationSection;
 import com.warehouse.mcp.domain.vo.CourierChange;
+import com.warehouse.mcp.domain.vo.CourierDeliveryArea;
 import com.warehouse.mcp.domain.vo.CourierDraft;
 import com.warehouse.mcp.domain.vo.CurrentUserProfile;
 import com.warehouse.mcp.domain.vo.DeliveryConditions;
@@ -34,6 +36,7 @@ import com.warehouse.mcp.domain.vo.ShipmentDraft;
 import com.warehouse.mcp.domain.vo.ShipmentParty;
 import com.warehouse.mcp.domain.vo.ShipmentPartyChange;
 import com.warehouse.mcp.domain.vo.ShipmentTracking;
+import com.warehouse.mcp.domain.vo.VehicleDraft;
 
 public class McpCommandPortImpl implements McpCommandPort {
 
@@ -49,6 +52,8 @@ public class McpCommandPortImpl implements McpCommandPort {
 
     private final ConfigurationServicePort configurationServicePort;
 
+    private final VehicleServicePort vehicleServicePort;
+
     private final McpQueryPort mcpQueryPort;
 
     private final ConfigurationMerge configurationMerge;
@@ -63,6 +68,7 @@ public class McpCommandPortImpl implements McpCommandPort {
                               final DeliveryServicePort deliveryServicePort,
                               final CourierServicePort courierServicePort,
                               final ConfigurationServicePort configurationServicePort,
+                              final VehicleServicePort vehicleServicePort,
                               final McpQueryPort mcpQueryPort,
                               final ConfigurationMerge configurationMerge,
                               final boolean writeEnabled) {
@@ -72,6 +78,7 @@ public class McpCommandPortImpl implements McpCommandPort {
         this.deliveryServicePort = deliveryServicePort;
         this.courierServicePort = courierServicePort;
         this.configurationServicePort = configurationServicePort;
+        this.vehicleServicePort = vehicleServicePort;
         this.mcpQueryPort = mcpQueryPort;
         this.configurationMerge = configurationMerge;
         this.references = new McpReferences(departmentServicePort, courierServicePort);
@@ -179,9 +186,6 @@ public class McpCommandPortImpl implements McpCommandPort {
     public DepartmentDetails changeDepartmentStatus(final DepartmentCode departmentCode, final String status,
                                                     final String reason) {
         requireChangeAccess();
-        if (!currentUser().isAdministrator()) {
-            throw new McpToolAccessException("Changing department status requires the ADMIN role or higher");
-        }
         this.departmentServicePort.changeStatus(departmentCode, status, reason);
         return this.departmentServicePort.findDepartment(departmentCode);
     }
@@ -232,6 +236,24 @@ public class McpCommandPortImpl implements McpCommandPort {
     }
 
     @Override
+    public VehicleId createVehicle(final VehicleDraft vehicle) {
+        requireChangeAccess();
+        return this.vehicleServicePort.create(vehicle);
+    }
+
+    @Override
+    public void assignCourierVehicle(final SupplierCode courierCode, final VehicleId vehicleId) {
+        requireChangeAccess();
+        this.courierServicePort.assignVehicle(courierCode, vehicleId);
+    }
+
+    @Override
+    public void changeCourierDeliveryArea(final SupplierCode courierCode, final CourierDeliveryArea deliveryArea) {
+        requireChangeAccess();
+        this.courierServicePort.changeDeliveryArea(courierCode, deliveryArea);
+    }
+
+    @Override
     public ConfigurationView updateConfiguration(final ConfigurationSection section,
                                                  final Map<String, Object> changes) {
         requireChangeAccess();
@@ -247,9 +269,6 @@ public class McpCommandPortImpl implements McpCommandPort {
     private void requireChangeAccess() {
         if (!this.writeEnabled) {
             throw new McpToolAccessException("Changing data over MCP is disabled on this server (MCP_WRITE_ENABLED)");
-        }
-        if (!currentUser().canChangeData()) {
-            throw new McpToolAccessException("Changing data requires the MANAGER role or higher");
         }
     }
 

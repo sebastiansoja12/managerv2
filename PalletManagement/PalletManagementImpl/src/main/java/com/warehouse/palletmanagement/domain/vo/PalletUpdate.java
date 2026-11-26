@@ -3,6 +3,7 @@ package com.warehouse.palletmanagement.domain.vo;
 public record PalletUpdate(String palletType,
                            String handlingPriority,
                            Boolean refrigerated,
+                           Boolean mixedDestinationsAllowed,
                            PalletDimension dimension,
                            String sealNumber) {
 

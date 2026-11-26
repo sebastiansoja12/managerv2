@@ -315,7 +315,7 @@ class OperatorConfigurationPortImplTest {
         final DepartmentId overriddenDepartment = new DepartmentId(1L);
         final DepartmentConfigurationOverride override = new DepartmentConfigurationOverride(overriddenDepartment,
                 null, null, true, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-                300, null, null, null);
+                300, null, null, null, null);
         when(departmentConfigurationOverrideRepository.findAll()).thenReturn(List.of(override));
         final OperatorConfigurationPort operatorConfigurationPort = new OperatorConfigurationPortImpl(
                 operatorConfigurationService, currentOperatorService, departmentConfigurationOverrideRepository,

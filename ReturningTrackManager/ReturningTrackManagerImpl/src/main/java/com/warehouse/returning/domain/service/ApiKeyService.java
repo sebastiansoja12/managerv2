@@ -13,13 +13,17 @@ import com.warehouse.returning.domain.vo.UserId;
 import com.warehouse.returning.infrastructure.adapter.secondary.exception.RestException;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 
 @Service
 public class ApiKeyService {
+
+    private static final String TOKEN_TYPE_CLAIM = "tokenType";
+
+    private static final String ACCESS_TOKEN_TYPE = "access";
 
     private final JwtProvider jwtProvider;
 
@@ -32,9 +36,15 @@ public class ApiKeyService {
             final Claims claims = Jwts
                     .parserBuilder()
                     .setSigningKey(getSigningKey())
+                    .requireIssuer(jwtProvider.getIssuer())
+                    .requireAudience(jwtProvider.getAudience())
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
+
+            if (!ACCESS_TOKEN_TYPE.equals(claims.get(TOKEN_TYPE_CLAIM, String.class))) {
+                throw new RestException(401, "Invalid or expired JWT token");
+            }
 
             final UserId userId = new UserId(claims.get("userId", Long.class));
             final DepartmentId departmentId = Optional.ofNullable(extractLongClaim(claims, "departmentId"))
@@ -46,7 +56,7 @@ public class ApiKeyService {
             final String issuer = claims.get("username", String.class);
 
             return new DecodedApiOperator(userId, departmentId, operatorId, issuer);
-        } catch (SignatureException | IllegalArgumentException e) {
+        } catch (JwtException | IllegalArgumentException e) {
             throw new RestException(401, "Invalid or expired JWT token");
         }
     }

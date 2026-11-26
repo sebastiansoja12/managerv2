@@ -6,6 +6,8 @@ public interface OperatorFilteredRepository<T> {
     void update(final T object);
     void delete(final T object);
     Criteria<T> createCriteria(final Class<T> clazz);
+    ConditionalUpdate<T> createUpdate(final Class<T> clazz);
+    T updateAndFlush(final T object);
 
 }
 

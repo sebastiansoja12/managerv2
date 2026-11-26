@@ -1,5 +1,6 @@
 package com.warehouse.geocoding.infrastructure.adapter.primary;
 
+import com.warehouse.auth.AccessUserControl;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.warehouse.geocoding.application.port.primary.PostalCodePort;
 import com.warehouse.geocoding.infrastructure.adapter.primary.api.PostalCodeApiResponse;
 
+@AccessUserControl
 @RestController
 @RequestMapping("/postal-codes")
 public class PostalCodeController {

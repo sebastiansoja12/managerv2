@@ -1,13 +1,18 @@
 package com.warehouse.palletmanagement.domain.model;
 
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.palletmanagement.PalletFixture;
 import com.warehouse.palletmanagement.domain.enumeration.PalletLoadBlockReason;
 import com.warehouse.palletmanagement.domain.enumeration.PalletScanErrorCode;
 import com.warehouse.palletmanagement.domain.enumeration.PalletStatus;
+import com.warehouse.palletmanagement.domain.vo.PalletAttributes;
+import com.warehouse.palletmanagement.domain.vo.PalletShipment;
 import com.warehouse.palletmanagement.domain.vo.ShipmentLoadResult;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -79,5 +84,48 @@ class PalletScanTest {
         assertThat(palletScan.requiresLoadedNotification(complete)).isTrue();
         assertThat(palletScan.loadedSnapshot().shipmentIds())
                 .containsExactly(new ShipmentId(1L), new ShipmentId(2L));
+    }
+
+    @Test
+    void shouldRejectPalletWhenShipmentHasDifferentDestinationDepartment() {
+        final PalletScan palletScan = new PalletScan(PalletFixture.readyPallet(new DepartmentId(5L), 1L, 2L));
+
+        assertThat(palletScan.rejectionReason(() -> List.of(
+                shipment(1L, new DepartmentId(5L)),
+                shipment(2L, new DepartmentId(6L)))))
+                .contains(PalletScanErrorCode.SHIPMENT_DESTINATION_MISMATCH);
+    }
+
+    @Test
+    void shouldAcceptPalletWhenAllShipmentsHaveSameDestinationDepartment() {
+        final PalletScan palletScan = new PalletScan(PalletFixture.readyPallet(new DepartmentId(5L), 1L, 2L));
+
+        assertThat(palletScan.rejectionReason(() -> List.of(
+                shipment(1L, new DepartmentId(5L)),
+                shipment(2L, null))))
+                .isEmpty();
+    }
+
+    @Test
+    void shouldAcceptDifferentDestinationDepartmentsWhenPalletAllowsMixedDestinations() {
+        final PalletScan palletScan = new PalletScan(PalletFixture.readyPallet(new DepartmentId(5L),
+                new PalletAttributes(null, null, false, true, null), 1L, 2L));
+
+        assertThat(palletScan.rejectionReason(() -> List.of(
+                shipment(1L, new DepartmentId(5L)),
+                shipment(2L, new DepartmentId(6L)))))
+                .isEmpty();
+    }
+
+    @Test
+    void shouldSkipDestinationCheckWhenPalletHasNoDestinationDepartment() {
+        final PalletScan palletScan = new PalletScan(PalletFixture.readyPallet(1L));
+
+        assertThat(palletScan.rejectionReason(() -> List.of(shipment(1L, new DepartmentId(6L))))).isEmpty();
+    }
+
+    private static PalletShipment shipment(final Long shipmentId, final DepartmentId destinationDepartmentId) {
+        return new PalletShipment(new ShipmentId(shipmentId), ShipmentStatus.ACCEPTED, BigDecimal.ONE,
+                destinationDepartmentId);
     }
 }

@@ -1,15 +1,15 @@
 package com.warehouse.organisationstructure.department.api.event;
 
-import com.warehouse.commonassets.event.integration.annotation.IntegrationEventType;
-import com.warehouse.commonassets.event.integration.model.IntegrationEvent;
-import com.warehouse.commonassets.event.integration.model.IntegrationEventKey;
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventType;
+import com.warehouse.eventoutbox.integration.model.IntegrationEvent;
+import com.warehouse.eventoutbox.integration.model.IntegrationEventKey;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.organisationstructure.department.api.dto.DepartmentCodeDto;
 
 import java.time.Instant;
 import java.util.Objects;
 
-@IntegrationEventType(value = "department.user.changed", version = 1)
+@IntegrationEventType(value = "department.user.changed", version = 1, topic = DepartmentTopics.USER_EVENTS)
 public record DepartmentUserChangedIntegrationEvent(
         DepartmentCodeDto departmentCode,
         UserId userId,

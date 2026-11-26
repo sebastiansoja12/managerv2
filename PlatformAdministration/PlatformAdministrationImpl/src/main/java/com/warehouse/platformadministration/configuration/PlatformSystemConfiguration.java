@@ -3,6 +3,21 @@ package com.warehouse.platformadministration.configuration;
 import tools.jackson.databind.ObjectMapper;
 import com.warehouse.asyncjob.api.ReadModelRebuildApiService;
 import com.warehouse.auth.OperatorSessionApiService;
+import com.warehouse.logisticsdelivery.api.DepartmentAssignmentApiService;
+import com.warehouse.platformadministration.application.port.primary.OperatorAdminActionPort;
+import com.warehouse.platformadministration.application.port.primary.OperatorAdminActionPortImpl;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
+import com.warehouse.platformadministration.application.port.secondary.DepartmentAssignmentRunServicePort;
+import com.warehouse.platformadministration.application.port.secondary.OperatorJobServicePort;
+import com.warehouse.platformadministration.application.service.OperatorJobRegistry;
+import com.warehouse.platformadministration.infrastructure.adapter.secondary.CourierAssignmentOrchestrationJobServiceAdapter;
+import com.warehouse.platformadministration.infrastructure.adapter.secondary.CourierAssignmentRecoveryJobServiceAdapter;
+import com.warehouse.platformadministration.infrastructure.adapter.secondary.CourierAssignmentRunCleanupJobServiceAdapter;
+import com.warehouse.platformadministration.infrastructure.adapter.secondary.DepartmentAssignmentRunServiceAdapter;
+import com.warehouse.platformadministration.infrastructure.adapter.secondary.DangerousGoodValidationJobServiceAdapter;
+import com.warehouse.platformadministration.infrastructure.adapter.secondary.DriverLicenseValidationJobServiceAdapter;
+import com.warehouse.platformadministration.infrastructure.adapter.secondary.InactiveDepartmentArchiveJobServiceAdapter;
+import com.warehouse.supplier.api.SupplierValidityApiService;
 import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import com.warehouse.platformadministration.application.port.primary.MaintenanceModePort;
 import com.warehouse.platformadministration.application.port.primary.MaintenanceModePortImpl;
@@ -32,6 +47,7 @@ import com.warehouse.platformadministration.infrastructure.adapter.secondary.Pla
 import com.warehouse.platformadministration.infrastructure.adapter.secondary.ReadModelRebuildServiceAdapter;
 import com.warehouse.platformadministration.infrastructure.adapter.secondary.RuntimeStatusServiceAdapter;
 import org.springframework.beans.factory.ObjectProvider;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
@@ -94,6 +110,58 @@ public class PlatformSystemConfiguration {
     public ReadModelRebuildServicePort readModelRebuildServicePort(
             final ReadModelRebuildApiService readModelRebuildApiService) {
         return new ReadModelRebuildServiceAdapter(readModelRebuildApiService);
+    }
+
+    @Bean
+    public OperatorJobServicePort courierAssignmentOrchestrationJobServicePort(
+            final DepartmentAssignmentApiService departmentAssignmentApiService) {
+        return new CourierAssignmentOrchestrationJobServiceAdapter(departmentAssignmentApiService);
+    }
+
+    @Bean
+    public OperatorJobServicePort courierAssignmentRecoveryJobServicePort(
+            final DepartmentAssignmentApiService departmentAssignmentApiService) {
+        return new CourierAssignmentRecoveryJobServiceAdapter(departmentAssignmentApiService);
+    }
+
+    @Bean
+    public OperatorJobServicePort courierAssignmentRunCleanupJobServicePort(
+            final DepartmentAssignmentApiService departmentAssignmentApiService) {
+        return new CourierAssignmentRunCleanupJobServiceAdapter(departmentAssignmentApiService);
+    }
+
+    @Bean
+    public OperatorJobServicePort inactiveDepartmentArchiveJobServicePort(
+            final DepartmentApiService departmentApiService,
+            final OperatorScopeExecutor operatorScopeExecutor) {
+        return new InactiveDepartmentArchiveJobServiceAdapter(departmentApiService, operatorScopeExecutor);
+    }
+
+    @Bean
+    public OperatorJobServicePort driverLicenseValidationJobServicePort(
+            final SupplierValidityApiService supplierValidityApiService) {
+        return new DriverLicenseValidationJobServiceAdapter(supplierValidityApiService);
+    }
+
+    @Bean
+    public OperatorJobServicePort dangerousGoodValidationJobServicePort(
+            final SupplierValidityApiService supplierValidityApiService) {
+        return new DangerousGoodValidationJobServiceAdapter(supplierValidityApiService);
+    }
+
+    @Bean
+    public DepartmentAssignmentRunServicePort departmentAssignmentRunServicePort(
+            final DepartmentAssignmentApiService departmentAssignmentApiService) {
+        return new DepartmentAssignmentRunServiceAdapter(departmentAssignmentApiService);
+    }
+
+    @Bean
+    public OperatorAdminActionPort operatorAdminActionPort(
+            @Qualifier("platformAdministration.operatorServicePort") final OperatorServicePort operatorServicePort,
+            final List<OperatorJobServicePort> operatorJobServicePorts,
+            final DepartmentAssignmentRunServicePort departmentAssignmentRunServicePort) {
+        return new OperatorAdminActionPortImpl(operatorServicePort, new OperatorJobRegistry(operatorJobServicePorts),
+                departmentAssignmentRunServicePort);
     }
 
     @Bean

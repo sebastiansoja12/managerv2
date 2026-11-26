@@ -2,6 +2,7 @@ package com.warehouse.organisationstructure.operatorconfiguration.infrastructure
 
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.DepartmentConfigurationOverride;
 import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.entity.DepartmentConfigurationOverrideEntity;
+import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.entity.embeddable.DepartmentCourierAssignmentPolicyEmbeddable;
 
 public class DepartmentConfigurationOverrideMapper {
 
@@ -16,7 +17,8 @@ public class DepartmentConfigurationOverrideMapper {
                 override.blockDeactivationWithActiveWork(), override.workTransferOnDeactivation(),
                 override.autoArchiveInactiveAfterDays(), override.dailyCapacity(),
                 override.capacityWarningThresholdPercent(), override.redirectOverflowToNeighbour(),
-                override.maxCouriersPerDepartment());
+                override.maxCouriersPerDepartment(),
+                DepartmentCourierAssignmentPolicyEmbeddable.from(override.courierAssignmentPolicy()));
     }
 
     public DepartmentConfigurationOverride toDomain(final DepartmentConfigurationOverrideEntity entity) {
@@ -30,6 +32,7 @@ public class DepartmentConfigurationOverrideMapper {
                 entity.getBlockDeactivationWithActiveWork(), entity.getWorkTransferOnDeactivation(),
                 entity.getAutoArchiveInactiveAfterDays(), entity.getDailyCapacity(),
                 entity.getCapacityWarningThresholdPercent(), entity.getRedirectOverflowToNeighbour(),
-                entity.getMaxCouriersPerDepartment());
+                entity.getMaxCouriersPerDepartment(),
+                entity.getCourierAssignmentPolicy() != null ? entity.getCourierAssignmentPolicy().toModel() : null);
     }
 }

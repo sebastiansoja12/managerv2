@@ -68,6 +68,19 @@ public final class SupplierConfigurationFixture {
             snapshots.put(snapshot.supplierId(), savedSnapshot);
             return SupplierConfiguration.restore(savedSnapshot);
         }
+
+        @Override
+        public List<SupplierConfiguration> findBySubstituteSupplierId(final SupplierId substituteSupplierId) {
+            return snapshots.values().stream()
+                    .filter(snapshot -> substituteSupplierId.equals(snapshot.values().substituteSupplierId()))
+                    .map(SupplierConfiguration::restore)
+                    .toList();
+        }
+
+        @Override
+        public void deleteBySupplierId(final SupplierId supplierId) {
+            snapshots.remove(supplierId);
+        }
     }
 
     public static final class InMemorySupplierConfigurationPolicyRepository

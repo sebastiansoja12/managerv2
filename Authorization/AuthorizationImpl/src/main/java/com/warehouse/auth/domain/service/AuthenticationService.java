@@ -11,4 +11,6 @@ public interface AuthenticationService {
     void logout(final String refreshToken);
     UserId currentUserId();
     OperatorId currentOperatorId();
+
+    void revokeSessions(final String username);
 }

@@ -1,5 +1,6 @@
 package com.warehouse.returning;
 
+import com.warehouse.eventoutbox.configuration.EventOutboxConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.persistence.autoconfigure.EntityScan;
@@ -8,6 +9,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -17,8 +19,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableDiscoveryClient
 @EnableFeignClients
 @SpringBootApplication(scanBasePackages = "com.warehouse.returning")
-@EntityScan(basePackages = {"com.warehouse.returning"})
-@EnableJpaRepositories(basePackages = {"com.warehouse.returning"})
+@EntityScan(basePackages = {"com.warehouse.returning", "com.warehouse.eventoutbox.outbox"})
+@EnableJpaRepositories(basePackages = {"com.warehouse.returning", "com.warehouse.eventoutbox.outbox"})
+@Import(EventOutboxConfiguration.class)
 @ConfigurationPropertiesScan("com.warehouse.returning")
 public class ReturningTrackSpringApplication {
 

@@ -31,7 +31,7 @@ import java.util.Optional;
 
 @Component
 @ConditionalOnProperty(
-        name = {"manager.kafka.integration-events.enabled", "manager.kafka.outbox.enabled"},
+        name = "manager.events.outbox.enabled",
         havingValue = "true")
 public class ShipmentAuditLogListener {
 

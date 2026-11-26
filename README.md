@@ -219,10 +219,45 @@ Separate Dockerfiles are available for:
 ## MCP Server
 
 `McpServer` exposes a stateless MCP endpoint (Spring AI MCP Server, streamable HTTP) at `/v1/api/mcp`.
-Requests are authenticated with a user API key sent as `Authorization: Bearer <key>`; the key is generated
-with `POST /v1/api/auth/me/api-key` (revoked with `DELETE`) and stored only as an HMAC hash
-with its issue date. Keys created before the issue date was introduced, and the keys assigned automatically at
-sign-up, are not accepted. Operator blocking and session revocation also invalidate API keys issued earlier.
+Requests are authenticated only with a dedicated MCP key sent as `Authorization: Bearer <mcp-key>`. MCP keys start
+with `mcp_`, are managed independently of user API keys and are accepted only on the MCP endpoint; REST endpoints
+reject them, and the MCP endpoint rejects API keys and JWTs. Keys are managed under `/v1/api/auth/me/mcp-keys`:
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| `POST` | `/auth/me/mcp-keys` | Body `{"name": "...", "expiresAt": "2027-01-01T00:00:00Z"}` (`expiresAt` optional). Returns the generated key. Authentication uses a SHA-256 hash; an AES-GCM encrypted copy supports owner-only revealing. Generating a new key revokes the previous one, because a user holds one active MCP key (`users.mcp_key_id`). |
+| `GET` | `/auth/me/mcp-keys` | Lists the caller's keys with prefix, status, creation, last use, expiry and revocation dates; never the secret. |
+| `DELETE` | `/auth/me/mcp-keys/{mcpKeyId}` | Revokes the key immediately. |
+| `POST` | `/auth/me/mcp-keys/{mcpKeyId}/reveal` | Reveals only the caller's active key; response uses `Cache-Control: no-store`. |
+
+MCP keys can also be managed in the GUI under **User profile → MCP key**. Keys are masked by default. The eye button reveals the key for five seconds; leaving the window hides it immediately. In **Users → MCP access**,
+ADMIN/SUPERADMIN users can manage users within their existing operator, department and role scope: revoke keys,
+block MCP entirely, or choose `NONE`, `READ` or `WRITE` (read and write) for each system area. Disabling MCP
+revokes all dedicated keys and prevents new keys; re-enabling access does not restore revoked keys.
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/auth/me/mcp-keys/access` | Current user's MCP policy. |
+| `GET`, `PUT` | `/users/{userId}/mcp-access` | Read or replace a managed user's policy: `{"enabled":true,"modules":{"SHIPMENTS":"READ","CONFIGURATION":"NONE"}}`. Omitted modules are denied. |
+| `DELETE` | `/users/{userId}/mcp-keys` | Revoke a managed user's dedicated MCP keys without changing their policy. |
+
+Areas are `PROFILE`, `SHIPMENTS`, `PROCESSES`, `DEVICES`, `DEPARTMENTS`, `DELIVERIES`, `COURIERS` and
+`CONFIGURATION`. Policies are stored in `mcp_access_policies` and `mcp_module_permissions` by Liquibase.
+Users without a saved policy retain their existing MCP access. Role requirements and `MCP_WRITE_ENABLED`
+remain upper limits. Each `tools/list` request returns only allowed tools; execution checks the current policy again.
+Refresh the tool list in connected MCP clients after changing permissions.
+
+The API key field uses the same five-second reveal mechanism via `POST /auth/me/api-key/reveal`.
+Encrypted copies use the existing `CREDENTIALS_ENCRYPTION_KEY`; migrations add `mcp_keys.encrypted_secret` and
+`users.encrypted_api_key`. Normal metadata responses never include secrets. Revocation removes the encrypted copy.
+Older hash-only keys cannot be recovered and must be regenerated once to enable revealing/copying.
+
+Missing, unknown, revoked or expired keys return `401`; a principal without MCP access returns `403`. Operator
+blocking and session revocation also invalidate MCP keys issued earlier.
+
+Migration from API keys: generate an MCP key and replace the API key in the MCP client configuration. During a
+transition period, `API_EXPOSURE_MCP_LEGACY_API_KEY_ENABLED=true` (`api.exposure.mcp-legacy-api-key-enabled`)
+still accepts API keys on the MCP endpoint and logs a warning on each use; it is `false` by default.
 
 | Tool | Parameters | Notes |
 | --- | --- | --- |
@@ -238,7 +273,9 @@ sign-up, are not accepted. Operator blocking and session revocation also invalid
 | `list_couriers` | none | Couriers of the caller's department; requires MANAGER or higher. |
 | `get_configuration` | `section` | One operator configuration section: `SHIPMENT`, `DEPARTMENTS`, `FLEET`, `COMMUNICATION`, `REGIONAL`, `SORTING` or `PICKUP_POINTS`. |
 
-Tools that change data require MANAGER or higher (`change_department_status` requires ADMIN). Optional fields that are
+Tools that change data require MANAGER or higher (`change_department_status` requires ADMIN). Every tool method must be annotated
+with `@Mcp(minimumLevel = ...)` (enforced by `McpServerArchitectureTest`); `McpAccessAspect` rejects calls that were not
+authenticated with an MCP key or whose user role is below the required level. Optional fields that are
 left out keep their current values.
 
 | Tool | Parameters | Notes |
@@ -255,11 +292,11 @@ left out keep their current values.
 | `update_courier` / `set_courier_active` | `courierCode` and the fields to change / `active` | Edit, activate or deactivate a courier. |
 | `update_configuration` | `section`, `changes` (JSON object) | Changes only the given fields of a configuration section; unknown fields are rejected. |
 
-All tools run in the operator context of the API key owner. Disable the endpoint with
+All tools run in the operator context of the MCP key owner. Disable the endpoint with
 `MCP_SERVER_ENABLED=false`, or only the tools that change data with `MCP_WRITE_ENABLED=false`. Example for Claude Code:
 
 ```bash
-claude mcp add --transport http manager https://manager.example.com/v1/api/mcp --header "Authorization: Bearer <api-key>"
+claude mcp add --transport http manager https://manager.example.com/v1/api/mcp --header "Authorization: Bearer <mcp-key>"
 ```
 
 ## API and Documentation

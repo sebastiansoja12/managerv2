@@ -11,6 +11,7 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.exception.Shipmen
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentPersistenceMapper;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +37,19 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
         } else {
             writeRepository.create(entity);
         }
+    }
+
+    @Override
+    public List<Shipment> findAllByIds(final Collection<ShipmentId> shipmentIds) {
+        if (shipmentIds.isEmpty()) {
+            return List.of();
+        }
+        return writeRepository.createCriteria(ShipmentEntity.class)
+                .in("shipmentId.value", shipmentIds.stream().map(ShipmentId::getValue).toList())
+                .list()
+                .stream()
+                .map(this.persistenceMapper::toDomain)
+                .toList();
     }
 
     @Override
@@ -87,6 +101,14 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
                 .one()
                 .map(this.persistenceMapper::toDomain)
                 .orElseThrow(() -> new ShipmentNotFoundException("Shipment was not found"));
+    }
+
+    @Override
+    public Optional<Shipment> findByPriceQuoteId(final PriceQuoteId priceQuoteId) {
+        return writeRepository.createCriteria(ShipmentEntity.class)
+                .eq("priceQuoteId.value", priceQuoteId.value())
+                .one()
+                .map(this.persistenceMapper::toDomain);
     }
 
     @Override

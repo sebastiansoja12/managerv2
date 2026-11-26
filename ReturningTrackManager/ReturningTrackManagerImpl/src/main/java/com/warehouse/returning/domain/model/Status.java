@@ -7,6 +7,8 @@ public enum Status {
 
     SENT,
 
+    HANDOVER,
+
     DELIVERY,
 
     RETURN,

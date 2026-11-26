@@ -11,11 +11,11 @@ import com.warehouse.organisationstructure.department.api.event.DepartmentStatus
 import com.warehouse.organisationstructure.department.api.event.DepartmentUserChangedIntegrationEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventListener;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.kafka.annotation.KafkaHandler;
-import org.springframework.kafka.annotation.KafkaListener;
 
 import java.time.Instant;
 
@@ -71,18 +71,18 @@ class DepartmentUserEventKafkaListenerTest {
     }
 
     @Test
-    void shouldConsumeDepartmentStatusEventThroughClassLevelKafkaListener() throws NoSuchMethodException {
-        final KafkaListener listenerAnnotation = DepartmentUserEventKafkaListener.class
-                .getAnnotation(KafkaListener.class);
-        final KafkaHandler handlerAnnotation = DepartmentUserEventKafkaListener.class
+    void shouldConsumeDepartmentUserAndStatusEventsInOneConsumerGroup() throws NoSuchMethodException {
+        final IntegrationEventListener userListener = DepartmentUserEventKafkaListener.class
+                .getDeclaredMethod("handle", DepartmentUserChangedIntegrationEvent.class)
+                .getAnnotation(IntegrationEventListener.class);
+        final IntegrationEventListener statusListener = DepartmentUserEventKafkaListener.class
                 .getDeclaredMethod("handle", DepartmentStatusChangedIntegrationEvent.class)
-                .getAnnotation(KafkaHandler.class);
+                .getAnnotation(IntegrationEventListener.class);
 
-        assertNotNull(listenerAnnotation);
-        assertNotNull(handlerAnnotation);
-        assertEquals(
-                "${manager.kafka.topics.department-status-events:department.status.events}",
-                listenerAnnotation.topics()[1]);
+        assertNotNull(userListener);
+        assertNotNull(statusListener);
+        assertEquals("manager-auth-department-users", userListener.group());
+        assertEquals(userListener.group(), statusListener.group());
     }
 
     private static DepartmentStatusChangedIntegrationEvent event(final DepartmentStatusDto status) {

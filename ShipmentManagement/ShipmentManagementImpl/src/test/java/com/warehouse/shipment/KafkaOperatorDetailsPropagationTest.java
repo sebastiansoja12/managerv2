@@ -5,7 +5,7 @@ import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.commonassets.kafka.domain.model.KafkaEventHeaders;
+import com.warehouse.eventoutbox.kafka.KafkaEventHeaders;
 import com.warehouse.commonassets.event.integration.context.OperatorAwareEvent;
 import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaOperatorContextRecordInterceptor;
 import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.KafkaTemplateClient;

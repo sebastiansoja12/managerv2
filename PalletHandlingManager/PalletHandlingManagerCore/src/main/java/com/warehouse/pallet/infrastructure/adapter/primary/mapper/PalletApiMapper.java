@@ -56,6 +56,7 @@ public final class PalletApiMapper {
                 pallet.getPalletType() == null ? null : pallet.getPalletType().name(),
                 pallet.getPalletHandlingPriority() == null ? null : pallet.getPalletHandlingPriority().name(),
                 Boolean.TRUE.equals(pallet.isRefrigerated()),
+                Boolean.TRUE.equals(pallet.isMixedDestinationsAllowed()),
                 pallet.getDimension() == null ? null : new DimensionApi(pallet.getDimension().getLength(),
                         pallet.getDimension().getWidth(), pallet.getDimension().getHeight()));
     }
@@ -115,6 +116,7 @@ public final class PalletApiMapper {
                 blank(request.palletType()) ? null : PalletType.valueOf(request.palletType().trim()),
                 blank(request.handlingPriority()) ? null : PalletHandlingPriority.valueOf(request.handlingPriority().trim()),
                 request.refrigerated(),
+                request.mixedDestinationsAllowed(),
                 anyDimension ? new Dimension(request.length(), request.width(), request.height()) : null,
                 blank(request.sealNumber()) ? null : new SealNumber(request.sealNumber().trim()));
     }

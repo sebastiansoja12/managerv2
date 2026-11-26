@@ -1,5 +1,6 @@
 package com.warehouse.auth.configuration;
 
+import java.time.Duration;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -12,6 +13,15 @@ public class AuthProperties {
     private Cookie cookie = new Cookie();
 
     private Cors cors = new Cors();
+
+    private Login login = new Login();
+
+    @Data
+    public static class Login {
+        private int maxFailedAttempts = 10;
+        private int maxFailedAttemptsPerClient = 100;
+        private Duration lockDuration = Duration.ofMinutes(15);
+    }
 
     @Data
     public static class Cookie {

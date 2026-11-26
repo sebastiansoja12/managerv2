@@ -84,7 +84,7 @@ class DestinationDepartmentResolverAdapterTest {
         when(operatorConfigurationApiService.getDepartmentConfiguration(new DepartmentId(7L))).thenReturn(
                 new DepartmentConfigurationDto(false, false, false, false,
                         new DepartmentDeliveryAreaPolicyDto(DeliveryAreaModeDto.COUNTRY_PARTITION, 50, true, false,
-                                UncoveredPostalCodePolicyDto.BLOCK), null, null, null));
+                                UncoveredPostalCodePolicyDto.BLOCK), null, null, null, null));
         when(geocodingCoordinatesService.findCoordinates(any())).thenReturn(new GeocodingCoordinatesDto(52.2, 21.0));
         when(deliveryAreaApiService.findServingDepartment(any())).thenReturn(Optional.empty());
         when(departmentApiService.getAllDepartments()).thenReturn(List.of(

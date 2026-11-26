@@ -6,13 +6,16 @@ import java.util.Optional;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.commonassets.identificator.VehicleId;
 import com.warehouse.mcp.application.port.secondary.CourierServicePort;
 import com.warehouse.mcp.domain.vo.Courier;
 import com.warehouse.mcp.domain.vo.CourierChange;
+import com.warehouse.mcp.domain.vo.CourierDeliveryArea;
 import com.warehouse.mcp.domain.vo.CourierDraft;
 import com.warehouse.supplier.api.SupplierApiService;
 import com.warehouse.supplier.api.dto.CreateSupplierApiRequest;
 import com.warehouse.supplier.api.dto.SupplierCodeDto;
+import com.warehouse.supplier.api.dto.SupplierDeliveryAreaDto;
 import com.warehouse.supplier.api.dto.SupplierDetailsDto;
 import com.warehouse.supplier.api.dto.SupplierProfileDto;
 
@@ -57,6 +60,18 @@ public class CourierServiceAdapter implements CourierServicePort {
     @Override
     public void deactivate(final SupplierCode courierCode) {
         this.supplierApiService.deactivate(courierCode);
+    }
+
+    @Override
+    public void assignVehicle(final SupplierCode courierCode, final VehicleId vehicleId) {
+        this.supplierApiService.assignVehicle(courierCode, vehicleId);
+    }
+
+    @Override
+    public void changeDeliveryArea(final SupplierCode courierCode, final CourierDeliveryArea deliveryArea) {
+        this.supplierApiService.changeDeliveryArea(courierCode, new SupplierDeliveryAreaDto(deliveryArea.areaName(),
+                deliveryArea.city(), deliveryArea.district(), deliveryArea.municipality(), deliveryArea.region(),
+                deliveryArea.country(), deliveryArea.postalCodes()));
     }
 
     private Courier map(final SupplierDetailsDto supplier) {

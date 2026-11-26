@@ -131,4 +131,28 @@
     <include file="changes/2026-11-04-department-lifecycle-capacity-connections.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-11-05-user-onboarding.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-11-05-fleet-tracking.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-06-current-department.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-06-shipment-rd-incident-reported.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-06-shipment-note-incident-source.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-12-shipment-rd-pallet-tracking-number.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-17-organization-analytics.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-18-integration-event-outbox.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-23-mcp-keys.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-23-mcp-access.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-23-mcp-key-reveal.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-23-api-key-reveal.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-24-billing-pricing.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-24-billing-shipment-payment-state.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-24-billing-payments.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-24-courier-assignment.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-25-delivery-version.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-25-courier-assignment-window.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-25-department-assignment-run.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-25-quartz-tables.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-24-billing-gateway.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-24-billing-payments-switch.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-24-billing-refunds.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-25-shipment-read-model-courier.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-24-billing-invoices.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-24-billing-customers.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

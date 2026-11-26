@@ -23,6 +23,27 @@ public class ShipmentPaymentConfigurationEmbeddable {
     @Column(name = "shipment_require_insurance_above_value")
     private double requireInsuranceAboveValue;
 
+    @Column(name = "shipment_payment_deadline_hours")
+    private int paymentDeadlineHours;
+
+    @Column(name = "shipment_payments_enabled")
+    private boolean paymentsEnabled;
+
+    @Column(name = "shipment_billing_street")
+    private String billingStreet;
+
+    @Column(name = "shipment_billing_postal_code")
+    private String billingPostalCode;
+
+    @Column(name = "shipment_billing_city")
+    private String billingCity;
+
+    @Column(name = "shipment_billing_country_code")
+    private String billingCountryCode;
+
+    @Column(name = "shipment_bank_account")
+    private String bankAccount;
+
     public ShipmentPaymentConfigurationEmbeddable() {
     }
 
@@ -35,6 +56,13 @@ public class ShipmentPaymentConfigurationEmbeddable {
         embeddable.maxCashOnDeliveryAmount = source.getMaxCashOnDeliveryAmount();
         embeddable.cashOnDeliveryPaymentMethod = source.getCashOnDeliveryPaymentMethod();
         embeddable.requireInsuranceAboveValue = source.getRequireInsuranceAboveValue();
+        embeddable.paymentDeadlineHours = source.getPaymentDeadlineHours();
+        embeddable.paymentsEnabled = source.isPaymentsEnabled();
+        embeddable.billingStreet = source.getBillingStreet();
+        embeddable.billingPostalCode = source.getBillingPostalCode();
+        embeddable.billingCity = source.getBillingCity();
+        embeddable.billingCountryCode = source.getBillingCountryCode();
+        embeddable.bankAccount = source.getBankAccount();
         return embeddable;
     }
 
@@ -43,7 +71,14 @@ public class ShipmentPaymentConfigurationEmbeddable {
                 allowCashOnDelivery,
                 maxCashOnDeliveryAmount,
                 cashOnDeliveryPaymentMethod,
-                requireInsuranceAboveValue
+                requireInsuranceAboveValue,
+                paymentDeadlineHours,
+                paymentsEnabled,
+                billingStreet,
+                billingPostalCode,
+                billingCity,
+                billingCountryCode,
+                bankAccount
         );
     }
 }

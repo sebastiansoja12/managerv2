@@ -34,6 +34,11 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
+            <artifactId>LogisticsOrchestratorApi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
             <artifactId>AsyncJob</artifactId>
             <version>${project.version}</version>
         </dependency>

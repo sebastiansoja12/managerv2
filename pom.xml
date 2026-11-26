@@ -35,6 +35,7 @@
         <module>ArchitectureTest</module>
         <module>ManagerTools</module>
         <module>E2E</module>
+        <module>EventOutbox</module>
         <module>Common</module>
         <module>AssetConverter</module>
 		<module>MessageProvider</module>
@@ -55,6 +56,8 @@
         <module>AuditLog</module>
         <module>IncidentManagement</module>
         <module>FleetTracking</module>
+        <module>OrganizationAnalytics</module>
+        <module>Billing</module>
     </modules>
 
 	<properties>

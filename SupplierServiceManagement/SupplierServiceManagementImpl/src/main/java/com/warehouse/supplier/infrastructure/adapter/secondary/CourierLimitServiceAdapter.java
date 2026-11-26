@@ -3,7 +3,7 @@ package com.warehouse.supplier.infrastructure.adapter.secondary;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import com.warehouse.organisationstructure.api.dto.DepartmentConfigurationDto;
-import com.warehouse.supplier.domain.port.secondary.CourierLimitServicePort;
+import com.warehouse.supplier.application.port.secondary.CourierLimitServicePort;
 
 public class CourierLimitServiceAdapter implements CourierLimitServicePort {
 

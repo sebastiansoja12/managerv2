@@ -1,6 +1,7 @@
 package com.warehouse.auth.domain.port.primary;
 
 import com.warehouse.auth.domain.model.AdminCreateRequest;
+import com.warehouse.auth.domain.model.CreateBusinessCustomerUserCommand;
 import com.warehouse.auth.domain.model.CreateOperatorUserCommand;
 import com.warehouse.auth.domain.model.CreateSupplierUserCommand;
 import com.warehouse.auth.domain.model.CreateUserCommand;
@@ -17,6 +18,7 @@ public interface AuthenticationPort {
     UserId createUser(final CreateUserCommand command);
     UserId createOperatorUser(final CreateOperatorUserCommand command);
     UserId createSupplierUser(final CreateSupplierUserCommand command);
+    UserId createBusinessCustomerUser(final CreateBusinessCustomerUserCommand command);
     UserId createAdminUser(final AdminCreateRequest request);
     void logout(final String refreshToken);
     void initiatePasswordReset(final String email);

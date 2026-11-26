@@ -22,6 +22,7 @@ import com.warehouse.auth.infrastructure.adapter.secondary.*;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.RefreshTokenMapper;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 import com.warehouse.commonassets.repository.NoOperatorContextRepository;
+import com.warehouse.commonassets.security.CredentialCipher;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 
 @Configuration
@@ -46,8 +47,9 @@ public class UserConfiguration {
 
     @Bean
     public UserRepository userRepository(final OperatorFilteredRepository<UserEntity> repository,
-                                         final NoOperatorContextRepository<UserEntity> noOperatorContextRepository) {
-        return new UserRepositoryImpl(repository, noOperatorContextRepository);
+                                         final NoOperatorContextRepository<UserEntity> noOperatorContextRepository,
+                                         final CredentialCipher credentialCipher) {
+        return new UserRepositoryImpl(repository, noOperatorContextRepository, credentialCipher);
     }
 
     @Bean
@@ -96,8 +98,9 @@ public class UserConfiguration {
     @Bean
     public UserApiService userApiService(final UserService userService,
                                          final ResponseMapper responseMapper,
-                                         final AuthenticationPort authenticationPort) {
-        return new UserApiServiceAdapter(userService, responseMapper, authenticationPort);
+                                         final AuthenticationPort authenticationPort,
+                                         final UserPort userPort) {
+        return new UserApiServiceAdapter(userService, responseMapper, authenticationPort, userPort);
     }
 
     @Bean

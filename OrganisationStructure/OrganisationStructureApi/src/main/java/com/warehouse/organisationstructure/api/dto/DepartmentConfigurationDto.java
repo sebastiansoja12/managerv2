@@ -7,13 +7,14 @@ public record DepartmentConfigurationDto(boolean autoAssignDeliveryAreas,
                                          DepartmentDeliveryAreaPolicyDto deliveryAreaPolicy,
                                          DepartmentConnectionPolicyDto connectionPolicy,
                                          DepartmentLifecyclePolicyDto lifecyclePolicy,
-                                         DepartmentCapacityPolicyDto capacityPolicy) {
+                                         DepartmentCapacityPolicyDto capacityPolicy,
+                                         DepartmentCourierAssignmentPolicyDto courierAssignmentPolicy) {
 
     public DepartmentConfigurationDto(final boolean autoAssignDeliveryAreas,
                                       final boolean autoConnectDepartments,
                                       final boolean preventDepartmentDeletion,
                                       final boolean preventDepartmentArchiving) {
         this(autoAssignDeliveryAreas, autoConnectDepartments, preventDepartmentDeletion, preventDepartmentArchiving,
-                null, null, null, null);
+                null, null, null, null, null);
     }
 }

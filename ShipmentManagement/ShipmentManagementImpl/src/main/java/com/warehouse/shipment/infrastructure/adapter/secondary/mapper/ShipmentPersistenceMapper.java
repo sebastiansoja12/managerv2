@@ -4,6 +4,8 @@ import com.warehouse.shipment.domain.vo.ShipmentDeliveryDetails;
 import java.util.UUID;
 
 import com.warehouse.commonassets.identificator.ExternalId;
+import com.warehouse.commonassets.identificator.PalletTrackingNumber;
+import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.vo.Party;
@@ -43,7 +45,10 @@ public class ShipmentPersistenceMapper {
                 entity.getDeclaredValue(),
                 entity.getServiceLevel(),
                 entity.getPackagingType(),
-                entity.getSource()
+                entity.getSource(),
+                entity.getPaymentState(),
+                entity.getPriceQuoteId(),
+                entity.getBillingCustomerId()
         );
     }
 
@@ -73,7 +78,10 @@ public class ShipmentPersistenceMapper {
                 entity.getDeclaredValue(),
                 entity.getServiceLevel(),
                 entity.getPackagingType(),
-                entity.getSource()
+                entity.getSource(),
+                entity.getPaymentState(),
+                entity.getPriceQuoteId(),
+                entity.getBillingCustomerId()
         );
     }
 
@@ -100,6 +108,9 @@ public class ShipmentPersistenceMapper {
                 .serviceLevel(shipment.getServiceLevel())
                 .packagingType(shipment.getPackagingType())
                 .source(shipment.getSource())
+                .paymentState(shipment.getPaymentState())
+                .priceQuoteId(shipment.getPriceQuoteId())
+                .billingCustomerId(shipment.getBillingCustomerId())
                 .price(shipment.getPrice())
                 .signatureRequired(shipment.getSignatureRequired())
                 .externalId(new ExternalId<>(shipment.getExternalShipmentId().value().toString()))
@@ -131,6 +142,9 @@ public class ShipmentPersistenceMapper {
                 .serviceLevel(snapshot.serviceLevel())
                 .packagingType(snapshot.packagingType())
                 .source(snapshot.source() == null ? ShipmentSource.WEB : snapshot.source())
+                .paymentState(snapshot.paymentState())
+                .priceQuoteId(snapshot.priceQuoteId())
+                .billingCustomerId(snapshot.billingCustomerId())
                 .price(snapshot.price())
                 .signatureRequired(snapshot.signatureRequired())
                 .externalId(new ExternalId<>(snapshot.externalShipmentId().value().toString()))
@@ -140,7 +154,30 @@ public class ShipmentPersistenceMapper {
 
     public ShipmentDeliveryDetails deliveryDetails(final ShipmentReadEntity entity) {
         return new ShipmentDeliveryDetails(entity.getOriginDepartmentId(), entity.getDestinationDepartmentId(),
-                entity.getPlannedDeliveryAt(), entity.getDeliveredAt());
+                entity.getCurrentDepartmentId(), entity.getPlannedDeliveryAt(), entity.getDeliveredAt(),
+                entity.getCourierCode() == null ? null : new SupplierCode(entity.getCourierCode()),
+                entity.getCourierName());
+    }
+
+    public boolean incidentReported(final ShipmentReadEntity entity) {
+        return Boolean.TRUE.equals(entity.getIncidentReported());
+    }
+
+    public ShipmentReadEntity withIncidentReported(final ShipmentReadEntity entity, final boolean incidentReported) {
+        return entity.toBuilder()
+                .incidentReported(incidentReported)
+                .build();
+    }
+
+    public PalletTrackingNumber palletTrackingNumber(final ShipmentReadEntity entity) {
+        return entity.getPalletTrackingNumber();
+    }
+
+    public ShipmentReadEntity withPalletTrackingNumber(final ShipmentReadEntity entity,
+                                                       final PalletTrackingNumber palletTrackingNumber) {
+        return entity.toBuilder()
+                .palletTrackingNumber(palletTrackingNumber)
+                .build();
     }
 
     public ShipmentReadEntity withDeliveryDetails(final ShipmentReadEntity entity,
@@ -148,8 +185,11 @@ public class ShipmentPersistenceMapper {
         return entity.toBuilder()
                 .originDepartmentId(deliveryDetails.originDepartmentId())
                 .destinationDepartmentId(deliveryDetails.destinationDepartmentId())
+                .currentDepartmentId(deliveryDetails.currentDepartmentId())
                 .plannedDeliveryAt(deliveryDetails.plannedDeliveryAt())
                 .deliveredAt(deliveryDetails.deliveredAt())
+                .courierCode(deliveryDetails.courierCode() == null ? null : deliveryDetails.courierCode().value())
+                .courierName(deliveryDetails.courierName())
                 .build();
     }
 

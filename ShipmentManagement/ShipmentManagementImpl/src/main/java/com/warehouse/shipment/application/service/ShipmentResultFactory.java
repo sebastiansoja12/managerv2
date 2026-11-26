@@ -5,6 +5,7 @@ import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.application.port.secondary.DepartmentServicePort;
 import com.warehouse.shipment.application.port.secondary.ReturningServicePort;
+import com.warehouse.shipment.application.port.secondary.ShipmentReadModelRepository;
 import com.warehouse.shipment.domain.exception.ReturnDetailsUnavailableException;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.vo.RouteLogRecord;
@@ -18,20 +19,32 @@ public class ShipmentResultFactory {
 
     private final ReturningServicePort returningServicePort;
 
+    private final ShipmentReadModelRepository shipmentReadModelRepository;
+
     public ShipmentResultFactory(final DepartmentServicePort departmentServicePort,
                                  final RouteLogService routeLogService,
-                                 final ReturningServicePort returningServicePort) {
+                                 final ReturningServicePort returningServicePort,
+                                 final ShipmentReadModelRepository shipmentReadModelRepository) {
         this.departmentServicePort = departmentServicePort;
         this.routeLogService = routeLogService;
         this.returningServicePort = returningServicePort;
+        this.shipmentReadModelRepository = shipmentReadModelRepository;
     }
 
     public ShipmentResult create(final Shipment shipment) {
         return new ShipmentResult(shipment.snapshot());
     }
 
+    public ShipmentResult createWithDeliveryDetails(final Shipment shipment) {
+        return new ShipmentResult(shipment.snapshot(), this.shipmentReadModelRepository
+                .findDeliveryDetails(shipment.getShipmentId())
+                .orElse(null), this.shipmentReadModelRepository.isIncidentReported(shipment.getShipmentId()),
+                this.shipmentReadModelRepository.findPalletTrackingNumber(shipment.getShipmentId()).orElse(null));
+    }
+
     public ShipmentResult create(final ShipmentListEntry entry) {
-        return new ShipmentResult(entry.shipment().snapshot(), entry.deliveryDetails());
+        return new ShipmentResult(entry.shipment().snapshot(), entry.deliveryDetails(), entry.incidentReported(),
+                entry.palletTrackingNumber());
     }
 
     public ShipmentRouteLog createControlCenter(final Shipment shipment) {

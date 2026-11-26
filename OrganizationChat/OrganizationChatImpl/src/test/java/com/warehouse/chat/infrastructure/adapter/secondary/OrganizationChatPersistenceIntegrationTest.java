@@ -12,7 +12,7 @@ import com.warehouse.chat.configuration.OrganizationChatConfiguration;
 import com.warehouse.chat.domain.model.ChatConversation;
 import com.warehouse.chat.domain.vo.ChatMessageSnapshot;
 import com.warehouse.chat.infrastructure.adapter.secondary.api.ChatMessageNotificationDto;
-import com.warehouse.commonassets.event.infrastructure.adapter.secondary.SpringDomainEventPublisher;
+import com.warehouse.eventoutbox.infrastructure.adapter.secondary.SpringDomainEventPublisher;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.repository.OperatorContextProvider;

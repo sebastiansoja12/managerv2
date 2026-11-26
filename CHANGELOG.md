@@ -7,6 +7,8 @@
 - AuditLog module consuming audit entries from Kafka and exposing them through a paginated REST endpoint, with audit recording for shipments, deliveries, pallets, pickup points and the delivery network.
 - PalletManagement module with pallet lists, details, documents, carrier assignment, pallet transports and pallet unloading.
 - DepartmentMap module with department layouts, storage locations, directions and pallet placement, movement and reservation.
+- `@Mcp(minimumLevel = ...)` annotation required on every MCP tool method (checked by an architecture test) and enforced by `McpAccessAspect`; it requires MCP key authentication and the given role level and replaces the role checks in the MCP ports.
+- Dedicated MCP keys (`mcp_` prefix, hashed, with name, expiry, last use and revocation) managed under `/auth/me/mcp-keys` and a separate security filter chain for the MCP endpoint; API keys no longer authenticate MCP requests unless `api.exposure.mcp-legacy-api-key-enabled` is set.
 - McpServer module exposing read-only and command tools for shipments, deliveries, departments, couriers, devices, processes and configuration with personal-data masking.
 - PlatformAdministration module for platform owners: operator users, departments, couriers, devices, API keys, sessions, access blocking, read-model rebuilds, data export and erasure, announcements, system status, maintenance mode and platform audit log.
 - Operator subscriptions, superadmin impersonation with operator consent and impersonation tokens.
@@ -21,6 +23,7 @@
 - Template-based mail service over SMTP driven by shipment Kafka events, including collected, reroute and external shipment templates.
 - Operator configuration for shipment policies, notifications, labels, tracking number prefixes, sorting, pickup points, fleet communication and regional settings.
 - `COLLECTED` shipment status, shipment content, parcel details, lifecycle timestamps, shipment source and party country codes.
+- `HANDOVER` shipment status set when a shipment is handed over for delivery, with a `ShipmentStatusChanged` event published after the shipment is saved.
 - Organization chat participants endpoint.
 - Common identifiers `IncidentId`, `TrackingSessionId` and `TrackingPositionId`.
 

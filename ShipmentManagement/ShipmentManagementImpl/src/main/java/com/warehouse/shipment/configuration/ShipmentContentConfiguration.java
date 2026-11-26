@@ -1,7 +1,7 @@
 package com.warehouse.shipment.configuration;
 
-import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
-import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
+import com.warehouse.eventoutbox.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.shipment.application.port.primary.ShipmentContentPort;
 import com.warehouse.shipment.application.port.primary.ShipmentContentPortImpl;
 import com.warehouse.shipment.application.port.secondary.AuditLogServicePort;
@@ -15,6 +15,10 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentCo
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import com.warehouse.shipment.application.port.primary.ShipmentIncidentPort;
+import com.warehouse.shipment.application.port.primary.ShipmentIncidentPortImpl;
+import com.warehouse.shipment.application.port.primary.ShipmentPort;
+import com.warehouse.shipment.application.port.primary.ShipmentReadModelSyncPort;
 
 @Configuration
 public class ShipmentContentConfiguration {
@@ -28,9 +32,16 @@ public class ShipmentContentConfiguration {
                 domainEventPublisher);
     }
 
+    @Bean
+    public ShipmentIncidentPort shipmentIncidentPort(final ShipmentPort shipmentPort,
+                                                     final ShipmentReadModelSyncPort shipmentReadModelSyncPort,
+                                                     final ShipmentContentPort shipmentContentPort) {
+        return new ShipmentIncidentPortImpl(shipmentPort, shipmentReadModelSyncPort, shipmentContentPort);
+    }
+
     @Bean("shipmentAuditLogServicePort")
     @ConditionalOnProperty(
-            name = {"manager.kafka.integration-events.enabled", "manager.kafka.outbox.enabled"},
+            name = "manager.events.outbox.enabled",
             havingValue = "true")
     public AuditLogServicePort shipmentAuditLogServicePort(
             final IntegrationEventPublisher integrationEventPublisher) {

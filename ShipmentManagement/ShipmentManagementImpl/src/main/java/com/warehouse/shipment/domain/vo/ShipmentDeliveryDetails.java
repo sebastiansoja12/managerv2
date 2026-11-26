@@ -1,21 +1,26 @@
 package com.warehouse.shipment.domain.vo;
 
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.SupplierCode;
 
 import java.time.LocalDateTime;
 
 public record ShipmentDeliveryDetails(DepartmentId originDepartmentId,
                                       DepartmentId destinationDepartmentId,
+                                      DepartmentId currentDepartmentId,
                                       LocalDateTime plannedDeliveryAt,
-                                      LocalDateTime deliveredAt) {
+                                      LocalDateTime deliveredAt,
+                                      SupplierCode courierCode,
+                                      String courierName) {
 
-    public static final ShipmentDeliveryDetails NONE = new ShipmentDeliveryDetails(null, null, null, null);
+    public static final ShipmentDeliveryDetails NONE = new ShipmentDeliveryDetails(null, null, null, null, null);
 
-    public ShipmentDeliveryDetails keepingOriginOf(final ShipmentDeliveryDetails current) {
-        if (current.originDepartmentId() == null) {
-            return this;
-        }
-        return new ShipmentDeliveryDetails(current.originDepartmentId(), destinationDepartmentId, plannedDeliveryAt,
-                deliveredAt);
+    public ShipmentDeliveryDetails(final DepartmentId originDepartmentId,
+                                   final DepartmentId destinationDepartmentId,
+                                   final DepartmentId currentDepartmentId,
+                                   final LocalDateTime plannedDeliveryAt,
+                                   final LocalDateTime deliveredAt) {
+        this(originDepartmentId, destinationDepartmentId, currentDepartmentId, plannedDeliveryAt, deliveredAt,
+                null, null);
     }
 }

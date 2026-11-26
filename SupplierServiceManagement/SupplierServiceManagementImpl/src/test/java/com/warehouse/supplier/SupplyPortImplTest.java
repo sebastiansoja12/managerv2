@@ -13,15 +13,21 @@ import com.warehouse.supplier.domain.exception.SupplierAlreadyExistsException;
 import com.warehouse.supplier.domain.exception.SupplierDepartmentAccessDeniedException;
 import com.warehouse.supplier.domain.enumeration.UserStatus;
 import com.warehouse.supplier.domain.model.Supplier;
-import com.warehouse.supplier.domain.port.primary.SupplyPortImpl;
-import com.warehouse.supplier.domain.port.secondary.CurrentUserServicePort;
-import com.warehouse.supplier.domain.port.secondary.DepartmentServicePort;
-import com.warehouse.supplier.domain.port.secondary.DeviceServicePort;
-import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
-import com.warehouse.supplier.domain.port.secondary.UserServicePort;
-import com.warehouse.supplier.domain.registry.DomainContext;
-import com.warehouse.supplier.domain.service.*;
-import com.warehouse.supplier.domain.vo.*;
+import com.warehouse.supplier.application.port.primary.SupplyPortImpl;
+import com.warehouse.supplier.application.port.secondary.CurrentUserServicePort;
+import com.warehouse.supplier.application.port.secondary.DepartmentServicePort;
+import com.warehouse.supplier.application.port.secondary.SupplierRepository;
+import com.warehouse.supplier.application.port.secondary.UserServicePort;
+import com.warehouse.eventoutbox.application.port.secondary.DomainEventPublisher;
+import com.warehouse.supplier.application.port.primary.command.ChangeSupplierDeviceCommand;
+import com.warehouse.supplier.application.port.primary.command.ChangeSupportedPackageTypeCommand;
+import com.warehouse.supplier.application.port.primary.command.SupplierCreateCommand;
+import com.warehouse.supplier.application.port.primary.result.SupplierCreateResponse;
+import com.warehouse.supplier.application.port.primary.result.SupplierResult;
+import com.warehouse.supplier.domain.event.SupplierAnonymized;
+import com.warehouse.supplier.domain.event.SupplierCreated;
+import com.warehouse.supplier.domain.service.DriverLicenseServiceImpl;
+import com.warehouse.supplier.domain.service.SupplierCodeGeneratorServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,10 +35,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -51,9 +56,6 @@ public class SupplyPortImplTest {
     private SupplierRepository supplierRepository;
 
     @Mock
-    private DeviceServicePort deviceServicePort;
-
-    @Mock
     private DepartmentServicePort departmentServicePort;
 
     @Mock
@@ -62,24 +64,18 @@ public class SupplyPortImplTest {
     @Mock
     private CurrentUserServicePort currentUserServicePort;
 
+    @Mock
+    private DomainEventPublisher domainEventPublisher;
+
     private SupplyPortImpl supplyPort;
 
     private int maxCouriersPerDepartment;
 
     @BeforeEach
     void setup() {
-        final SupplierService service = new SupplierServiceImpl(supplierRepository);
-        final SupplierValidatorService validatorService = new SupplierValidatorServiceImpl(supplierRepository, deviceServicePort, departmentServicePort);
-        final SupplierCodeGeneratorService generatorService = new SupplierCodeGeneratorServiceImpl();
-        final DriverLicenseService driverLicenseService = new DriverLicenseServiceImpl();
-        final ApplicationContext applicationContext = mock(ApplicationContext.class);
-        final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
-        final DomainContext domainContext = new DomainContext();
-        domainContext.setApplicationEventPublisher(eventPublisher);
-        domainContext.setApplicationContext(applicationContext);
-        supplyPort = new SupplyPortImpl(service, generatorService, validatorService, driverLicenseService,
-                deviceServicePort, departmentServicePort, userServicePort, supplierRepository,
-                departmentId -> maxCouriersPerDepartment, currentUserServicePort);
+        supplyPort = new SupplyPortImpl(supplierRepository, new SupplierCodeGeneratorServiceImpl(),
+                new DriverLicenseServiceImpl(), departmentServicePort, userServicePort,
+                departmentId -> maxCouriersPerDepartment, currentUserServicePort, domainEventPublisher);
     }
 
     @Test
@@ -93,7 +89,9 @@ public class SupplyPortImplTest {
         when(currentUserServicePort.canAccessDepartment(DEPARTMENT_ID)).thenReturn(true);
         when(currentUserServicePort.canAccessDepartment(otherDepartmentId)).thenReturn(false);
 
-        assertEquals(List.of(ownCourier), supplyPort.getAllInCurrentUserDepartment());
+        final List<SupplierResult> couriers = supplyPort.getAllInCurrentUserDepartment();
+
+        assertEquals(List.of(ownCourier.snapshot()), couriers.stream().map(SupplierResult::supplier).toList());
     }
 
     @Test
@@ -110,6 +108,7 @@ public class SupplyPortImplTest {
 
         verify(supplierRepository).create(argThat(supplier -> new UserId(101L).equals(supplier.createdUserId())
                 && supplier.getUserStatus() == UserStatus.USER_CREATED));
+        verify(domainEventPublisher).publish(any(SupplierCreated.class));
     }
 
     @Test
@@ -158,26 +157,32 @@ public class SupplyPortImplTest {
 
     @Test
     void shouldGetOneById() {
-        final Supplier supplier = mock(Supplier.class);
+        final Supplier supplier = supplier(1L, DEPARTMENT_ID);
         final SupplierId supplierId = new SupplierId(1L);
         when(supplierRepository.findById(supplierId)).thenReturn(supplier);
-        final Supplier supplierDb = this.supplyPort.getOneById(supplierId);
-        assertEquals(supplier, supplierDb);
+        when(departmentServicePort.getDepartmentCode(DEPARTMENT_ID)).thenReturn(DEPARTMENT_CODE);
+
+        final Optional<SupplierResult> result = this.supplyPort.getOneById(supplierId);
+
+        assertEquals(Optional.of(new SupplierResult(supplier.snapshot(), DEPARTMENT_CODE)), result);
     }
 
     @Test
     void shouldGetOneByCode() {
-        final Supplier supplier = mock(Supplier.class);
+        final Supplier supplier = supplier(1L, DEPARTMENT_ID);
         final SupplierCode supplierCode = new SupplierCode("123");
         when(supplierRepository.findByCode(supplierCode)).thenReturn(supplier);
-        final Supplier supplierDb = this.supplyPort.getOneByCode(supplierCode);
-        assertEquals(supplier, supplierDb);
+        when(departmentServicePort.getDepartmentCode(DEPARTMENT_ID)).thenReturn(DEPARTMENT_CODE);
+
+        final Optional<SupplierResult> result = this.supplyPort.getOneByCode(supplierCode);
+
+        assertEquals(Optional.of(new SupplierResult(supplier.snapshot(), DEPARTMENT_CODE)), result);
     }
 
     @Test
     void shouldAddPackageType() {
         final ChangeSupportedPackageTypeCommand request = new ChangeSupportedPackageTypeCommand(new SupplierCode("123"), Set.of(PackageType.LARGE));
-        when(supplierRepository.findByCode(new SupplierCode("123"))).thenReturn(mock(Supplier.class));
+        when(supplierRepository.findByCode(new SupplierCode("123"))).thenReturn(supplier(1L, DEPARTMENT_ID));
         this.supplyPort.addPackageType(request);
         verify(supplierRepository).update(any());
     }
@@ -186,7 +191,7 @@ public class SupplyPortImplTest {
     void shouldAddDevice() {
         final DeviceId deviceId = new DeviceId("");
         final ChangeSupplierDeviceCommand request = new ChangeSupplierDeviceCommand(new SupplierCode("123"), deviceId);
-        when(supplierRepository.findByCode(new SupplierCode("123"))).thenReturn(mock(Supplier.class));
+        when(supplierRepository.findByCode(new SupplierCode("123"))).thenReturn(supplier(1L, DEPARTMENT_ID));
         this.supplyPort.addDevice(request);
         verify(supplierRepository).update(any());
     }
@@ -216,7 +221,6 @@ public class SupplyPortImplTest {
         when(supplierRepository.findAssignedToDepartment(DEPARTMENT_ID)).thenReturn(java.util.List.of(first, second));
         when(supplierRepository.findAssignedToDepartment(targetDepartmentId)).thenReturn(java.util.List.of(
                 supplier(3L, targetDepartmentId)));
-        when(supplierRepository.findById(first.getSupplierId())).thenReturn(first);
 
         supplyPort.transferCouriers(DEPARTMENT_ID, targetDepartmentId);
 
@@ -256,6 +260,16 @@ public class SupplyPortImplTest {
         supplyPort.createInCurrentUserDepartment(request);
 
         verify(supplierRepository).create(any());
+    }
+
+    @Test
+    void shouldPublishAnonymizedEventForEachAnonymizedSupplier() {
+        when(supplierRepository.findAllByCurrentDepartment()).thenReturn(List.of(supplier(1L, DEPARTMENT_ID)));
+
+        final int anonymized = supplyPort.anonymizeAll();
+
+        assertEquals(1, anonymized);
+        verify(domainEventPublisher).publish(any(SupplierAnonymized.class));
     }
 
     private void stubDepartment() {

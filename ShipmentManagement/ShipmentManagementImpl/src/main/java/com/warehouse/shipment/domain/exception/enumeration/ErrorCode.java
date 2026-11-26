@@ -16,7 +16,9 @@ public enum ErrorCode {
     RECIPIENT_POSTAL_CODE_NOT_FOUND(400, "Country could not be determined from recipient postal code"),
     ROUTE_TRACKER_SERVICE_NOT_AVAILABLE(500, "Route tracker service is not available"),
     ROUTE_TRACKER_SERVICE_ERROR(401, "Error occurred in route tracker"),
-    SHIPMENT_EXTENDED_LIMITATIONS(400, "Shipment invalid limitations");
+    SHIPMENT_EXTENDED_LIMITATIONS(400, "Shipment invalid limitations"),
+    SHIPMENT_NOT_PRICEABLE(400, "Shipment cannot be priced"),
+    BILLING_CUSTOMER_NOT_ACTIVE(403, "Business customer is not active");
 
     private final int code;
 

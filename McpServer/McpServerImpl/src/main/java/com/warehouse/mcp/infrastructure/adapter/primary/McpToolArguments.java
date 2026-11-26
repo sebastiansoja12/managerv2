@@ -3,17 +3,23 @@ package com.warehouse.mcp.infrastructure.adapter.primary;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.UUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.warehouse.commonassets.identificator.CarrierId;
 import com.warehouse.commonassets.identificator.DeliveryId;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.TrackingNumber;
+import com.warehouse.commonassets.identificator.VehicleId;
 import com.warehouse.mcp.domain.vo.PartyRole;
 
 public class McpToolArguments {
@@ -82,6 +88,25 @@ public class McpToolArguments {
     public SupplierCode optionalCourierCode(final String value) {
         final String code = optional(value);
         return code == null ? null : new SupplierCode(code);
+    }
+
+    public CarrierId carrierId(final Long value) {
+        return new CarrierId(required(value, "carrierId"));
+    }
+
+    public VehicleId vehicleId(final Long value) {
+        return new VehicleId(required(value, "vehicleId"));
+    }
+
+    public Set<String> postalCodes(final String value) {
+        final Set<String> postalCodes = Arrays.stream(required(value, "postalCodes").split(","))
+                .map(String::trim)
+                .filter(postalCode -> !postalCode.isEmpty())
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        if (postalCodes.isEmpty()) {
+            throw new McpToolFailure("Parameter postalCodes is required");
+        }
+        return postalCodes;
     }
 
     public int stepNumber(final Integer value) {

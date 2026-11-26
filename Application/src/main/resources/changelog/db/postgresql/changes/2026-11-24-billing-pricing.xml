@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-24-postgresql-table-price-lists" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="price_lists"/>
+            </not>
+        </preConditions>
+        <createTable tableName="price_lists">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="operator_id" type="BIGINT" />
+            <column name="template" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="currency" type="VARCHAR(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="insurance_percent" type="DECIMAL(7,3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="vat_percent" type="DECIMAL(7,3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <sql>
+            ALTER TABLE price_lists ADD CONSTRAINT ck_price_lists_template CHECK (template = (operator_id IS NULL));
+            CREATE UNIQUE INDEX uq_price_lists_template ON price_lists (template) WHERE template = true AND operator_id IS NULL;
+            CREATE UNIQUE INDEX uq_price_lists_operator ON price_lists (operator_id) WHERE operator_id IS NOT NULL;
+        </sql>
+    </changeSet>
+
+    <changeSet id="2026-11-24-postgresql-table-price-list-size-classes" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="price_list_size_classes"/>
+            </not>
+        </preConditions>
+        <createTable tableName="price_list_size_classes">
+            <column name="price_list_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_price_list_size_classes" references="price_lists(id)" deleteCascade="true" />
+            </column>
+            <column name="position" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="code" type="VARCHAR(20)">
+                <constraints nullable="false" />
+            </column>
+            <column name="max_length_cm" type="DECIMAL(10,2)">
+                <constraints nullable="false" />
+            </column>
+            <column name="max_width_cm" type="DECIMAL(10,2)">
+                <constraints nullable="false" />
+            </column>
+            <column name="max_height_cm" type="DECIMAL(10,2)">
+                <constraints nullable="false" />
+            </column>
+            <column name="net_price" type="DECIMAL(19,2)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="price_list_size_classes" columnNames="price_list_id, position"
+                       constraintName="pk_price_list_size_classes" />
+    </changeSet>
+
+    <changeSet id="2026-11-24-postgresql-table-price-list-weight-bands" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="price_list_weight_bands"/>
+            </not>
+        </preConditions>
+        <createTable tableName="price_list_weight_bands">
+            <column name="price_list_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_price_list_weight_bands" references="price_lists(id)" deleteCascade="true" />
+            </column>
+            <column name="position" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="from_kg" type="DECIMAL(10,3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="to_kg" type="DECIMAL(10,3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="net_surcharge" type="DECIMAL(19,2)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="price_list_weight_bands" columnNames="price_list_id, position"
+                       constraintName="pk_price_list_weight_bands" />
+    </changeSet>
+
+    <changeSet id="2026-11-24-postgresql-table-price-list-service-levels" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="price_list_service_levels"/>
+            </not>
+        </preConditions>
+        <createTable tableName="price_list_service_levels">
+            <column name="price_list_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_price_list_service_levels" references="price_lists(id)" deleteCascade="true" />
+            </column>
+            <column name="service_level" type="VARCHAR(20)">
+                <constraints nullable="false" />
+            </column>
+            <column name="multiplier" type="DECIMAL(7,3)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="price_list_service_levels" columnNames="price_list_id, service_level"
+                       constraintName="pk_price_list_service_levels" />
+    </changeSet>
+
+    <changeSet id="2026-11-24-postgresql-table-price-list-delivery-methods" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="price_list_delivery_methods"/>
+            </not>
+        </preConditions>
+        <createTable tableName="price_list_delivery_methods">
+            <column name="price_list_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_price_list_delivery_methods" references="price_lists(id)" deleteCascade="true" />
+            </column>
+            <column name="delivery_method" type="VARCHAR(20)">
+                <constraints nullable="false" />
+            </column>
+            <column name="surcharge" type="DECIMAL(19,2)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="price_list_delivery_methods" columnNames="price_list_id, delivery_method"
+                       constraintName="pk_price_list_delivery_methods" />
+    </changeSet>
+
+    <changeSet id="2026-11-24-postgresql-table-price-quotes" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="price_quotes"/>
+            </not>
+        </preConditions>
+        <createTable tableName="price_quotes">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="price_list_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="currency" type="VARCHAR(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="vat_percent" type="DECIMAL(7,3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="quoted_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <createIndex tableName="price_quotes" indexName="idx_price_quotes_operator">
+            <column name="operator_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2026-11-24-postgresql-table-price-quote-lines" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="price_quote_lines"/>
+            </not>
+        </preConditions>
+        <createTable tableName="price_quote_lines">
+            <column name="quote_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_price_quote_lines_quote" references="price_quotes(id)" deleteCascade="true" />
+            </column>
+            <column name="position" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="type" type="VARCHAR(30)">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="net" type="DECIMAL(19,2)">
+                <constraints nullable="false" />
+            </column>
+            <column name="vat" type="DECIMAL(19,2)">
+                <constraints nullable="false" />
+            </column>
+            <column name="gross" type="DECIMAL(19,2)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="price_quote_lines" columnNames="quote_id, position"
+                       constraintName="pk_price_quote_lines" />
+    </changeSet>
+
+    <changeSet id="2026-11-24-postgresql-price-list-template-data" author="s-soja">
+        <sql>
+            INSERT INTO price_lists (id, operator_id, template, currency, insurance_percent, vat_percent, updated_at)
+            VALUES (1, NULL, true, 'PLN', 1.0, 23, now());
+            INSERT INTO price_list_size_classes (price_list_id, position, code, max_length_cm, max_width_cm, max_height_cm, net_price)
+            VALUES (1, 0, 'S', 8, 38, 64, 12.00),
+                   (1, 1, 'M', 19, 38, 64, 14.00),
+                   (1, 2, 'L', 41, 38, 64, 17.00),
+                   (1, 3, 'XL', 80, 60, 120, 39.00);
+            INSERT INTO price_list_weight_bands (price_list_id, position, from_kg, to_kg, net_surcharge)
+            VALUES (1, 0, 0, 5, 0.00),
+                   (1, 1, 5, 10, 3.00),
+                   (1, 2, 10, 25, 8.00),
+                   (1, 3, 25, 50, 20.00);
+            INSERT INTO price_list_service_levels (price_list_id, service_level, multiplier)
+            VALUES (1, 'ECONOMY', 0.90),
+                   (1, 'STANDARD', 1.00),
+                   (1, 'EXPRESS', 1.50);
+            INSERT INTO price_list_delivery_methods (price_list_id, delivery_method, surcharge)
+            VALUES (1, 'COURIER', 4.00),
+                   (1, 'PICKUP_POINT', 0.00),
+                   (1, 'LOCKER', 0.00);
+        </sql>
+    </changeSet>
+</databaseChangeLog>

@@ -1,6 +1,7 @@
 package com.warehouse.shipment.application.service;
 
 import com.warehouse.shipment.domain.vo.ShipmentDeliveryDetails;
+import com.warehouse.commonassets.identificator.PalletTrackingNumber;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.application.port.primary.ShipmentReadModelSyncPort;
 import com.warehouse.shipment.application.port.secondary.ShipmentReadModelRepository;
@@ -26,8 +27,7 @@ public class ShipmentReadModelSyncServiceImpl implements ShipmentReadModelSyncPo
     @Transactional
     @Override
     public void syncReadModel(final ShipmentId shipmentId) {
-        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        this.readModelRepository.sync(shipment.snapshot());
+        this.readModelRepository.sync(this.shipmentRepository.findById(shipmentId).snapshot());
     }
 
     @Transactional
@@ -36,7 +36,8 @@ public class ShipmentReadModelSyncServiceImpl implements ShipmentReadModelSyncPo
         final List<Shipment> shipments = this.shipmentRepository.findAllCreatedBetween(
                 dateFrom.atStartOfDay(),
                 dateTo.plusDays(1).atStartOfDay());
-        return syncReadModels(shipments);
+        shipments.forEach(shipment -> this.readModelRepository.sync(shipment.snapshot()));
+        return shipments.size();
     }
 
     @Transactional
@@ -46,11 +47,16 @@ public class ShipmentReadModelSyncServiceImpl implements ShipmentReadModelSyncPo
         this.readModelRepository.sync(shipment.snapshot(), deliveryDetails);
     }
 
-    private int syncReadModels(final List<Shipment> shipments) {
-        shipments.stream()
-                .map(Shipment::snapshot)
-                .forEach(this.readModelRepository::sync);
+    @Transactional
+    @Override
+    public void syncIncidentReported(final ShipmentId shipmentId, final boolean incidentReported) {
+        this.readModelRepository.changeIncidentReported(shipmentId, incidentReported);
+    }
 
-        return shipments.size();
+    @Transactional
+    @Override
+    public void syncPalletTrackingNumber(final ShipmentId shipmentId,
+                                         final PalletTrackingNumber palletTrackingNumber) {
+        this.readModelRepository.changePalletTrackingNumber(shipmentId, palletTrackingNumber);
     }
 }

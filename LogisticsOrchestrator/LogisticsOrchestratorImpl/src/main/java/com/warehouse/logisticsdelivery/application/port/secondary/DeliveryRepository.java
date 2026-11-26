@@ -40,5 +40,11 @@ public interface DeliveryRepository {
 
     List<Delivery> findActiveByDepartment(final DepartmentId departmentId);
 
+    List<AwaitingCourierDelivery> findAwaitingCourier(final AwaitingCourierQuery query);
+
+    boolean assignCourier(final Delivery delivery);
+
+    long countActiveBySupplier(final SupplierId supplierId);
+
     void createOrUpdate(final Delivery delivery);
 }

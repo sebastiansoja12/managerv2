@@ -30,6 +30,8 @@ public interface UserPort {
 
     void changeLanguage(final UserId userId, final String language);
 
+    String revealApiKey(final UserId userId);
+
     String regenerateApiKey(final UserId userId);
 
     void deleteApiKey(final UserId userId);

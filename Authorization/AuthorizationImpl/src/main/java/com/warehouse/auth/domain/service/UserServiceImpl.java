@@ -16,6 +16,8 @@ import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.auth.domain.vo.UserResponse;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.McpKeyId;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import org.springframework.stereotype.Service;
 
@@ -98,6 +100,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Optional<String> findApiKeySecret(final UserId userId) {
+        return this.userRepository.findApiKeySecret(userId);
+    }
+
+    @Override
     public void changeApiKey(final UserId userId, final String apiKey) {
         final OrganizationUser user = this.userRepository.findById(userId);
         user.changeApiKey(apiKey);
@@ -106,16 +113,35 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void issueApiKey(final UserId userId, final String apiKeyHash, final Instant issuedAt) {
+    public void issueApiKey(final UserId userId, final String apiKeyHash, final String secret, final Instant issuedAt) {
         final OrganizationUser user = this.userRepository.findById(userId);
         user.issueApiKey(apiKeyHash, issuedAt);
-        this.userRepository.createOrUpdate(user);
+        this.userRepository.saveApiKey(user, secret);
         DomainRegistry.eventPublisher().publishEvent(new UserChangedEvent(user.snapshot()));
     }
 
     @Override
     public Optional<OrganizationUser> findByApiKeyHash(final String apiKeyHash) {
         return this.userRepository.findByApiKeyHash(apiKeyHash);
+    }
+
+    @Override
+    public void assignMcpKey(final UserId userId, final McpKeyId mcpKeyId) {
+        final OrganizationUser user = this.userRepository.findById(userId);
+        user.assignMcpKey(mcpKeyId);
+        this.userRepository.createOrUpdate(user);
+    }
+
+    @Override
+    public void removeMcpKey(final UserId userId, final McpKeyId mcpKeyId) {
+        final OrganizationUser user = this.userRepository.findById(userId);
+        user.removeMcpKey(mcpKeyId);
+        this.userRepository.createOrUpdate(user);
+    }
+
+    @Override
+    public Optional<OrganizationUser> findByIdInOperator(final UserId userId, final OperatorId operatorId) {
+        return this.userRepository.findByIdInOperator(userId, operatorId);
     }
 
     @Override

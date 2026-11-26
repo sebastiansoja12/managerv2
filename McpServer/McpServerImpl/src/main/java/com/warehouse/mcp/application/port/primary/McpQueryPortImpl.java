@@ -14,7 +14,6 @@ import com.warehouse.mcp.application.port.secondary.DepartmentServicePort;
 import com.warehouse.mcp.application.port.secondary.DeviceServicePort;
 import com.warehouse.mcp.application.port.secondary.ProcessServicePort;
 import com.warehouse.mcp.application.port.secondary.ShipmentServicePort;
-import com.warehouse.mcp.domain.exception.McpToolAccessException;
 import com.warehouse.mcp.domain.service.PersonalDataMasking;
 import com.warehouse.mcp.domain.vo.CurrentUserProfile;
 import com.warehouse.mcp.domain.vo.DepartmentDetails;
@@ -120,9 +119,6 @@ public class McpQueryPortImpl implements McpQueryPort {
 
     @Override
     public DeviceList listDevices(final DeviceFilter filter) {
-        if (!this.currentUserServicePort.currentUser().canManageDevices()) {
-            throw new McpToolAccessException("Listing devices requires the MANAGER role or higher");
-        }
         final List<DeviceAccess> devices = this.deviceServicePort.findAllDevices().stream()
                 .filter(filter::matches)
                 .toList();
@@ -173,9 +169,6 @@ public class McpQueryPortImpl implements McpQueryPort {
 
     @Override
     public CourierList listCouriers() {
-        if (!this.currentUserServicePort.currentUser().canManageDevices()) {
-            throw new McpToolAccessException("Listing couriers requires the MANAGER role or higher");
-        }
         final List<Courier> couriers = this.courierServicePort.findCouriers();
         return new CourierList(couriers.size(), couriers.stream().limit(MAX_COURIERS).toList());
     }

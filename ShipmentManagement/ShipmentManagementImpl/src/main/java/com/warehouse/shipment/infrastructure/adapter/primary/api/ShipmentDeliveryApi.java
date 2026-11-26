@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 
 public record ShipmentDeliveryApi(DepartmentIdDto originDepartmentId,
                                   DepartmentIdDto destinationDepartmentId,
+                                  DepartmentIdDto currentDepartmentId,
                                   LocalDateTime plannedDeliveryAt,
-                                  LocalDateTime deliveredAt) {
+                                  LocalDateTime deliveredAt,
+                                  String courierCode,
+                                  String courierName) {
 }

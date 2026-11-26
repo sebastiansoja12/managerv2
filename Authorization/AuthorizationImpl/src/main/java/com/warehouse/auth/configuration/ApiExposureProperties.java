@@ -27,12 +27,19 @@ public class ApiExposureProperties {
             "/mcp"
     ));
 
+    private boolean mcpLegacyApiKeyEnabled = false;
+
     private List<String> externalPaths = new ArrayList<>(List.of(
             "/external"
     ));
 
     private List<PublicEndpoint> publicEndpoints = new ArrayList<>(List.of(
             new PublicEndpoint("POST", "/device-activations")
+    ));
+
+    private List<String> publicPaths = new ArrayList<>(List.of(
+            "/billing/webhooks",
+            "/auth/invitations"
     ));
 
     public String getInternalPrefix() {
@@ -74,6 +81,14 @@ public class ApiExposureProperties {
                 .anyMatch(path -> normalizedPath.equals(path) || normalizedPath.startsWith(path + "/"));
     }
 
+    public boolean isMcpLegacyApiKeyEnabled() {
+        return mcpLegacyApiKeyEnabled;
+    }
+
+    public void setMcpLegacyApiKeyEnabled(final boolean mcpLegacyApiKeyEnabled) {
+        this.mcpLegacyApiKeyEnabled = mcpLegacyApiKeyEnabled;
+    }
+
     public String[] mcpSecurityMatchers() {
         return mcpPaths.stream()
                 .map(this::normalizePath)
@@ -109,6 +124,28 @@ public class ApiExposureProperties {
 
     public void setPublicEndpoints(final List<PublicEndpoint> publicEndpoints) {
         this.publicEndpoints = publicEndpoints;
+    }
+
+    public List<String> getPublicPaths() {
+        return publicPaths;
+    }
+
+    public void setPublicPaths(final List<String> publicPaths) {
+        this.publicPaths = publicPaths;
+    }
+
+    public boolean isPublicPath(final HttpServletRequest request) {
+        final String normalizedPath = requestPathWithoutContext(request);
+        return publicPaths.stream()
+                .map(this::normalizePath)
+                .anyMatch(path -> normalizedPath.equals(path) || normalizedPath.startsWith(path + "/"));
+    }
+
+    public String[] publicSecurityMatchers() {
+        return publicPaths.stream()
+                .map(this::normalizePath)
+                .flatMap(path -> Stream.of(path, path + "/**"))
+                .toArray(String[]::new);
     }
 
     public boolean isInternalControllerPath(final String path) {

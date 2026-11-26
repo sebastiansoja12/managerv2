@@ -1,14 +1,14 @@
 package com.warehouse.mail.api.event;
 
-import com.warehouse.commonassets.event.integration.annotation.IntegrationEventType;
-import com.warehouse.commonassets.event.integration.model.IntegrationEvent;
-import com.warehouse.commonassets.event.integration.model.IntegrationEventKey;
+import com.warehouse.eventoutbox.integration.annotation.IntegrationEventType;
+import com.warehouse.eventoutbox.integration.model.IntegrationEvent;
+import com.warehouse.eventoutbox.integration.model.IntegrationEventKey;
 import com.warehouse.commonassets.identificator.SupplierCode;
 
 import java.time.Instant;
 import java.util.Objects;
 
-@IntegrationEventType(value = "supplier.driver-license.invalidated", version = 1)
+@IntegrationEventType(value = "supplier.driver-license.invalidated", version = 1, topic = MailTopics.SUPPLIER_DRIVER_LICENSE_INVALIDATED)
 public record SupplierDriverLicenseInvalidatedIntegrationEvent(
         SupplierCode supplierCode,
         String email,
