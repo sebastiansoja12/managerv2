@@ -66,6 +66,15 @@ processes, devices, departments, couriers and configuration, and, for managers, 
 | `Device` | Device pairing, device verification and terminal/device access validation. |
 | `AuditLog` | Shared operator-scoped audit log (`/audit-log`): what was done (resource, action, changed fields) and who did it (user, department). Modules translate their domain events into `AuditLogEntryIntegrationEvent`, publish it through the Kafka outbox (`audit-log.entries`) and `AuditLogKafkaEventListener` stores it idempotently by event ID. |
 | `McpServer` | MCP server (`/v1/api/mcp`) that lets AI assistants look up and change shipments, deliveries, departments, couriers and configuration. |
+| `Billing` | Price lists, shipment quotes, counter and Stripe payments, refunds, invoices with corrections sent by e-mail, and business customers authenticated by API key (`/billing`, `/external/payments`). |
+| `DriverHub` | Carriers, drivers, carrier vehicles and courier vehicle and device assignment (`/carriers`, `/drivers`). |
+| `DeliveryNetwork` | Operator delivery network with department connections (`/delivery-networks/current`). |
+| `PalletManagement` | Pallets, pallet documents, carrier assignment, pallet transports and unloading (`/pallets`). |
+| `IncidentManagement` | Shipment incidents: reporting, assignment, comments, resolution, reopening and statistics (`/incidents`). |
+| `FleetTracking` | Driver tracking sessions, GPS position ingestion, last known vehicle positions and route history (`/fleet-tracking/sessions`). |
+| `OrganizationAnalytics` | Department performance comparison, cost register and shipment forecast (`/analytics`). |
+| `PlatformAdministration` | Platform-owner tools: operator users, departments, access blocking, read-model rebuilds, data export and erasure, announcements, system status, maintenance mode, platform audit log and courier assignment jobs. |
+| `AsyncJob` and `EventOutbox` | Background jobs and the Kafka outbox with retries and capped exponential backoff. |
 | `SupplierServiceManagement` | Suppliers, package types, delivery areas, vehicle data and supplier updates. |
 | `GeocodingService` | Geocoding provider configuration and geocoding API. |
 | `PathFinder` and `DestinationDetermination` | Routing, delivery-department determination, address coordinates and area calculation support. |
@@ -113,6 +122,23 @@ Common environment variables:
 - `JWT_SECRET_KEY`
 - `AUTH_CORS_ALLOWED_ORIGINS`
 - `CREDENTIALS_ENCRYPTION_KEY`
+- `BILLING_PAYMENT_GATEWAY`, `BILLING_FAKE_GATEWAY_URL`, `BILLING_PAYMENT_SUCCESS_URL`, `BILLING_PAYMENT_CANCEL_URL`
+- `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
+
+### Billing and courier assignment
+
+`Billing` prices shipments from database price lists and tracks their payment state; unpaid shipments cannot
+leave draft statuses. `BILLING_PAYMENT_GATEWAY` selects the payment gateway: `fake` (default, a local fake gateway
+under `/billing/dev/fake-gateway`) or `stripe` (test mode, with `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`).
+
+Courier assignment runs in `LogisticsOrchestrator` assign deliveries awaiting a courier in batches per department.
+They are scheduled by Quartz with a clustered JDBC job store:
+
+- `MANAGER_COURIER_ASSIGNMENT_CRON` (every 30 minutes), `MANAGER_COURIER_ASSIGNMENT_RECOVERY_CRON` (every 5 minutes),
+  `MANAGER_COURIER_ASSIGNMENT_CLEANUP_CRON` (daily at midnight)
+- `MANAGER_COURIER_ASSIGNMENT_WORKERS`, `MANAGER_COURIER_ASSIGNMENT_QUEUE_CAPACITY`, `MANAGER_COURIER_ASSIGNMENT_RUN_LEASE`,
+  `MANAGER_COURIER_ASSIGNMENT_RUN_MAX_RETRIES`, `MANAGER_COURIER_ASSIGNMENT_RUN_PENDING_RECOVERY_DELAY`,
+  `MANAGER_COURIER_ASSIGNMENT_RUN_RETENTION`, `MANAGER_COURIER_ASSIGNMENT_TRANSACTION_TIMEOUT_SECONDS`
 
 ### E-mail notifications
 

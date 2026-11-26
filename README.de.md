@@ -68,6 +68,15 @@ Kuriere und Konfiguration abfragen und, mit Managerrechten, ändern.
 | `Device` | Gerätekopplung, Geräteprüfung und Zugriffsprüfung für Terminals/Geräte. |
 | `AuditLog` | Gemeinsames betreiberbezogenes Audit-Log (`/audit-log`): was getan wurde (Ressource, Aktion, geänderte Felder) und wer es getan hat (Benutzer, Niederlassung). Module übersetzen ihre Domänenereignisse in `AuditLogEntryIntegrationEvent`, veröffentlichen sie über den Kafka-Outbox (`audit-log.entries`), und `AuditLogKafkaEventListener` speichert sie idempotent nach Ereignis-ID. |
 | `McpServer` | MCP-Server (`/v1/api/mcp`), über den KI-Assistenten Sendungen, Zustellungen, Niederlassungen, Kuriere und Konfiguration abfragen und ändern. |
+| `Billing` | Preislisten, Sendungsangebote, Zahlungen am Schalter und über Stripe, Erstattungen, Rechnungen mit Korrekturen per E-Mail sowie Geschäftskunden mit API-Key-Authentifizierung (`/billing`, `/external/payments`). |
+| `DriverHub` | Frachtführer, Fahrer, Fahrzeuge der Frachtführer sowie Zuordnung von Fahrzeugen und Geräten zu Kurieren (`/carriers`, `/drivers`). |
+| `DeliveryNetwork` | Zustellnetz des Betreibers mit Verbindungen zwischen Niederlassungen (`/delivery-networks/current`). |
+| `PalletManagement` | Paletten, Palettendokumente, Frachtführerzuordnung, Palettentransporte und Entladung (`/pallets`). |
+| `IncidentManagement` | Sendungsvorfälle: Meldung, Zuweisung, Kommentare, Lösung, Wiedereröffnung und Statistiken (`/incidents`). |
+| `FleetTracking` | Tracking-Sitzungen der Fahrer, Erfassung von GPS-Positionen, letzte bekannte Fahrzeugpositionen und Routenverlauf (`/fleet-tracking/sessions`). |
+| `OrganizationAnalytics` | Leistungsvergleich der Niederlassungen, Kostenregister und Sendungsprognose (`/analytics`). |
+| `PlatformAdministration` | Werkzeuge für Plattformbetreiber: Betreiberbenutzer, Niederlassungen, Zugangssperren, Neuaufbau von Lesemodellen, Datenexport und -löschung, Ankündigungen, Systemstatus, Wartungsmodus, Plattform-Auditprotokoll und Jobs zur Kurierzuweisung. |
+| `AsyncJob` und `EventOutbox` | Hintergrundjobs und der Kafka-Outbox mit Wiederholungen und begrenztem exponentiellem Backoff. |
 | `SupplierServiceManagement` | Lieferanten, Pakettypen, Zustellgebiete, Fahrzeugdaten und Lieferantenaktualisierungen. |
 | `GeocodingService` | Konfiguration des Geokodierungsanbieters und Geokodierungs-API. |
 | `PathFinder` und `DestinationDetermination` | Routenplanung, Bestimmung der Zustellniederlassung, Adresskoordinaten und Gebietsberechnung. |
@@ -115,6 +124,24 @@ Häufig genutzte Umgebungsvariablen:
 - `JWT_SECRET_KEY`
 - `AUTH_CORS_ALLOWED_ORIGINS`
 - `CREDENTIALS_ENCRYPTION_KEY`
+- `BILLING_PAYMENT_GATEWAY`, `BILLING_FAKE_GATEWAY_URL`, `BILLING_PAYMENT_SUCCESS_URL`, `BILLING_PAYMENT_CANCEL_URL`
+- `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
+
+### Abrechnung und Kurierzuweisung
+
+`Billing` bepreist Sendungen anhand von Preislisten aus der Datenbank und verfolgt ihren Zahlungsstatus; unbezahlte
+Sendungen können die Entwurfsstatus nicht verlassen. `BILLING_PAYMENT_GATEWAY` wählt das Zahlungsgateway: `fake`
+(Standard, ein lokales Test-Gateway unter `/billing/dev/fake-gateway`) oder `stripe` (Testmodus, mit
+`STRIPE_SECRET_KEY` und `STRIPE_WEBHOOK_SECRET`).
+
+Kurierzuweisungsläufe in `LogisticsOrchestrator` weisen Zustellungen, die auf einen Kurier warten, je Niederlassung
+in Stapeln zu. Geplant werden sie von Quartz mit einem geclusterten JDBC-Jobspeicher:
+
+- `MANAGER_COURIER_ASSIGNMENT_CRON` (alle 30 Minuten), `MANAGER_COURIER_ASSIGNMENT_RECOVERY_CRON` (alle 5 Minuten),
+  `MANAGER_COURIER_ASSIGNMENT_CLEANUP_CRON` (täglich um Mitternacht)
+- `MANAGER_COURIER_ASSIGNMENT_WORKERS`, `MANAGER_COURIER_ASSIGNMENT_QUEUE_CAPACITY`, `MANAGER_COURIER_ASSIGNMENT_RUN_LEASE`,
+  `MANAGER_COURIER_ASSIGNMENT_RUN_MAX_RETRIES`, `MANAGER_COURIER_ASSIGNMENT_RUN_PENDING_RECOVERY_DELAY`,
+  `MANAGER_COURIER_ASSIGNMENT_RUN_RETENTION`, `MANAGER_COURIER_ASSIGNMENT_TRANSACTION_TIMEOUT_SECONDS`
 
 ### E-Mail-Benachrichtigungen
 

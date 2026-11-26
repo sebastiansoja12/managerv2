@@ -66,6 +66,15 @@ procesy, urządzenia, oddziały, kurierów i konfigurację, a kierownikom także
 | `Device` | Parowanie urządzeń, weryfikacja urządzeń i walidacja dostępu terminali/urządzeń. |
 | `AuditLog` | Wspólny dziennik audytu w zakresie operatora (`/audit-log`): co zrobiono (zasób, akcja, zmienione pola) i kto to zrobił (użytkownik, oddział). Moduły zamieniają swoje zdarzenia domenowe na `AuditLogEntryIntegrationEvent`, publikują je przez outbox Kafki (`audit-log.entries`), a `AuditLogKafkaEventListener` zapisuje je idempotentnie według ID zdarzenia. |
 | `McpServer` | Serwer MCP (`/v1/api/mcp`), przez który asystenci AI wyszukują i zmieniają przesyłki, dostawy, oddziały, kurierów i konfigurację. |
+| `Billing` | Cenniki, wyceny przesyłek, płatności przy okienku i przez Stripe, zwroty, faktury z korektami wysyłane e-mailem oraz klienci biznesowi uwierzytelniani kluczem API (`/billing`, `/external/payments`). |
+| `DriverHub` | Przewoźnicy, kierowcy, pojazdy przewoźników oraz przypisanie pojazdów i urządzeń kurierom (`/carriers`, `/drivers`). |
+| `DeliveryNetwork` | Sieć doręczeń operatora z połączeniami między oddziałami (`/delivery-networks/current`). |
+| `PalletManagement` | Palety, dokumenty palet, przypisanie przewoźnika, transporty i rozładunek palet (`/pallets`). |
+| `IncidentManagement` | Incydenty przesyłek: zgłaszanie, przypisanie, komentarze, rozwiązywanie, ponowne otwieranie i statystyki (`/incidents`). |
+| `FleetTracking` | Sesje śledzenia kierowców, przyjmowanie pozycji GPS, ostatnie znane pozycje pojazdów i historia tras (`/fleet-tracking/sessions`). |
+| `OrganizationAnalytics` | Porównanie wyników oddziałów, rejestr kosztów i prognoza przesyłek (`/analytics`). |
+| `PlatformAdministration` | Narzędzia właściciela platformy: użytkownicy operatorów, oddziały, blokowanie dostępu, przebudowa modeli odczytu, eksport i usuwanie danych, ogłoszenia, status systemu, tryb serwisowy, dziennik audytu platformy i zadania przydziału kurierów. |
+| `AsyncJob` i `EventOutbox` | Zadania w tle i outbox Kafki z ponowieniami i ograniczonym wykładniczym opóźnieniem. |
 | `SupplierServiceManagement` | Dostawcy, typy paczek, obszary doręczeń, dane pojazdów i aktualizacje dostawców. |
 | `GeocodingService` | Konfiguracja dostawcy geokodowania i API geokodowania. |
 | `PathFinder` i `DestinationDetermination` | Wyznaczanie tras, ustalanie oddziału doręczającego, współrzędne adresów i obliczenia obszarów. |
@@ -113,6 +122,23 @@ Często używane zmienne środowiskowe:
 - `JWT_SECRET_KEY`
 - `AUTH_CORS_ALLOWED_ORIGINS`
 - `CREDENTIALS_ENCRYPTION_KEY`
+- `BILLING_PAYMENT_GATEWAY`, `BILLING_FAKE_GATEWAY_URL`, `BILLING_PAYMENT_SUCCESS_URL`, `BILLING_PAYMENT_CANCEL_URL`
+- `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
+
+### Rozliczenia i przydział kurierów
+
+`Billing` wycenia przesyłki według cenników z bazy danych i śledzi stan ich płatności; nieopłacone przesyłki nie
+mogą opuścić statusów roboczych. `BILLING_PAYMENT_GATEWAY` wybiera bramkę płatności: `fake` (domyślnie, lokalna
+atrapa bramki pod `/billing/dev/fake-gateway`) albo `stripe` (tryb testowy, z `STRIPE_SECRET_KEY` i `STRIPE_WEBHOOK_SECRET`).
+
+Przebiegi przydziału kurierów w `LogisticsOrchestrator` przypisują dostawy oczekujące na kuriera partiami w każdym
+oddziale. Harmonogram obsługuje Quartz z klastrowym magazynem zadań JDBC:
+
+- `MANAGER_COURIER_ASSIGNMENT_CRON` (co 30 minut), `MANAGER_COURIER_ASSIGNMENT_RECOVERY_CRON` (co 5 minut),
+  `MANAGER_COURIER_ASSIGNMENT_CLEANUP_CRON` (codziennie o północy)
+- `MANAGER_COURIER_ASSIGNMENT_WORKERS`, `MANAGER_COURIER_ASSIGNMENT_QUEUE_CAPACITY`, `MANAGER_COURIER_ASSIGNMENT_RUN_LEASE`,
+  `MANAGER_COURIER_ASSIGNMENT_RUN_MAX_RETRIES`, `MANAGER_COURIER_ASSIGNMENT_RUN_PENDING_RECOVERY_DELAY`,
+  `MANAGER_COURIER_ASSIGNMENT_RUN_RETENTION`, `MANAGER_COURIER_ASSIGNMENT_TRANSACTION_TIMEOUT_SECONDS`
 
 ### Powiadomienia e-mail
 
