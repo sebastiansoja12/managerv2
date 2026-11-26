@@ -12,7 +12,7 @@
 
     <groupId>com.warehouse</groupId>
     <artifactId>EventOutbox</artifactId>
-    <version>2026.4-SNAPSHOT</version>
+    <version>1.0.0-RC-SNAPSHOT</version>
     <description>Integration events: type registry, typed Kafka listeners, domain event translation and transactional outbox</description>
 
     <properties>

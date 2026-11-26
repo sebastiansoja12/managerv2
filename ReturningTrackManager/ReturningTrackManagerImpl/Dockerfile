@@ -8,7 +8,7 @@ RUN mvn -f EventOutbox/pom.xml install -DskipTests \
 
 FROM eclipse-temurin:21-jre
 
-COPY --from=build /workspace/ReturningTrackManager/ReturningTrackManagerImpl/target/ReturningTrackManagerImpl-2026.4-SNAPSHOT.jar /app.jar
+COPY --from=build /workspace/ReturningTrackManager/ReturningTrackManagerImpl/target/ReturningTrackManagerImpl-1.0.0-RC-SNAPSHOT.jar /app.jar
 
 EXPOSE 8070
 

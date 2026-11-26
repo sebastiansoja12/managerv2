@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>LogisticsOrchestrator</artifactId>
-        <version>2026.4-SNAPSHOT</version>
+        <version>1.0.0-RC-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -181,7 +181,7 @@
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>DeliveryOperationImpl</artifactId>
-            <version>2026.4-SNAPSHOT</version>
+            <version>1.0.0-RC-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

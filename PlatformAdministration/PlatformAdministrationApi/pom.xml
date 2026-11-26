@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>PlatformAdministration</artifactId>
-        <version>2026.4-SNAPSHOT</version>
+        <version>1.0.0-RC-SNAPSHOT</version>
     </parent>
 
     <artifactId>PlatformAdministrationApi</artifactId>

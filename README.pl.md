@@ -2,7 +2,7 @@
 
 [English](README.md) | **Polski** | [Deutsch](README.de.md)
 
-**Wersja rozwojowa 2026.4 - 10 września 2026**
+**Wersja rozwojowa 1.0.0-RC - 26 listopada 2026**
 
 Manager 2.0 to backend w Java 21 / Spring Boot do obsługi operacji magazynowych
 i logistycznych. Repozytorium jest wielomodułowym projektem Maven. Główną aplikacją
