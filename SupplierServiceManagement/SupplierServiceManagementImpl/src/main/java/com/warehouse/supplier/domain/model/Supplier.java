@@ -225,6 +225,11 @@ public class Supplier {
         markAsModified();
     }
 
+    public boolean servesDeliveryArea() {
+        return this.status == SupplierStatus.ACTIVE && this.deliveryArea != null
+                && this.deliveryArea.postalCodes() != null && !this.deliveryArea.postalCodes().isEmpty();
+    }
+
     public void changeDeliveryArea(final DeliveryArea deliveryArea) {
         this.deliveryArea = deliveryArea;
         markAsModified();

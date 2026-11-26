@@ -13,6 +13,8 @@ import com.warehouse.eventoutbox.application.port.secondary.IntegrationEventPubl
 import com.warehouse.organisationstructure.api.OperatorApiService;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.supplier.api.SupplierApiService;
+import com.warehouse.supplier.api.SupplierValidityApiService;
+import com.warehouse.supplier.infrastructure.adapter.primary.SupplierValidityApiServiceAdapter;
 import com.warehouse.supplier.infrastructure.adapter.primary.SupplierApiServiceAdapter;
 import com.warehouse.supplier.infrastructure.adapter.primary.SupplierValidityJob;
 import com.warehouse.supplier.application.port.primary.*;
@@ -85,6 +87,13 @@ public class SupplierConfiguration {
             final MailServicePort mailServicePort) {
         return new DriverLicenseObserverPortImpl(driverLicenseService, operatorServicePort, supplierRepository,
                 operatorContext, mailServicePort);
+    }
+
+    @Bean
+    public SupplierValidityApiService supplierValidityApiService(
+            final DriverLicenseObserverPort driverLicenseObserverPort,
+            final DangerousGoodObserverPort dangerousGoodObserverPort) {
+        return new SupplierValidityApiServiceAdapter(driverLicenseObserverPort, dangerousGoodObserverPort);
     }
 
     @Bean

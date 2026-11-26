@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 public class DangerousGoodObserverPortImpl implements DangerousGoodObserverPort {
@@ -31,19 +30,21 @@ public class DangerousGoodObserverPortImpl implements DangerousGoodObserverPort 
     @Override
     public void run() {
         log.info("===============  Checking dangerous good certifications validity ===============");
-        final Instant now = Instant.now();
-        final Set<OperatorId> operatorIds = this.operatorServicePort.findActiveOperators();
-        for (final OperatorId operatorId : operatorIds) {
-            this.operatorContext.runAs(operatorId, () -> {
-                final List<Supplier> suppliers =
-                        this.supplierRepository.findAllWithExpiredDangerousGoodCertification(now);
-                suppliers.forEach(supplier -> {
-                    log.warn("Suppliers {} dangerous good certification expired!", supplier.supplierCode().value());
-                    supplier.markCertificationAsInvalid();
-                    this.supplierRepository.update(supplier);
-                });
-            });
-        }
+        this.operatorServicePort.findActiveOperators().forEach(this::run);
         log.info("===============  Checking dangerous good certifications validity finished ===============");
+    }
+
+    @Override
+    public int run(final OperatorId operatorId) {
+        final Instant now = Instant.now();
+        return this.operatorContext.runAs(operatorId, () -> {
+            final List<Supplier> suppliers = this.supplierRepository.findAllWithExpiredDangerousGoodCertification(now);
+            suppliers.forEach(supplier -> {
+                log.warn("Suppliers {} dangerous good certification expired!", supplier.supplierCode().value());
+                supplier.markCertificationAsInvalid();
+                this.supplierRepository.update(supplier);
+            });
+            return suppliers.size();
+        });
     }
 }

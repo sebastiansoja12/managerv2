@@ -1,12 +1,16 @@
 package com.warehouse.supplier.infrastructure.adapter.primary;
 
 import com.warehouse.commonassets.helper.Result;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.identificator.VehicleId;
 import com.warehouse.supplier.api.SupplierApiService;
 import com.warehouse.supplier.api.dto.CreateSupplierApiRequest;
+import com.warehouse.supplier.api.dto.DeliveryAreaCourierDto;
 import com.warehouse.supplier.api.dto.SupplierCodeDto;
+import com.warehouse.supplier.api.dto.SupplierDeliveryAreaDto;
 import com.warehouse.supplier.api.dto.SupplierDetailsDto;
 import com.warehouse.supplier.api.dto.SupplierProfileDto;
 import com.warehouse.supplier.application.port.primary.SupplyPort;
@@ -61,6 +65,16 @@ public class SupplierApiServiceAdapter implements SupplierApiService {
     }
 
     @Override
+    public void assignVehicle(final SupplierCode supplierCode, final VehicleId vehicleId) {
+        supplyPort.assignVehicle(SupplierApiServiceMapper.map(supplierCode, vehicleId));
+    }
+
+    @Override
+    public void changeDeliveryArea(final SupplierCode supplierCode, final SupplierDeliveryAreaDto deliveryArea) {
+        supplyPort.updateDeliveryArea(SupplierApiServiceMapper.map(supplierCode, deliveryArea));
+    }
+
+    @Override
     public int anonymizeAll() {
         return supplyPort.anonymizeAll();
     }
@@ -78,6 +92,14 @@ public class SupplierApiServiceAdapter implements SupplierApiService {
     @Override
     public Optional<SupplierProfileDto> findProfileByUserId(final UserId userId) {
         return supplyPort.getOneByUserId(userId).map(SupplierApiServiceMapper::mapProfile);
+    }
+
+    @Override
+    public List<DeliveryAreaCourierDto> findDeliveryAreaCouriers(final DepartmentId departmentId) {
+        return supplyPort.getDeliveryAreaCouriers(departmentId)
+                .stream()
+                .map(SupplierApiServiceMapper::mapDeliveryAreaCourier)
+                .toList();
     }
 
     @Override

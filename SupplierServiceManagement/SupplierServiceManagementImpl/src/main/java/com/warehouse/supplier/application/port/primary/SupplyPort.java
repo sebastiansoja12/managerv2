@@ -20,6 +20,8 @@ import com.warehouse.supplier.application.port.primary.result.DriverLicenseRespo
 import com.warehouse.supplier.application.port.primary.result.SupplierCreateResponse;
 import com.warehouse.supplier.application.port.primary.result.SupplierResult;
 
+import com.warehouse.supplier.domain.vo.SupplierSnapshot;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -62,6 +64,8 @@ public interface SupplyPort {
     CertificationUpdateResponse updateCertification(final CertificationUpdateCommand command);
 
     long countAssignedCouriers(final DepartmentId departmentId);
+
+    List<SupplierSnapshot> getDeliveryAreaCouriers(final DepartmentId departmentId);
 
     void transferCouriers(final DepartmentId sourceDepartmentId, final DepartmentId targetDepartmentId);
 

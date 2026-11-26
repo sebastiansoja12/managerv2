@@ -43,6 +43,7 @@ import com.warehouse.supplier.domain.exception.SupplierAlreadyExistsException;
 import com.warehouse.supplier.domain.exception.SupplierDepartmentAccessDeniedException;
 import com.warehouse.supplier.domain.exception.SupplierNotFoundException;
 import com.warehouse.supplier.domain.model.Supplier;
+import com.warehouse.supplier.domain.vo.SupplierSnapshot;
 import com.warehouse.supplier.domain.service.DriverLicenseService;
 import com.warehouse.supplier.domain.service.SupplierCodeGeneratorService;
 import com.warehouse.supplier.domain.vo.SupplierActivationData;
@@ -276,6 +277,15 @@ public class SupplyPortImpl implements SupplyPort {
     @Override
     public long countAssignedCouriers(final DepartmentId departmentId) {
         return this.supplierRepository.findAssignedToDepartment(departmentId).size();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<SupplierSnapshot> getDeliveryAreaCouriers(final DepartmentId departmentId) {
+        return this.supplierRepository.findAssignedToDepartment(departmentId).stream()
+                .filter(Supplier::servesDeliveryArea)
+                .map(Supplier::snapshot)
+                .toList();
     }
 
     @Override
