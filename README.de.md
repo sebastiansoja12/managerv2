@@ -245,6 +245,32 @@ Separate Dockerfiles gibt es für:
 - `Gateway` auf Port `8088`
 - `EurekaServer` auf Port `8761`
 
+## Impersonation
+
+Ein Plattformbetreiber kann im Namen des Superadmins eines Betreibers in dessen Anwendung arbeiten, z. B. um bei der
+Konfiguration zu helfen. Dafür ist immer die Einwilligung des Betreibers nötig:
+
+1. Der Plattformbetreiber fordert die Einwilligung mit `POST /operators/{operatorId}/impersonation-consents` an
+   (optionaler Grund, bis zu 500 Zeichen, für den Betreiber sichtbar). Eine Anfrage gilt 24 Stunden; solange sie offen
+   ist, liefert eine neue Anfrage die bestehende zurück. `GET /operators/{operatorId}/impersonation-consents/latest`
+   liefert ihren Status.
+2. Die Superadmins des Betreibers erhalten die Anfrage per WebSocket (`/user/queue/impersonation-consents`) und
+   entscheiden unter `/impersonation-consents` (`/pending`, `/active`, `/{consentId}/approve`, `/reject`, `/revoke`).
+   Der Zugriff wird für 30, 60, 120, 240 oder 480 Minuten gewährt und kann jederzeit widerrufen werden. Diese
+   Entscheidungen sind aus einer Impersonationssitzung heraus nicht möglich.
+3. Mit einer erteilten Einwilligung meldet `POST /platform/auth/impersonations` den Plattformbetreiber als aktiven
+   Superadmin des Betreibers an. Es wird nur ein Zugriffs-Cookie ausgegeben und das Refresh-Cookie gelöscht, daher kann
+   die Sitzung nicht verlängert werden. Das JWT enthält `impersonatedBy`, `impersonatedByUsername` und
+   `impersonationConsentId` und läuft nach höchstens 30 Minuten ab, nie später als der gewährte Zugriff.
+4. Jede Anfrage prüft die Einwilligung und das Konto des Plattformbetreibers erneut, ein Widerruf oder Ablauf beendet
+   die Sitzung also sofort. `GET /auth/me/impersonation` liefert den impersonierenden Plattformbetreiber oder `204`
+   außerhalb einer Impersonation.
+
+Impersonation funktioniert auch für Betreiber mit inaktivem Status. Der Wartungsmodus kann aus einer
+Impersonationssitzung nicht geändert werden. Jede schreibende Anfrage (`POST`, `PUT`, `PATCH`, `DELETE`) während der
+Impersonation wird mit Plattformbetreiber, Betreiber und impersoniertem Benutzer im Plattform-Auditprotokoll
+gespeichert. Einwilligungen werden in `impersonation_consents` gespeichert.
+
 ## MCP-Server
 
 `McpServer` stellt unter `/v1/api/mcp` einen zustandslosen MCP-Endpunkt bereit (Spring AI MCP Server, Streamable HTTP).

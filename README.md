@@ -242,6 +242,30 @@ Separate Dockerfiles are available for:
 - `Gateway` on port `8088`
 - `EurekaServer` on port `8761`
 
+## Impersonation
+
+A platform owner can work in an operator application on behalf of the operator's superadmin, for example to help
+with configuration. It always requires the operator's consent:
+
+1. The platform owner requests consent with `POST /operators/{operatorId}/impersonation-consents` (optional reason,
+   up to 500 characters, visible to the operator). A request is valid for 24 hours; while one is open, a new request
+   returns the existing one. `GET /operators/{operatorId}/impersonation-consents/latest` returns its status.
+2. The operator's superadmins receive the request over WebSocket (`/user/queue/impersonation-consents`) and decide
+   under `/impersonation-consents` (`/pending`, `/active`, `/{consentId}/approve`, `/reject`, `/revoke`). Access is
+   granted for 30, 60, 120, 240 or 480 minutes and can be revoked at any time. These decisions cannot be made from an
+   impersonation session.
+3. With an approved consent, `POST /platform/auth/impersonations` signs the platform owner in as the operator's active
+   superadmin. Only an access cookie is issued and the refresh cookie is cleared, so the session cannot be refreshed.
+   The JWT carries `impersonatedBy`, `impersonatedByUsername` and `impersonationConsentId` and expires after at most
+   30 minutes, never later than the granted access.
+4. Every request checks the consent and the platform owner account again, so revocation or expiry ends the session
+   immediately. `GET /auth/me/impersonation` returns the impersonating platform owner, or `204` outside impersonation.
+
+Impersonation also works for operators with an inactive status. Maintenance mode cannot be changed from an
+impersonation session. Every write request (`POST`, `PUT`, `PATCH`, `DELETE`) made during impersonation is recorded
+in the platform audit log with the platform owner, the operator and the impersonated user. Consents are stored in
+`impersonation_consents`.
+
 ## MCP Server
 
 `McpServer` exposes a stateless MCP endpoint (Spring AI MCP Server, streamable HTTP) at `/v1/api/mcp`.

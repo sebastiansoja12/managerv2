@@ -242,6 +242,30 @@ Osobne pliki Dockerfile są dostępne dla:
 - `Gateway` na porcie `8088`
 - `EurekaServer` na porcie `8761`
 
+## Impersonacja
+
+Właściciel platformy może pracować w aplikacji operatora w imieniu jego superadministratora, np. żeby pomóc
+w konfiguracji. Zawsze wymaga to zgody operatora:
+
+1. Właściciel platformy prosi o zgodę przez `POST /operators/{operatorId}/impersonation-consents` (opcjonalny powód,
+   do 500 znaków, widoczny dla operatora). Prośba jest ważna 24 godziny; dopóki jest otwarta, kolejna prośba zwraca
+   tę samą. `GET /operators/{operatorId}/impersonation-consents/latest` zwraca jej status.
+2. Superadministratorzy operatora dostają prośbę przez WebSocket (`/user/queue/impersonation-consents`) i decydują
+   pod `/impersonation-consents` (`/pending`, `/active`, `/{consentId}/approve`, `/reject`, `/revoke`). Dostęp jest
+   przyznawany na 30, 60, 120, 240 lub 480 minut i można go w każdej chwili cofnąć. Tych decyzji nie da się podjąć
+   z sesji impersonacji.
+3. Po zatwierdzeniu zgody `POST /platform/auth/impersonations` loguje właściciela platformy jako aktywnego
+   superadministratora operatora. Wydawane jest tylko ciasteczko dostępowe, a ciasteczko odświeżania jest czyszczone,
+   więc sesji nie da się odświeżyć. JWT zawiera `impersonatedBy`, `impersonatedByUsername` i `impersonationConsentId`
+   i wygasa najpóźniej po 30 minutach, nigdy później niż przyznany dostęp.
+4. Każde żądanie ponownie sprawdza zgodę i konto właściciela platformy, więc cofnięcie lub wygaśnięcie zgody od razu
+   kończy sesję. `GET /auth/me/impersonation` zwraca impersonującego właściciela platformy albo `204` poza impersonacją.
+
+Impersonacja działa także dla operatorów z nieaktywnym statusem. Z sesji impersonacji nie można zmienić trybu
+serwisowego. Każde żądanie zapisujące (`POST`, `PUT`, `PATCH`, `DELETE`) wykonane podczas impersonacji trafia do
+dziennika audytu platformy z właścicielem platformy, operatorem i impersonowanym użytkownikiem. Zgody są zapisywane
+w `impersonation_consents`.
+
 ## Serwer MCP
 
 `McpServer` wystawia bezstanowy endpoint MCP (Spring AI MCP Server, streamable HTTP) pod `/v1/api/mcp`.
