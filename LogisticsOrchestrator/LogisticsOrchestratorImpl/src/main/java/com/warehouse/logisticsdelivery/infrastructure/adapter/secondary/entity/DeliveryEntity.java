@@ -9,6 +9,7 @@ import com.warehouse.logisticsdelivery.domain.enumeration.PickupMethod;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryTargetType;
 import jakarta.persistence.*;
 import lombok.Builder;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -95,12 +96,20 @@ public class DeliveryEntity extends BelongsToOperator {
     @Column(name = "delivered_at")
     private LocalDateTime deliveredAt;
 
+    @Column(name = "current_department_since")
+    private LocalDateTime currentDepartmentSince;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
     @Column(name = "token")
     private String token;
 
     @Column(name = "replaced_by_delivery_id")
     private String replacedByDeliveryId;
 
+    @BatchSize(size = 50)
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "delivery_id", referencedColumnName = "id", nullable = false)
     @OrderBy("stepNumber ASC")
@@ -131,9 +140,11 @@ public class DeliveryEntity extends BelongsToOperator {
                            final String instructions,
                            final LocalDateTime plannedAt,
                            final LocalDateTime deliveredAt,
+                           final LocalDateTime currentDepartmentSince,
                            final String token,
                            final String replacedByDeliveryId,
-                           final List<DeliveryStepEntity> deliverySteps) {
+                           final List<DeliveryStepEntity> deliverySteps,
+                           final Long version) {
         this.id = id == null ? DeliveryId.generate() : id;
         this.shipmentId = shipmentId;
         this.targetType = targetType;
@@ -155,9 +166,11 @@ public class DeliveryEntity extends BelongsToOperator {
         this.instructions = instructions;
         this.plannedAt = plannedAt;
         this.deliveredAt = deliveredAt;
+        this.currentDepartmentSince = currentDepartmentSince;
         this.token = token;
         this.replacedByDeliveryId = replacedByDeliveryId;
         this.deliverySteps = deliverySteps == null ? new ArrayList<>() : new ArrayList<>(deliverySteps);
+        this.version = version;
     }
 
     public DeliveryId getId() { return id; }
@@ -173,6 +186,8 @@ public class DeliveryEntity extends BelongsToOperator {
     public DepartmentId getOriginDepartmentId() { return originDepartmentId; }
     public DepartmentId getDestinationDepartmentId() { return destinationDepartmentId; }
     public DepartmentId getCurrentDepartmentId() { return currentDepartmentId; }
+    public LocalDateTime getCurrentDepartmentSince() { return currentDepartmentSince; }
+    public Long getVersion() { return version; }
     public PickupMethod getPickupMethod() { return pickupMethod; }
     public DeliveryMethod getMethod() { return method; }
     public PickupPointId getPickupPointId() { return pickupPointId; }

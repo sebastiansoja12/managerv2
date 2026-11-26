@@ -46,6 +46,7 @@ public class Delivery {
     private LocalDateTime deliveredAt;
     private String token;
     private DeliveryId replacedByDeliveryId;
+    private Long version;
 
     public Delivery(final DeliveryTarget target,
                     final ShipmentId shipmentId,
@@ -101,7 +102,8 @@ public class Delivery {
                     final LocalDateTime plannedAt,
                     final LocalDateTime deliveredAt,
                     final String token,
-                    final DeliveryId replacedByDeliveryId) {
+                    final DeliveryId replacedByDeliveryId,
+                    final Long version) {
         this.deliveryId = deliveryId;
         this.target = target;
         this.shipmentId = shipmentId;
@@ -125,6 +127,7 @@ public class Delivery {
         this.deliveredAt = deliveredAt;
         this.token = token;
         this.replacedByDeliveryId = replacedByDeliveryId;
+        this.version = version;
     }
 
     public static Delivery forPallet(final DeliveryTarget target, final DepartmentId originDepartmentId,
@@ -158,6 +161,44 @@ public class Delivery {
         this.supplierId = supplierId;
         this.vehicleId = vehicleId;
         markAsModified();
+    }
+
+    public void assignCourier(final SupplierId supplierId, final VehicleId vehicleId) {
+        if (this.supplierId != null) {
+            return;
+        }
+        if (!isAwaitingCourierAtDestination()) {
+            throw new DeliveryModificationException("Delivery " + deliveryId.getId()
+                    + " is not awaiting a courier in its destination department");
+        }
+        assignSupplier(supplierId, vehicleId);
+    }
+
+    public boolean isInDestinationDepartment() {
+        return this.destinationDepartmentId != null && this.destinationDepartmentId.equals(this.currentDepartmentId);
+    }
+
+    public boolean isAwaitingCourierAtDestination() {
+        return isActive()
+                && this.supplierId == null
+                && this.target.type() == DeliveryTargetType.SHIPMENT
+                && this.method == DeliveryMethod.COURIER
+                && this.deliveryStatus == DeliveryStatus.DEPOT
+                && this.destinationDepartmentId != null
+                && this.destinationDepartmentId.equals(this.currentDepartmentId)
+                && lastStepStatus() == DeliveryStatus.DEPOT;
+    }
+
+    public LocalDateTime getCurrentDepartmentSince() {
+        DepartmentId department = null;
+        LocalDateTime since = this.createdAt;
+        for (final DeliveryStep step : this.deliverySteps) {
+            if (step.departmentId() != null && !step.departmentId().equals(department)) {
+                department = step.departmentId();
+                since = step.attemptedAt();
+            }
+        }
+        return since;
     }
 
     public void unassignSupplier() {
@@ -372,6 +413,14 @@ public class Delivery {
                 deliverySteps.stream().map(DeliveryStep::snapshot).toList());
     }
 
+    public Long getVersion() {
+        return version;
+    }
+
+    public void applyPersistedVersion(final Long persistedVersion) {
+        this.version = persistedVersion;
+    }
+
     public DeliveryId getReplacedByDeliveryId() {
         return replacedByDeliveryId;
     }
@@ -476,6 +525,11 @@ public class Delivery {
         ensureCanBeModified();
         deliverySteps.add(deliveryStep);
         this.currentDepartmentId = resolveCurrentDepartmentId();
+    }
+
+    private DeliveryStatus lastStepStatus() {
+        return this.deliverySteps.isEmpty() ? this.deliveryStatus
+                : this.deliverySteps.get(this.deliverySteps.size() - 1).deliveryStatus();
     }
 
     private DepartmentId resolveCurrentDepartmentId() {

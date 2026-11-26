@@ -28,7 +28,8 @@ public interface DeliveryEntityMapper {
                 entity.getCurrentDepartmentId(), entity.getPickupMethod(), entity.getMethod(), entity.getPickupPointId(), entity.getDeliveryPickupPointId(),
                 Boolean.TRUE.equals(entity.getSignatureRequired()), entity.getInstructions(), entity.getPlannedAt(),
                 entity.getDeliveredAt(), entity.getToken(),
-                entity.getReplacedByDeliveryId() == null ? null : new DeliveryId(entity.getReplacedByDeliveryId()));
+                entity.getReplacedByDeliveryId() == null ? null : new DeliveryId(entity.getReplacedByDeliveryId()),
+                entity.getVersion());
     }
 
     default DeliveryStep toDomain(final DeliveryStepEntity entity) {
@@ -64,10 +65,12 @@ public interface DeliveryEntityMapper {
                 .instructions(delivery.getInstructions())
                 .plannedAt(delivery.getPlannedAt())
                 .deliveredAt(delivery.getDeliveredAt())
+                .currentDepartmentSince(delivery.getCurrentDepartmentSince())
                 .token(delivery.getToken())
                 .replacedByDeliveryId(delivery.getReplacedByDeliveryId() == null ? null
                         : delivery.getReplacedByDeliveryId().getId())
                 .deliverySteps(steps)
+                .version(delivery.getVersion())
                 .build();
     }
 

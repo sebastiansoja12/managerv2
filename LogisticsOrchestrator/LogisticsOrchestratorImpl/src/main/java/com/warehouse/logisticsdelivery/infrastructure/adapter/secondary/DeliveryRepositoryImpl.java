@@ -9,7 +9,13 @@ import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryLifecycleStatu
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryType;
 import com.warehouse.logisticsdelivery.domain.model.Delivery;
 import com.warehouse.logisticsdelivery.domain.vo.DeliveryTarget;
+import com.warehouse.logisticsdelivery.application.port.secondary.AwaitingCourierDelivery;
+import com.warehouse.logisticsdelivery.application.port.secondary.AwaitingCourierQuery;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryRepository;
+import com.warehouse.logisticsdelivery.domain.enumeration.CourierAssignmentDateField;
+import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryMethod;
+import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryTargetType;
+import com.warehouse.logisticsdelivery.domain.vo.DeliveryAssignmentCursor;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.entity.DeliveryEntity;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.mapper.DeliveryEntityMapper;
 import org.mapstruct.factory.Mappers;
@@ -190,12 +196,79 @@ public class DeliveryRepositoryImpl implements DeliveryRepository {
     }
 
     @Override
+    public List<AwaitingCourierDelivery> findAwaitingCourier(final AwaitingCourierQuery query) {
+        return awaitingCourier(query).list().stream()
+                .map(entity -> toAwaitingCourier(entity, query.dateField()))
+                .toList();
+    }
+
+    @Override
+    public boolean assignCourier(final Delivery delivery) {
+        final int updated = repository.createUpdate(DeliveryEntity.class)
+                .set("supplierId.value", delivery.getSupplierId() == null ? null : delivery.getSupplierId().value())
+                .set("vehicleId.value", delivery.getVehicleId() == null ? null : delivery.getVehicleId().value())
+                .set("status", delivery.getStatus())
+                .increment("version")
+                .eq("id.id", delivery.getDeliveryId().getId())
+                .eq("version", delivery.getVersion())
+                .isNull("supplierId.value")
+                .execute();
+        if (updated == 1) {
+            delivery.applyPersistedVersion(delivery.getVersion() + 1);
+        }
+        return updated == 1;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countActiveBySupplier(final SupplierId supplierId) {
+        return repository.createCriteria(DeliveryEntity.class)
+                .eq("supplierId.value", supplierId.value())
+                .in("status", List.of(DeliveryLifecycleStatus.CREATED, DeliveryLifecycleStatus.MODIFIED))
+                .count();
+    }
+
+    private Criteria<DeliveryEntity> awaitingCourier(final AwaitingCourierQuery query) {
+        final String eventTimeField = eventTimeField(query.dateField());
+        final Criteria<DeliveryEntity> criteria = repository.createCriteria(DeliveryEntity.class)
+                .eq("destinationDepartmentId.value", query.destinationDepartmentId().getValue())
+                .isNull("supplierId.value")
+                .in("status", List.of(DeliveryLifecycleStatus.CREATED, DeliveryLifecycleStatus.MODIFIED))
+                .eq("targetType", DeliveryTargetType.SHIPMENT)
+                .eq("method", DeliveryMethod.COURIER)
+                .ge(eventTimeField, query.range().fromInclusive())
+                .lt(eventTimeField, query.range().toExclusive());
+        if (query.after() != null) {
+            final CriteriaBuilder builder = criteria.getCriteriaBuilder();
+            final Root<DeliveryEntity> root = criteria.getRoot();
+            criteria.and(builder.or(
+                    builder.greaterThan(root.get(eventTimeField), query.after().eventTime()),
+                    builder.and(builder.equal(root.get(eventTimeField), query.after().eventTime()),
+                            builder.greaterThan(root.get("id").get("id"), query.after().deliveryId().getId()))));
+        }
+        return criteria.asc(eventTimeField).asc("id.id").maxResults(query.limit());
+    }
+
+    private AwaitingCourierDelivery toAwaitingCourier(final DeliveryEntity entity,
+                                                      final CourierAssignmentDateField dateField) {
+        final LocalDateTime eventTime = dateField == CourierAssignmentDateField.CREATION
+                ? entity.getCreated() : entity.getCurrentDepartmentSince();
+        return new AwaitingCourierDelivery(mapper.toDomain(entity),
+                new DeliveryAssignmentCursor(eventTime, entity.getId()));
+    }
+
+    private static String eventTimeField(final CourierAssignmentDateField dateField) {
+        return dateField == CourierAssignmentDateField.CREATION ? "created" : "currentDepartmentSince";
+    }
+
+    @Override
     public void createOrUpdate(final Delivery delivery) {
         final DeliveryEntity entity = mapper.toEntity(delivery);
         if (deliveryExists(delivery.getDeliveryId())) {
-            repository.update(entity);
+            delivery.applyPersistedVersion(repository.updateAndFlush(entity).getVersion());
         } else {
             repository.create(entity);
+            delivery.applyPersistedVersion(entity.getVersion());
         }
     }
 
