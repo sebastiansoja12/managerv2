@@ -1,4 +1,4 @@
-## [2026.4] - Unreleased
+## [2026.4] - 2026-11-26
 
 ### Added
 - FleetTracking API and implementation modules with driver tracking sessions, batched GPS position ingestion from terminals, accuracy, sequence and plausible-speed filtering, last known vehicle positions, route history and `tracking_session`/`tracking_position` tables.
@@ -26,6 +26,25 @@
 - `HANDOVER` shipment status set when a shipment is handed over for delivery, with a `ShipmentStatusChanged` event published after the shipment is saved.
 - Organization chat participants endpoint.
 - Common identifiers `IncidentId`, `TrackingSessionId` and `TrackingPositionId`.
+- Billing module with database price lists, shipment quotes, counter and Stripe test-mode payments, payment expiry, refunds, invoices with corrections and business customers.
+- Shipment pricing through Billing with payment state tracking; unpaid shipments cannot leave draft statuses.
+- Issued invoices sent by e-mail with the PDF attached from document storage.
+- Business customer accounts authenticated by API key on a dedicated external security chain and rejected on every other authentication path.
+- Payments switch, payment deadline and seller billing data in the operator payment configuration and courier assignment policies in the department configuration.
+- Courier and department assignment runs in LogisticsOrchestrator that assign awaiting deliveries to couriers in batches with locking, metrics and recovery, scheduled by Quartz with a clustered JDBC job store.
+- Platform jobs for courier assignment orchestration, recovery and cleanup, with department assignment runs visible to platform administrators.
+- Courier assignment data in the delivery read model.
+- Supplier delivery areas with couriers and supplier validity checks in the supplier API, and carrier vehicle creation in the carrier API.
+- MCP commands for couriers and vehicles.
+- `LOST` shipment status, login throttling, password policy and refresh token revocation.
+- Billing and courier assignment identifiers, immutable `Money` arithmetic and conditional updates in the operator-filtered repository.
+- EventOutbox module with an integration event registry, typed Kafka listeners, domain event translation and a transactional `integration_event_outbox` with retries, a dead-letter topic and OpenTelemetry trace propagation.
+- Jaeger, Elasticsearch, Kibana and a Logstash event journal in docker compose that indexes every Kafka topic with its headers.
+- OrganizationAnalytics module with a department cost register, performance report and shipment volume forecast (`/analytics`), backed by daily shipment registration and delivery statistics.
+- JPEG photo upload endpoint for shipments.
+- Repackaging as an incident resolution, department incident statistics and incident handling in ShipmentManagement that adds notes and repacks, returns, cancels or marks shipments as lost.
+- Return shipment delivery created when a shipment is marked as returned.
+- Supplier deactivation and anonymization events that release substitutes and configurations.
 
 ### Changed
 - Extracted deliveries from shipments into the hexagonal `logisticsdelivery` context; shipments now read routing data from deliveries.
@@ -38,6 +57,12 @@
 - Modeled organization users as a role-based account hierarchy with account levels and audiences.
 - Department code is carried explicitly instead of through the deprecated department ownership base class.
 - Restricted `/fleet-tracking/**` endpoints to authenticated users.
+- Shipments created through MCP no longer send a client price; the price comes from Billing.
+- Shipment, delivery, pallet, supplier, operator, department, pickup-point, audit, mail and invitation events are published as translated integration events through the outbox and consumed by typed listeners instead of direct Kafka sends; ReturningTrackManager uses the outbox with its own table.
+- Deliveries track their current department and sync delivery details and pallet tracking numbers into the shipment read model.
+- Public shipment creation is limited per client and reroute tokens are limited within a time window.
+- Remaining REST controllers are protected with `AccessUserControl` and ReturningTrackManager validates the JWT issuer and audience.
+- Route log reads in RouteTrackerFlow are scoped to the current operator.
 
 ### Fixed
 - Driver license and dangerous good certification invalidation job for suppliers.
@@ -49,7 +74,7 @@
 - Removed the PathFinder lookup from shipment management in favor of delivery areas.
 - Removed the standalone shipment dangerous good table and the deprecated software configuration service.
 
-## [2026.3] - 2026-09-10
+## [2026.3] - 2026-07-16
 
 ### Added
 - PickupPointManagement API and implementation modules with pickup-point types, capabilities, shipment-size policies, opening schedules, lifecycle rules and operator-scoped persistence.
@@ -115,7 +140,7 @@
 - Obsolete shipment assignment events and old route-history notifier.
 - Legacy dangerous goods standalone module.
 
-## [2026.2] - 2026-07-01
+## [2026.2] - 2026-03-16
 
 ### Added
 - Authorization API support required by the GUI.
@@ -141,7 +166,7 @@
 ### Deprecated
 - Redirect domain.
 
-## [2026.1] - 2026-04-24
+## [2026.1] - 2026-02-03
 
 ### Added
 - ProcessHub implementation with JPA adapters, events, ports and test endpoints.
@@ -166,7 +191,7 @@
 ### Deprecated
 - Microservice exclusions that are no longer part of the monolith runtime.
 
-## [2025.3] - 2025-12-27
+## [2025.3] - 2026-01-03
 
 ### Added
 - Gateway module and Spring Boot 3.5.5 upgrade.
