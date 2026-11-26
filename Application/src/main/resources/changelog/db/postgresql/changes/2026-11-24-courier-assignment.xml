@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-24-operator-courier-assignment-policy" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="operator_configurations"/>
+                <not>
+                    <columnExists tableName="operator_configurations"
+                                  columnName="department_courier_assignment_enabled"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="operator_configurations">
+            <column name="department_courier_assignment_enabled" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="department_courier_assignment_date_field" type="VARCHAR(32)"
+                    defaultValue="DESTINATION_ARRIVAL"/>
+            <column name="department_courier_assignment_window_start" type="TIME" defaultValue="00:00:00"/>
+            <column name="department_courier_assignment_window_end" type="TIME" defaultValue="00:00:00"/>
+            <column name="department_courier_assignment_oldest_day_offset" type="INT" defaultValueNumeric="1"/>
+            <column name="department_courier_assignment_newest_day_offset" type="INT" defaultValueNumeric="0"/>
+            <column name="department_courier_assignment_processing_delay_minutes" type="INT"
+                    defaultValueNumeric="0"/>
+            <column name="department_courier_assignment_late_arrival_tolerance_minutes" type="INT"
+                    defaultValueNumeric="30"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2026-11-24-operator-courier-assignment-policy-aud" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="operator_configurations_aud"/>
+                <not>
+                    <columnExists tableName="operator_configurations_aud"
+                                  columnName="department_courier_assignment_enabled"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="operator_configurations_aud">
+            <column name="department_courier_assignment_enabled" type="BOOLEAN"/>
+            <column name="department_courier_assignment_date_field" type="VARCHAR(32)"/>
+            <column name="department_courier_assignment_window_start" type="TIME"/>
+            <column name="department_courier_assignment_window_end" type="TIME"/>
+            <column name="department_courier_assignment_oldest_day_offset" type="INT"/>
+            <column name="department_courier_assignment_newest_day_offset" type="INT"/>
+            <column name="department_courier_assignment_processing_delay_minutes" type="INT"/>
+            <column name="department_courier_assignment_late_arrival_tolerance_minutes" type="INT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2026-11-24-department-override-courier-assignment-policy" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="department_configuration_override"/>
+                <not>
+                    <columnExists tableName="department_configuration_override"
+                                  columnName="department_courier_assignment_enabled"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="department_configuration_override">
+            <column name="department_courier_assignment_enabled" type="BOOLEAN"/>
+            <column name="department_courier_assignment_date_field" type="VARCHAR(32)"/>
+            <column name="department_courier_assignment_window_start" type="TIME"/>
+            <column name="department_courier_assignment_window_end" type="TIME"/>
+            <column name="department_courier_assignment_oldest_day_offset" type="INT"/>
+            <column name="department_courier_assignment_newest_day_offset" type="INT"/>
+            <column name="department_courier_assignment_processing_delay_minutes" type="INT"/>
+            <column name="department_courier_assignment_late_arrival_tolerance_minutes" type="INT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2026-11-24-delivery-current-department-since" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="delivery" columnName="current_department_since"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="delivery">
+            <column name="current_department_since" type="TIMESTAMP"/>
+        </addColumn>
+        <sql>UPDATE delivery d
+             SET current_department_since = COALESCE(
+                 (SELECT MIN(step.attempted_at)
+                  FROM delivery_step step
+                  WHERE step.delivery_id = d.id
+                    AND step.department_id = d.current_department_id
+                    AND step.step_number > COALESCE(
+                        (SELECT MAX(other.step_number)
+                         FROM delivery_step other
+                         WHERE other.delivery_id = d.id
+                           AND other.department_id IS NOT NULL
+                           AND other.department_id &lt;&gt; d.current_department_id), 0)),
+                 d.created)
+             WHERE d.status IN ('CREATED', 'MODIFIED')</sql>
+    </changeSet>
+
+    <changeSet id="2026-11-24-delivery-courier-assignment-indexes" author="s-soja">
+        <sql>CREATE INDEX IF NOT EXISTS idx_delivery_awaiting_courier_arrival
+             ON delivery (operator_id, destination_department_id, current_department_since, id)
+             WHERE supplier_id IS NULL AND status IN ('CREATED', 'MODIFIED') AND target_type = 'SHIPMENT'</sql>
+        <sql>CREATE INDEX IF NOT EXISTS idx_delivery_awaiting_courier_created
+             ON delivery (operator_id, destination_department_id, created, id)
+             WHERE supplier_id IS NULL AND status IN ('CREATED', 'MODIFIED') AND target_type = 'SHIPMENT'</sql>
+        <sql>CREATE INDEX IF NOT EXISTS idx_delivery_active_supplier
+             ON delivery (supplier_id)
+             WHERE supplier_id IS NOT NULL AND status IN ('CREATED', 'MODIFIED')</sql>
+    </changeSet>
+</databaseChangeLog>

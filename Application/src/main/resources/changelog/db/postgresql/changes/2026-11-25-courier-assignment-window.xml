@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-25-courier-assignment-window-operator" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="operator_configurations" columnName="department_courier_assignment_window_type"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="operator_configurations">
+            <column name="department_courier_assignment_window_type" type="VARCHAR(32)" defaultValue="ROLLING"/>
+            <column name="department_courier_assignment_time_zone" type="VARCHAR(64)"/>
+            <column name="department_courier_assignment_overlap_minutes" type="INT" defaultValueNumeric="15"/>
+            <column name="department_courier_assignment_max_window_hours" type="INT" defaultValueNumeric="24"/>
+            <column name="department_courier_assignment_lookback_days" type="INT" defaultValueNumeric="3"/>
+            <column name="department_courier_assignment_batch_size" type="INT" defaultValueNumeric="500"/>
+        </addColumn>
+        <dropColumn tableName="operator_configurations" columnName="department_courier_assignment_oldest_day_offset"/>
+        <dropColumn tableName="operator_configurations" columnName="department_courier_assignment_newest_day_offset"/>
+        <dropColumn tableName="operator_configurations"
+                    columnName="department_courier_assignment_late_arrival_tolerance_minutes"/>
+    </changeSet>
+
+    <changeSet id="2026-11-25-courier-assignment-window-operator-aud" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="operator_configurations_aud"/>
+                <not>
+                    <columnExists tableName="operator_configurations_aud"
+                                  columnName="department_courier_assignment_window_type"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="operator_configurations_aud">
+            <column name="department_courier_assignment_window_type" type="VARCHAR(32)"/>
+            <column name="department_courier_assignment_time_zone" type="VARCHAR(64)"/>
+            <column name="department_courier_assignment_overlap_minutes" type="INT"/>
+            <column name="department_courier_assignment_max_window_hours" type="INT"/>
+            <column name="department_courier_assignment_lookback_days" type="INT"/>
+            <column name="department_courier_assignment_batch_size" type="INT"/>
+        </addColumn>
+        <dropColumn tableName="operator_configurations_aud" columnName="department_courier_assignment_oldest_day_offset"/>
+        <dropColumn tableName="operator_configurations_aud" columnName="department_courier_assignment_newest_day_offset"/>
+        <dropColumn tableName="operator_configurations_aud"
+                    columnName="department_courier_assignment_late_arrival_tolerance_minutes"/>
+    </changeSet>
+
+    <changeSet id="2026-11-25-courier-assignment-window-override" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="department_configuration_override"
+                              columnName="department_courier_assignment_window_type"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="department_configuration_override">
+            <column name="department_courier_assignment_window_type" type="VARCHAR(32)"/>
+            <column name="department_courier_assignment_time_zone" type="VARCHAR(64)"/>
+            <column name="department_courier_assignment_overlap_minutes" type="INT"/>
+            <column name="department_courier_assignment_max_window_hours" type="INT"/>
+            <column name="department_courier_assignment_lookback_days" type="INT"/>
+            <column name="department_courier_assignment_batch_size" type="INT"/>
+        </addColumn>
+        <dropColumn tableName="department_configuration_override"
+                    columnName="department_courier_assignment_oldest_day_offset"/>
+        <dropColumn tableName="department_configuration_override"
+                    columnName="department_courier_assignment_newest_day_offset"/>
+        <dropColumn tableName="department_configuration_override"
+                    columnName="department_courier_assignment_late_arrival_tolerance_minutes"/>
+    </changeSet>
+</databaseChangeLog>

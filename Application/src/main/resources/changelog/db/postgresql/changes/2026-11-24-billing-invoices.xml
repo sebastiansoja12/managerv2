@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-24-postgresql-table-invoices" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="invoices"/>
+            </not>
+        </preConditions>
+        <createTable tableName="invoices">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="number" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="corrected_invoice_id" type="BIGINT">
+                <constraints foreignKeyName="fk_invoices_corrected_invoice" references="invoices(id)"/>
+            </column>
+            <column name="corrected_invoice_number" type="VARCHAR(32)"/>
+            <column name="payment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price_quote_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payment_method" type="VARCHAR(20)"/>
+            <column name="issue_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sale_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="seller_name" type="VARCHAR(255)"/>
+            <column name="seller_tax_id" type="VARCHAR(32)"/>
+            <column name="seller_street" type="VARCHAR(255)"/>
+            <column name="seller_postal_code" type="VARCHAR(20)"/>
+            <column name="seller_city" type="VARCHAR(255)"/>
+            <column name="seller_country_code" type="VARCHAR(2)"/>
+            <column name="seller_email" type="VARCHAR(255)"/>
+            <column name="seller_bank_account" type="VARCHAR(64)"/>
+            <column name="buyer_name" type="VARCHAR(255)"/>
+            <column name="buyer_tax_id" type="VARCHAR(32)"/>
+            <column name="buyer_street" type="VARCHAR(255)"/>
+            <column name="buyer_postal_code" type="VARCHAR(20)"/>
+            <column name="buyer_city" type="VARCHAR(255)"/>
+            <column name="buyer_country_code" type="VARCHAR(2)"/>
+            <column name="buyer_email" type="VARCHAR(255)"/>
+            <column name="buyer_language" type="VARCHAR(8)"/>
+            <column name="currency" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="issued_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="document_id" type="UUID"/>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="invoices" columnNames="payment_id, type"
+                             constraintName="uq_invoices_payment_type"/>
+        <addUniqueConstraint tableName="invoices" columnNames="operator_id, number"
+                             constraintName="uq_invoices_operator_number"/>
+        <createIndex tableName="invoices" indexName="ix_invoices_operator_issued_at">
+            <column name="operator_id"/>
+            <column name="issued_at"/>
+        </createIndex>
+        <createIndex tableName="invoices" indexName="ix_invoices_price_quote_id">
+            <column name="price_quote_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2026-11-24-postgresql-table-invoice-lines" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="invoice_lines"/>
+            </not>
+        </preConditions>
+        <createTable tableName="invoice_lines">
+            <column name="invoice_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_invoice_lines_invoice" references="invoices(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="position" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="vat_percent" type="DECIMAL(7,3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="net" type="DECIMAL(19,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="vat" type="DECIMAL(19,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="gross" type="DECIMAL(19,2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="invoice_lines" columnNames="invoice_id, position"
+                       constraintName="pk_invoice_lines"/>
+    </changeSet>
+
+    <changeSet id="2026-11-24-postgresql-table-invoice-number-sequences" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="invoice_number_sequences"/>
+            </not>
+        </preConditions>
+        <createTable tableName="invoice_number_sequences">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="invoice_type" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="period" type="VARCHAR(7)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_value" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="invoice_number_sequences" columnNames="operator_id, invoice_type, period"
+                             constraintName="uq_invoice_number_sequences_operator_type_period"/>
+    </changeSet>
+
+    <changeSet id="2026-11-24-postgresql-operator-billing-settings" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="operator_configurations"/>
+                <not>
+                    <columnExists tableName="operator_configurations" columnName="shipment_bank_account"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="operator_configurations">
+            <column name="shipment_billing_street" type="VARCHAR(255)"/>
+            <column name="shipment_billing_postal_code" type="VARCHAR(20)"/>
+            <column name="shipment_billing_city" type="VARCHAR(255)"/>
+            <column name="shipment_billing_country_code" type="VARCHAR(2)"/>
+            <column name="shipment_bank_account" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2026-11-24-postgresql-operator-billing-settings-aud" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="operator_configurations_aud"/>
+                <not>
+                    <columnExists tableName="operator_configurations_aud" columnName="shipment_bank_account"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="operator_configurations_aud">
+            <column name="shipment_billing_street" type="VARCHAR(255)"/>
+            <column name="shipment_billing_postal_code" type="VARCHAR(20)"/>
+            <column name="shipment_billing_city" type="VARCHAR(255)"/>
+            <column name="shipment_billing_country_code" type="VARCHAR(2)"/>
+            <column name="shipment_bank_account" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2026-11-24-mail-templates-invoice-issued" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM mail_templates WHERE template_key = 'invoice.issued'</sqlCheck>
+        </preConditions>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="ee7cb8d9-5679-425e-ab74-a525bd032c34"/>
+            <column name="template_key" value="invoice.issued"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Faktura {{invoiceNumber}}"/>
+            <column name="body"><![CDATA[Dzień dobry,
+
+w załączniku przesyłamy dokument {{invoiceNumber}} w formacie PDF.
+
+Dziękujemy za skorzystanie z naszych usług.
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="acd8fb6c-1ee3-428f-85a1-7aa559b91c4c"/>
+            <column name="template_key" value="invoice.issued"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Invoice {{invoiceNumber}}"/>
+            <column name="body"><![CDATA[Hello,
+
+please find attached document {{invoiceNumber}} in PDF format.
+
+Thank you for using our services.
+
+Best regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="83d3bbd1-068c-43fc-a56e-11b0625c0acb"/>
+            <column name="template_key" value="invoice.issued"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Rechnung {{invoiceNumber}}"/>
+            <column name="body"><![CDATA[Guten Tag,
+
+im Anhang erhalten Sie das Dokument {{invoiceNumber}} im PDF-Format.
+
+Vielen Dank, dass Sie unsere Dienste nutzen.
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

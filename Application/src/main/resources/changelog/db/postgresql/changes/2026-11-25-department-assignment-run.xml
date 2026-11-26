@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-25-drop-courier-assignment-task" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="courier_assignment_task"/>
+        </preConditions>
+        <dropTable tableName="courier_assignment_task"/>
+    </changeSet>
+
+    <changeSet id="2026-11-25-department-assignment-run" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="department_assignment_run"/>
+            </not>
+        </preConditions>
+        <createTable tableName="department_assignment_run">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_department_assignment_run"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_field" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="window_from" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="window_to" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="backlog_from" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="batch_size" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cursor_date" type="TIMESTAMP"/>
+            <column name="cursor_id" type="VARCHAR(255)"/>
+            <column name="max_eligible_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="watermark" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="retries" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lease_owner" type="VARCHAR(128)"/>
+            <column name="lease_until" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="summary" type="TEXT"/>
+            <column name="error" type="VARCHAR(1000)"/>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <sql>CREATE UNIQUE INDEX uk_department_assignment_run_active
+             ON department_assignment_run (department_id)
+             WHERE status IN ('PENDING', 'PROCESSING')</sql>
+        <createIndex tableName="department_assignment_run" indexName="idx_department_assignment_run_recovery">
+            <column name="operator_id"/>
+            <column name="status"/>
+            <column name="lease_until"/>
+        </createIndex>
+        <createIndex tableName="department_assignment_run" indexName="idx_department_assignment_run_last_completed">
+            <column name="operator_id"/>
+            <column name="department_id"/>
+            <column name="status"/>
+            <column name="watermark"/>
+        </createIndex>
+        <createIndex tableName="department_assignment_run" indexName="idx_department_assignment_run_created">
+            <column name="operator_id"/>
+            <column name="created_at"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

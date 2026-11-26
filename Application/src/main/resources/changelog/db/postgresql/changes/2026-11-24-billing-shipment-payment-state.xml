@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-24-billing-shipment-payment-state" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="shipment" columnName="payment_state"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="shipment">
+            <column name="payment_state" type="VARCHAR(32)"/>
+            <column name="price_quote_id" type="BIGINT"/>
+            <column name="billing_customer_id" type="BIGINT"/>
+        </addColumn>
+        <addColumn tableName="shipment_rd">
+            <column name="payment_state" type="VARCHAR(32)"/>
+            <column name="price_quote_id" type="BIGINT"/>
+            <column name="billing_customer_id" type="BIGINT"/>
+        </addColumn>
+        <addColumn tableName="shipment_aud">
+            <column name="payment_state" type="VARCHAR(32)"/>
+            <column name="price_quote_id" type="BIGINT"/>
+            <column name="billing_customer_id" type="BIGINT"/>
+        </addColumn>
+        <update tableName="shipment">
+            <column name="payment_state" value="NOT_REQUIRED"/>
+        </update>
+        <update tableName="shipment_rd">
+            <column name="payment_state" value="NOT_REQUIRED"/>
+        </update>
+        <addNotNullConstraint tableName="shipment" columnName="payment_state" columnDataType="VARCHAR(32)"/>
+        <addNotNullConstraint tableName="shipment_rd" columnName="payment_state" columnDataType="VARCHAR(32)"/>
+    </changeSet>
+    <changeSet id="2026-11-24-billing-drop-legacy-price" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="price"/>
+        </preConditions>
+        <dropTable tableName="price"/>
+    </changeSet>
+</databaseChangeLog>

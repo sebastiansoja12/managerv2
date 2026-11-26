@@ -57,6 +57,7 @@
         <module>IncidentManagement</module>
         <module>FleetTracking</module>
         <module>OrganizationAnalytics</module>
+        <module>Billing</module>
     </modules>
 
 	<properties>
